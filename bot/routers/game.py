@@ -7,7 +7,8 @@ from aiogram.fsm.storage.base import StorageKey
 from aiogram.types import Message, CallbackQuery
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from cache.keys import OWNER_GAME_KEY, PLAYERS_IDS_KEY
+
+from cache.cache_types import GameCache, UserGameCache
 from keyboards.inline.cb.cb_text import JOIN_CB, FINISH_REGISTRATION_CB
 from keyboards.inline.keypads.join import get_join_kb
 from states.states import GameFsm, UserFsm
@@ -25,6 +26,7 @@ async def start_registration(
     scheduler: AsyncIOScheduler,
     dispatcher: Dispatcher,
 ):
+
     state_with: FSMContext = FSMContext(
         # bot=bot,  # объект бота
         storage=dispatcher.storage,  # dp - экземпляр диспатчера
@@ -40,12 +42,13 @@ async def start_registration(
     await state_with.set_state(UserFsm.ACTION)  # пример присвоения стейта
 
     await state.set_state(GameFsm.REGISTRATION)
-    await state.update_data(
-        {
-            OWNER_GAME_KEY: message.from_user.id,
-            PLAYERS_IDS_KEY: [message.from_user.id],
-        }
-    )
+    user_data: UserGameCache = {"fullname": message.from_user.full_name}
+    game_cache: GameCache = {
+        "owner": message.from_user.id,
+        "players_ids": [message.from_user.id],
+        "players": {str(message.from_user.id): user_data},
+    }
+    await state.update_data(game_cache)
     url = f'<a href="tg://user?id={message.from_user.id}">{message.from_user.full_name}</a>'
     sent_message = await message.answer(
         f"Скорее присоединяйся к игре!\nУчастники:\n- {url}",
@@ -75,6 +78,7 @@ async def join_new_member(callback: CallbackQuery, state: FSMContext):
         return
     ids.append(callback.from_user.id)
     await callback.answer("Ты в игре! Удачи!", show_alert=True)
+    print("text", callback.message.text)
     await callback.message.edit_text(
         text=callback.message.text + f"\n- {callback.from_user.full_name}",
         reply_markup=get_join_kb(),

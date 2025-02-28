@@ -2,7 +2,7 @@ from aiogram.fsm.context import FSMContext
 from mypy.build import TypedDict
 from random import shuffle
 
-from cache.keys import PLAYERS_IDS_KEY
+from cache.cache_types import GameCache
 
 
 class CacheData(TypedDict, total=False):
@@ -23,7 +23,8 @@ PLAYERS = ("mafia", "doctor", "policeman")
 
 
 async def select_roles(state: FSMContext):
-    ids = (await state.get_data())[PLAYERS_IDS_KEY]
+    game_cache: GameCache = await state.get_data()
+    ids = game_cache["players_ids"]
     if len(ids) < 3:
         return
     for user_id in ids:
