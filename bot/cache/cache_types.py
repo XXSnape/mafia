@@ -21,3 +21,5 @@ class GameCache(TypedDict, total=False):
     policeman: list[int]
     civilians: list[int]
     died: list[int]
+    mafia_poll_delete: int
+    number_of_night: int

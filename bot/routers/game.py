@@ -1,26 +1,24 @@
-from aiogram import Router, F, Dispatcher
+from aiogram import Router, F, Dispatcher, Bot
 from aiogram.enums import ChatType
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
-from aiogram.fsm.storage.base import StorageKey
 from aiogram.types import Message, CallbackQuery
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 
-from cache.cache_types import GameCache, UserGameCache
-from constants.output import PARTICIPANTS
+from cache.cache_types import GameCache
 from keyboards.inline.cb.cb_text import (
     JOIN_CB,
     FINISH_REGISTRATION_CB,
 )
 from keyboards.inline.keypads.join import get_join_kb
 from services.registartion import (
-    add_user_and_get_profile,
     add_user_to_game,
+    init_game,
 )
 from states.states import GameFsm, UserFsm
-from tasks.tasks import start_first_night
+from tasks.tasks import start_game, start_night
 from utils.utils import (
     get_profiles,
     get_profiles_during_registration,
@@ -30,6 +28,9 @@ router = Router()
 
 router.message.filter(
     F.chat.type.in_({ChatType.GROUP, ChatType.SUPERGROUP})
+)
+router.callback_query.filter(
+    F.message.chat.type.in_({ChatType.GROUP, ChatType.SUPERGROUP})
 )
 
 
@@ -41,7 +42,7 @@ async def start_registration(
     dispatcher: Dispatcher,
 ):
     await message.delete()
-    await state.set_state(GameFsm.REGISTRATION)
+    await init_game(state=state, message=message)
     profiles = await add_user_to_game(
         dispatcher=dispatcher, tg_obj=message, state=state
     )
@@ -86,11 +87,14 @@ async def join_new_member(
     )
 
 
-@router.message(
+@router.callback_query(
     GameFsm.REGISTRATION, F.data == FINISH_REGISTRATION_CB
 )
 async def finish_registration(
-    callback: CallbackQuery, state: FSMContext
+    callback: CallbackQuery,
+    state: FSMContext,
+    bot: Bot,
+    dispatcher: Dispatcher,
 ):
     game_data: GameCache = await state.get_data()
     if game_data["owner"] != callback.from_user.id:
@@ -104,9 +108,15 @@ async def finish_registration(
             "Слишком мало игроков", show_alert=True
         )
         return
-    await start_first_night(
+    await start_game(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
         bot=callback.bot,
         state=state,
+    )
+    await start_night(
+        bot=bot,
+        dispatcher=dispatcher,
+        state=state,
+        chat_id=callback.message.chat.id,
     )
