@@ -1,11 +1,23 @@
-from typing import TypedDict
+from typing import TypedDict, TypeAlias
 
 
 class UserGameCache(TypedDict):
-    fullname: str
+    full_name: str
 
 
-class GameCache(TypedDict):
+UsersInGame: TypeAlias = dict[str, UserGameCache]
+
+
+class UserCache(TypedDict):
+    game_chat: int
+
+
+class GameCache(TypedDict, total=False):
     owner: int
     players_ids: list[int]
     players: dict[str, UserGameCache]
+    mafias: list[int]
+    doctors: list[int]
+    policeman: list[int]
+    civilians: list[int]
+    died: list[int]

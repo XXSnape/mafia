@@ -1,7 +1,7 @@
 from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 
-from utils.play import select_roles
+from services.registartion import select_roles
 
 from states.states import GameFsm
 

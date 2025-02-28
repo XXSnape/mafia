@@ -9,14 +9,28 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 
 from cache.cache_types import GameCache, UserGameCache
-from keyboards.inline.cb.cb_text import JOIN_CB, FINISH_REGISTRATION_CB
+from constants.output import PARTICIPANTS
+from keyboards.inline.cb.cb_text import (
+    JOIN_CB,
+    FINISH_REGISTRATION_CB,
+)
 from keyboards.inline.keypads.join import get_join_kb
+from services.registartion import (
+    add_user_and_get_profile,
+    add_user_to_game,
+)
 from states.states import GameFsm, UserFsm
 from tasks.tasks import start_first_night
+from utils.utils import (
+    get_profiles,
+    get_profiles_during_registration,
+)
 
 router = Router()
 
-router.message.filter(F.chat.type.in_({ChatType.GROUP, ChatType.SUPERGROUP}))
+router.message.filter(
+    F.chat.type.in_({ChatType.GROUP, ChatType.SUPERGROUP})
+)
 
 
 @router.message(Command("registration"), StateFilter(default_state))
@@ -26,32 +40,13 @@ async def start_registration(
     scheduler: AsyncIOScheduler,
     dispatcher: Dispatcher,
 ):
-
-    state_with: FSMContext = FSMContext(
-        # bot=bot,  # объект бота
-        storage=dispatcher.storage,  # dp - экземпляр диспатчера
-        key=StorageKey(
-            chat_id=message.from_user.id,  # если юзер в ЛС, то chat_id=user_id
-            user_id=message.from_user.id,
-            bot_id=message.bot.id,
-        ),
-    )
-    await state_with.update_data(
-        {"game": message.chat.id}
-    )  # обновить дату для пользователя
-    await state_with.set_state(UserFsm.ACTION)  # пример присвоения стейта
-
+    await message.delete()
     await state.set_state(GameFsm.REGISTRATION)
-    user_data: UserGameCache = {"fullname": message.from_user.full_name}
-    game_cache: GameCache = {
-        "owner": message.from_user.id,
-        "players_ids": [message.from_user.id],
-        "players": {str(message.from_user.id): user_data},
-    }
-    await state.update_data(game_cache)
-    url = f'<a href="tg://user?id={message.from_user.id}">{message.from_user.full_name}</a>'
+    profiles = await add_user_to_game(
+        dispatcher=dispatcher, tg_obj=message, state=state
+    )
     sent_message = await message.answer(
-        f"Скорее присоединяйся к игре!\nУчастники:\n- {url}",
+        get_profiles_during_registration(profiles),
         reply_markup=get_join_kb(),
     )
     await sent_message.pin()
@@ -69,50 +64,44 @@ async def start_registration(
 
 
 @router.callback_query(GameFsm.REGISTRATION, F.data == JOIN_CB)
-async def join_new_member(callback: CallbackQuery, state: FSMContext):
-    ids: list[int] = (await state.get_data())[PLAYERS_IDS_KEY]
+async def join_new_member(
+    callback: CallbackQuery,
+    state: FSMContext,
+    dispatcher: Dispatcher,
+):
+    game_cache: GameCache = await state.get_data()
+    ids: list[int] = game_cache["players_ids"]
     if callback.from_user.id in ids:
         await callback.answer(
             "Ты уже успешно зарегистрировался!", show_alert=True
         )
         return
-    ids.append(callback.from_user.id)
+    profiles = await add_user_to_game(
+        dispatcher=dispatcher, tg_obj=callback, state=state
+    )
     await callback.answer("Ты в игре! Удачи!", show_alert=True)
-    print("text", callback.message.text)
     await callback.message.edit_text(
-        text=callback.message.text + f"\n- {callback.from_user.full_name}",
+        text=get_profiles_during_registration(profiles),
         reply_markup=get_join_kb(),
     )
 
 
-# -1002327574177
-@router.message(Command("s"), UserFsm.ACTION)
-async def h(
-    message: Message,
-    state: FSMContext,
-    dispatcher: Dispatcher,
+@router.message(
+    GameFsm.REGISTRATION, F.data == FINISH_REGISTRATION_CB
+)
+async def finish_registration(
+    callback: CallbackQuery, state: FSMContext
 ):
-    await message.answer("hello!")
-    user_data = await state.get_data()
-    print(f"{user_data=}")
-    s = FSMContext(
-        # bot=bot,  # объект бота
-        storage=dispatcher.storage,  # dp - экземпляр диспатчера
-        key=StorageKey(
-            chat_id=user_data["game"],  # если юзер в ЛС, то chat_id=user_id
-            user_id=user_data["game"],
-            bot_id=message.bot.id,
-        ),
-    )
-    print("game data", await s.get_data())
-
-
-@router.message(GameFsm.REGISTRATION, F.data == FINISH_REGISTRATION_CB)
-async def finish_registration(callback: CallbackQuery, state: FSMContext):
-    owner = (await state.get_data())[OWNER_GAME_KEY]
-    if owner != callback.from_user.id:
+    game_data: GameCache = await state.get_data()
+    if game_data["owner"] != callback.from_user.id:
         await callback.answer(
-            "Пожалуйста, попросите создателя начать игру", show_alert=True
+            "Пожалуйста, попросите создателя начать игру",
+            show_alert=True,
+        )
+        return
+    if len(game_data["players_ids"]) < 3:
+        await callback.answer(
+            "Слишком мало игроков", show_alert=True
         )
         return
     await start_first_night(
