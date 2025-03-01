@@ -8,4 +8,5 @@ class GameFsm(StatesGroup):
 
 class UserFsm(StatesGroup):
     REGISTRATION = State()
-    MAFIA_ATTACK = State()
+    MAFIA_ATTACKS = State()
+    DOCTOR_TREATS = State()

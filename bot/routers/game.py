@@ -13,6 +13,7 @@ from keyboards.inline.cb.cb_text import (
     FINISH_REGISTRATION_CB,
 )
 from keyboards.inline.keypads.join import get_join_kb
+from services.mailing import familiarize_players
 from services.registartion import (
     add_user_to_game,
     init_game,
@@ -114,6 +115,7 @@ async def finish_registration(
         bot=callback.bot,
         state=state,
     )
+    await familiarize_players(bot=callback.bot, state=state)
     await start_night(
         bot=bot,
         dispatcher=dispatcher,

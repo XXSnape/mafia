@@ -1,8 +1,17 @@
-from typing import TypedDict, TypeAlias
+from typing import TypedDict, TypeAlias, NotRequired, Literal
+
+
+class Roles:
+    mafia = "Мафия"
+    doctor = "Доктор"
+    policeman = "Комиссар"
+    civilian = "Мирный житель"
 
 
 class UserGameCache(TypedDict):
     full_name: str
+    url: str
+    role: NotRequired[str]
 
 
 UsersInGame: TypeAlias = dict[str, UserGameCache]
@@ -12,14 +21,17 @@ class UserCache(TypedDict):
     game_chat: int
 
 
-class GameCache(TypedDict, total=False):
+class GameCache(TypedDict):
     owner: int
     players_ids: list[int]
-    players: dict[str, UserGameCache]
+    players: UsersInGame
     mafias: list[int]
     doctors: list[int]
     policeman: list[int]
     civilians: list[int]
     died: list[int]
-    mafia_poll_delete: int
+    recovered: list[int]
+    to_delete: list[int]
+    # wait_for: list[int]
+    last_treated: int
     number_of_night: int
