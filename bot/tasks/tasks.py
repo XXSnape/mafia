@@ -1,8 +1,12 @@
+from datetime import datetime, timedelta
+
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from cache.cache_types import GameCache
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
+from services.play import sum_up_after_night
 from services.registartion import select_roles
 from services.mailing import MailerToPlayers
 
@@ -10,7 +14,11 @@ from states.states import GameFsm
 
 
 async def start_night(
-    bot: Bot, dispatcher: Dispatcher, state: FSMContext, chat_id: int
+    bot: Bot,
+    dispatcher: Dispatcher,
+    state: FSMContext,
+    chat_id: int,
+    scheduler: AsyncIOScheduler,
 ):
     game_data: GameCache = await state.get_data()
     game_data["number_of_night"] += 1
@@ -29,6 +37,16 @@ async def start_night(
         await mailer.mail_doctor()
     if game_data["policeman"]:
         await mailer.mail_policeman()
+    scheduler.add_job(
+        sum_up_after_night,
+        "date",
+        run_date=datetime.now() + timedelta(seconds=30),
+        kwargs={
+            "bot": bot,
+            "state": state,
+            "dispatcher": dispatcher,
+        },
+    )
 
 
 async def start_game(

@@ -1,9 +1,11 @@
+from datetime import timedelta
+
 from aiogram import Router, F, Dispatcher, Bot
 from aiogram.enums import ChatType
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, ChatPermissions
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 
@@ -35,6 +37,20 @@ router.callback_query.filter(
 )
 
 
+@router.message(GameFsm.STARTED)
+async def delete_message_from_non_players(
+    message: Message, state: FSMContext
+):
+    game_data: GameCache = await state.get_data()
+    if message.from_user.id not in game_data["players_ids"]:
+        await message.delete()
+        # await message.chat.restrict(
+        #     user_id=message.from_user.id,
+        #     permissions=ChatPermissions(can_send_messages=False),
+        #     until_date=timedelta(seconds=30),
+        # )
+
+
 @router.message(Command("registration"), StateFilter(default_state))
 async def start_registration(
     message: Message,
@@ -44,11 +60,11 @@ async def start_registration(
 ):
     await message.delete()
     await init_game(state=state, message=message)
-    profiles = await add_user_to_game(
+    live_players, players = await add_user_to_game(
         dispatcher=dispatcher, tg_obj=message, state=state
     )
     sent_message = await message.answer(
-        get_profiles_during_registration(profiles),
+        get_profiles_during_registration(live_players, players),
         reply_markup=get_join_kb(),
     )
     await sent_message.pin()
@@ -78,12 +94,12 @@ async def join_new_member(
             "Ты уже успешно зарегистрировался!", show_alert=True
         )
         return
-    profiles = await add_user_to_game(
+    live_players, players = await add_user_to_game(
         dispatcher=dispatcher, tg_obj=callback, state=state
     )
     await callback.answer("Ты в игре! Удачи!", show_alert=True)
     await callback.message.edit_text(
-        text=get_profiles_during_registration(profiles),
+        text=get_profiles_during_registration(live_players, players),
         reply_markup=get_join_kb(),
     )
 
@@ -96,6 +112,7 @@ async def finish_registration(
     state: FSMContext,
     bot: Bot,
     dispatcher: Dispatcher,
+    scheduler: AsyncIOScheduler,
 ):
     game_data: GameCache = await state.get_data()
     if game_data["owner"] != callback.from_user.id:
@@ -121,4 +138,5 @@ async def finish_registration(
         dispatcher=dispatcher,
         state=state,
         chat_id=callback.message.chat.id,
+        scheduler=scheduler,
     )

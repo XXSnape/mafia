@@ -13,6 +13,7 @@ from cache.cache_types import (
     UserGameCache,
     UsersInGame,
     Roles,
+    LivePlayersIds,
 )
 from states.states import GameFsm
 from utils.utils import get_profile_link
@@ -20,6 +21,7 @@ from utils.utils import get_profile_link
 
 async def init_game(message: Message, state: FSMContext):
     game_data: GameCache = {
+        "game_chat": message.chat.id,
         "owner": message.from_user.id,
         "players_ids": [],
         "players": {},
@@ -61,7 +63,7 @@ async def add_user_to_game(
     dispatcher: Dispatcher,
     tg_obj: CallbackQuery | Message,
     state: FSMContext,
-) -> UsersInGame:
+) -> tuple[LivePlayersIds, UsersInGame]:
     if isinstance(tg_obj, CallbackQuery):
         chat_id = tg_obj.message.chat.id
     else:
@@ -83,7 +85,7 @@ async def add_user_to_game(
     }
     game_data["players_ids"].append(tg_obj.from_user.id)
     game_data["players"][str(tg_obj.from_user.id)] = user_game_data
-    return game_data["players"]
+    return game_data["players_ids"], game_data["players"]
 
 
 class Role(NamedTuple):
