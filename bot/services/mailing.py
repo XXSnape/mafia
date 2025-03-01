@@ -1,7 +1,11 @@
+from collections.abc import Iterable
+from typing import Literal
+
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State
 
-from cache.cache_types import GameCache
+from cache.cache_types import GameCache, RolesKeysLiteral
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
@@ -38,66 +42,79 @@ async def familiarize_players(bot: Bot, state: FSMContext):
         )
 
 
-async def mail_mafia(
-    dispatcher: Dispatcher,
-    bot: Bot,
-    state: FSMContext,
-):
-    game_data: GameCache = await state.get_data()
-    mafias = game_data["mafias"]
-    mafia_id = mafias[0]
-    players = game_data["players"]
-    markup = send_selection_to_players_kb(
-        players_ids=game_data["players_ids"],
-        players=players,
-        exclude=mafia_id,
-    )
+class MailerToPlayers:
+    def __init__(
+        self, state: FSMContext, bot: Bot, dispatcher: Dispatcher
+    ):
+        self.state = state
+        self.bot = bot
+        self.dispatcher = dispatcher
 
-    sent_survey = await bot.send_message(
-        chat_id=mafia_id,
-        text="Кого убить этой ночью?",
-        reply_markup=markup,
-    )
-    game_data["to_delete"].append(sent_survey.message_id)
+    async def _mail_user(
+        self,
+        text: str,
+        role_key: RolesKeysLiteral,
+        new_state: State,
+        exclude: Iterable[int] | int = (),
+    ):
+        game_data: GameCache = await self.state.get_data()
+        roles = game_data[role_key]
+        role_id = roles[0]
+        players = game_data["players"]
+        markup = send_selection_to_players_kb(
+            players_ids=game_data["players_ids"],
+            players=players,
+            exclude=exclude,
+        )
+        sent_survey = await self.bot.send_message(
+            chat_id=role_id,
+            text=text,
+            reply_markup=markup,
+        )
+        game_data["to_delete"].append(sent_survey.message_id)
+        await self.state.set_data(game_data)
+        await get_state_and_assign(
+            dispatcher=self.dispatcher,
+            chat_id=role_id,
+            bot_id=self.bot.id,
+            new_state=new_state,
+        )
 
-    await state.set_data(game_data)
-    await get_state_and_assign(
-        dispatcher=dispatcher,
-        chat_id=mafia_id,
-        bot_id=bot.id,
-        new_state=UserFsm.MAFIA_ATTACKS,
-    )
+    async def mail_mafia(self):
+        game_data: GameCache = await self.state.get_data()
+        mafias = game_data["mafias"]
+        mafia_id = mafias[0]
+        await self._mail_user(
+            text="Кого убить этой ночью?",
+            role_key="mafias",
+            new_state=UserFsm.MAFIA_ATTACKS,
+            exclude=mafia_id,
+        )
 
+    async def mail_doctor(
+        self,
+    ):
+        game_data: GameCache = await self.state.get_data()
+        exclude = (
+            []
+            if game_data["last_treated"] == 0
+            else game_data["last_treated"]
+        )
+        await self._mail_user(
+            text="Кого вылечить этой ночью?",
+            role_key="doctors",
+            new_state=UserFsm.DOCTOR_TREATS,
+            exclude=exclude,
+        )
 
-async def main_doctor(
-    dispatcher: Dispatcher,
-    bot: Bot,
-    state: FSMContext,
-):
-    game_data: GameCache = await state.get_data()
-    doctors = game_data["doctors"]
-    doctor_id = doctors[0]
-    players = game_data["players"]
-    exclude = (
-        []
-        if game_data["last_treated"] == 0
-        else game_data["last_treated"]
-    )
-    markup = send_selection_to_players_kb(
-        players_ids=game_data["players_ids"],
-        players=players,
-        exclude=exclude,
-    )
-    sent_survey = await bot.send_message(
-        chat_id=doctor_id,
-        text="Кого вылечить этой ночью?",
-        reply_markup=markup,
-    )
-    game_data["to_delete"].append(sent_survey.message_id)
-    await state.set_data(game_data)
-    await get_state_and_assign(
-        dispatcher=dispatcher,
-        chat_id=doctor_id,
-        bot_id=bot.id,
-        new_state=UserFsm.DOCTOR_TREATS,
-    )
+    async def mail_policeman(
+        self,
+    ):
+        game_data: GameCache = await self.state.get_data()
+        exclude = game_data["policeman"]
+        await self._mail_user(
+            text="Кого проверить этой ночью?",
+            role_key="policeman",
+            new_state=UserFsm.POLICEMAN_CHECKS,
+            exclude=exclude,
+        )

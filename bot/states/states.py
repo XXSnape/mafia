@@ -10,3 +10,4 @@ class UserFsm(StatesGroup):
     REGISTRATION = State()
     MAFIA_ATTACKS = State()
     DOCTOR_TREATS = State()
+    POLICEMAN_CHECKS = State()

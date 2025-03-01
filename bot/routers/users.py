@@ -58,3 +58,29 @@ async def doctor_treats(
     url = game_data["players"][str(recovered_user_id)]["url"]
     await callback.message.edit_text(f"Ты выбрал вылечить {url}")
     game_data["to_delete"].remove(callback.message.message_id)
+
+
+@router.callback_query(
+    UserFsm.POLICEMAN_CHECKS, UserIndexCbData.filter()
+)
+async def policeman_checks(
+    callback: CallbackQuery,
+    callback_data: UserIndexCbData,
+    state: FSMContext,
+    dispatcher: Dispatcher,
+):
+    user_data: UserCache = await state.get_data()
+    game_state = await get_state_and_assign(
+        dispatcher=dispatcher,
+        chat_id=user_data["game_chat"],
+        bot_id=callback.bot.id,
+    )
+    game_data: GameCache = await game_state.get_data()
+
+    checked_user_id = game_data["players_ids"][
+        callback_data.user_index
+    ]
+    role = game_data["players"][str(checked_user_id)]["role"]
+    url = game_data["players"][str(checked_user_id)]["url"]
+    await callback.message.edit_text(f"{url} - {role}!")
+    game_data["to_delete"].remove(callback.message.message_id)

@@ -1,3 +1,4 @@
+from enum import StrEnum
 from typing import TypedDict, TypeAlias, NotRequired, Literal
 
 
@@ -35,3 +36,6 @@ class GameCache(TypedDict):
     # wait_for: list[int]
     last_treated: int
     number_of_night: int
+
+
+RolesKeysLiteral = Literal["mafias", "doctors", "policeman"]

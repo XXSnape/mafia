@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from cache.cache_types import GameCache
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
 from services.registartion import select_roles
-from services.mailing import mail_mafia, main_doctor
+from services.mailing import MailerToPlayers
 
 from states.states import GameFsm
 
@@ -20,12 +20,15 @@ async def start_night(
         text=f"Наступает ночь {game_data['number_of_night']}.\n\nВсем приготовиться.",
         reply_markup=get_to_bot_kb("Действовать!"),
     )
+    mailer = MailerToPlayers(
+        state=state, bot=bot, dispatcher=dispatcher
+    )
     if game_data["mafias"]:
-        await mail_mafia(dispatcher=dispatcher, bot=bot, state=state)
+        await mailer.mail_mafia()
     if game_data["doctors"]:
-        await main_doctor(
-            dispatcher=dispatcher, bot=bot, state=state
-        )
+        await mailer.mail_doctor()
+    if game_data["policeman"]:
+        await mailer.mail_policeman()
 
 
 async def start_game(
