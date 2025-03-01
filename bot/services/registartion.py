@@ -29,6 +29,8 @@ async def init_game(message: Message, state: FSMContext):
         "vote_for": [],
         # 'wait_for': [],
         "number_of_night": 0,
+        "pros": [],
+        "cons": [],
         "mafias": [],
         "doctors": [],
         "policeman": [],

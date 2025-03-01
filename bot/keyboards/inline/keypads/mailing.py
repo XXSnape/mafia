@@ -5,7 +5,7 @@ from aiogram.types import InlineKeyboardButton
 
 from cache.cache_types import UsersInGame
 from keyboards.inline.builder import generate_inline_kb
-from keyboards.inline.callback_factory.user_index import (
+from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 

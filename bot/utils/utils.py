@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 from aiogram.types import Message
 from sqlalchemy.testing.suite.test_reflection import users
 
@@ -5,6 +7,7 @@ from cache.cache_types import (
     UsersInGame,
     UserGameCache,
     LivePlayersIds,
+    PlayersIds,
 )
 
 
@@ -32,3 +35,12 @@ def get_profiles_during_registration(
 ) -> str:
     profiles = get_profiles(live_players_ids, players)
     return f"Скорее присоединяйся к игре!\nУчастники:\n{profiles}"
+
+
+def add_voice(
+    user_id: int, add_to: PlayersIds, delete_from: PlayersIds
+):
+    with suppress(ValueError):
+        delete_from.remove(user_id)
+    if user_id not in add_to:
+        add_to.append(user_id)

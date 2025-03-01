@@ -2,8 +2,9 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 
 from cache.cache_types import GameCache
+from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from services.registartion import get_state_and_assign
-from states.states import UserFsm
+from states.states import UserFsm, GameFsm
 from utils.utils import get_profiles
 import asyncio
 
@@ -58,5 +59,35 @@ async def sum_up_after_night(
         )
 
 
-async def suggest_vote(bot: Bot, chat_id: int):
-    await bot.send_message()
+async def confirm_final_aim(
+    bot: Bot, state: FSMContext, group_chat_id: int
+):
+    game_data: GameCache = await state.get_data()
+    vote_for = game_data["vote_for"]
+    vote_for.sort(reverse=True)
+
+    if (not vote_for) or (
+        len(vote_for) != 1
+        and vote_for.count(vote_for[0])
+        == vote_for.count(vote_for[1])
+    ):
+        await bot.send_message(
+            chat_id=group_chat_id,
+            text="Доброта или банальная несогласованность? "
+            "Посмотрим, воспользуются ли преступники таким подарком.",
+        )
+        return
+    aim_id = vote_for[0]
+    vote_for.clear()
+    url = game_data["players"][str(aim_id)]["url"]
+    await state.set_state(GameFsm.VOTE)
+    sent_survey = await bot.send_message(
+        chat_id=group_chat_id,
+        text=f"На кону судьба {url}!",
+        reply_markup=get_vote_for_aim_kb(
+            user_id=aim_id,
+            pros=game_data["pros"],
+            cons=game_data["cons"],
+        ),
+    )
+    game_data["to_delete"].append(sent_survey.message_id)

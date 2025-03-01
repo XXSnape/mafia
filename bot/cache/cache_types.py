@@ -28,6 +28,8 @@ class UserCache(TypedDict):
 class GameCache(TypedDict, total=True):
     owner: int
     game_chat: int
+    pros: PlayersIds
+    cons: PlayersIds
     players_ids: LivePlayersIds
     players: UsersInGame
     mafias: PlayersIds

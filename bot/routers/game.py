@@ -1,7 +1,9 @@
+from contextlib import suppress
 from datetime import timedelta
 
 from aiogram import Router, F, Dispatcher, Bot
 from aiogram.enums import ChatType
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
@@ -10,11 +12,16 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 
 from cache.cache_types import GameCache
+from keyboards.inline.callback_factory.recognize_user import (
+    AimedUserCbData,
+    ProsAndCons,
+)
 from keyboards.inline.cb.cb_text import (
     JOIN_CB,
     FINISH_REGISTRATION_CB,
 )
 from keyboards.inline.keypads.join import get_join_kb
+from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from services.mailing import familiarize_players
 from services.registartion import (
     add_user_to_game,
@@ -25,6 +32,7 @@ from tasks.tasks import start_game, start_night
 from utils.utils import (
     get_profiles,
     get_profiles_during_registration,
+    add_voice,
 )
 
 router = Router()
@@ -140,3 +148,38 @@ async def finish_registration(
         chat_id=callback.message.chat.id,
         scheduler=scheduler,
     )
+
+
+@router.callback_query(GameFsm.VOTE, AimedUserCbData.filter())
+async def confirm_vote(
+    callback: CallbackQuery,
+    callback_data: AimedUserCbData,
+    state: FSMContext,
+):
+    if callback_data.user_id == callback.from_user.id:
+        await callback.answer(
+            "Теперь твой судья - демократия!", show_alert=True
+        )
+        return
+    game_data: GameCache = await state.get_data()
+    if callback_data.action == ProsAndCons.pros:
+        add_voice(
+            user_id=callback.from_user.id,
+            add_to=game_data["pros"],
+            delete_from=game_data["cons"],
+        )
+    elif callback_data.action == ProsAndCons.cons:
+        add_voice(
+            user_id=callback.from_user.id,
+            add_to=game_data["cons"],
+            delete_from=game_data["pros"],
+        )
+    with suppress(TelegramBadRequest):
+        await callback.message.edit_reply_markup(
+            reply_markup=get_vote_for_aim_kb(
+                user_id=callback_data.user_id,
+                pros=game_data["pros"],
+                cons=game_data["cons"],
+            )
+        )
+    await callback.answer()

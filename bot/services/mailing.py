@@ -12,7 +12,7 @@ from cache.cache_types import (
     LivePlayersIds,
     UsersInGame,
 )
-from keyboards.inline.callback_factory.user_index import (
+from keyboards.inline.callback_factory.recognize_user import (
     UserVoteIndexCbData,
 )
 from keyboards.inline.keypads.mailing import (

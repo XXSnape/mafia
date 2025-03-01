@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
 from cache.cache_types import UserCache, GameCache
-from keyboards.inline.callback_factory.user_index import (
+from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
     UserVoteIndexCbData,
 )

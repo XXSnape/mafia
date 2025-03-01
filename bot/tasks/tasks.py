@@ -6,7 +6,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from cache.cache_types import GameCache
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
-from services.play import sum_up_after_night, suggest_vote
+from services.play import sum_up_after_night, confirm_final_aim
 from services.registartion import select_roles
 from services.mailing import MailerToPlayers
 
@@ -43,7 +43,7 @@ async def start_night(
     scheduler.add_job(
         sum_up_after_night,
         "date",
-        run_date=datetime.now() + timedelta(seconds=30),
+        run_date=datetime.now() + timedelta(seconds=20),
         kwargs={
             "bot": bot,
             "state": state,
@@ -53,7 +53,17 @@ async def start_night(
     scheduler.add_job(
         mailer.suggest_vote,
         "date",
-        run_date=datetime.now() + timedelta(seconds=60),
+        run_date=datetime.now() + timedelta(seconds=40),
+    )
+    scheduler.add_job(
+        confirm_final_aim,
+        "date",
+        run_date=datetime.now() + timedelta(seconds=50),
+        kwargs={
+            "bot": bot,
+            "state": state,
+            "group_chat_id": chat_id,
+        },
     )
 
 
