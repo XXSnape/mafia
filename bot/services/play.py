@@ -56,3 +56,7 @@ async def sum_up_after_night(
                 for victim_id in victims
             )
         )
+
+
+async def suggest_vote(bot: Bot, chat_id: int):
+    await bot.send_message()

@@ -1,3 +1,4 @@
+import asyncio
 from collections.abc import Iterable
 from typing import Literal
 
@@ -5,10 +6,19 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 
-from cache.cache_types import GameCache, RolesKeysLiteral
+from cache.cache_types import (
+    GameCache,
+    RolesKeysLiteral,
+    LivePlayersIds,
+    UsersInGame,
+)
+from keyboards.inline.callback_factory.user_index import (
+    UserVoteIndexCbData,
+)
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
+from keyboards.inline.keypads.to_bot import get_to_bot_kb
 from services.registartion import get_state_and_assign
 from states.states import UserFsm
 
@@ -44,11 +54,16 @@ async def familiarize_players(bot: Bot, state: FSMContext):
 
 class MailerToPlayers:
     def __init__(
-        self, state: FSMContext, bot: Bot, dispatcher: Dispatcher
+        self,
+        state: FSMContext,
+        bot: Bot,
+        dispatcher: Dispatcher,
+        group_chat_id: int,
     ):
         self.state = state
         self.bot = bot
         self.dispatcher = dispatcher
+        self.group_chat_id = group_chat_id
 
     async def _mail_user(
         self,
@@ -117,4 +132,43 @@ class MailerToPlayers:
             role_key="policeman",
             new_state=UserFsm.POLICEMAN_CHECKS,
             exclude=exclude,
+        )
+
+    async def send_request_to_vote(
+        self,
+        user_id: int,
+        players_ids: LivePlayersIds,
+        players: UsersInGame,
+    ):
+        await self.bot.send_message(
+            chat_id=user_id,
+            text="Проголосуй за того, кто не нравится!",
+            reply_markup=send_selection_to_players_kb(
+                players_ids=players_ids,
+                players=players,
+                exclude=user_id,
+                user_index_cb=UserVoteIndexCbData,
+            ),
+        )
+
+    async def suggest_vote(self):
+        await self.bot.send_message(
+            chat_id=self.group_chat_id,
+            text="Кого обвиним во всем и повесим?",
+            reply_markup=get_to_bot_kb(
+                text="Участвовать в социальной жизни!"
+            ),
+        )
+        game_data: GameCache = await self.state.get_data()
+        live_players = game_data["players_ids"]
+        players = game_data["players"]
+        await asyncio.gather(
+            *(
+                self.send_request_to_vote(
+                    user_id=user_id,
+                    players_ids=live_players,
+                    players=players,
+                )
+                for user_id in live_players
+            )
         )

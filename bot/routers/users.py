@@ -4,7 +4,7 @@ from aiogram.types import CallbackQuery
 
 from cache.cache_types import UserCache, GameCache
 from keyboards.inline.callback_factory.user_index import (
-    UserIndexCbData,
+    UserActionIndexCbData,
 )
 from services.registartion import get_state_and_assign
 from states.states import UserFsm
@@ -13,11 +13,11 @@ router = Router()
 
 
 @router.callback_query(
-    UserFsm.MAFIA_ATTACKS, UserIndexCbData.filter()
+    UserFsm.MAFIA_ATTACKS, UserActionIndexCbData.filter()
 )
 async def mafia_attacks(
     callback: CallbackQuery,
-    callback_data: UserIndexCbData,
+    callback_data: UserActionIndexCbData,
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
@@ -36,11 +36,11 @@ async def mafia_attacks(
 
 
 @router.callback_query(
-    UserFsm.DOCTOR_TREATS, UserIndexCbData.filter()
+    UserFsm.DOCTOR_TREATS, UserActionIndexCbData.filter()
 )
 async def doctor_treats(
     callback: CallbackQuery,
-    callback_data: UserIndexCbData,
+    callback_data: UserActionIndexCbData,
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
@@ -61,11 +61,11 @@ async def doctor_treats(
 
 
 @router.callback_query(
-    UserFsm.POLICEMAN_CHECKS, UserIndexCbData.filter()
+    UserFsm.POLICEMAN_CHECKS, UserActionIndexCbData.filter()
 )
 async def policeman_checks(
     callback: CallbackQuery,
-    callback_data: UserIndexCbData,
+    callback_data: UserActionIndexCbData,
     state: FSMContext,
     dispatcher: Dispatcher,
 ):

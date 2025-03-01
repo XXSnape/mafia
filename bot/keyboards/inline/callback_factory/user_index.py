@@ -1,5 +1,9 @@
 from aiogram.filters.callback_data import CallbackData
 
 
-class UserIndexCbData(CallbackData, prefix="user"):
+class UserActionIndexCbData(CallbackData, prefix="user"):
     user_index: int
+
+
+class UserVoteIndexCbData(UserActionIndexCbData, prefix="vote"):
+    pass
