@@ -1,5 +1,6 @@
 from contextlib import suppress
 
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from sqlalchemy.testing.suite.test_reflection import users
 
@@ -8,6 +9,7 @@ from cache.cache_types import (
     UserGameCache,
     LivePlayersIds,
     PlayersIds,
+    GameCache,
 )
 
 
@@ -44,3 +46,12 @@ def add_voice(
         delete_from.remove(user_id)
     if user_id not in add_to:
         add_to.append(user_id)
+
+
+async def clear_data_after_all_actions(state: FSMContext):
+    game_data: GameCache = await state.get_data()
+    game_data["pros"].clear()
+    game_data["cons"].clear()
+    game_data["recovered"].clear()
+    game_data["vote_for"].clear()
+    await state.set_data(game_data)

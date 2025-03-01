@@ -1,12 +1,24 @@
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 
-from cache.cache_types import GameCache
+from cache.cache_types import GameCache, UserGameCache
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from services.registartion import get_state_and_assign
 from states.states import UserFsm, GameFsm
 from utils.utils import get_profiles
 import asyncio
+
+
+def remove_user_from_game(game_data: GameCache, user_id: int):
+    game_data["players_ids"].remove(user_id)
+    roles = {
+        "Мафия": game_data["mafias"],
+        "Доктор": game_data["doctors"],
+        "Комиссар": game_data["policeman"],
+        "Мирный житель": game_data["civilians"],
+    }
+    user_role = game_data["players"][str(user_id)]["role"]
+    roles[user_role].remove(user_id)
 
 
 async def report_death(
@@ -32,7 +44,7 @@ async def sum_up_after_night(
     victims = set(game_data["died"]) - set(game_data["recovered"])
     text_about_dead = ""
     for victim_id in victims:
-        game_data["players_ids"].remove(victim_id)
+        remove_user_from_game(game_data=game_data, user_id=victim_id)
         url = game_data["players"][str(victim_id)]["url"]
         role = game_data["players"][str(victim_id)]["role"]
         text_about_dead += f"Сегодня был убит {role} - {url}!\n\n"
@@ -78,7 +90,6 @@ async def confirm_final_aim(
         )
         return
     aim_id = vote_for[0]
-    vote_for.clear()
     url = game_data["players"][str(aim_id)]["url"]
     await state.set_state(GameFsm.VOTE)
     sent_survey = await bot.send_message(
@@ -91,3 +102,27 @@ async def confirm_final_aim(
         ),
     )
     game_data["to_delete"].append(sent_survey.message_id)
+
+
+async def sum_up_after_voting(
+    bot: Bot,
+    state: FSMContext,
+):
+    game_data: GameCache = await state.get_data()
+    pros = game_data["pros"]
+    cons = game_data["cons"]
+    if len(pros) == len(cons) or len(pros) < len(cons):
+        await bot.send_message(
+            chat_id=game_data["game_chat"],
+            text=f"Что ж, такова воля народа! Сегодня днем город не опустел!",
+        )
+        return
+    removed_user = game_data["vote_for"][0]
+    user_info: UserGameCache = game_data["players"][
+        str(removed_user)
+    ]
+    remove_user_from_game(game_data=game_data, user_id=removed_user)
+    await bot.send_message(
+        chat_id=game_data["game_chat"],
+        text=f'Сегодня народ принял тяжелое решение и повесил {user_info["url"]}, который был {user_info["role"]}!',
+    )

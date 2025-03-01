@@ -26,6 +26,7 @@ from services.mailing import familiarize_players
 from services.registartion import (
     add_user_to_game,
     init_game,
+    select_roles,
 )
 from states.states import GameFsm, UserFsm
 from tasks.tasks import start_game, start_night
@@ -134,18 +135,14 @@ async def finish_registration(
             "Слишком мало игроков", show_alert=True
         )
         return
+    await select_roles(state=state)
+    await familiarize_players(bot=callback.bot, state=state)
     await start_game(
         chat_id=callback.message.chat.id,
         message_id=callback.message.message_id,
         bot=callback.bot,
         state=state,
-    )
-    await familiarize_players(bot=callback.bot, state=state)
-    await start_night(
-        bot=bot,
         dispatcher=dispatcher,
-        state=state,
-        chat_id=callback.message.chat.id,
         scheduler=scheduler,
     )
 

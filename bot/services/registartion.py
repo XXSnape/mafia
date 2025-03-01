@@ -96,7 +96,7 @@ class Role(NamedTuple):
     role: str
 
 
-async def select_roles(bot: Bot, state: FSMContext):
+async def select_roles(state: FSMContext):
     game_data: GameCache = await state.get_data()
     ids = game_data["players_ids"][:]
     shuffle(ids)
