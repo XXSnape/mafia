@@ -18,7 +18,10 @@ from keyboards.inline.callback_factory.user_index import (
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
-from keyboards.inline.keypads.to_bot import get_to_bot_kb
+from keyboards.inline.keypads.to_bot import (
+    get_to_bot_kb,
+    participate_in_social_life,
+)
 from services.registartion import get_state_and_assign
 from states.states import UserFsm
 
@@ -155,9 +158,7 @@ class MailerToPlayers:
         await self.bot.send_message(
             chat_id=self.group_chat_id,
             text="Кого обвиним во всем и повесим?",
-            reply_markup=get_to_bot_kb(
-                text="Участвовать в социальной жизни!"
-            ),
+            reply_markup=participate_in_social_life(),
         )
         game_data: GameCache = await self.state.get_data()
         live_players = game_data["players_ids"]

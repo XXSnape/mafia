@@ -17,25 +17,27 @@ class UserGameCache(TypedDict):
 
 UsersInGame: TypeAlias = dict[str, UserGameCache]
 
-LivePlayersIds: TypeAlias = list[int]
+PlayersIds: TypeAlias = list[int]
+LivePlayersIds: TypeAlias = PlayersIds
 
 
 class UserCache(TypedDict):
     game_chat: int
 
 
-class GameCache(TypedDict):
+class GameCache(TypedDict, total=True):
     owner: int
     game_chat: int
     players_ids: LivePlayersIds
     players: UsersInGame
-    mafias: list[int]
-    doctors: list[int]
-    policeman: list[int]
-    civilians: list[int]
-    died: list[int]
-    recovered: list[int]
-    to_delete: list[int]
+    mafias: PlayersIds
+    doctors: PlayersIds
+    policeman: PlayersIds
+    civilians: PlayersIds
+    died: PlayersIds
+    recovered: PlayersIds
+    to_delete: PlayersIds
+    vote_for: PlayersIds
     # wait_for: list[int]
     last_treated: int
     number_of_night: int

@@ -1,5 +1,6 @@
 from aiogram import types
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from functools import partial
 
 
 def get_to_bot_kb(text="Ознакомиться с ролью"):
@@ -10,3 +11,8 @@ def get_to_bot_kb(text="Ознакомиться с ролью"):
         )
     )
     return builder.as_markup()
+
+
+participate_in_social_life = partial(
+    get_to_bot_kb, text="Участвовать в социальной жизни!"
+)
