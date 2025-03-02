@@ -74,6 +74,10 @@ async def delete_messages_from_to_delete(
     )
 
 
+def make_pretty(string: str) -> str:
+    return f"<b><i><u>{string}</u></i></b>"
+
+
 async def clear_data_after_all_actions(state: FSMContext):
     game_data: GameCache = await state.get_data()
     game_data["pros"].clear()

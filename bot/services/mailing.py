@@ -24,6 +24,7 @@ from keyboards.inline.keypads.to_bot import (
 )
 from services.registartion import get_state_and_assign
 from states.states import UserFsm
+from utils.utils import make_pretty
 
 
 async def familiarize_players(bot: Bot, state: FSMContext):
@@ -37,25 +38,25 @@ async def familiarize_players(bot: Bot, state: FSMContext):
         await bot.send_photo(
             chat_id=user_id,
             photo="https://i.pinimg.com/736x/a1/10/db/a110db3eaba78bf6423bcea68f330a64.jpg",
-            caption="Твоя роль - Мафия! Тебе нужно уничтожить всех горожан.",
+            caption=f"Твоя роль - {make_pretty('Мафия')}! Тебе нужно уничтожить всех горожан.",
         )
     for user_id in doctors:
         await bot.send_photo(
             chat_id=user_id,
             photo="https://gipermed.ru/upload/iblock/4bf/4bfa55f59ceb538bd2c8c437e8f71e5a.jpg",
-            caption="Твоя роль - Доктор! Тебе нужно стараться лечить тех, кому нужна помощь.",
+            caption=f"Твоя роль - {make_pretty('Доктор')}! Тебе нужно стараться лечить тех, кому нужна помощь.",
         )
     for user_id in policeman:
         await bot.send_photo(
             chat_id=user_id,
             photo="https://avatars.mds.yandex.net/get-kinopoisk-image/1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x",
-            caption="Твоя роль - Комиссар! Тебе нужно вычислить мафию.",
+            caption=f"Твоя роль - {make_pretty('Комиссар')}! Тебе нужно вычислить мафию.",
         )
     for user_id in civilians:
         await bot.send_photo(
             chat_id=user_id,
             photo="https://cdn.culture.ru/c/820179.jpg",
-            caption="Твоя роль - Мирный житель! Тебе нужно вычислить мафию на голосовании.",
+            caption=f"Твоя роль - {make_pretty('Мирный житель')}! Тебе нужно вычислить мафию на голосовании.",
         )
 
 

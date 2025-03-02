@@ -16,7 +16,7 @@ from cache.cache_types import (
     LivePlayersIds,
 )
 from states.states import GameFsm
-from utils.utils import get_profile_link
+from utils.utils import get_profile_link, make_pretty
 
 
 async def init_game(message: Message, state: FSMContext):
@@ -107,8 +107,8 @@ async def select_roles(state: FSMContext):
     roles = (mafias, doctors, policeman, civilians)
     for index, user_id in enumerate(ids):
         current_role: Role = roles[index]
-        game_data["players"][str(user_id)][
-            "role"
-        ] = current_role.role
+        game_data["players"][str(user_id)]["role"] = make_pretty(
+            current_role.role
+        )
         current_role.players.append(user_id)
     await state.set_data(game_data)
