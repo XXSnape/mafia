@@ -128,19 +128,23 @@ async def start_game(
                 result = "Игра завершена! Вся преступная верхушка обезглавлена, город может спать спокойно!\n"
             winners = "\nПобедители:\n"
             losers = "\nПроигравшие:\n"
+            winners_ids = set()
             for user_id, player in game_data["players"].items():
                 text = f'{player["url"]} - {player["pretty_role"]}\n'
                 if int(user_id) in game_data["winners"]:
                     winners += text
+                    winners_ids.add(user_id)
                 elif int(user_id) in game_data["losers"]:
                     losers += text
                 elif e.winner == Groupings.criminals:
                     if player["role"] == Roles.mafia:
                         winners += text
+                        winners_ids.add(user_id)
                     else:
                         losers += text
                 else:
                     if player["role"] != Roles.mafia:
+                        winners_ids.add(user_id)
                         winners += text
                     else:
                         losers += text
@@ -157,14 +161,7 @@ async def start_game(
                         dispatcher=dispatcher,
                         chat_id=int(user_id),
                         bot=bot,
-                        is_win=(
-                            player["role"] == Roles.mafia
-                            and e.winner == Groupings.criminals
-                        )
-                        or (
-                            player["role"] != Roles.mafia
-                            and e.winner == Groupings.civilians
-                        ),
+                        is_win=user_id in winners_ids,
                         role=player["pretty_role"],
                     )
                     for user_id, player in game_data[
