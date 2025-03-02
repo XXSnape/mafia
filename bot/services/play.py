@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from random import randint
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
@@ -47,6 +48,7 @@ def remove_user_from_game(
         Roles.lawyer: game_data["lawyers"],
         Roles.masochist: game_data["masochists"],
         Roles.prosecutor: game_data["prosecutors"],
+        Roles.lucky_gay: game_data["lucky_guys"],
     }
     user_role = game_data["players"][str(user_id)]["role"]
     roles[user_role].remove(user_id)
@@ -76,6 +78,14 @@ async def sum_up_after_night(
     victims = set(game_data["died"]) - set(game_data["recovered"])
     text_about_dead = ""
     for victim_id in victims:
+        if victim_id in game_data["lucky_guys"]:
+            if randint(1, 10) in (1, 2, 3, 4):
+                await bot.send_message(
+                    chat_id=victim_id,
+                    text="Тебе сегодня крупно повезло!",
+                )
+                victims.remove(victim_id)
+                continue
         remove_user_from_game(
             game_data=game_data, user_id=victim_id, is_night=True
         )

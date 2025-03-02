@@ -22,6 +22,7 @@ class Roles:
     lawyer = "Адвокат"
     civilian = "Мирный житель"
     masochist = "Мазохист"
+    lucky_gay = "Везунчик"
 
 
 class UserGameCache(TypedDict):
@@ -49,10 +50,12 @@ class GameCache(TypedDict, total=True):
     cons: PlayersIds
     players_ids: LivePlayersIds
     players: UsersInGame
+
     prosecutors: PlayersIds
     mafias: PlayersIds
     doctors: PlayersIds
     policeman: PlayersIds
+    lucky_guys: PlayersIds
     civilians: PlayersIds
     lawyers: PlayersIds
     died: PlayersIds
@@ -78,4 +81,5 @@ RolesKeysLiteral = Literal[
     "prosecutors",
     "lawyers",
     "masochists",
+    "lucky_guys",
 ]

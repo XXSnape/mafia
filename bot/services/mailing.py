@@ -36,6 +36,7 @@ async def familiarize_players(bot: Bot, state: FSMContext):
     lawyers = game_data["lawyers"]
     prosecutors = game_data["prosecutors"]
     masochists = game_data["masochists"]
+    lucky_guys = game_data["lucky_guys"]
     for user_id in mafias:
         await bot.send_photo(
             chat_id=user_id,
@@ -77,6 +78,13 @@ async def familiarize_players(bot: Bot, state: FSMContext):
             chat_id=user_id,
             photo="https://i.pinimg.com/736x/14/a5/f5/14a5f5eb5dbd73c4707f24d436d80c0b.jpg",
             caption=f"Твоя роль - {make_pretty(Roles.masochist)}! Тебе нужно умереть на дневном голосовании.",
+        )
+    for user_id in lucky_guys:
+        await bot.send_photo(
+            chat_id=user_id,
+            photo="https://avatars.mds.yandex.net/get-mpic/5031100/img_id5520953584482126492.jpeg/orig",
+            caption=f"Твоя роль - {make_pretty(Roles.lucky_gay)}! "
+            f"Возможно тебе повезет и ты останешься жив после покушения.",
         )
 
 

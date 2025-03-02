@@ -41,6 +41,7 @@ async def init_game(message: Message, state: FSMContext):
         "policeman": [],
         "civilians": [],
         "masochists": [],
+        "lucky_guys": [],
         "losers": [],
         "winners": [],
         "lawyers": [],
@@ -99,9 +100,11 @@ async def select_roles(state: FSMContext):
     prosecutors = Role(game_data["prosecutors"], Roles.prosecutor)
     masochists = Role(game_data["masochists"], Roles.masochist)
     lawyers = Role(game_data["lawyers"], Roles.lawyer)
+    lucky_guys = Role(game_data["lucky_guys"], Roles.lucky_gay)
     roles = (
         mafias,
         doctors,
+        lucky_guys,
         masochists,
         prosecutors,
         lawyers,
