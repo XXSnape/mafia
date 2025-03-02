@@ -34,24 +34,28 @@ async def familiarize_players(bot: Bot, state: FSMContext):
     civilians = game_data["civilians"]
 
     for user_id in mafias:
-        await bot.send_message(
+        await bot.send_photo(
             chat_id=user_id,
-            text="Твоя роль - Мафия! Тебе нужно уничтожить всех горожан.",
+            photo="https://i.pinimg.com/736x/a1/10/db/a110db3eaba78bf6423bcea68f330a64.jpg",
+            caption="Твоя роль - Мафия! Тебе нужно уничтожить всех горожан.",
         )
     for user_id in doctors:
-        await bot.send_message(
+        await bot.send_photo(
             chat_id=user_id,
-            text="Твоя роль - Доктор! Тебе нужно стараться лечить тех, кому нужна помощь.",
+            photo="https://gipermed.ru/upload/iblock/4bf/4bfa55f59ceb538bd2c8c437e8f71e5a.jpg",
+            caption="Твоя роль - Доктор! Тебе нужно стараться лечить тех, кому нужна помощь.",
         )
     for user_id in policeman:
-        await bot.send_message(
+        await bot.send_photo(
             chat_id=user_id,
-            text="Твоя роль - Комиссар! Тебе нужно вычислить мафию.",
+            photo="https://avatars.mds.yandex.net/get-kinopoisk-image/1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x",
+            caption="Твоя роль - Комиссар! Тебе нужно вычислить мафию.",
         )
     for user_id in civilians:
-        await bot.send_message(
+        await bot.send_photo(
             chat_id=user_id,
-            text="Твоя роль - Мирный житель! Тебе нужно вычислить мафию на голосовании.",
+            photo="https://cdn.culture.ru/c/820179.jpg",
+            caption="Твоя роль - Мирный житель! Тебе нужно вычислить мафию на голосовании.",
         )
 
 
@@ -163,9 +167,10 @@ class MailerToPlayers:
         )
 
     async def suggest_vote(self):
-        await self.bot.send_message(
+        await self.bot.send_photo(
             chat_id=self.group_chat_id,
-            text="Кого обвиним во всем и повесим?",
+            photo="https://studychinese.ru/content/dictionary/pictures/25/12774.jpg",
+            caption="Кого обвиним во всем и повесим?",
             reply_markup=participate_in_social_life(),
         )
         game_data: GameCache = await self.state.get_data()

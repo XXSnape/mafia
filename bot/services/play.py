@@ -74,9 +74,10 @@ async def sum_up_after_night(
     await bot.send_message(
         chat_id=game_data["game_chat"], text=text_about_dead
     )
-    await bot.send_message(
+    await bot.send_photo(
         chat_id=game_data["game_chat"],
-        text="Живые игроки:\n" + live_players,
+        photo="https://i.pinimg.com/originals/b1/80/98/b18098074864e4b1bf5cc8412ced6421.jpg",
+        caption="Живые игроки:\n" + live_players,
     )
     if victims:
         await asyncio.gather(

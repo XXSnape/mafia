@@ -37,9 +37,10 @@ async def start_night(
         players=game_data["players"],
     )
     await state.set_data(game_data)
-    await bot.send_message(
+    await bot.send_photo(
         chat_id=chat_id,
-        text=f"Наступает ночь {game_data['number_of_night']}.\n\nЖивые участники:{profiles}",
+        photo="https://i.pinimg.com/originals/f0/43/ed/f043edcac9690fdec845925508006459.jpg",
+        caption=f"Наступает ночь {game_data['number_of_night']}.\n\nЖивые участники:{profiles}",
         reply_markup=get_to_bot_kb("Действовать!"),
     )
     mailer = MailerToPlayers(
