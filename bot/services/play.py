@@ -30,13 +30,23 @@ def check_end_of_game(async_func: Callable):
     return wrapper
 
 
-def remove_user_from_game(game_data: GameCache, user_id: int):
+def remove_user_from_game(
+    game_data: GameCache, user_id: int, is_night: bool
+):
+    if user_id in game_data["masochists"]:
+        if is_night:
+            game_data["losers"].append(user_id)
+        else:
+            game_data["winners"].append(user_id)
     game_data["players_ids"].remove(user_id)
     roles = {
         Roles.mafia: game_data["mafias"],
         Roles.doctor: game_data["doctors"],
         Roles.policeman: game_data["policeman"],
         Roles.civilian: game_data["civilians"],
+        Roles.lawyer: game_data["lawyers"],
+        Roles.masochist: game_data["masochists"],
+        Roles.prosecutor: game_data["prosecutors"],
     }
     user_role = game_data["players"][str(user_id)]["role"]
     roles[user_role].remove(user_id)
@@ -66,7 +76,9 @@ async def sum_up_after_night(
     victims = set(game_data["died"]) - set(game_data["recovered"])
     text_about_dead = ""
     for victim_id in victims:
-        remove_user_from_game(game_data=game_data, user_id=victim_id)
+        remove_user_from_game(
+            game_data=game_data, user_id=victim_id, is_night=True
+        )
         url = game_data["players"][str(victim_id)]["url"]
         role = game_data["players"][str(victim_id)]["role"]
         text_about_dead += f"Сегодня был убит {role} - {url}!\n\n"
@@ -156,10 +168,12 @@ async def sum_up_after_voting(
         )
         return
 
-    remove_user_from_game(game_data=game_data, user_id=removed_user)
+    remove_user_from_game(
+        game_data=game_data, user_id=removed_user, is_night=False
+    )
     await bot.send_message(
         chat_id=game_data["game_chat"],
-        text=f'Сегодня народ принял тяжелое решение и повесил {user_info["url"]} с ролью {user_info["role"]}!',
+        text=f'Сегодня народ принял тяжелое решение и повесил {user_info["url"]} с ролью {user_info["pretty_role"]}!',
     )
 
 

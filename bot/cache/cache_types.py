@@ -11,6 +11,7 @@ from typing import (
 class Groupings(StrEnum):
     criminals = "criminals"
     civilians = "civilians"
+    masochists = "masochists"
 
 
 class Roles:
@@ -20,6 +21,7 @@ class Roles:
     prosecutor = "Прокурор"
     lawyer = "Адвокат"
     civilian = "Мирный житель"
+    masochist = "Мазохист"
 
 
 class UserGameCache(TypedDict):
@@ -54,7 +56,9 @@ class GameCache(TypedDict, total=True):
     civilians: PlayersIds
     lawyers: PlayersIds
     died: PlayersIds
-
+    masochists: PlayersIds
+    winners: PlayersIds
+    losers: PlayersIds
     cant_vote: PlayersIds
     recovered: PlayersIds
     to_delete: ChatsAndMessagesIds
@@ -68,5 +72,10 @@ class GameCache(TypedDict, total=True):
 
 
 RolesKeysLiteral = Literal[
-    "mafias", "doctors", "policeman", "prosecutors", "lawyers"
+    "mafias",
+    "doctors",
+    "policeman",
+    "prosecutors",
+    "lawyers",
+    "masochists",
 ]

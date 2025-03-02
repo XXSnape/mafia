@@ -128,9 +128,13 @@ async def start_game(
                 result = "Игра завершена! Вся преступная верхушка обезглавлена, город может спать спокойно!\n"
             winners = "\nПобедители:\n"
             losers = "\nПроигравшие:\n"
-            for player in game_data["players"].values():
+            for user_id, player in game_data["players"].items():
                 text = f'{player["url"]} - {player["pretty_role"]}\n'
-                if e.winner == Groupings:
+                if int(user_id) in game_data["winners"]:
+                    winners += text
+                elif int(user_id) in game_data["losers"]:
+                    losers += text
+                elif e.winner == Groupings.criminals:
                     if player["role"] == Roles.mafia:
                         winners += text
                     else:

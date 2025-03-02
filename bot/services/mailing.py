@@ -33,8 +33,9 @@ async def familiarize_players(bot: Bot, state: FSMContext):
     doctors = game_data["doctors"]
     policeman = game_data["policeman"]
     civilians = game_data["civilians"]
+    lawyers = game_data["lawyers"]
     prosecutors = game_data["prosecutors"]
-
+    masochists = game_data["masochists"]
     for user_id in mafias:
         await bot.send_photo(
             chat_id=user_id,
@@ -53,6 +54,12 @@ async def familiarize_players(bot: Bot, state: FSMContext):
             photo="https://avatars.mds.yandex.net/get-kinopoisk-image/1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x",
             caption=f"Твоя роль - {make_pretty(Roles.policeman)}! Тебе нужно вычислить мафию.",
         )
+    for user_id in lawyers:
+        await bot.send_photo(
+            chat_id=user_id,
+            photo="https://avatars.mds.yandex.net/get-altay/5579175/2a0000017e0aa51c3c1fd887206b0156ee34/XXL_height",
+            caption=f"Твоя роль - {make_pretty(Roles.lawyer)}! Тебе нужно защитить мирных жителей от своих же на голосовании.",
+        )
     for user_id in prosecutors:
         await bot.send_photo(
             chat_id=user_id,
@@ -64,6 +71,12 @@ async def familiarize_players(bot: Bot, state: FSMContext):
             chat_id=user_id,
             photo="https://cdn.culture.ru/c/820179.jpg",
             caption=f"Твоя роль - {make_pretty(Roles.civilian)}! Тебе нужно вычислить мафию на голосовании.",
+        )
+    for user_id in masochists:
+        await bot.send_photo(
+            chat_id=user_id,
+            photo="https://i.pinimg.com/736x/14/a5/f5/14a5f5eb5dbd73c4707f24d436d80c0b.jpg",
+            caption=f"Твоя роль - {make_pretty(Roles.masochist)}! Тебе нужно умереть на дневном голосовании.",
         )
 
 
