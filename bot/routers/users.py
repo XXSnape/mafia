@@ -155,6 +155,37 @@ async def prosecutor_arrests(
     await game_state.set_data(game_data)
 
 
+@router.callback_query(
+    UserFsm.LAWYER_PROTECTS, UserActionIndexCbData.filter()
+)
+async def lawyer_protects(
+    callback: CallbackQuery,
+    callback_data: UserActionIndexCbData,
+    state: FSMContext,
+    dispatcher: Dispatcher,
+):
+    user_data: UserCache = await state.get_data()
+    game_state = await get_state_and_assign(
+        dispatcher=dispatcher,
+        chat_id=user_data["game_chat"],
+        bot_id=callback.bot.id,
+    )
+    game_data: GameCache = await game_state.get_data()
+    await callback.bot.send_message(
+        chat_id=user_data["game_chat"],
+        text="Кому-то обеспечена защита лучшими адвокатами города!",
+    )
+    protected_user_id = game_data["players_ids"][
+        callback_data.user_index
+    ]
+    game_data["last_protected"] = protected_user_id
+    game_data["protected"].append(protected_user_id)
+    url = game_data["players"][str(protected_user_id)]["url"]
+    await callback.message.delete()
+    await callback.message.answer(f"Ты выбрал защитить {url}")
+    await game_state.set_data(game_data)
+
+
 @router.callback_query(UserVoteIndexCbData.filter())
 async def vote_for(
     callback: CallbackQuery,

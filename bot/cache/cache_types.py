@@ -18,6 +18,7 @@ class Roles:
     doctor = "Доктор"
     policeman = "Комиссар"
     prosecutor = "Прокурор"
+    lawyer = "Адвокат"
     civilian = "Мирный житель"
 
 
@@ -51,17 +52,21 @@ class GameCache(TypedDict, total=True):
     doctors: PlayersIds
     policeman: PlayersIds
     civilians: PlayersIds
+    lawyers: PlayersIds
     died: PlayersIds
+
     cant_vote: PlayersIds
     recovered: PlayersIds
     to_delete: ChatsAndMessagesIds
     vote_for: PlayersIds
+    protected: PlayersIds
     # wait_for: list[int]
     last_treated: int
     last_arrested: int
+    last_protected: int
     number_of_night: int
 
 
 RolesKeysLiteral = Literal[
-    "mafias", "doctors", "policeman", "prosecutors"
+    "mafias", "doctors", "policeman", "prosecutors", "lawyers"
 ]

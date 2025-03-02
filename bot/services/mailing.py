@@ -128,6 +128,20 @@ class MailerToPlayers:
             exclude=[prosecutor_id] + exclude,
         )
 
+    async def mail_lawyer(self):
+        game_data: GameCache = await self.state.get_data()
+        exclude = (
+            []
+            if game_data["last_protected"] == 0
+            else game_data["last_protected"]
+        )
+        await self._mail_user(
+            text="Кого защитить на голосовании?",
+            role_key="lawyers",
+            new_state=UserFsm.LAWYER_PROTECTS,
+            exclude=exclude,
+        )
+
     async def mail_mafia(self):
         game_data: GameCache = await self.state.get_data()
         mafias = game_data["mafias"]
