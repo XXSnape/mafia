@@ -12,4 +12,5 @@ class UserFsm(StatesGroup):
     MAFIA_ATTACKS = State()
     DOCTOR_TREATS = State()
     POLICEMAN_CHECKS = State()
+    PROSECUTOR_ARRESTS = State()
     WAIT_FOR_LATEST_LETTER = State()

@@ -56,6 +56,8 @@ async def start_night(
         await mailer.mail_doctor()
     if game_data["policeman"]:
         await mailer.mail_policeman()
+    if game_data["prosecutors"]:
+        await mailer.mail_prosecutor()
 
     await asyncio.sleep(20)
     await delete_messages_from_to_delete(
@@ -85,7 +87,7 @@ async def start_night(
         state=state,
     )
     await asyncio.sleep(2)
-    await clear_data_after_all_actions(state=state)
+    await clear_data_after_all_actions(state=state, bot=bot)
 
 
 async def start_game(

@@ -11,6 +11,7 @@ from cache.cache_types import (
     RolesKeysLiteral,
     LivePlayersIds,
     UsersInGame,
+    Roles,
 )
 from keyboards.inline.callback_factory.recognize_user import (
     UserVoteIndexCbData,
@@ -32,30 +33,37 @@ async def familiarize_players(bot: Bot, state: FSMContext):
     doctors = game_data["doctors"]
     policeman = game_data["policeman"]
     civilians = game_data["civilians"]
+    prosecutors = game_data["prosecutors"]
 
     for user_id in mafias:
         await bot.send_photo(
             chat_id=user_id,
             photo="https://i.pinimg.com/736x/a1/10/db/a110db3eaba78bf6423bcea68f330a64.jpg",
-            caption=f"Твоя роль - {make_pretty('Мафия')}! Тебе нужно уничтожить всех горожан.",
+            caption=f"Твоя роль - {make_pretty(Roles.mafia)}! Тебе нужно уничтожить всех горожан.",
         )
     for user_id in doctors:
         await bot.send_photo(
             chat_id=user_id,
             photo="https://gipermed.ru/upload/iblock/4bf/4bfa55f59ceb538bd2c8c437e8f71e5a.jpg",
-            caption=f"Твоя роль - {make_pretty('Доктор')}! Тебе нужно стараться лечить тех, кому нужна помощь.",
+            caption=f"Твоя роль - {make_pretty(Roles.doctor)}! Тебе нужно стараться лечить тех, кому нужна помощь.",
         )
     for user_id in policeman:
         await bot.send_photo(
             chat_id=user_id,
             photo="https://avatars.mds.yandex.net/get-kinopoisk-image/1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x",
-            caption=f"Твоя роль - {make_pretty('Комиссар')}! Тебе нужно вычислить мафию.",
+            caption=f"Твоя роль - {make_pretty(Roles.policeman)}! Тебе нужно вычислить мафию.",
+        )
+    for user_id in prosecutors:
+        await bot.send_photo(
+            chat_id=user_id,
+            photo="https://avatars.mds.yandex.net/i?id=b5115d431dafc24be07a55a8b6343540_l-5205087-images-thumbs&n=13",
+            caption=f"Твоя роль - {make_pretty(Roles.prosecutor)}! Тебе нельзя допустить, чтобы днем мафия могла говорить.",
         )
     for user_id in civilians:
         await bot.send_photo(
             chat_id=user_id,
             photo="https://cdn.culture.ru/c/820179.jpg",
-            caption=f"Твоя роль - {make_pretty('Мирный житель')}! Тебе нужно вычислить мафию на голосовании.",
+            caption=f"Твоя роль - {make_pretty(Roles.civilian)}! Тебе нужно вычислить мафию на голосовании.",
         )
 
 
@@ -104,6 +112,22 @@ class MailerToPlayers:
             new_state=new_state,
         )
 
+    async def mail_prosecutor(self):
+        game_data: GameCache = await self.state.get_data()
+        prosecutors = game_data["prosecutors"]
+        prosecutor_id = prosecutors[0]
+        exclude = (
+            []
+            if game_data["last_arrested"] == 0
+            else [game_data["last_arrested"]]
+        )
+        await self._mail_user(
+            text="Кого арестовать этой ночью?",
+            role_key="prosecutors",
+            new_state=UserFsm.PROSECUTOR_ARRESTS,
+            exclude=[prosecutor_id] + exclude,
+        )
+
     async def mail_mafia(self):
         game_data: GameCache = await self.state.get_data()
         mafias = game_data["mafias"]
@@ -119,13 +143,11 @@ class MailerToPlayers:
         self,
     ):
         game_data: GameCache = await self.state.get_data()
-        print("mail doctor", game_data)
         exclude = (
             []
             if game_data["last_treated"] == 0
             else game_data["last_treated"]
         )
-        print("exclude doc", exclude)
         await self._mail_user(
             text="Кого вылечить этой ночью?",
             role_key="doctors",
@@ -185,5 +207,6 @@ class MailerToPlayers:
                     players=players,
                 )
                 for user_id in live_players
+                if user_id not in game_data["cant_vote"]
             )
         )

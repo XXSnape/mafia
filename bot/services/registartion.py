@@ -31,8 +31,10 @@ async def init_game(message: Message, state: FSMContext):
         "vote_for": [],
         # 'wait_for': [],
         "number_of_night": 0,
+        "cant_vote": [],
         "pros": [],
         "cons": [],
+        "prosecutors": [],
         "mafias": [],
         "doctors": [],
         "policeman": [],
@@ -40,6 +42,7 @@ async def init_game(message: Message, state: FSMContext):
         "died": [],
         "recovered": [],
         "last_treated": 0,
+        "last_arrested": 0,
     }
     await state.set_data(game_data)
     await state.set_state(GameFsm.REGISTRATION)
@@ -87,7 +90,8 @@ async def select_roles(state: FSMContext):
     doctors = Role(game_data["doctors"], Roles.doctor)
     policeman = Role(game_data["policeman"], Roles.policeman)
     civilians = Role(game_data["civilians"], Roles.civilian)
-    roles = (mafias, doctors, policeman, civilians)
+    prosecutors = Role(game_data["prosecutors"], Roles.prosecutor)
+    roles = (mafias, doctors, prosecutors, policeman, civilians)
     for index, user_id in enumerate(ids):
         current_role: Role = roles[index]
         game_data["players"][str(user_id)][

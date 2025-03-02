@@ -51,7 +51,9 @@ async def delete_message_from_non_players(
     message: Message, state: FSMContext
 ):
     game_data: GameCache = await state.get_data()
-    if message.from_user.id not in game_data["players_ids"]:
+    if (
+        message.from_user.id not in game_data["players_ids"]
+    ) or message.from_user.id in game_data["cant_vote"]:
         await message.delete()
         # await message.chat.restrict(
         #     user_id=message.from_user.id,
@@ -159,6 +161,12 @@ async def confirm_vote(
         )
         return
     game_data: GameCache = await state.get_data()
+    if callback.from_user.id in game_data["cant_vote"]:
+        await callback.answer(
+            "Ты арестован и не можешь голосовать!", show_alert=True
+        )
+        return
+
     if callback_data.action == ProsAndCons.pros:
         add_voice(
             user_id=callback.from_user.id,

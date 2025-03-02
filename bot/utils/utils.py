@@ -78,13 +78,19 @@ def make_pretty(string: str) -> str:
     return f"<b><i><u>{string}</u></i></b>"
 
 
-async def clear_data_after_all_actions(state: FSMContext):
+async def clear_data_after_all_actions(bot: Bot, state: FSMContext):
     game_data: GameCache = await state.get_data()
     game_data["pros"].clear()
     game_data["cons"].clear()
     game_data["recovered"].clear()
     game_data["vote_for"].clear()
     game_data["died"].clear()
+    for cant_vote_id in game_data["cant_vote"]:
+        with suppress(TelegramBadRequest):
+            await bot.unban_chat_member(
+                chat_id=game_data["game_chat"], user_id=cant_vote_id
+            )
+    game_data["cant_vote"].clear()
     await state.set_data(game_data)
 
 
