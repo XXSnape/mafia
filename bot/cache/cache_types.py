@@ -12,6 +12,7 @@ class Groupings(StrEnum):
     criminals = "criminals"
     civilians = "civilians"
     masochists = "masochists"
+    suicide_bombers = "suicide_bombers"
 
 
 class Roles:
@@ -23,6 +24,7 @@ class Roles:
     civilian = "Мирный житель"
     masochist = "Мазохист"
     lucky_gay = "Везунчик"
+    suicide_bomber = "Ночной смертник"
 
 
 class UserGameCache(TypedDict):
@@ -60,6 +62,7 @@ class GameCache(TypedDict, total=True):
     lawyers: PlayersIds
     died: PlayersIds
     masochists: PlayersIds
+    suicide_bombers: PlayersIds
     winners: PlayersIds
     losers: PlayersIds
     cant_vote: PlayersIds
@@ -82,4 +85,5 @@ RolesKeysLiteral = Literal[
     "lawyers",
     "masochists",
     "lucky_guys",
+    "suicide_bombers",
 ]

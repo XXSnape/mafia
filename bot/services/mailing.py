@@ -37,6 +37,7 @@ async def familiarize_players(bot: Bot, state: FSMContext):
     prosecutors = game_data["prosecutors"]
     masochists = game_data["masochists"]
     lucky_guys = game_data["lucky_guys"]
+    suicide_bombers = game_data["suicide_bombers"]
     for user_id in mafias:
         await bot.send_photo(
             chat_id=user_id,
@@ -85,6 +86,16 @@ async def familiarize_players(bot: Bot, state: FSMContext):
             photo="https://avatars.mds.yandex.net/get-mpic/5031100/img_id5520953584482126492.jpeg/orig",
             caption=f"Твоя роль - {make_pretty(Roles.lucky_gay)}! "
             f"Возможно тебе повезет и ты останешься жив после покушения.",
+        )
+    for user_id in suicide_bombers:
+        await bot.send_photo(
+            chat_id=user_id,
+            photo="https://sun6-22.userapi.com/impg/zAaADEA19scv86EFl8bY1wUYRCJyBPGg1qamiA/xjMRCUhA20g.jpg?"
+            "size=1280x1280&quality=96&"
+            "sign=de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag="
+            "EOC9ErRHImjvmda4Qd5Pq59HPf-wUgr77rzHZvabHjc&type=album",
+            caption=f"Твоя роль - {make_pretty(Roles.suicide_bomber)}! "
+            f"Тебе нужно умереть ночью.",
         )
 
 

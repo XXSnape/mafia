@@ -39,6 +39,11 @@ def remove_user_from_game(
             game_data["losers"].append(user_id)
         else:
             game_data["winners"].append(user_id)
+    if user_id in game_data["suicide_bombers"]:
+        if is_night:
+            game_data["winners"].append(user_id)
+        else:
+            game_data["losers"].append(user_id)
     game_data["players_ids"].remove(user_id)
     roles = {
         Roles.mafia: game_data["mafias"],
@@ -49,6 +54,7 @@ def remove_user_from_game(
         Roles.masochist: game_data["masochists"],
         Roles.prosecutor: game_data["prosecutors"],
         Roles.lucky_gay: game_data["lucky_guys"],
+        Roles.suicide_bomber: game_data["suicide_bombers"],
     }
     user_role = game_data["players"][str(user_id)]["role"]
     roles[user_role].remove(user_id)
@@ -90,7 +96,7 @@ async def sum_up_after_night(
             game_data=game_data, user_id=victim_id, is_night=True
         )
         url = game_data["players"][str(victim_id)]["url"]
-        role = game_data["players"][str(victim_id)]["role"]
+        role = game_data["players"][str(victim_id)]["pretty_role"]
         text_about_dead += f"Сегодня был убит {role} - {url}!\n\n"
     live_players = get_profiles(
         live_players_ids=game_data["players_ids"],

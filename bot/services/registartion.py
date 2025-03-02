@@ -31,6 +31,7 @@ async def init_game(message: Message, state: FSMContext):
         "vote_for": [],
         # 'wait_for': [],
         "number_of_night": 0,
+        "suicide_bombers": [],
         "cant_vote": [],
         "pros": [],
         "cons": [],
@@ -101,14 +102,17 @@ async def select_roles(state: FSMContext):
     masochists = Role(game_data["masochists"], Roles.masochist)
     lawyers = Role(game_data["lawyers"], Roles.lawyer)
     lucky_guys = Role(game_data["lucky_guys"], Roles.lucky_gay)
+    suicide_bombers = Role(
+        game_data["suicide_bombers"], Roles.suicide_bomber
+    )
     roles = (
         mafias,
         doctors,
+        suicide_bombers,
         lucky_guys,
         masochists,
         prosecutors,
         lawyers,
-        # prosecutors,
         policeman,
         civilians,
     )
