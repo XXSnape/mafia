@@ -113,11 +113,13 @@ class MailerToPlayers:
         self,
     ):
         game_data: GameCache = await self.state.get_data()
+        print("mail doctor", game_data)
         exclude = (
             []
             if game_data["last_treated"] == 0
             else game_data["last_treated"]
         )
+        print("exclude doc", exclude)
         await self._mail_user(
             text="Кого вылечить этой ночью?",
             role_key="doctors",

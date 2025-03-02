@@ -1,12 +1,29 @@
+from collections.abc import Callable
+
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 
-from cache.cache_types import GameCache, UserGameCache
+from cache.cache_types import GameCache, UserGameCache, Groupings
+from general.exceptions import GameIsOver
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from services.registartion import get_state_and_assign
 from states.states import UserFsm, GameFsm
 from utils.utils import get_profiles
 import asyncio
+
+
+def check_end_of_game(async_func: Callable):
+    async def wrapper(**kwargs):
+        result = await async_func(**kwargs)
+        state = kwargs["state"]
+        game_data: GameCache = await state.get_data()
+        if not game_data["mafias"]:
+            raise GameIsOver(winner=Groupings.civilians)
+        if len(game_data["players_ids"]) == 2:
+            raise GameIsOver(winner=Groupings.criminals)
+        return result
+
+    return wrapper
 
 
 def remove_user_from_game(game_data: GameCache, user_id: int):
@@ -37,8 +54,9 @@ async def report_death(
     )
 
 
+@check_end_of_game
 async def sum_up_after_night(
-    bot: Bot, state: FSMContext, dispatcher: Dispatcher
+    *, bot: Bot, state: FSMContext, dispatcher: Dispatcher
 ):
     game_data: GameCache = await state.get_data()
     victims = set(game_data["died"]) - set(game_data["recovered"])
@@ -104,7 +122,9 @@ async def confirm_final_aim(
     game_data["to_delete"].append(sent_survey.message_id)
 
 
+@check_end_of_game
 async def sum_up_after_voting(
+    *,
     bot: Bot,
     state: FSMContext,
 ):
@@ -126,3 +146,11 @@ async def sum_up_after_voting(
         chat_id=game_data["game_chat"],
         text=f'Сегодня народ принял тяжелое решение и повесил {user_info["url"]}, который был {user_info["role"]}!',
     )
+
+
+# async def check_end_of_game(state: FSMContext):
+#     game_data: GameCache = await state.get_data()
+#     if not game_data["mafias"]:
+#         raise GameIsOver(winner=Groupings.civilians)
+#     if len(game_data["players"]) == 2:
+#         raise GameIsOver(winner=Groupings.criminals)

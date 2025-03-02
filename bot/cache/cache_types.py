@@ -2,6 +2,11 @@ from enum import StrEnum
 from typing import TypedDict, TypeAlias, NotRequired, Literal
 
 
+class Groupings(StrEnum):
+    criminals = "criminals"
+    civilians = "civilians"
+
+
 class Roles:
     mafia = "Мафия"
     doctor = "Доктор"

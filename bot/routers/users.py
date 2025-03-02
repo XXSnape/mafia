@@ -32,6 +32,9 @@ async def mafia_attacks(
         bot_id=callback.bot.id,
     )
     game_data: GameCache = await game_state.get_data()
+    await callback.bot.send_message(
+        chat_id=user_data["game_chat"], text="Мафия выбрала жертву!"
+    )
     died_user_id = game_data["players_ids"][callback_data.user_index]
     game_data["died"].append(died_user_id)
     url = game_data["players"][str(died_user_id)]["url"]
@@ -55,13 +58,19 @@ async def doctor_treats(
         bot_id=callback.bot.id,
     )
     game_data: GameCache = await game_state.get_data()
+    await callback.bot.send_message(
+        chat_id=user_data["game_chat"],
+        text="Доктор спешит кому-то на помощь!",
+    )
     recovered_user_id = game_data["players_ids"][
         callback_data.user_index
     ]
     game_data["recovered"].append(recovered_user_id)
     url = game_data["players"][str(recovered_user_id)]["url"]
+    game_data["last_treated"] = recovered_user_id
     await callback.message.edit_text(f"Ты выбрал вылечить {url}")
     game_data["to_delete"].remove(callback.message.message_id)
+    await game_state.set_data(game_data)
 
 
 @router.callback_query(
@@ -80,7 +89,10 @@ async def policeman_checks(
         bot_id=callback.bot.id,
     )
     game_data: GameCache = await game_state.get_data()
-
+    await callback.bot.send_message(
+        chat_id=user_data["game_chat"],
+        text="РАБОТАЕТ местная полиция!",
+    )
     checked_user_id = game_data["players_ids"][
         callback_data.user_index
     ]
