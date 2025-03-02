@@ -42,7 +42,8 @@ async def mafia_attacks(
     # )
     game_data["died"].append(died_user_id)
     url = game_data["players"][str(died_user_id)]["url"]
-    await callback.message.edit_text(f"Ты выбрал убить {url}")
+    await callback.message.delete()
+    await callback.message.answer(f"Ты выбрал убить {url}")
 
 
 @router.callback_query(
@@ -76,7 +77,8 @@ async def doctor_treats(
     game_data["recovered"].append(recovered_user_id)
     url = game_data["players"][str(recovered_user_id)]["url"]
     game_data["last_treated"] = recovered_user_id
-    await callback.message.edit_text(f"Ты выбрал вылечить {url}")
+    await callback.message.delete()
+    await callback.message.answer(f"Ты выбрал вылечить {url}")
     await game_state.set_data(game_data)
 
 
@@ -109,7 +111,8 @@ async def policeman_checks(
     # )
     role = game_data["players"][str(checked_user_id)]["role"]
     url = game_data["players"][str(checked_user_id)]["url"]
-    await callback.message.edit_text(f"{url} - {role}!")
+    await callback.message.delete()
+    await callback.message.answer(f"{url} - {role}!")
 
 
 @router.callback_query(UserVoteIndexCbData.filter())
@@ -134,7 +137,8 @@ async def vote_for(
         "url"
     ]
     voted_url = game_data["players"][str(voted_user_id)]["url"]
-    await callback.message.edit_text(
+    await callback.message.delete()
+    await callback.message.answer(
         f"Ты выбрал голосовать за {voted_url}"
     )
     await callback.bot.send_message(

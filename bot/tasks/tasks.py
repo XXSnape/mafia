@@ -84,39 +84,6 @@ async def start_night(
     )
     await asyncio.sleep(2)
     await clear_data_after_all_actions(state=state)
-    # scheduler.add_job(
-    #     sum_up_after_night,
-    #     "date",
-    #     run_date=datetime.now() + timedelta(seconds=20),
-    #     kwargs={
-    #         "bot": bot,
-    #         "state": state,
-    #         "dispatcher": dispatcher,
-    #     },
-    # )
-    # scheduler.add_job(
-    #     mailer.suggest_vote,
-    #     "date",
-    #     run_date=datetime.now() + timedelta(seconds=40),
-    # )
-    # scheduler.add_job(
-    #     confirm_final_aim,
-    #     "date",
-    #     run_date=datetime.now() + timedelta(seconds=50),
-    #     kwargs={
-    #         "bot": bot,
-    #         "state": state,
-    #         "group_chat_id": chat_id,
-    #     },
-    # )
-    # scheduler.add_job(
-    #     sum_up_after_voting,
-    #     "date",
-    #     run_date=datetime.now() + timedelta(seconds=60),
-    #     kwargs={"bot": bot, "state": state},
-    # )
-    # await asyncio.sleep(62)
-    # await clear_data_after_all_actions(state=state)
 
 
 async def start_game(
@@ -139,16 +106,6 @@ async def start_game(
     )
     while True:
         try:
-            # game_data: GameCache = await state.get_data()
-            # if (
-            #     not game_data["mafias"]
-            #     or len(game_data["players_ids"]) == 1
-            # ):
-            #     await bot.send_message(
-            #         chat_id=chat_id, text="Игра завершена!"
-            #     )
-            #     await state.clear()
-            #     return
             await start_night(
                 bot=bot,
                 dispatcher=dispatcher,
@@ -167,5 +124,9 @@ async def start_game(
                     chat_id=chat_id,
                     text="Игра завершена! Вся преступная верхушка обезглавлена, город может спать спокойно!",
                 )
+            game_data: GameCache = await state.get_data()
+            await delete_messages_from_to_delete(
+                bot=bot, to_delete=game_data["to_delete"]
+            )
             await state.clear()
             return
