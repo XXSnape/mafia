@@ -54,4 +54,5 @@ async def clear_data_after_all_actions(state: FSMContext):
     game_data["cons"].clear()
     game_data["recovered"].clear()
     game_data["vote_for"].clear()
+    game_data["died"].clear()
     await state.set_data(game_data)
