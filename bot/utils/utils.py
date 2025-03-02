@@ -6,6 +6,7 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.fsm.storage.base import StorageKey
+from aiogram.types import ChatPermissions
 
 from cache.cache_types import (
     UsersInGame,
@@ -88,8 +89,13 @@ async def clear_data_after_all_actions(bot: Bot, state: FSMContext):
     game_data["protected"].clear()
     for cant_vote_id in game_data["cant_vote"]:
         with suppress(TelegramBadRequest):
-            await bot.unban_chat_member(
-                chat_id=game_data["game_chat"], user_id=cant_vote_id
+            await bot.restrict_chat_member(
+                chat_id=game_data["game_chat"],
+                user_id=cant_vote_id,
+                permissions=ChatPermissions(
+                    can_send_messages=True,
+                    can_send_other_messages=True,
+                ),
             )
     game_data["cant_vote"].clear()
     await state.set_data(game_data)
