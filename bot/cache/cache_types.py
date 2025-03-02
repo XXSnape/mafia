@@ -25,6 +25,7 @@ class Roles:
     masochist = "Мазохист"
     lucky_gay = "Везунчик"
     suicide_bomber = "Ночной смертник"
+    bodyguard = "Телохранитель"
 
 
 class UserGameCache(TypedDict):
@@ -58,6 +59,7 @@ class GameCache(TypedDict, total=True):
     doctors: PlayersIds
     policeman: PlayersIds
     lucky_guys: PlayersIds
+    bodyguards: PlayersIds
     civilians: PlayersIds
     lawyers: PlayersIds
     died: PlayersIds
@@ -70,10 +72,13 @@ class GameCache(TypedDict, total=True):
     to_delete: ChatsAndMessagesIds
     vote_for: PlayersIds
     protected: PlayersIds
+    self_protected: PlayersIds
+
     # wait_for: list[int]
     last_treated: int
     last_arrested: int
     last_protected: int
+    last_self_protected: int
     number_of_night: int
 
 
@@ -86,4 +91,5 @@ RolesKeysLiteral = Literal[
     "masochists",
     "lucky_guys",
     "suicide_bombers",
+    "bodyguards",
 ]

@@ -38,6 +38,7 @@ async def familiarize_players(bot: Bot, state: FSMContext):
     masochists = game_data["masochists"]
     lucky_guys = game_data["lucky_guys"]
     suicide_bombers = game_data["suicide_bombers"]
+    bodyguards = game_data["bodyguards"]
     for user_id in mafias:
         await bot.send_photo(
             chat_id=user_id,
@@ -96,6 +97,13 @@ async def familiarize_players(bot: Bot, state: FSMContext):
             "EOC9ErRHImjvmda4Qd5Pq59HPf-wUgr77rzHZvabHjc&type=album",
             caption=f"Твоя роль - {make_pretty(Roles.suicide_bomber)}! "
             f"Тебе нужно умереть ночью.",
+        )
+    for user_id in bodyguards:
+        await bot.send_photo(
+            chat_id=user_id,
+            photo="https://avatars.mds.yandex.net/get-kinopoisk-image/1900788/db009751-69de-467c-9023-0439e82cbde3/1920x",
+            caption=f"Твоя роль - {make_pretty(Roles.bodyguard)}! "
+            f"Тебе защитить собой лучших специалистов",
         )
 
 
@@ -158,6 +166,22 @@ class MailerToPlayers:
             role_key="prosecutors",
             new_state=UserFsm.PROSECUTOR_ARRESTS,
             exclude=[prosecutor_id] + exclude,
+        )
+
+    async def mail_bodyguard(self):
+        game_data: GameCache = await self.state.get_data()
+        bodyguards = game_data["bodyguards"]
+        bodyguard_id = bodyguards[0]
+        exclude = (
+            []
+            if game_data["last_self_protected"] == 0
+            else [game_data["last_self_protected"]]
+        )
+        await self._mail_user(
+            text="За кого пожертвовать собой?",
+            role_key="bodyguards",
+            new_state=UserFsm.BODYGUARD_PROTECTS,
+            exclude=[bodyguard_id] + exclude,
         )
 
     async def mail_lawyer(self):

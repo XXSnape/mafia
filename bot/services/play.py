@@ -55,6 +55,7 @@ def remove_user_from_game(
         Roles.prosecutor: game_data["prosecutors"],
         Roles.lucky_gay: game_data["lucky_guys"],
         Roles.suicide_bomber: game_data["suicide_bombers"],
+        Roles.bodyguard: game_data["bodyguards"],
     }
     user_role = game_data["players"][str(user_id)]["role"]
     roles[user_role].remove(user_id)
@@ -81,7 +82,14 @@ async def sum_up_after_night(
     *, bot: Bot, state: FSMContext, dispatcher: Dispatcher
 ):
     game_data: GameCache = await state.get_data()
-    victims = set(game_data["died"]) - set(game_data["recovered"])
+    victims = (
+        set(game_data["died"])
+        - set(game_data["recovered"])
+        - set(game_data["self_protected"])
+    )
+    if game_data["self_protected"]:
+        if game_data["bodyguards"][0] not in game_data["recovered"]:
+            victims.add(game_data["bodyguards"][0])
     text_about_dead = ""
     for victim_id in victims:
         if victim_id in game_data["lucky_guys"]:
@@ -98,6 +106,7 @@ async def sum_up_after_night(
         url = game_data["players"][str(victim_id)]["url"]
         role = game_data["players"][str(victim_id)]["pretty_role"]
         text_about_dead += f"Сегодня был убит {role} - {url}!\n\n"
+
     live_players = get_profiles(
         live_players_ids=game_data["players_ids"],
         players=game_data["players"],

@@ -87,6 +87,7 @@ async def clear_data_after_all_actions(bot: Bot, state: FSMContext):
     game_data["vote_for"].clear()
     game_data["died"].clear()
     game_data["protected"].clear()
+    game_data["self_protected"].clear()
     for cant_vote_id in game_data["cant_vote"]:
         with suppress(TelegramBadRequest):
             await bot.restrict_chat_member(

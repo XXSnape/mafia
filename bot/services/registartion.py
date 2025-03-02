@@ -39,6 +39,7 @@ async def init_game(message: Message, state: FSMContext):
         "protected": [],
         "mafias": [],
         "doctors": [],
+        "bodyguards": [],
         "policeman": [],
         "civilians": [],
         "masochists": [],
@@ -48,6 +49,8 @@ async def init_game(message: Message, state: FSMContext):
         "lawyers": [],
         "died": [],
         "recovered": [],
+        "self_protected": [],
+        "last_self_protected": 0,
         "last_treated": 0,
         "last_arrested": 0,
         "last_protected": 0,
@@ -102,12 +105,14 @@ async def select_roles(state: FSMContext):
     masochists = Role(game_data["masochists"], Roles.masochist)
     lawyers = Role(game_data["lawyers"], Roles.lawyer)
     lucky_guys = Role(game_data["lucky_guys"], Roles.lucky_gay)
+    bodyguards = Role(game_data["bodyguards"], Roles.bodyguard)
     suicide_bombers = Role(
         game_data["suicide_bombers"], Roles.suicide_bomber
     )
     roles = (
         mafias,
         doctors,
+        bodyguards,
         suicide_bombers,
         lucky_guys,
         masochists,
