@@ -91,7 +91,7 @@ async def sum_up_after_night(
 
 async def confirm_final_aim(
     bot: Bot, state: FSMContext, group_chat_id: int
-):
+) -> bool:
     game_data: GameCache = await state.get_data()
     vote_for = game_data["vote_for"]
     vote_for.sort(reverse=True)
@@ -106,7 +106,7 @@ async def confirm_final_aim(
             text="Доброта или банальная несогласованность? "
             "Посмотрим, воспользуются ли преступники таким подарком.",
         )
-        return
+        return False
     aim_id = vote_for[0]
     url = game_data["players"][str(aim_id)]["url"]
     await state.set_state(GameFsm.VOTE)
@@ -119,7 +119,10 @@ async def confirm_final_aim(
             cons=game_data["cons"],
         ),
     )
-    game_data["to_delete"].append(sent_survey.message_id)
+    game_data["to_delete"].append(
+        [group_chat_id, sent_survey.message_id]
+    )
+    return True
 
 
 @check_end_of_game
@@ -144,7 +147,7 @@ async def sum_up_after_voting(
     remove_user_from_game(game_data=game_data, user_id=removed_user)
     await bot.send_message(
         chat_id=game_data["game_chat"],
-        text=f'Сегодня народ принял тяжелое решение и повесил {user_info["url"]}, который был {user_info["role"]}!',
+        text=f'Сегодня народ принял тяжелое решение и повесил {user_info["url"]} с ролью {user_info["role"]}!',
     )
 
 

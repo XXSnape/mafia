@@ -16,7 +16,11 @@ from services.play import (
 from services.mailing import MailerToPlayers
 
 from states.states import GameFsm
-from utils.utils import get_profiles, clear_data_after_all_actions
+from utils.utils import (
+    get_profiles,
+    clear_data_after_all_actions,
+    delete_messages_from_to_delete,
+)
 
 
 async def start_night(
@@ -52,18 +56,28 @@ async def start_night(
         await mailer.mail_policeman()
 
     await asyncio.sleep(20)
+    await delete_messages_from_to_delete(
+        bot=bot, to_delete=game_data["to_delete"]
+    )
     await sum_up_after_night(
         bot=bot, state=state, dispatcher=dispatcher
     )
     await asyncio.sleep(20)
     await mailer.suggest_vote()
     await asyncio.sleep(10)
-    await confirm_final_aim(
+    await delete_messages_from_to_delete(
+        bot=bot, to_delete=game_data["to_delete"]
+    )
+    result = await confirm_final_aim(
         bot=bot,
         state=state,
         group_chat_id=chat_id,
     )
-    await asyncio.sleep(10)
+    if result:
+        await asyncio.sleep(10)
+    await delete_messages_from_to_delete(
+        bot=bot, to_delete=game_data["to_delete"]
+    )
     await sum_up_after_voting(
         bot=bot,
         state=state,

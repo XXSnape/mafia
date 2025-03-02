@@ -89,7 +89,9 @@ class MailerToPlayers:
             text=text,
             reply_markup=markup,
         )
-        game_data["to_delete"].append(sent_survey.message_id)
+        game_data["to_delete"].append(
+            [role_id, sent_survey.message_id]
+        )
         await self.state.set_data(game_data)
         await get_state_and_assign(
             dispatcher=self.dispatcher,
@@ -141,11 +143,12 @@ class MailerToPlayers:
 
     async def send_request_to_vote(
         self,
+        game_data: GameCache,
         user_id: int,
         players_ids: LivePlayersIds,
         players: UsersInGame,
     ):
-        await self.bot.send_message(
+        sent_message = await self.bot.send_message(
             chat_id=user_id,
             text="Проголосуй за того, кто не нравится!",
             reply_markup=send_selection_to_players_kb(
@@ -154,6 +157,9 @@ class MailerToPlayers:
                 exclude=user_id,
                 user_index_cb=UserVoteIndexCbData,
             ),
+        )
+        game_data["to_delete"].append(
+            [user_id, sent_message.message_id]
         )
 
     async def suggest_vote(self):
@@ -168,6 +174,7 @@ class MailerToPlayers:
         await asyncio.gather(
             *(
                 self.send_request_to_vote(
+                    game_data=game_data,
                     user_id=user_id,
                     players_ids=live_players,
                     players=players,

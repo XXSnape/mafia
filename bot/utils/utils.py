@@ -1,5 +1,8 @@
+import asyncio
 from contextlib import suppress
 
+from aiogram import Bot
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from sqlalchemy.testing.suite.test_reflection import users
@@ -10,6 +13,7 @@ from cache.cache_types import (
     LivePlayersIds,
     PlayersIds,
     GameCache,
+    ChatsAndMessagesIds,
 )
 
 
@@ -46,6 +50,28 @@ def add_voice(
         delete_from.remove(user_id)
     if user_id not in add_to:
         add_to.append(user_id)
+
+
+async def delete_message_by_chat(
+    bot: Bot, chat_id: int, message_id: int
+):
+    with suppress(TelegramBadRequest):
+        await bot.delete_message(
+            chat_id=chat_id, message_id=message_id
+        )
+
+
+async def delete_messages_from_to_delete(
+    bot: Bot, to_delete: ChatsAndMessagesIds
+):
+    await asyncio.gather(
+        *(
+            delete_message_by_chat(
+                bot=bot, chat_id=chat_id, message_id=message_id
+            )
+            for chat_id, message_id in to_delete
+        )
+    )
 
 
 async def clear_data_after_all_actions(state: FSMContext):

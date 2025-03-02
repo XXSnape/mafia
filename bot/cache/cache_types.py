@@ -1,5 +1,11 @@
 from enum import StrEnum
-from typing import TypedDict, TypeAlias, NotRequired, Literal
+from typing import (
+    TypedDict,
+    TypeAlias,
+    NotRequired,
+    Literal,
+    Iterable,
+)
 
 
 class Groupings(StrEnum):
@@ -24,6 +30,7 @@ UsersInGame: TypeAlias = dict[str, UserGameCache]
 
 PlayersIds: TypeAlias = list[int]
 LivePlayersIds: TypeAlias = PlayersIds
+ChatsAndMessagesIds: TypeAlias = list[list[int]]
 
 
 class UserCache(TypedDict):
@@ -43,7 +50,7 @@ class GameCache(TypedDict, total=True):
     civilians: PlayersIds
     died: PlayersIds
     recovered: PlayersIds
-    to_delete: PlayersIds
+    to_delete: ChatsAndMessagesIds
     vote_for: PlayersIds
     # wait_for: list[int]
     last_treated: int
