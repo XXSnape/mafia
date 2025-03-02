@@ -22,9 +22,8 @@ from keyboards.inline.keypads.to_bot import (
     get_to_bot_kb,
     participate_in_social_life,
 )
-from services.registartion import get_state_and_assign
 from states.states import UserFsm
-from utils.utils import make_pretty
+from utils.utils import make_pretty, get_state_and_assign
 
 
 async def familiarize_players(bot: Bot, state: FSMContext):

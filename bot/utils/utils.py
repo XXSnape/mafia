@@ -1,11 +1,11 @@
 import asyncio
 from contextlib import suppress
 
-from aiogram import Bot
+from aiogram import Bot, Dispatcher
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
-from sqlalchemy.testing.suite.test_reflection import users
+from aiogram.fsm.state import State
+from aiogram.fsm.storage.base import StorageKey
 
 from cache.cache_types import (
     UsersInGame,
@@ -86,3 +86,40 @@ async def clear_data_after_all_actions(state: FSMContext):
     game_data["vote_for"].clear()
     game_data["died"].clear()
     await state.set_data(game_data)
+
+
+async def reset_state(
+    dispatcher: Dispatcher,
+    chat_id: int,
+    bot: Bot,
+    is_win: bool,
+    role: str,
+):
+    if is_win:
+        text = f"Поздравлю! Ты победил в роли {role}"
+    else:
+        text = f"К несчастью! Ты проиграл в роли {role}"
+    await bot.send_message(chat_id=chat_id, text=text)
+    state = await get_state_and_assign(
+        dispatcher=dispatcher, chat_id=chat_id, bot_id=bot.id
+    )
+    await state.clear()
+
+
+async def get_state_and_assign(
+    dispatcher: Dispatcher,
+    chat_id: int,
+    bot_id: int,
+    new_state: State | None = None,
+):
+    chat_state: FSMContext = FSMContext(
+        storage=dispatcher.storage,
+        key=StorageKey(
+            chat_id=chat_id,
+            user_id=chat_id,
+            bot_id=bot_id,
+        ),
+    )
+    if new_state:
+        await chat_state.set_state(new_state)
+    return chat_state

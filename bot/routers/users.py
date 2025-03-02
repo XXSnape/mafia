@@ -10,7 +10,7 @@ from keyboards.inline.callback_factory.recognize_user import (
 from keyboards.inline.keypads.to_bot import (
     participate_in_social_life,
 )
-from services.registartion import get_state_and_assign
+from utils.utils import get_state_and_assign
 from states.states import UserFsm
 
 router = Router()
@@ -109,7 +109,7 @@ async def policeman_checks(
     #     chat_id=checked_user_id,
     #     text="Тебе же нечего скрывать, да? Оперативные службы проводят в отношении тебя тщательную проверку",
     # )
-    role = game_data["players"][str(checked_user_id)]["role"]
+    role = game_data["players"][str(checked_user_id)]["pretty_role"]
     url = game_data["players"][str(checked_user_id)]["url"]
     await callback.message.delete()
     await callback.message.answer(f"{url} - {role}!")

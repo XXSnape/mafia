@@ -3,12 +3,16 @@ from collections.abc import Callable
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 
-from cache.cache_types import GameCache, UserGameCache, Groupings
+from cache.cache_types import (
+    GameCache,
+    UserGameCache,
+    Groupings,
+    Roles,
+)
 from general.exceptions import GameIsOver
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
-from services.registartion import get_state_and_assign
 from states.states import UserFsm, GameFsm
-from utils.utils import get_profiles
+from utils.utils import get_profiles, get_state_and_assign
 import asyncio
 
 
@@ -29,10 +33,10 @@ def check_end_of_game(async_func: Callable):
 def remove_user_from_game(game_data: GameCache, user_id: int):
     game_data["players_ids"].remove(user_id)
     roles = {
-        "Мафия": game_data["mafias"],
-        "Доктор": game_data["doctors"],
-        "Комиссар": game_data["policeman"],
-        "Мирный житель": game_data["civilians"],
+        Roles.mafia: game_data["mafias"],
+        Roles.doctor: game_data["doctors"],
+        Roles.policeman: game_data["policeman"],
+        Roles.civilian: game_data["civilians"],
     }
     user_role = game_data["players"][str(user_id)]["role"]
     roles[user_role].remove(user_id)

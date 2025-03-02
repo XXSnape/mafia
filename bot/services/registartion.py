@@ -1,10 +1,8 @@
 from random import shuffle
 from typing import NamedTuple
 
-from aiogram import Dispatcher, Bot
+from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State
-from aiogram.fsm.storage.base import StorageKey
 from aiogram.types import Message, CallbackQuery
 
 from cache.cache_types import (
@@ -16,7 +14,11 @@ from cache.cache_types import (
     LivePlayersIds,
 )
 from states.states import GameFsm
-from utils.utils import get_profile_link, make_pretty
+from utils.utils import (
+    get_profile_link,
+    make_pretty,
+    get_state_and_assign,
+)
 
 
 async def init_game(message: Message, state: FSMContext):
@@ -41,25 +43,6 @@ async def init_game(message: Message, state: FSMContext):
     }
     await state.set_data(game_data)
     await state.set_state(GameFsm.REGISTRATION)
-
-
-async def get_state_and_assign(
-    dispatcher: Dispatcher,
-    chat_id: int,
-    bot_id: int,
-    new_state: State | None = None,
-):
-    chat_state: FSMContext = FSMContext(
-        storage=dispatcher.storage,
-        key=StorageKey(
-            chat_id=chat_id,
-            user_id=chat_id,
-            bot_id=bot_id,
-        ),
-    )
-    if new_state:
-        await chat_state.set_state(new_state)
-    return chat_state
 
 
 async def add_user_to_game(
@@ -107,8 +90,12 @@ async def select_roles(state: FSMContext):
     roles = (mafias, doctors, policeman, civilians)
     for index, user_id in enumerate(ids):
         current_role: Role = roles[index]
-        game_data["players"][str(user_id)]["role"] = make_pretty(
-            current_role.role
+        game_data["players"][str(user_id)][
+            "role"
+        ] = current_role.role
+        game_data["players"][str(user_id)]["pretty_role"] = (
+            make_pretty(current_role.role)
         )
+
         current_role.players.append(user_id)
     await state.set_data(game_data)

@@ -24,6 +24,7 @@ class UserGameCache(TypedDict):
     full_name: str
     url: str
     role: NotRequired[str]
+    pretty_role: NotRequired[str]
 
 
 UsersInGame: TypeAlias = dict[str, UserGameCache]
