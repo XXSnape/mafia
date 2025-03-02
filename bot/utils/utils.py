@@ -95,6 +95,7 @@ async def clear_data_after_all_actions(bot: Bot, state: FSMContext):
                 permissions=ChatPermissions(
                     can_send_messages=True,
                     can_send_other_messages=True,
+                    can_send_polls=True,
                 ),
             )
     game_data["cant_vote"].clear()
