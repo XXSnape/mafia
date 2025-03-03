@@ -188,8 +188,8 @@ class MailerToPlayers:
         game_data: GameCache = await self.state.get_data()
         exclude = (
             []
-            if game_data["last_protected"] == 0
-            else game_data["last_protected"]
+            if game_data["last_forgiven"] == 0
+            else game_data["last_forgiven"]
         )
         await self._mail_user(
             text="Кого защитить на голосовании?",

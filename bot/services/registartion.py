@@ -50,10 +50,11 @@ async def init_game(message: Message, state: FSMContext):
         "died": [],
         "recovered": [],
         "self_protected": [],
+        "have_alibi": [],
         "last_self_protected": 0,
         "last_treated": 0,
         "last_arrested": 0,
-        "last_protected": 0,
+        "last_forgiven": 0,
     }
     await state.set_data(game_data)
     await state.set_state(GameFsm.REGISTRATION)
@@ -111,6 +112,8 @@ async def select_roles(state: FSMContext):
     )
     roles = (
         mafias,
+        policeman,
+        lawyers,
         doctors,
         prosecutors,
         bodyguards,

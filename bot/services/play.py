@@ -186,13 +186,13 @@ async def sum_up_after_voting(
     user_info: UserGameCache = game_data["players"][
         str(removed_user)
     ]
-    if removed_user == game_data["last_protected"]:
+
+    if removed_user in game_data["have_alibi"]:
         await bot.send_message(
             chat_id=game_data["game_chat"],
-            text=f"У {user_info['url']} есть алиби, поэтому местные жители гвоздя программы",
+            text=f"У {user_info['url']} есть алиби, поэтому местные жители отпустили гвоздя программы",
         )
         return
-
     remove_user_from_game(
         game_data=game_data, user_id=removed_user, is_night=False
     )

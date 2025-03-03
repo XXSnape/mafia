@@ -9,6 +9,7 @@ from cache.cache_types import UserCache, GameCache
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
+from services.actions_at_night import get_user_id_and_inform_players
 
 from states.states import UserFsm
 from utils.utils import get_state_and_assign
@@ -25,20 +26,16 @@ async def prosecutor_arrests(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    user_data: UserCache = await state.get_data()
-    game_state = await get_state_and_assign(
-        dispatcher=dispatcher,
-        chat_id=user_data["game_chat"],
-        bot_id=callback.bot.id,
+    game_state, game_data, arrested_user_id = (
+        await get_user_id_and_inform_players(
+            callback=callback,
+            callback_data=callback_data,
+            state=state,
+            dispatcher=dispatcher,
+            message_to_group="По данным разведки потенциальный злоумышленник арестован!",
+            message_to_user="Ты выбрал арестовать {url}",
+        )
     )
-    game_data: GameCache = await game_state.get_data()
-    await callback.bot.send_message(
-        chat_id=user_data["game_chat"],
-        text="По данным разведки потенциальный злоумышленник арестован!",
-    )
-    arrested_user_id = game_data["players_ids"][
-        callback_data.user_index
-    ]
     with suppress(TelegramBadRequest):
         await callback.bot.restrict_chat_member(
             chat_id=game_data["game_chat"],
@@ -47,7 +44,35 @@ async def prosecutor_arrests(
         )
     game_data["cant_vote"].append(arrested_user_id)
     game_data["last_arrested"] = arrested_user_id
-    url = game_data["players"][str(arrested_user_id)]["url"]
-    await callback.message.delete()
-    await callback.message.answer(f"Ты выбрал арестовать {url}")
     await game_state.set_data(game_data)
+
+    # role = game_data["players"][str(checked_user_id)]["pretty_role"]
+    # url = game_data["players"][str(checked_user_id)]["url"]
+    # await callback.answer(f"{url} - {role}!", show_alert=True)
+    # await callback.message.answer(f"{url} - {role}!")
+    # user_data: UserCache = await state.get_data()
+    # game_state = await get_state_and_assign(
+    #     dispatcher=dispatcher,
+    #     chat_id=user_data["game_chat"],
+    #     bot_id=callback.bot.id,
+    # )
+    # game_data: GameCache = await game_state.get_data()
+    # await callback.bot.send_message(
+    #     chat_id=user_data["game_chat"],
+    #     text="По данным разведки потенциальный злоумышленник арестован!",
+    # )
+    # arrested_user_id = game_data["players_ids"][
+    #     callback_data.user_index
+    # ]
+    # with suppress(TelegramBadRequest):
+    #     await callback.bot.restrict_chat_member(
+    #         chat_id=game_data["game_chat"],
+    #         user_id=arrested_user_id,
+    #         permissions=ChatPermissions(can_send_messages=False),
+    #     )
+    # game_data["cant_vote"].append(arrested_user_id)
+    # game_data["last_arrested"] = arrested_user_id
+    # url = game_data["players"][str(arrested_user_id)]["url"]
+    # await callback.message.delete()
+    # await callback.message.answer(f"Ты выбрал арестовать {url}")
+    # await game_state.set_data(game_data)
