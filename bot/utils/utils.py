@@ -1,20 +1,15 @@
-import asyncio
 from contextlib import suppress
 
 from aiogram import Bot, Dispatcher
-from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.fsm.storage.base import StorageKey
-from aiogram.types import ChatPermissions
 
 from cache.cache_types import (
     UsersInGame,
     UserGameCache,
     LivePlayersIds,
     PlayersIds,
-    GameCache,
-    ChatsAndMessagesIds,
 )
 
 
@@ -53,73 +48,8 @@ def add_voice(
         add_to.append(user_id)
 
 
-async def delete_message_by_chat(
-    bot: Bot, chat_id: int, message_id: int
-):
-    with suppress(TelegramBadRequest):
-        await bot.delete_message(
-            chat_id=chat_id, message_id=message_id
-        )
-
-
-async def delete_messages_from_to_delete(
-    bot: Bot, to_delete: ChatsAndMessagesIds
-):
-    await asyncio.gather(
-        *(
-            delete_message_by_chat(
-                bot=bot, chat_id=chat_id, message_id=message_id
-            )
-            for chat_id, message_id in to_delete
-        )
-    )
-
-
 def make_pretty(string: str) -> str:
     return f"<b><i><u>{string}</u></i></b>"
-
-
-async def clear_data_after_all_actions(bot: Bot, state: FSMContext):
-    game_data: GameCache = await state.get_data()
-    game_data["pros"].clear()
-    game_data["cons"].clear()
-    game_data["recovered"].clear()
-    game_data["vote_for"].clear()
-    game_data["died"].clear()
-    game_data["protected"].clear()
-    game_data["self_protected"].clear()
-    game_data["have_alibi"].clear()
-    for cant_vote_id in game_data["cant_vote"]:
-        with suppress(TelegramBadRequest):
-            await bot.restrict_chat_member(
-                chat_id=game_data["game_chat"],
-                user_id=cant_vote_id,
-                permissions=ChatPermissions(
-                    can_send_messages=True,
-                    can_send_other_messages=True,
-                    can_send_polls=True,
-                ),
-            )
-    game_data["cant_vote"].clear()
-    await state.set_data(game_data)
-
-
-async def reset_state(
-    dispatcher: Dispatcher,
-    chat_id: int,
-    bot: Bot,
-    is_win: bool,
-    role: str,
-):
-    if is_win:
-        text = f"Поздравлю! Ты победил в роли {role}"
-    else:
-        text = f"К несчастью! Ты проиграл в роли {role}"
-    await bot.send_message(chat_id=chat_id, text=text)
-    state = await get_state_and_assign(
-        dispatcher=dispatcher, chat_id=chat_id, bot_id=bot.id
-    )
-    await state.clear()
 
 
 async def get_state_and_assign(

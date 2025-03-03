@@ -12,14 +12,12 @@ from keyboards.inline.cb.cb_text import (
 )
 
 from keyboards.inline.keypads.join import get_join_kb
-from services.mailing import familiarize_players
 from services.registartion import (
     init_game,
     add_user_to_game,
-    select_roles,
 )
 from states.states import GameFsm
-from tasks.tasks import start_game
+from services.pipeline_game import Game
 from utils.utils import get_profiles_during_registration
 
 router = Router(name=__name__)
@@ -84,7 +82,6 @@ async def join_new_member(
 async def finish_registration(
     callback: CallbackQuery,
     state: FSMContext,
-    bot: Bot,
     dispatcher: Dispatcher,
     scheduler: AsyncIOScheduler,
 ):
@@ -100,13 +97,10 @@ async def finish_registration(
             "Слишком мало игроков", show_alert=True
         )
         return
-    await select_roles(state=state)
-    await familiarize_players(bot=callback.bot, state=state)
-    await start_game(
-        chat_id=callback.message.chat.id,
-        message_id=callback.message.message_id,
-        bot=callback.bot,
+    game = Game(
+        message=callback.message,
         state=state,
         dispatcher=dispatcher,
         scheduler=scheduler,
     )
+    await game.start_game()

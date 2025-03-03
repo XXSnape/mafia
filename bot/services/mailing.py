@@ -11,8 +11,8 @@ from cache.cache_types import (
     RolesKeysLiteral,
     LivePlayersIds,
     UsersInGame,
-    Roles,
 )
+from general.players import Roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserVoteIndexCbData,
 )
@@ -27,86 +27,6 @@ from states.states import UserFsm
 from utils.utils import make_pretty, get_state_and_assign
 
 
-async def familiarize_players(bot: Bot, state: FSMContext):
-    game_data: GameCache = await state.get_data()
-    mafias = game_data["mafias"]
-    doctors = game_data["doctors"]
-    policeman = game_data["policeman"]
-    civilians = game_data["civilians"]
-    lawyers = game_data["lawyers"]
-    prosecutors = game_data["prosecutors"]
-    masochists = game_data["masochists"]
-    lucky_guys = game_data["lucky_guys"]
-    suicide_bombers = game_data["suicide_bombers"]
-    bodyguards = game_data["bodyguards"]
-    for user_id in mafias:
-        await bot.send_photo(
-            chat_id=user_id,
-            photo="https://i.pinimg.com/736x/a1/10/db/a110db3eaba78bf6423bcea68f330a64.jpg",
-            caption=f"Твоя роль - {make_pretty(Roles.mafia)}! Тебе нужно уничтожить всех горожан.",
-        )
-    for user_id in doctors:
-        await bot.send_photo(
-            chat_id=user_id,
-            photo="https://gipermed.ru/upload/iblock/4bf/4bfa55f59ceb538bd2c8c437e8f71e5a.jpg",
-            caption=f"Твоя роль - {make_pretty(Roles.doctor)}! Тебе нужно стараться лечить тех, кому нужна помощь.",
-        )
-    for user_id in policeman:
-        await bot.send_photo(
-            chat_id=user_id,
-            photo="https://avatars.mds.yandex.net/get-kinopoisk-image/1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x",
-            caption=f"Твоя роль - {make_pretty(Roles.policeman)}! Тебе нужно вычислить мафию.",
-        )
-    for user_id in lawyers:
-        await bot.send_photo(
-            chat_id=user_id,
-            photo="https://avatars.mds.yandex.net/get-altay/5579175/2a0000017e0aa51c3c1fd887206b0156ee34/XXL_height",
-            caption=f"Твоя роль - {make_pretty(Roles.lawyer)}! Тебе нужно защитить мирных жителей от своих же на голосовании.",
-        )
-    for user_id in prosecutors:
-        await bot.send_photo(
-            chat_id=user_id,
-            photo="https://avatars.mds.yandex.net/i?id=b5115d431dafc24be07a55a8b6343540_l-5205087-images-thumbs&n=13",
-            caption=f"Твоя роль - {make_pretty(Roles.prosecutor)}! Тебе нельзя допустить, чтобы днем мафия могла говорить.",
-        )
-    for user_id in civilians:
-        await bot.send_photo(
-            chat_id=user_id,
-            photo="https://cdn.culture.ru/c/820179.jpg",
-            caption=f"Твоя роль - {make_pretty(Roles.civilian)}! Тебе нужно вычислить мафию на голосовании.",
-        )
-    for user_id in masochists:
-        await bot.send_photo(
-            chat_id=user_id,
-            photo="https://i.pinimg.com/736x/14/a5/f5/14a5f5eb5dbd73c4707f24d436d80c0b.jpg",
-            caption=f"Твоя роль - {make_pretty(Roles.masochist)}! Тебе нужно умереть на дневном голосовании.",
-        )
-    for user_id in lucky_guys:
-        await bot.send_photo(
-            chat_id=user_id,
-            photo="https://avatars.mds.yandex.net/get-mpic/5031100/img_id5520953584482126492.jpeg/orig",
-            caption=f"Твоя роль - {make_pretty(Roles.lucky_gay)}! "
-            f"Возможно тебе повезет и ты останешься жив после покушения.",
-        )
-    for user_id in suicide_bombers:
-        await bot.send_photo(
-            chat_id=user_id,
-            photo="https://sun6-22.userapi.com/impg/zAaADEA19scv86EFl8bY1wUYRCJyBPGg1qamiA/xjMRCUhA20g.jpg?"
-            "size=1280x1280&quality=96&"
-            "sign=de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag="
-            "EOC9ErRHImjvmda4Qd5Pq59HPf-wUgr77rzHZvabHjc&type=album",
-            caption=f"Твоя роль - {make_pretty(Roles.suicide_bomber)}! "
-            f"Тебе нужно умереть ночью.",
-        )
-    for user_id in bodyguards:
-        await bot.send_photo(
-            chat_id=user_id,
-            photo="https://avatars.mds.yandex.net/get-kinopoisk-image/1900788/db009751-69de-467c-9023-0439e82cbde3/1920x",
-            caption=f"Твоя роль - {make_pretty(Roles.bodyguard)}! "
-            f"Тебе защитить собой лучших специалистов",
-        )
-
-
 class MailerToPlayers:
     def __init__(
         self,
@@ -119,6 +39,20 @@ class MailerToPlayers:
         self.bot = bot
         self.dispatcher = dispatcher
         self.group_chat_id = group_chat_id
+
+    async def mailing(self, game_data: GameCache):
+        if game_data["mafias"]:
+            await self._mail_mafia()
+        if game_data["doctors"]:
+            await self._mail_doctor()
+        if game_data["policeman"]:
+            await self._mail_policeman()
+        if game_data["prosecutors"]:
+            await self._mail_prosecutor()
+        if game_data["lawyers"]:
+            await self._mail_lawyer()
+        if game_data["bodyguards"]:
+            await self._mail_bodyguard()
 
     async def _mail_user(
         self,
@@ -152,7 +86,7 @@ class MailerToPlayers:
             new_state=new_state,
         )
 
-    async def mail_prosecutor(self):
+    async def _mail_prosecutor(self):
         game_data: GameCache = await self.state.get_data()
         prosecutors = game_data["prosecutors"]
         prosecutor_id = prosecutors[0]
@@ -168,7 +102,7 @@ class MailerToPlayers:
             exclude=[prosecutor_id] + exclude,
         )
 
-    async def mail_bodyguard(self):
+    async def _mail_bodyguard(self):
         game_data: GameCache = await self.state.get_data()
         bodyguards = game_data["bodyguards"]
         bodyguard_id = bodyguards[0]
@@ -184,7 +118,7 @@ class MailerToPlayers:
             exclude=[bodyguard_id] + exclude,
         )
 
-    async def mail_lawyer(self):
+    async def _mail_lawyer(self):
         game_data: GameCache = await self.state.get_data()
         exclude = (
             []
@@ -198,7 +132,7 @@ class MailerToPlayers:
             exclude=exclude,
         )
 
-    async def mail_mafia(self):
+    async def _mail_mafia(self):
         game_data: GameCache = await self.state.get_data()
         mafias = game_data["mafias"]
         mafia_id = mafias[0]
@@ -209,7 +143,7 @@ class MailerToPlayers:
             exclude=mafia_id,
         )
 
-    async def mail_doctor(
+    async def _mail_doctor(
         self,
     ):
         game_data: GameCache = await self.state.get_data()
@@ -225,7 +159,7 @@ class MailerToPlayers:
             exclude=exclude,
         )
 
-    async def mail_policeman(
+    async def _mail_policeman(
         self,
     ):
         game_data: GameCache = await self.state.get_data()
@@ -280,3 +214,98 @@ class MailerToPlayers:
                 if user_id not in game_data["cant_vote"]
             )
         )
+
+    async def report_death(
+        self,
+        chat_id: int,
+    ):
+
+        await get_state_and_assign(
+            dispatcher=self.dispatcher,
+            chat_id=chat_id,
+            bot_id=self.bot.id,
+            new_state=UserFsm.WAIT_FOR_LATEST_LETTER,
+        )
+        await self.bot.send_message(
+            chat_id=chat_id,
+            text="К сожалению, тебя убили! Отправь напоследок все, что думаешь!",
+        )
+
+    async def familiarize_players(self):
+        game_data: GameCache = await self.state.get_data()
+        mafias = game_data["mafias"]
+        doctors = game_data["doctors"]
+        policeman = game_data["policeman"]
+        civilians = game_data["civilians"]
+        lawyers = game_data["lawyers"]
+        prosecutors = game_data["prosecutors"]
+        masochists = game_data["masochists"]
+        lucky_guys = game_data["lucky_guys"]
+        suicide_bombers = game_data["suicide_bombers"]
+        bodyguards = game_data["bodyguards"]
+        for user_id in mafias:
+            await self.bot.send_photo(
+                chat_id=user_id,
+                photo="https://i.pinimg.com/736x/a1/10/db/a110db3eaba78bf6423bcea68f330a64.jpg",
+                caption=f"Твоя роль - {make_pretty(Roles.mafia)}! Тебе нужно уничтожить всех горожан.",
+            )
+        for user_id in doctors:
+            await self.bot.send_photo(
+                chat_id=user_id,
+                photo="https://gipermed.ru/upload/iblock/4bf/4bfa55f59ceb538bd2c8c437e8f71e5a.jpg",
+                caption=f"Твоя роль - {make_pretty(Roles.doctor)}! Тебе нужно стараться лечить тех, кому нужна помощь.",
+            )
+        for user_id in policeman:
+            await self.bot.send_photo(
+                chat_id=user_id,
+                photo="https://avatars.mds.yandex.net/get-kinopoisk-image/1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x",
+                caption=f"Твоя роль - {make_pretty(Roles.policeman)}! Тебе нужно вычислить мафию.",
+            )
+        for user_id in lawyers:
+            await self.bot.send_photo(
+                chat_id=user_id,
+                photo="https://avatars.mds.yandex.net/get-altay/5579175/2a0000017e0aa51c3c1fd887206b0156ee34/XXL_height",
+                caption=f"Твоя роль - {make_pretty(Roles.lawyer)}! Тебе нужно защитить мирных жителей от своих же на голосовании.",
+            )
+        for user_id in prosecutors:
+            await self.bot.send_photo(
+                chat_id=user_id,
+                photo="https://avatars.mds.yandex.net/i?id=b5115d431dafc24be07a55a8b6343540_l-5205087-images-thumbs&n=13",
+                caption=f"Твоя роль - {make_pretty(Roles.prosecutor)}! Тебе нельзя допустить, чтобы днем мафия могла говорить.",
+            )
+        for user_id in civilians:
+            await self.bot.send_photo(
+                chat_id=user_id,
+                photo="https://cdn.culture.ru/c/820179.jpg",
+                caption=f"Твоя роль - {make_pretty(Roles.civilian)}! Тебе нужно вычислить мафию на голосовании.",
+            )
+        for user_id in masochists:
+            await self.bot.send_photo(
+                chat_id=user_id,
+                photo="https://i.pinimg.com/736x/14/a5/f5/14a5f5eb5dbd73c4707f24d436d80c0b.jpg",
+                caption=f"Твоя роль - {make_pretty(Roles.masochist)}! Тебе нужно умереть на дневном голосовании.",
+            )
+        for user_id in lucky_guys:
+            await self.bot.send_photo(
+                chat_id=user_id,
+                photo="https://avatars.mds.yandex.net/get-mpic/5031100/img_id5520953584482126492.jpeg/orig",
+                caption=f"Твоя роль - {make_pretty(Roles.lucky_gay)}! "
+                f"Возможно тебе повезет и ты останешься жив после покушения.",
+            )
+        for user_id in suicide_bombers:
+            await self.bot.send_photo(
+                chat_id=user_id,
+                photo="https://sun6-22.userapi.com/impg/zAaADEA19scv86EFl8bY1wUYRCJyBPGg1qamiA/xjMRCUhA20g.jpg?"
+                "size=1280x1280&quality=96&"
+                "sign=de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag="
+                "EOC9ErRHImjvmda4Qd5Pq59HPf-wUgr77rzHZvabHjc&type=album",
+                caption=f"Твоя роль - {make_pretty(Roles.suicide_bomber)}! "
+                f"Тебе нужно умереть ночью.",
+            )
+        for user_id in bodyguards:
+            await self.bot.send_photo(
+                chat_id=user_id,
+                photo="https://avatars.mds.yandex.net/get-kinopoisk-image/1900788/db009751-69de-467c-9023-0439e82cbde3/1920x",
+                caption=f"Твоя роль - {make_pretty(Roles.bodyguard)}! "
+                f"Тебе защитить собой лучших специалистов",
+            )

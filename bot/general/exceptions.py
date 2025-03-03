@@ -1,4 +1,4 @@
-from cache.cache_types import Groupings
+from general.players import Groupings
 
 
 class GameIsOver(Exception):
