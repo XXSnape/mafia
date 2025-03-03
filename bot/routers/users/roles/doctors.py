@@ -6,7 +6,10 @@ from cache.cache_types import UserCache, GameCache
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
-from services.actions_at_night import get_user_id_and_inform_players
+from services.actions_at_night import (
+    get_user_id_and_inform_players,
+    take_action_and_register_user,
+)
 from states.states import UserFsm
 from utils.utils import get_state_and_assign
 
@@ -22,19 +25,29 @@ async def doctor_treats(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    game_state, game_data, recovered_user_id = (
-        await get_user_id_and_inform_players(
-            callback=callback,
-            callback_data=callback_data,
-            state=state,
-            dispatcher=dispatcher,
-            message_to_group="Доктор спешит кому-то на помощь!",
-            message_to_user="Ты выбрал вылечить {url}",
-        )
+    await take_action_and_register_user(
+        callback=callback,
+        callback_data=callback_data,
+        state=state,
+        dispatcher=dispatcher,
+        message_to_group="Доктор спешит кому-то на помощь!",
+        message_to_user="Ты выбрал вылечить {url}",
+        last_processed_user_key="last_treated",
+        list_to_process_key="recovered",
     )
-    game_data["recovered"].append(recovered_user_id)
-    game_data["last_treated"] = recovered_user_id
-    await game_state.set_data(game_data)
+    # game_state, game_data, recovered_user_id = (
+    #     await get_user_id_and_inform_players(
+    #         callback=callback,
+    #         callback_data=callback_data,
+    #         state=state,
+    #         dispatcher=dispatcher,
+    #         message_to_group="Доктор спешит кому-то на помощь!",
+    #         message_to_user="Ты выбрал вылечить {url}",
+    #     )
+    # )
+    # game_data["recovered"].append(recovered_user_id)
+    # game_data["last_treated"] = recovered_user_id
+    # await game_state.set_data(game_data)
     # user_data: UserCache = await state.get_data()
     # game_state = await get_state_and_assign(
     #     dispatcher=dispatcher,

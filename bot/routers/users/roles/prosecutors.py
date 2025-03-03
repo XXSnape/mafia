@@ -9,7 +9,10 @@ from cache.cache_types import UserCache, GameCache
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
-from services.actions_at_night import get_user_id_and_inform_players
+from services.actions_at_night import (
+    get_user_id_and_inform_players,
+    take_action_and_register_user,
+)
 
 from states.states import UserFsm
 from utils.utils import get_state_and_assign
@@ -26,25 +29,37 @@ async def prosecutor_arrests(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    game_state, game_data, arrested_user_id = (
-        await get_user_id_and_inform_players(
+    game_data, arrested_user_id = (
+        await take_action_and_register_user(
             callback=callback,
             callback_data=callback_data,
             state=state,
             dispatcher=dispatcher,
             message_to_group="По данным разведки потенциальный злоумышленник арестован!",
             message_to_user="Ты выбрал арестовать {url}",
+            last_processed_user_key="last_arrested",
+            list_to_process_key="cant_vote",
         )
     )
+    # game_state, game_data, arrested_user_id = (
+    #     await get_user_id_and_inform_players(
+    #         callback=callback,
+    #         callback_data=callback_data,
+    #         state=state,
+    #         dispatcher=dispatcher,
+    #         message_to_group="По данным разведки потенциальный злоумышленник арестован!",
+    #         message_to_user="Ты выбрал арестовать {url}",
+    #     )
+    # )
     with suppress(TelegramBadRequest):
         await callback.bot.restrict_chat_member(
             chat_id=game_data["game_chat"],
             user_id=arrested_user_id,
             permissions=ChatPermissions(can_send_messages=False),
         )
-    game_data["cant_vote"].append(arrested_user_id)
-    game_data["last_arrested"] = arrested_user_id
-    await game_state.set_data(game_data)
+    # game_data["cant_vote"].append(arrested_user_id)
+    # game_data["last_arrested"] = arrested_user_id
+    # await game_state.set_data(game_data)
 
     # role = game_data["players"][str(checked_user_id)]["pretty_role"]
     # url = game_data["players"][str(checked_user_id)]["url"]

@@ -2,7 +2,12 @@ from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from cache.cache_types import UserCache, GameCache
+from cache.cache_types import (
+    UserCache,
+    GameCache,
+    LastProcessedLiteral,
+    ListToProcessLiteral,
+)
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
@@ -63,3 +68,30 @@ async def get_user_id_and_inform_players(
     await callback.message.delete()
     await callback.message.answer(message_to_user.format(url=url))
     return game_state, game_data, user_id
+
+
+async def take_action_and_register_user(
+    callback: CallbackQuery,
+    callback_data: UserActionIndexCbData,
+    state: FSMContext,
+    dispatcher: Dispatcher,
+    message_to_group: str,
+    message_to_user: str,
+    last_processed_user_key: LastProcessedLiteral,
+    list_to_process_key: ListToProcessLiteral,
+):
+    game_state, game_data, user_id = (
+        await get_user_id_and_inform_players(
+            callback=callback,
+            callback_data=callback_data,
+            state=state,
+            dispatcher=dispatcher,
+            message_to_group=message_to_group,
+            message_to_user=message_to_user,
+        )
+    )
+
+    game_data[last_processed_user_key] = user_id
+    game_data[list_to_process_key].append(user_id)
+    await game_state.set_data(game_data)
+    return game_data, user_id

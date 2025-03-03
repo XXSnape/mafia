@@ -6,7 +6,10 @@ from cache.cache_types import UserCache, GameCache
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
-from services.actions_at_night import get_user_id_and_inform_players
+from services.actions_at_night import (
+    get_user_id_and_inform_players,
+    take_action_and_register_user,
+)
 from states.states import UserFsm
 from utils.utils import get_state_and_assign
 
@@ -33,16 +36,26 @@ async def bodyguard_protects(
     #     chat_id=user_data["game_chat"],
     #     text="Кто-то пожертвовал собой!",
     # )
-    game_state, game_data, protected_user_id = (
-        await get_user_id_and_inform_players(
-            callback=callback,
-            callback_data=callback_data,
-            state=state,
-            dispatcher=dispatcher,
-            message_to_group="Кто-то пожертвовал собой!",
-            message_to_user="Ты выбрал пожертвовать собой, чтобы спасти {url}",
-        )
+    await take_action_and_register_user(
+        callback=callback,
+        callback_data=callback_data,
+        state=state,
+        dispatcher=dispatcher,
+        message_to_group="Кто-то пожертвовал собой!",
+        message_to_user="Ты выбрал пожертвовать собой, чтобы спасти {url}",
+        last_processed_user_key="last_self_protected",
+        list_to_process_key="self_protected",
     )
-    game_data["last_self_protected"] = protected_user_id
-    game_data["self_protected"].append(protected_user_id)
-    await game_state.set_data(game_data)
+    # game_state, game_data, protected_user_id = (
+    #     await get_user_id_and_inform_players(
+    #         callback=callback,
+    #         callback_data=callback_data,
+    #         state=state,
+    #         dispatcher=dispatcher,
+    #         message_to_group="Кто-то пожертвовал собой!",
+    #         message_to_user="Ты выбрал пожертвовать собой, чтобы спасти {url}",
+    #     )
+    # )
+    # game_data["last_self_protected"] = protected_user_id
+    # game_data["self_protected"].append(protected_user_id)
+    # await game_state.set_data(game_data)

@@ -4,7 +4,10 @@ from aiogram.types import CallbackQuery
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
-from services.actions_at_night import get_user_id_and_inform_players
+from services.actions_at_night import (
+    get_user_id_and_inform_players,
+    take_action_and_register_user,
+)
 from states.states import UserFsm
 
 
@@ -20,19 +23,29 @@ async def lawyer_protects(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    game_state, game_data, protected_user_id = (
-        await get_user_id_and_inform_players(
-            callback=callback,
-            callback_data=callback_data,
-            state=state,
-            dispatcher=dispatcher,
-            message_to_group="Кому-то обеспечена защита лучшими адвокатами города!",
-            message_to_user="Ты выбрал защитить {url}",
-        )
+    await take_action_and_register_user(
+        callback=callback,
+        callback_data=callback_data,
+        state=state,
+        dispatcher=dispatcher,
+        message_to_group="Кому-то обеспечена защита лучшими адвокатами города!",
+        message_to_user="Ты выбрал защитить {url}",
+        last_processed_user_key="last_forgiven",
+        list_to_process_key="have_alibi",
     )
-    game_data["have_alibi"].append(protected_user_id)
-    game_data["last_forgiven"] = protected_user_id
-    await game_state.set_data(game_data)
+    # game_state, game_data, protected_user_id = (
+    #     await get_user_id_and_inform_players(
+    #         callback=callback,
+    #         callback_data=callback_data,
+    #         state=state,
+    #         dispatcher=dispatcher,
+    #         message_to_group="Кому-то обеспечена защита лучшими адвокатами города!",
+    #         message_to_user="Ты выбрал защитить {url}",
+    #     )
+    # )
+    # game_data["have_alibi"].append(protected_user_id)
+    # game_data["last_forgiven"] = protected_user_id
+    # await game_state.set_data(game_data)
     # user_data: UserCache = await state.get_data()
     # game_state = await get_state_and_assign(
     #     dispatcher=dispatcher,

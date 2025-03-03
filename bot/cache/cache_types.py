@@ -94,3 +94,12 @@ RolesKeysLiteral = Literal[
     "suicide_bombers",
     "bodyguards",
 ]
+LastProcessedLiteral = Literal[
+    "last_treated",
+    "last_arrested",
+    "last_forgiven",
+    "last_self_protected",
+]
+ListToProcessLiteral = Literal[
+    "self_protected", "recovered", "have_alibi", "cant_vote"
+]
