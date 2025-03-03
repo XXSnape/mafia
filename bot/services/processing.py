@@ -14,8 +14,10 @@ from cache.cache_types import (
     GameCache,
     UserGameCache,
     ChatsAndMessagesIds,
+    Roles,
+    Role,
 )
-from general.players import Groupings, Roles
+from general.players import Groupings
 from general.exceptions import GameIsOver
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from services.mailing import MailerToPlayers
@@ -247,18 +249,11 @@ class Executor:
             else:
                 game_data["losers"].append(user_id)
         game_data["players_ids"].remove(user_id)
-        roles = {
-            Roles.mafia: game_data["mafias"],
-            Roles.doctor: game_data["doctors"],
-            Roles.policeman: game_data["policeman"],
-            Roles.civilian: game_data["civilians"],
-            Roles.lawyer: game_data["lawyers"],
-            Roles.masochist: game_data["masochists"],
-            Roles.prosecutor: game_data["prosecutors"],
-            Roles.lucky_gay: game_data["lucky_guys"],
-            Roles.suicide_bomber: game_data["suicide_bombers"],
-            Roles.bodyguard: game_data["bodyguards"],
-            Roles.prime_minister: game_data["prime_ministers"],
-        }
+        roles = {}
+        for role in Roles:
+            current_role: Role = role.value
+            roles[current_role.role] = game_data[
+                current_role.roles_key
+            ]
         user_role = game_data["players"][str(user_id)]["role"]
         roles[user_role].remove(user_id)

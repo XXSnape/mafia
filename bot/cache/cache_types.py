@@ -1,3 +1,4 @@
+import enum
 from typing import (
     TypedDict,
     TypeAlias,
@@ -65,6 +66,9 @@ class GameCache(TypedDict, total=True):
     number_of_night: int
 
 
+from enum import StrEnum
+from typing import NamedTuple
+
 RolesKeysLiteral = Literal[
     "mafias",
     "doctors",
@@ -76,7 +80,10 @@ RolesKeysLiteral = Literal[
     "suicide_bombers",
     "bodyguards",
     "instigators",
+    "civilians",
+    "prime_ministers",
 ]
+
 LastProcessedLiteral = Literal[
     "last_treated",
     "last_arrested",
@@ -90,3 +97,138 @@ ListToProcessLiteral = Literal[
     "cant_vote",
     "missed",
 ]
+
+
+class Groupings(StrEnum):
+    criminals = "criminals"
+    civilians = "civilians"
+    masochists = "masochists"
+    suicide_bombers = "suicide_bombers"
+    other = "other"
+
+
+class Role(NamedTuple):
+    role: str
+    roles_key: RolesKeysLiteral
+    last_interactive: LastProcessedLiteral | None
+    photo: str
+    grouping: str
+    purpose: str
+
+
+class Roles(enum.Enum):
+    mafia = Role(
+        role="Мафия",
+        roles_key="mafias",
+        last_interactive=None,
+        photo="https://i.pinimg.com/736x/a1/10/db/a110db3eaba78bf6423bcea68f330a64.jpg",
+        grouping=Groupings.criminals,
+        purpose="Тебе нужно уничтожить всех горожан.",
+    )
+    doctor = Role(
+        role="Доктор",
+        roles_key="doctors",
+        last_interactive="last_treated",
+        photo="https://gipermed.ru/upload/iblock/4bf/4bfa55f59ceb538bd2c8c437e8f71e5a.jpg",
+        grouping=Groupings.civilians,
+        purpose="Тебе нужно стараться лечить тех, кому нужна помощь.",
+    )
+    policeman = Role(
+        role="Комиссар",
+        roles_key="policeman",
+        last_interactive=None,
+        photo="https://avatars.mds.yandex.net/get-kinopoisk-image/"
+        "1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x",
+        grouping=Groupings.civilians,
+        purpose="Тебе нужно вычислить мафию.",
+    )
+    # policeman = "Комиссар"
+    prosecutor = Role(
+        role="Прокурор",
+        roles_key="prosecutors",
+        last_interactive="last_arrested",
+        photo="https://avatars.mds.yandex.net/i?"
+        "id=b5115d431dafc24be07a55a8b6343540_l-5205087-images-thumbs&n=13",
+        grouping=Groupings.civilians,
+        purpose="Тебе нельзя допустить, чтобы днем мафия могла говорить.",
+    )
+    # prosecutor = "Прокурор"
+    lawyer = Role(
+        role="Адвокат",
+        roles_key="lawyers",
+        last_interactive="last_forgiven",
+        photo="https://avatars.mds.yandex.net/get-altay/"
+        "5579175/2a0000017e0aa51c3c1fd887206b0156ee34/XXL_height",
+        grouping=Groupings.civilians,
+        purpose="Тебе нужно защитить мирных жителей от своих же на голосовании.",
+    )
+    # lawyer = "Адвокат"
+    civilian = Role(
+        role="Мирный житель",
+        roles_key="civilians",
+        last_interactive=None,
+        photo="https://cdn.culture.ru/c/820179.jpg",
+        grouping=Groupings.civilians,
+        purpose="Тебе нужно вычислить мафию на голосовании.",
+    )
+    # civilian = "Мирный житель"
+    masochist = Role(
+        role="Мазохист",
+        roles_key="masochists",
+        last_interactive=None,
+        photo="https://i.pinimg.com/736x/14/a5/f5/14a5f5eb5dbd73c4707f24d436d80c0b.jpg",
+        grouping=Groupings.masochists,
+        purpose="Тебе нужно умереть на дневном голосовании.",
+    )
+    # masochist = "Мазохист"
+    lucky_gay = Role(
+        role="Везунчик",
+        roles_key="lucky_guys",
+        last_interactive=None,
+        photo="https://avatars.mds.yandex.net/get-mpic/5031100/img_id5520953584482126492.jpeg/orig",
+        grouping=Groupings.civilians,
+        purpose="Возможно тебе повезет и ты останешься жив после покушения.",
+    )
+    # lucky_gay = "Везунчик"
+    suicide_bomber = Role(
+        role="Ночной смертник",
+        roles_key="suicide_bombers",
+        last_interactive=None,
+        photo="https://sun6-22.userapi.com/impg/zAaADEA19scv86EFl8bY1wUYRCJyBPGg1qamiA/xjMRCUhA20g.jpg?"
+        "size=1280x1280&quality=96&"
+        "sign=de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag="
+        "EOC9ErRHImjvmda4Qd5Pq59HPf-wUgr77rzHZvabHjc&type=album",
+        grouping=Groupings.suicide_bombers,
+        purpose="Тебе нужно умереть ночью.",
+    )
+    # suicide_bomber = "Ночной смертник"
+    bodyguard = Role(
+        role="Телохранитель",
+        roles_key="bodyguards",
+        last_interactive="last_self_protected",
+        photo="https://sun6-22.userapi.com/impg/zAaADEA19scv86EFl8bY1wUYRCJyBPGg1qamiA/xjMRCUhA20g.jpg?"
+        "size=1280x1280&quality=96&"
+        "sign=de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag="
+        "EOC9ErRHImjvmda4Qd5Pq59HPf-wUgr77rzHZvabHjc&type=album",
+        grouping=Groupings.civilians,
+        purpose="Тебе нужно защитить собой лучших специалистов",
+    )
+    prime_minister = Role(
+        role="Премьер-министр",
+        roles_key="prime_ministers",
+        last_interactive=None,
+        photo="https://avatars.mds.yandex.net/i?id=fb2e5e825d183d5344d93bc5636bc4c4_l-5084109-images-thumbs&n=13",
+        grouping=Groupings.civilians,
+        purpose="Твой голос стоит как 2!",
+    )
+    # bodyguard = "Телохранитель"
+    # prime_minister = "Премьер-министр"
+    instigator = Role(
+        role="Подстрекатель",
+        roles_key="instigators",
+        last_interactive=None,
+        photo="https://avatars.dzeninfra.ru/get-zen_doc/3469057/"
+        "pub_620655d2a7947c53d6c601a2_620671b4b495be46b12c0a0c/scale_1200",
+        grouping=Groupings.other,
+        purpose="Твоя жертва всегда ошибется при выборе на голосовании.",
+    )

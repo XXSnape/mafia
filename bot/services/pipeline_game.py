@@ -1,6 +1,5 @@
 import asyncio
 from random import shuffle
-from typing import NamedTuple
 
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
@@ -9,9 +8,11 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from cache.cache_types import (
     GameCache,
+    Role,
+    Roles,
 )
 from general.exceptions import GameIsOver
-from general.players import Groupings, Roles
+from general.players import Groupings
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
 from services.mailing import MailerToPlayers
 from services.processing import (
@@ -72,6 +73,7 @@ class Game:
                 await self.start_night()
             except GameIsOver as e:
                 await self.give_out_rewards(e=e)
+                return
 
     async def start_night(
         self,
@@ -128,13 +130,13 @@ class Game:
             elif int(user_id) in game_data["losers"]:
                 losers += text
             elif e.winner == Groupings.criminals:
-                if player["role"] == Roles.mafia:
+                if player["role"] == Roles.mafia.value.role:
                     winners += text
                     winners_ids.add(user_id)
                 else:
                     losers += text
             else:
-                if player["role"] != Roles.mafia:
+                if player["role"] != Roles.mafia.value.role:
                     winners_ids.add(user_id)
                     winners += text
                 else:
@@ -184,58 +186,73 @@ class Game:
         game_data: GameCache = await self.state.get_data()
         ids = game_data["players_ids"][:]
         shuffle(ids)
-        mafias = Role(game_data["mafias"], Roles.mafia)
-        doctors = Role(game_data["doctors"], Roles.doctor)
-        policeman = Role(game_data["policeman"], Roles.policeman)
-        civilians = Role(game_data["civilians"], Roles.civilian)
-        prosecutors = Role(
-            game_data["prosecutors"], Roles.prosecutor
-        )
-        masochists = Role(game_data["masochists"], Roles.masochist)
-        lawyers = Role(game_data["lawyers"], Roles.lawyer)
-        lucky_guys = Role(game_data["lucky_guys"], Roles.lucky_gay)
-        bodyguards = Role(game_data["bodyguards"], Roles.bodyguard)
-        instigators = Role(
-            game_data["instigators"], Roles.instigator
-        )
-        prime_ministers = Role(
-            game_data["prime_ministers"], Roles.prime_minister
-        )
-        suicide_bombers = Role(
-            game_data["suicide_bombers"], Roles.suicide_bomber
-        )
-        roles = (
-            mafias,
-            policeman,
-            instigators,
-            prime_ministers,
-            bodyguards,
-            doctors,
-            lawyers,
-            doctors,
-            prosecutors,
-            bodyguards,
-            suicide_bombers,
-            lucky_guys,
-            masochists,
-            # prosecutors,
-            lawyers,
-            policeman,
-            civilians,
-        )
-        for index, user_id in enumerate(ids):
-            current_role: Role = roles[index]
+        for user_id, role in zip(ids, Roles):
+            current_role: Role = role.value
+            roles = game_data[current_role.roles_key]
             game_data["players"][str(user_id)][
                 "role"
             ] = current_role.role
             game_data["players"][str(user_id)]["pretty_role"] = (
                 make_pretty(current_role.role)
             )
-
-            current_role.players.append(user_id)
+            roles.append(user_id)
+        #
+        #
+        # for role in Roles:
+        #     current_role: Role = role.value
+        #     roles = game_data[current_role.roles_key]
+        # mafias = Role(game_data["mafias"], Roles.mafia)
+        # doctors = Role(game_data["doctors"], Roles.doctor)
+        # policeman = Role(game_data["policeman"], Roles.policeman)
+        # civilians = Role(game_data["civilians"], Roles.civilian)
+        # prosecutors = Role(
+        #     game_data["prosecutors"], Roles.prosecutor
+        # )
+        # masochists = Role(game_data["masochists"], Roles.masochist)
+        # lawyers = Role(game_data["lawyers"], Roles.lawyer)
+        # lucky_guys = Role(game_data["lucky_guys"], Roles.lucky_gay)
+        # bodyguards = Role(game_data["bodyguards"], Roles.bodyguard)
+        # instigators = Role(
+        #     game_data["instigators"], Roles.instigator
+        # )
+        # prime_ministers = Role(
+        #     game_data["prime_ministers"], Roles.prime_minister
+        # )
+        # suicide_bombers = Role(
+        #     game_data["suicide_bombers"], Roles.suicide_bomber
+        # )
+        # roles = (
+        #     mafias,
+        #     policeman,
+        #     instigators,
+        #     prime_ministers,
+        #     bodyguards,
+        #     doctors,
+        #     lawyers,
+        #     doctors,
+        #     prosecutors,
+        #     bodyguards,
+        #     suicide_bombers,
+        #     lucky_guys,
+        #     masochists,
+        #     # prosecutors,
+        #     lawyers,
+        #     policeman,
+        #     civilians,
+        # )
+        # for index, user_id in enumerate(ids):
+        #     current_role: Role = roles[index]
+        #     game_data["players"][str(user_id)][
+        #         "role"
+        #     ] = current_role.role
+        #     game_data["players"][str(user_id)]["pretty_role"] = (
+        #         make_pretty(current_role.role)
+        #     )
+        #
+        #     current_role.players.append(user_id)
         await self.state.set_data(game_data)
 
 
-class Role(NamedTuple):
-    players: list[int]
-    role: str
+# class Role(NamedTuple):
+#     players: list[int]
+#     role: str
