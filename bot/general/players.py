@@ -20,3 +20,4 @@ class Roles:
     suicide_bomber = "Ночной смертник"
     bodyguard = "Телохранитель"
     prime_minister = "Премьер-министр"
+    instigator = "Подстрекатель"

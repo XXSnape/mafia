@@ -15,4 +15,5 @@ class UserFsm(StatesGroup):
     PROSECUTOR_ARRESTS = State()
     LAWYER_PROTECTS = State()
     BODYGUARD_PROTECTS = State()
+    INSTIGATOR_LYING = State()
     WAIT_FOR_LATEST_LETTER = State()

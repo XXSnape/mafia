@@ -53,6 +53,8 @@ class GameCache(TypedDict, total=True):
     self_protected: PlayersIds
     have_alibi: PlayersIds
     prime_ministers: PlayersIds
+    instigators: PlayersIds
+    missed: PlayersIds
 
     # wait_for: list[int]
     two_voices: PlayersIds
@@ -73,6 +75,7 @@ RolesKeysLiteral = Literal[
     "lucky_guys",
     "suicide_bombers",
     "bodyguards",
+    "instigators",
 ]
 LastProcessedLiteral = Literal[
     "last_treated",
@@ -81,5 +84,9 @@ LastProcessedLiteral = Literal[
     "last_self_protected",
 ]
 ListToProcessLiteral = Literal[
-    "self_protected", "recovered", "have_alibi", "cant_vote"
+    "self_protected",
+    "recovered",
+    "have_alibi",
+    "cant_vote",
+    "missed",
 ]

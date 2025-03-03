@@ -51,7 +51,7 @@ async def take_action_and_register_user(
     dispatcher: Dispatcher,
     message_to_group: str,
     message_to_user: str,
-    last_processed_user_key: LastProcessedLiteral,
+    last_processed_user_key: LastProcessedLiteral | None,
     list_to_process_key: ListToProcessLiteral,
 ):
     game_state, game_data, user_id = (
@@ -64,8 +64,8 @@ async def take_action_and_register_user(
             message_to_user=message_to_user,
         )
     )
-
-    game_data[last_processed_user_key] = user_id
+    if last_processed_user_key:
+        game_data[last_processed_user_key] = user_id
     game_data[list_to_process_key].append(user_id)
     await game_state.set_data(game_data)
     return game_data, user_id

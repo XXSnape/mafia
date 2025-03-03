@@ -68,6 +68,7 @@ class Executor:
         game_data["protected"].clear()
         game_data["self_protected"].clear()
         game_data["have_alibi"].clear()
+        game_data["missed"].clear()
         for cant_vote_id in game_data["cant_vote"]:
             with suppress(TelegramBadRequest):
                 await self.bot.restrict_chat_member(

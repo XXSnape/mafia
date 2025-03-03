@@ -195,6 +195,9 @@ class Game:
         lawyers = Role(game_data["lawyers"], Roles.lawyer)
         lucky_guys = Role(game_data["lucky_guys"], Roles.lucky_gay)
         bodyguards = Role(game_data["bodyguards"], Roles.bodyguard)
+        instigators = Role(
+            game_data["instigators"], Roles.instigator
+        )
         prime_ministers = Role(
             game_data["prime_ministers"], Roles.prime_minister
         )
@@ -204,6 +207,7 @@ class Game:
         roles = (
             mafias,
             policeman,
+            instigators,
             prime_ministers,
             bodyguards,
             doctors,

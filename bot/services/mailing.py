@@ -53,6 +53,8 @@ class MailerToPlayers:
             await self._mail_lawyer()
         if game_data["bodyguards"]:
             await self._mail_bodyguard()
+        if game_data["instigators"]:
+            await self._mail_instigator()
 
     async def _mail_user(
         self,
@@ -159,6 +161,18 @@ class MailerToPlayers:
             exclude=exclude,
         )
 
+    async def _mail_instigator(
+        self,
+    ):
+        game_data: GameCache = await self.state.get_data()
+        exclude = game_data["instigators"][0]
+        await self._mail_user(
+            text="Кого надоумить на неправильный выбор?",
+            role_key="instigators",
+            new_state=UserFsm.INSTIGATOR_LYING,
+            exclude=exclude,
+        )
+
     async def _mail_policeman(
         self,
     ):
@@ -244,6 +258,7 @@ class MailerToPlayers:
         suicide_bombers = game_data["suicide_bombers"]
         bodyguards = game_data["bodyguards"]
         prime_ministers = game_data["prime_ministers"]
+        instigators = game_data["instigators"]
         for user_id in mafias:
             await self.bot.send_photo(
                 chat_id=user_id,
@@ -316,4 +331,13 @@ class MailerToPlayers:
                 photo="https://avatars.mds.yandex.net/i?id=fb2e5e825d183d5344d93bc5636bc4c4_l-5084109-images-thumbs&n=13",
                 caption=f"Твоя роль - {make_pretty(Roles.prime_minister)}! "
                 f"Твой голос стоит как 2!",
+            )
+
+        for user_id in instigators:
+            await self.bot.send_photo(
+                chat_id=user_id,
+                photo="https://avatars.dzeninfra.ru/get-zen_doc/3469057/"
+                "pub_620655d2a7947c53d6c601a2_620671b4b495be46b12c0a0c/scale_1200",
+                caption=f"Твоя роль - {make_pretty(Roles.instigator)}! "
+                f"Твоя жертва всегда ошибется при выборе на голосовании.",
             )

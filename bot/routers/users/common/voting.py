@@ -1,3 +1,5 @@
+from random import choice
+
 from aiogram import Router, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
@@ -29,9 +31,14 @@ async def vote_for(
         bot_id=callback.bot.id,
     )
     game_data: GameCache = await game_state.get_data()
-    voted_user_id = game_data["players_ids"][
-        callback_data.user_index
-    ]
+    if callback.from_user.id in game_data["missed"]:
+        ids = game_data["players_ids"][:]
+        ids.remove(callback.from_user.id)
+        voted_user_id = choice(ids)
+    else:
+        voted_user_id = game_data["players_ids"][
+            callback_data.user_index
+        ]
     game_data["vote_for"].append(voted_user_id)
     voting_url = game_data["players"][str(callback.from_user.id)][
         "url"
