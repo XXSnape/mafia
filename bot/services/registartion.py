@@ -112,11 +112,12 @@ async def select_roles(state: FSMContext):
     roles = (
         mafias,
         doctors,
+        prosecutors,
         bodyguards,
         suicide_bombers,
         lucky_guys,
         masochists,
-        prosecutors,
+        # prosecutors,
         lawyers,
         policeman,
         civilians,

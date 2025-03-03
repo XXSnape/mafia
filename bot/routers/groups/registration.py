@@ -1,65 +1,28 @@
-from contextlib import suppress
-from datetime import timedelta
-
-from aiogram import Router, F, Dispatcher, Bot
-from aiogram.enums import ChatType
-from aiogram.exceptions import TelegramBadRequest
+from aiogram import Router, Dispatcher, F, Bot
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
-from aiogram.types import Message, CallbackQuery, ChatPermissions
+from aiogram.types import Message, CallbackQuery
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-
 from cache.cache_types import GameCache
-from keyboards.inline.callback_factory.recognize_user import (
-    AimedUserCbData,
-    ProsAndCons,
-)
 from keyboards.inline.cb.cb_text import (
     JOIN_CB,
     FINISH_REGISTRATION_CB,
 )
+
 from keyboards.inline.keypads.join import get_join_kb
-from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from services.mailing import familiarize_players
 from services.registartion import (
-    add_user_to_game,
     init_game,
+    add_user_to_game,
     select_roles,
 )
-from states.states import GameFsm, UserFsm
-from tasks.tasks import start_game, start_night
-from utils.utils import (
-    get_profiles,
-    get_profiles_during_registration,
-    add_voice,
-)
+from states.states import GameFsm
+from tasks.tasks import start_game
+from utils.utils import get_profiles_during_registration
 
-router = Router()
-
-router.message.filter(
-    F.chat.type.in_({ChatType.GROUP, ChatType.SUPERGROUP})
-)
-router.callback_query.filter(
-    F.message.chat.type.in_({ChatType.GROUP, ChatType.SUPERGROUP})
-)
-
-
-@router.message(GameFsm.STARTED)
-async def delete_message_from_non_players(
-    message: Message, state: FSMContext
-):
-    game_data: GameCache = await state.get_data()
-    if (
-        message.from_user.id not in game_data["players_ids"]
-    ) or message.from_user.id in game_data["cant_vote"]:
-        await message.delete()
-        # await message.chat.restrict(
-        #     user_id=message.from_user.id,
-        #     permissions=ChatPermissions(can_send_messages=False),
-        #     until_date=timedelta(seconds=30),
-        # )
+router = Router(name=__name__)
 
 
 @router.message(Command("registration"), StateFilter(default_state))
@@ -147,44 +110,3 @@ async def finish_registration(
         dispatcher=dispatcher,
         scheduler=scheduler,
     )
-
-
-@router.callback_query(GameFsm.VOTE, AimedUserCbData.filter())
-async def confirm_vote(
-    callback: CallbackQuery,
-    callback_data: AimedUserCbData,
-    state: FSMContext,
-):
-    if callback_data.user_id == callback.from_user.id:
-        await callback.answer(
-            "Теперь твой судья - демократия!", show_alert=True
-        )
-        return
-    game_data: GameCache = await state.get_data()
-    if callback.from_user.id in game_data["cant_vote"]:
-        await callback.answer(
-            "Ты арестован и не можешь голосовать!", show_alert=True
-        )
-        return
-
-    if callback_data.action == ProsAndCons.pros:
-        add_voice(
-            user_id=callback.from_user.id,
-            add_to=game_data["pros"],
-            delete_from=game_data["cons"],
-        )
-    elif callback_data.action == ProsAndCons.cons:
-        add_voice(
-            user_id=callback.from_user.id,
-            add_to=game_data["cons"],
-            delete_from=game_data["pros"],
-        )
-    with suppress(TelegramBadRequest):
-        await callback.message.edit_reply_markup(
-            reply_markup=get_vote_for_aim_kb(
-                user_id=callback_data.user_id,
-                pros=game_data["pros"],
-                cons=game_data["cons"],
-            )
-        )
-    await callback.answer()
