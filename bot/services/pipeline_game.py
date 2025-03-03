@@ -91,6 +91,7 @@ class Game:
             reply_markup=get_to_bot_kb("Действовать!"),
         )
         await self.mailer.mailing(game_data=game_data)
+        game_data["angels_died"].clear()
         await asyncio.sleep(6)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
@@ -144,9 +145,6 @@ class Game:
         await self.bot.send_message(
             chat_id=self.group_chat_id,
             text=result + winners + losers,
-        )
-        await self.executor.delete_messages_from_to_delete(
-            to_delete=game_data["to_delete"]
         )
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]

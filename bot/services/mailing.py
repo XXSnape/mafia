@@ -57,6 +57,9 @@ class MailerToPlayers:
             await self._mail_bodyguard()
         if game_data["instigators"]:
             await self._mail_instigator()
+        if game_data["angels_died"]:
+            print("there are angels")
+            await self._mail_angel_of_death()
 
     async def _mail_user(
         self,
@@ -120,6 +123,13 @@ class MailerToPlayers:
             role_key="bodyguards",
             new_state=UserFsm.BODYGUARD_PROTECTS,
             exclude=[bodyguard_id] + exclude,
+        )
+
+    async def _mail_angel_of_death(self):
+        await self._mail_user(
+            text="Глупые людишки тебя линчевали, кому ты отомстишь?",
+            role_key="angels_died",
+            new_state=UserFsm.ANGEL_TAKES_REVENGE,
         )
 
     async def _mail_lawyer(self):

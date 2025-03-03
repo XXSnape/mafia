@@ -110,6 +110,9 @@ class Executor:
                 text=f"У {user_info['url']} есть алиби, поэтому местные жители отпустили гвоздя программы",
             )
             return
+        if removed_user in game_data["angels_of_death"]:
+            game_data["angels_died"].append(removed_user)
+            print("angel died")
         self.remove_user_from_game(
             game_data=game_data, user_id=removed_user, is_night=False
         )

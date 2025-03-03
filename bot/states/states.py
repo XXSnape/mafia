@@ -16,4 +16,5 @@ class UserFsm(StatesGroup):
     LAWYER_PROTECTS = State()
     BODYGUARD_PROTECTS = State()
     INSTIGATOR_LYING = State()
+    ANGEL_TAKES_REVENGE = State()
     WAIT_FOR_LATEST_LETTER = State()

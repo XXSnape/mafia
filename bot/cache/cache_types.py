@@ -48,6 +48,8 @@ class GameCache(TypedDict, total=True):
     losers: PlayersIds
     cant_vote: PlayersIds
     recovered: PlayersIds
+    angels_of_death: PlayersIds
+    angels_died: PlayersIds
     to_delete: ChatsAndMessagesIds
     vote_for: PlayersIds
     protected: PlayersIds
@@ -82,6 +84,8 @@ RolesKeysLiteral = Literal[
     "instigators",
     "civilians",
     "prime_ministers",
+    "angels_of_death",
+    "angels_died",
 ]
 
 LastProcessedLiteral = Literal[
@@ -90,6 +94,7 @@ LastProcessedLiteral = Literal[
     "last_forgiven",
     "last_self_protected",
 ]
+
 ListToProcessLiteral = Literal[
     "self_protected",
     "recovered",
@@ -132,6 +137,14 @@ class Roles(enum.Enum):
         photo="https://gipermed.ru/upload/iblock/4bf/4bfa55f59ceb538bd2c8c437e8f71e5a.jpg",
         grouping=Groupings.civilians,
         purpose="Тебе нужно стараться лечить тех, кому нужна помощь.",
+    )
+    angel_of_death = Role(
+        role="Ангел смерти",
+        roles_key="angels_of_death",
+        last_interactive=None,
+        photo="https://avatars.mds.yandex.net/get-entity_search/10844899/935958285/S600xU_2x",
+        purpose="Если ты умрешь на голосовании, сможешь ночью забрать кого-нибудь с собой",
+        grouping=Groupings.civilians,
     )
     policeman = Role(
         role="Комиссар",
