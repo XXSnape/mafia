@@ -89,12 +89,12 @@ class Game:
             reply_markup=get_to_bot_kb("Действовать!"),
         )
         await self.mailer.mailing(game_data=game_data)
-        await asyncio.sleep(20)
+        await asyncio.sleep(6)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
         await self.executor.sum_up_after_night()
-        await asyncio.sleep(20)
+        await asyncio.sleep(5)
         await self.mailer.suggest_vote()
         await asyncio.sleep(10)
         await self.executor.delete_messages_from_to_delete(
@@ -102,7 +102,7 @@ class Game:
         )
         result = await self.executor.confirm_final_aim()
         if result:
-            await asyncio.sleep(10)
+            await asyncio.sleep(15)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
@@ -171,7 +171,7 @@ class Game:
         if is_win:
             text = f"Поздравлю! Ты победил в роли {role}"
         else:
-            text = f"К несчастью! Ты проиграл в роли {role}"
+            text = f"К несчастью, ты проиграл в роли {role}"
         await self.bot.send_message(chat_id=chat_id, text=text)
         state = await get_state_and_assign(
             dispatcher=self.dispatcher,
@@ -195,12 +195,17 @@ class Game:
         lawyers = Role(game_data["lawyers"], Roles.lawyer)
         lucky_guys = Role(game_data["lucky_guys"], Roles.lucky_gay)
         bodyguards = Role(game_data["bodyguards"], Roles.bodyguard)
+        prime_ministers = Role(
+            game_data["prime_ministers"], Roles.prime_minister
+        )
         suicide_bombers = Role(
             game_data["suicide_bombers"], Roles.suicide_bomber
         )
         roles = (
             mafias,
             policeman,
+            prime_ministers,
+            bodyguards,
             doctors,
             lawyers,
             doctors,

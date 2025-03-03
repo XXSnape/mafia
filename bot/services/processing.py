@@ -89,6 +89,7 @@ class Executor:
         game_data: GameCache = await self.state.get_data()
         pros = game_data["pros"]
         cons = game_data["cons"]
+        print("pros", pros, "cons", cons)
         if len(pros) == len(cons) or len(pros) < len(cons):
             await self.bot.send_message(
                 chat_id=game_data["game_chat"],
@@ -256,6 +257,7 @@ class Executor:
             Roles.lucky_gay: game_data["lucky_guys"],
             Roles.suicide_bomber: game_data["suicide_bombers"],
             Roles.bodyguard: game_data["bodyguards"],
+            Roles.prime_minister: game_data["prime_ministers"],
         }
         user_role = game_data["players"][str(user_id)]["role"]
         roles[user_role].remove(user_id)

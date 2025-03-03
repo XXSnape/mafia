@@ -39,6 +39,7 @@ async def init_game(message: Message, state: FSMContext):
         "civilians": [],
         "masochists": [],
         "lucky_guys": [],
+        "prime_ministers": [],
         "losers": [],
         "winners": [],
         "lawyers": [],

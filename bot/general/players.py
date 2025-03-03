@@ -19,3 +19,4 @@ class Roles:
     lucky_gay = "Везунчик"
     suicide_bomber = "Ночной смертник"
     bodyguard = "Телохранитель"
+    prime_minister = "Премьер-министр"

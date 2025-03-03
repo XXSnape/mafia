@@ -4,6 +4,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.fsm.storage.base import StorageKey
+from sqlalchemy.event import remove
 
 from cache.cache_types import (
     UsersInGame,
@@ -40,12 +41,18 @@ def get_profiles_during_registration(
 
 
 def add_voice(
-    user_id: int, add_to: PlayersIds, delete_from: PlayersIds
+    user_id: int,
+    add_to: PlayersIds,
+    delete_from: PlayersIds,
+    prime_ministers: PlayersIds,
 ):
-    with suppress(ValueError):
-        delete_from.remove(user_id)
+    repeat = 2 if user_id in prime_ministers else 1
+    for _ in range(repeat):
+        with suppress(ValueError):
+            delete_from.remove(user_id)
     if user_id not in add_to:
-        add_to.append(user_id)
+        for _ in range(repeat):
+            add_to.append(user_id)
 
 
 def make_pretty(string: str) -> str:

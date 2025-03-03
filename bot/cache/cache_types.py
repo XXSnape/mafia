@@ -52,8 +52,10 @@ class GameCache(TypedDict, total=True):
     protected: PlayersIds
     self_protected: PlayersIds
     have_alibi: PlayersIds
+    prime_ministers: PlayersIds
 
     # wait_for: list[int]
+    two_voices: PlayersIds
     last_treated: int
     last_arrested: int
     last_forgiven: int

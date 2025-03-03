@@ -34,18 +34,19 @@ async def confirm_vote(
             "Ты арестован и не можешь голосовать!", show_alert=True
         )
         return
-
     if callback_data.action == ProsAndCons.pros:
         add_voice(
             user_id=callback.from_user.id,
             add_to=game_data["pros"],
             delete_from=game_data["cons"],
+            prime_ministers=game_data["prime_ministers"],
         )
     elif callback_data.action == ProsAndCons.cons:
         add_voice(
             user_id=callback.from_user.id,
             add_to=game_data["cons"],
             delete_from=game_data["pros"],
+            prime_ministers=game_data["prime_ministers"],
         )
     with suppress(TelegramBadRequest):
         await callback.message.edit_reply_markup(

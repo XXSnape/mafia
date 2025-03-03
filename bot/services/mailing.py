@@ -243,6 +243,7 @@ class MailerToPlayers:
         lucky_guys = game_data["lucky_guys"]
         suicide_bombers = game_data["suicide_bombers"]
         bodyguards = game_data["bodyguards"]
+        prime_ministers = game_data["prime_ministers"]
         for user_id in mafias:
             await self.bot.send_photo(
                 chat_id=user_id,
@@ -308,4 +309,11 @@ class MailerToPlayers:
                 photo="https://avatars.mds.yandex.net/get-kinopoisk-image/1900788/db009751-69de-467c-9023-0439e82cbde3/1920x",
                 caption=f"Твоя роль - {make_pretty(Roles.bodyguard)}! "
                 f"Тебе защитить собой лучших специалистов",
+            )
+        for user_id in prime_ministers:
+            await self.bot.send_photo(
+                chat_id=user_id,
+                photo="https://avatars.mds.yandex.net/i?id=fb2e5e825d183d5344d93bc5636bc4c4_l-5084109-images-thumbs&n=13",
+                caption=f"Твоя роль - {make_pretty(Roles.prime_minister)}! "
+                f"Твой голос стоит как 2!",
             )
