@@ -5,7 +5,7 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, ChatPermissions
 
-from cache.cache_types import UserCache, GameCache
+from cache.cache_types import UserCache, GameCache, Roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
@@ -35,10 +35,11 @@ async def prosecutor_arrests(
             callback_data=callback_data,
             state=state,
             dispatcher=dispatcher,
-            message_to_group="По данным разведки потенциальный злоумышленник арестован!",
-            message_to_user="Ты выбрал арестовать {url}",
-            last_processed_user_key="last_arrested",
-            list_to_process_key="cant_vote",
+            # message_to_group="По данным разведки потенциальный злоумышленник арестован!",
+            # message_to_user="Ты выбрал арестовать {url}",
+            role=Roles.prosecutor,
+            # last_processed_user_key="last_arrested",
+            # list_to_process_key="cant_vote",
         )
     )
     # game_state, game_data, arrested_user_id = (

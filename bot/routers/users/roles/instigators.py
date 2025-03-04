@@ -2,6 +2,7 @@ from aiogram import Router, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
+from cache.cache_types import Roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
@@ -27,8 +28,9 @@ async def instigator_lying(
         callback_data=callback_data,
         state=state,
         dispatcher=dispatcher,
-        message_to_group="Кажется, кто-то становится жертвой психологического насилия!",
-        message_to_user="Ты выбрал прополоскать мозги {url}",
-        list_to_process_key="missed",
-        last_processed_user_key=None,
+        # message_to_group="Кажется, кто-то становится жертвой психологического насилия!",
+        # message_to_user="Ты выбрал прополоскать мозги {url}",
+        role=Roles.instigator,
+        # list_to_process_key="missed",
+        # last_processed_user_key=None,
     )

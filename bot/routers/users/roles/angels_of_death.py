@@ -2,10 +2,14 @@ from aiogram import Router, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
+from cache.cache_types import Roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
-from services.actions_at_night import get_user_id_and_inform_players
+from services.actions_at_night import (
+    get_user_id_and_inform_players,
+    take_action_and_register_user,
+)
 from states.states import UserFsm
 
 
@@ -21,14 +25,23 @@ async def angel_takes_revenge(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    game_state, game_data, died_user_id = (
-        await get_user_id_and_inform_players(
-            callback=callback,
-            callback_data=callback_data,
-            state=state,
-            dispatcher=dispatcher,
-            message_to_group="Ангел смерти спускается во имя мести!",
-            message_to_user="Ты выбрал отомстить {url}",
-        )
+    await take_action_and_register_user(
+        callback=callback,
+        callback_data=callback_data,
+        state=state,
+        dispatcher=dispatcher,
+        role=Roles.angel_of_death,
+        # message_to_group="Ангел смерти спускается во имя мести!",
+        # message_to_user="Ты выбрал отомстить {url}",
     )
-    game_data["died"].append(died_user_id)
+    # game_state, game_data, died_user_id = (
+    #     await get_user_id_and_inform_players(
+    #         callback=callback,
+    #         callback_data=callback_data,
+    #         state=state,
+    #         dispatcher=dispatcher,
+    #         message_to_group="Ангел смерти спускается во имя мести!",
+    #         message_to_user="Ты выбрал отомстить {url}",
+    #     )
+    # )
+    # game_data["killed_by_angel_of_death"].append(died_user_id)

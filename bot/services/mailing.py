@@ -42,160 +42,186 @@ class MailerToPlayers:
         self.dispatcher = dispatcher
         self.group_chat_id = group_chat_id
 
-    async def mailing(self, game_data: GameCache):
-        if game_data["mafias"]:
-            await self._mail_mafia()
-        if game_data["doctors"]:
-            await self._mail_doctor()
-        if game_data["policeman"]:
-            await self._mail_policeman()
-        if game_data["prosecutors"]:
-            await self._mail_prosecutor()
-        if game_data["lawyers"]:
-            await self._mail_lawyer()
-        if game_data["bodyguards"]:
-            await self._mail_bodyguard()
-        if game_data["instigators"]:
-            await self._mail_instigator()
-        if game_data["angels_died"]:
-            print("there are angels")
-            await self._mail_angel_of_death()
-
-    async def _mail_user(
-        self,
-        text: str,
-        role_key: RolesKeysLiteral,
-        new_state: State,
-        exclude: Iterable[int] | int = (),
-    ):
+    async def mailing(self):
         game_data: GameCache = await self.state.get_data()
-        roles = game_data[role_key]
-        role_id = roles[0]
-        players = game_data["players"]
-        markup = send_selection_to_players_kb(
-            players_ids=game_data["players_ids"],
-            players=players,
-            exclude=exclude,
-        )
-        sent_survey = await self.bot.send_message(
-            chat_id=role_id,
-            text=text,
-            reply_markup=markup,
-        )
-        game_data["to_delete"].append(
-            [role_id, sent_survey.message_id]
-        )
-        await self.state.set_data(game_data)
-        await get_state_and_assign(
-            dispatcher=self.dispatcher,
-            chat_id=role_id,
-            bot_id=self.bot.id,
-            new_state=new_state,
-        )
+        for role in Roles:
+            current_role: Role = role.value
+            if (
+                current_role.roles_key not in game_data
+            ) or current_role.mail_message is None:
+                continue
+            roles = game_data[current_role.roles_key]
+            exclude = []
+            player_id = roles[0]
+            if current_role.is_self_selecting is False:
+                exclude = [player_id]
+            if current_role.last_interactive_key:
+                exclude += game_data[
+                    current_role.last_interactive_key
+                ]
+            markup = send_selection_to_players_kb(
+                players_ids=game_data["players_ids"],
+                players=game_data["players"],
+                exclude=exclude,
+            )
+            sent_survey = await self.bot.send_message(
+                chat_id=player_id,
+                text=current_role.mail_message,
+                reply_markup=markup,
+            )
+            game_data["to_delete"].append(
+                [player_id, sent_survey.message_id]
+            )
+            await get_state_and_assign(
+                dispatcher=self.dispatcher,
+                chat_id=player_id,
+                bot_id=self.bot.id,
+                new_state=current_role.state_for_waiting_for_action,
+            )
 
-    async def _mail_prosecutor(self):
-        game_data: GameCache = await self.state.get_data()
-        prosecutors = game_data["prosecutors"]
-        prosecutor_id = prosecutors[0]
-        exclude = (
-            []
-            if game_data["last_arrested"] == 0
-            else [game_data["last_arrested"]]
-        )
-        await self._mail_user(
-            text="Кого арестовать этой ночью?",
-            role_key="prosecutors",
-            new_state=UserFsm.PROSECUTOR_ARRESTS,
-            exclude=[prosecutor_id] + exclude,
-        )
-
-    async def _mail_bodyguard(self):
-        game_data: GameCache = await self.state.get_data()
-        bodyguards = game_data["bodyguards"]
-        bodyguard_id = bodyguards[0]
-        exclude = (
-            []
-            if game_data["last_self_protected"] == 0
-            else [game_data["last_self_protected"]]
-        )
-        await self._mail_user(
-            text="За кого пожертвовать собой?",
-            role_key="bodyguards",
-            new_state=UserFsm.BODYGUARD_PROTECTS,
-            exclude=[bodyguard_id] + exclude,
-        )
-
-    async def _mail_angel_of_death(self):
-        await self._mail_user(
-            text="Глупые людишки тебя линчевали, кому ты отомстишь?",
-            role_key="angels_died",
-            new_state=UserFsm.ANGEL_TAKES_REVENGE,
-        )
-
-    async def _mail_lawyer(self):
-        game_data: GameCache = await self.state.get_data()
-        exclude = (
-            []
-            if game_data["last_forgiven"] == 0
-            else game_data["last_forgiven"]
-        )
-        await self._mail_user(
-            text="Кого защитить на голосовании?",
-            role_key="lawyers",
-            new_state=UserFsm.LAWYER_PROTECTS,
-            exclude=exclude,
-        )
-
-    async def _mail_mafia(self):
-        game_data: GameCache = await self.state.get_data()
-        mafias = game_data["mafias"]
-        mafia_id = mafias[0]
-        await self._mail_user(
-            text="Кого убить этой ночью?",
-            role_key="mafias",
-            new_state=UserFsm.MAFIA_ATTACKS,
-            exclude=mafia_id,
-        )
-
-    async def _mail_doctor(
-        self,
-    ):
-        game_data: GameCache = await self.state.get_data()
-        exclude = (
-            []
-            if game_data["last_treated"] == 0
-            else game_data["last_treated"]
-        )
-        await self._mail_user(
-            text="Кого вылечить этой ночью?",
-            role_key="doctors",
-            new_state=UserFsm.DOCTOR_TREATS,
-            exclude=exclude,
-        )
-
-    async def _mail_instigator(
-        self,
-    ):
-        game_data: GameCache = await self.state.get_data()
-        exclude = game_data["instigators"][0]
-        await self._mail_user(
-            text="Кого надоумить на неправильный выбор?",
-            role_key="instigators",
-            new_state=UserFsm.INSTIGATOR_LYING,
-            exclude=exclude,
-        )
-
-    async def _mail_policeman(
-        self,
-    ):
-        game_data: GameCache = await self.state.get_data()
-        exclude = game_data["policeman"]
-        await self._mail_user(
-            text="Кого проверить этой ночью?",
-            role_key="policeman",
-            new_state=UserFsm.POLICEMAN_CHECKS,
-            exclude=exclude,
-        )
+    # async def _mail_user(
+    #     self,
+    #     text: str,
+    #     role_key: RolesKeysLiteral,
+    #     new_state: State,
+    #     exclude: Iterable[int] | int = (),
+    # ):
+    #
+    #     game_data: GameCache = await self.state.get_data()
+    #     for role in Roles:
+    #         current_role: Role = role.value
+    #         if (current_role.roles_key not in game_data) or current_role.mail_message is None:
+    #             continue
+    #         roles = game_data[current_role.roles_key]
+    #         exclude = []
+    #         player_id = roles[0]
+    #         if current_role.is_self_selecting is False:
+    #             exclude = [player_id]
+    #         if current_role.last_interactive_key:
+    #             exclude += game_data[current_role.last_interactive_key]
+    #         markup = send_selection_to_players_kb(
+    #             players_ids=game_data["players_ids"],
+    #             players=game_data['players'],
+    #             exclude=exclude,
+    #         )
+    #         sent_survey = await self.bot.send_message(
+    #             chat_id=player_id,
+    #             text=text,
+    #             reply_markup=markup,
+    #         )
+    #         game_data["to_delete"].append(
+    #             [player_id, sent_survey.message_id]
+    #         )
+    #         await get_state_and_assign(
+    #             dispatcher=self.dispatcher,
+    #             chat_id=player_id,
+    #             bot_id=self.bot.id,
+    #             new_state=current_role.state_for_waiting_for_action,
+    #         )
+    #
+    # async def _mail_prosecutor(self):
+    #     game_data: GameCache = await self.state.get_data()
+    #     prosecutors = game_data["prosecutors"]
+    #     prosecutor_id = prosecutors[0]
+    #     exclude = (
+    #         []
+    #         if game_data["last_arrested"] == 0
+    #         else [game_data["last_arrested"]]
+    #     )
+    #     await self._mail_user(
+    #         text="Кого арестовать этой ночью?",
+    #         role_key="prosecutors",
+    #         new_state=UserFsm.PROSECUTOR_ARRESTS,
+    #         exclude=[prosecutor_id] + exclude,
+    #     )
+    #
+    # async def _mail_bodyguard(self):
+    #     game_data: GameCache = await self.state.get_data()
+    #     bodyguards = game_data["bodyguards"]
+    #     bodyguard_id = bodyguards[0]
+    #     exclude = (
+    #         []
+    #         if game_data["last_self_protected"] == 0
+    #         else [game_data["last_self_protected"]]
+    #     )
+    #     await self._mail_user(
+    #         text="За кого пожертвовать собой?",
+    #         role_key="bodyguards",
+    #         new_state=UserFsm.BODYGUARD_PROTECTS,
+    #         exclude=[bodyguard_id] + exclude,
+    #     )
+    #
+    # async def _mail_angel_of_death(self):
+    #     await self._mail_user(
+    #         text="Глупые людишки тебя линчевали, кому ты отомстишь?",
+    #         role_key="angels_died",
+    #         new_state=UserFsm.ANGEL_TAKES_REVENGE,
+    #     )
+    #
+    # async def _mail_lawyer(self):
+    #     game_data: GameCache = await self.state.get_data()
+    #     exclude = (
+    #         []
+    #         if game_data["last_forgiven"] == 0
+    #         else game_data["last_forgiven"]
+    #     )
+    #     await self._mail_user(
+    #         text="Кого защитить на голосовании?",
+    #         role_key="lawyers",
+    #         new_state=UserFsm.LAWYER_PROTECTS,
+    #         exclude=exclude,
+    #     )
+    #
+    # async def _mail_mafia(self):
+    #     game_data: GameCache = await self.state.get_data()
+    #     mafias = game_data["mafias"]
+    #     mafia_id = mafias[0]
+    #     await self._mail_user(
+    #         text="Кого убить этой ночью?",
+    #         role_key="mafias",
+    #         new_state=UserFsm.MAFIA_ATTACKS,
+    #         exclude=mafia_id,
+    #     )
+    #
+    # async def _mail_doctor(
+    #     self,
+    # ):
+    #     game_data: GameCache = await self.state.get_data()
+    #     exclude = (
+    #         []
+    #         if game_data["last_treated"] == 0
+    #         else game_data["last_treated"]
+    #     )
+    #     await self._mail_user(
+    #         text="Кого вылечить этой ночью?",
+    #         role_key="doctors",
+    #         new_state=UserFsm.DOCTOR_TREATS,
+    #         exclude=exclude,
+    #     )
+    #
+    # async def _mail_instigator(
+    #     self,
+    # ):
+    #     game_data: GameCache = await self.state.get_data()
+    #     exclude = game_data["instigators"][0]
+    #     await self._mail_user(
+    #         text="Кого надоумить на неправильный выбор?",
+    #         role_key="instigators",
+    #         new_state=UserFsm.INSTIGATOR_LYING,
+    #         exclude=exclude,
+    #     )
+    #
+    # async def _mail_policeman(
+    #     self,
+    # ):
+    #     game_data: GameCache = await self.state.get_data()
+    #     exclude = game_data["policeman"]
+    #     await self._mail_user(
+    #         text="Кого проверить этой ночью?",
+    #         role_key="policeman",
+    #         new_state=UserFsm.POLICEMAN_CHECKS,
+    #         exclude=exclude,
+    #     )
 
     async def send_request_to_vote(
         self,

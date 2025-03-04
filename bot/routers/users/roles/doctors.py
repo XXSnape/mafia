@@ -2,7 +2,7 @@ from aiogram import Router, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from cache.cache_types import UserCache, GameCache
+from cache.cache_types import UserCache, GameCache, Roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
@@ -30,10 +30,11 @@ async def doctor_treats(
         callback_data=callback_data,
         state=state,
         dispatcher=dispatcher,
-        message_to_group="Доктор спешит кому-то на помощь!",
-        message_to_user="Ты выбрал вылечить {url}",
-        last_processed_user_key="last_treated",
-        list_to_process_key="recovered",
+        # message_to_group="Доктор спешит кому-то на помощь!",
+        # message_to_user="Ты выбрал вылечить {url}",
+        role=Roles.doctor,
+        # last_processed_user_key="last_treated",
+        # list_to_process_key="recovered",
     )
     # game_state, game_data, recovered_user_id = (
     #     await get_user_id_and_inform_players(

@@ -7,6 +7,8 @@ from cache.cache_types import (
     GameCache,
     LastProcessedLiteral,
     ListToProcessLiteral,
+    Roles,
+    Role,
 )
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
@@ -49,23 +51,23 @@ async def take_action_and_register_user(
     callback_data: UserActionIndexCbData,
     state: FSMContext,
     dispatcher: Dispatcher,
-    message_to_group: str,
-    message_to_user: str,
-    last_processed_user_key: LastProcessedLiteral | None,
-    list_to_process_key: ListToProcessLiteral,
+    role: Roles,
+    # message_to_group: str,
+    # message_to_user: str,
 ):
+    current_role: Role = role.value
     game_state, game_data, user_id = (
         await get_user_id_and_inform_players(
             callback=callback,
             callback_data=callback_data,
             state=state,
             dispatcher=dispatcher,
-            message_to_group=message_to_group,
-            message_to_user=message_to_user,
+            message_to_group=current_role.message_to_group_after_action,
+            message_to_user=current_role.message_to_user_after_action,
         )
     )
-    if last_processed_user_key:
-        game_data[last_processed_user_key] = user_id
-    game_data[list_to_process_key].append(user_id)
-    await game_state.set_data(game_data)
+    if current_role.last_interactive_key:
+        game_data[current_role.last_interactive_key][:] = [user_id]
+    if current_role.processed_users_key:
+        game_data[current_role.processed_users_key].append(user_id)
     return game_data, user_id

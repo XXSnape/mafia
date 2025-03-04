@@ -1,10 +1,15 @@
 import enum
+from dataclasses import dataclass
 from typing import (
     TypedDict,
     TypeAlias,
     NotRequired,
     Literal,
 )
+
+from aiogram.fsm.state import State
+
+from states.states import UserFsm
 
 
 class UserGameCache(TypedDict):
@@ -41,30 +46,38 @@ class GameCache(TypedDict, total=True):
     bodyguards: PlayersIds
     civilians: PlayersIds
     lawyers: PlayersIds
-    died: PlayersIds
+    # died: PlayersIds
     masochists: PlayersIds
     suicide_bombers: PlayersIds
     winners: PlayersIds
     losers: PlayersIds
-    cant_vote: PlayersIds
-    recovered: PlayersIds
     angels_of_death: PlayersIds
-    angels_died: PlayersIds
     to_delete: ChatsAndMessagesIds
     vote_for: PlayersIds
-    protected: PlayersIds
-    self_protected: PlayersIds
-    have_alibi: PlayersIds
+    # protected: PlayersIds
     prime_ministers: PlayersIds
     instigators: PlayersIds
+
+    angels_died: PlayersIds
+    killed_by_mafia: PlayersIds
+    killed_by_don: PlayersIds
+    killed_by_policeman: PlayersIds
+    killed_by_angel_of_death: PlayersIds
+    treated_by_doctor: PlayersIds
+    treated_by_bodyguard: PlayersIds
+    voted_by_prime: PlayersIds
+    self_protected: PlayersIds
+    have_alibi: PlayersIds
+    cant_vote: PlayersIds
     missed: PlayersIds
 
     # wait_for: list[int]
     two_voices: PlayersIds
-    last_treated: int
-    last_arrested: int
-    last_forgiven: int
-    last_self_protected: int
+    last_treated_by_doctor: PlayersIds
+    last_arrested_by_prosecutor: PlayersIds
+    last_forgiven_by_lawyer: PlayersIds
+    last_self_protected_by_bodyguard: PlayersIds
+
     number_of_night: int
 
 
@@ -89,18 +102,14 @@ RolesKeysLiteral = Literal[
 ]
 
 LastProcessedLiteral = Literal[
-    "last_treated",
-    "last_arrested",
-    "last_forgiven",
-    "last_self_protected",
-]
-
-ListToProcessLiteral = Literal[
-    "self_protected",
-    "recovered",
-    "have_alibi",
-    "cant_vote",
-    "missed",
+    "last_treated_by_doctor",
+    "last_arrested_by_prosecutor",
+    "last_forgiven_by_lawyer",
+    "last_self_protected_by_bodyguard",
+    # "last_treated",
+    # "last_arrested",
+    # "last_forgiven",
+    # "last_self_protected",
 ]
 
 
@@ -112,74 +121,138 @@ class Groupings(StrEnum):
     other = "other"
 
 
-class Role(NamedTuple):
+ListToProcessLiteral = Literal[
+    "angels_died",
+    "killed_by_mafia",
+    "killed_by_don",
+    "killed_by_policeman",
+    "killed_by_angel_of_death",
+    "treated_by_doctor",
+    "treated_by_bodyguard",
+    "voted_by_prime",
+    "self_protected",
+    "have_alibi",
+    "cant_vote",
+    "missed",
+]
+
+
+@dataclass
+class ExtraCache:
+    key: ListToProcessLiteral
+    is_cleared: bool = True
+
+
+@dataclass
+class Role:
     role: str
     roles_key: RolesKeysLiteral
-    last_interactive: LastProcessedLiteral | None
+    processed_users_key: ListToProcessLiteral | None
     photo: str
     grouping: str
     purpose: str
+    is_self_selecting: bool = False
+    mail_message: str | None = None
+    message_to_user_after_action: str | None = None
+    message_to_group_after_action: str | None = None
+    last_interactive_key: LastProcessedLiteral | None = None
+    is_mass_mailing_list: bool = False
+    extra_data: list[ExtraCache] | None = None
+    state_for_waiting_for_action: State | None = None
 
 
 class Roles(enum.Enum):
     mafia = Role(
         role="Мафия",
         roles_key="mafias",
-        last_interactive=None,
+        processed_users_key="killed_by_mafia",
         photo="https://i.pinimg.com/736x/a1/10/db/a110db3eaba78bf6423bcea68f330a64.jpg",
         grouping=Groupings.criminals,
         purpose="Тебе нужно уничтожить всех горожан.",
+        message_to_group_after_action="Мафия выбрала жертву!",
+        message_to_user_after_action="Ты выбрал убить {url}",
+        extra_data=[ExtraCache("killed_by_don")],
+        mail_message="Кого убить этой ночью?",
+        is_mass_mailing_list=True,
+        state_for_waiting_for_action=UserFsm.MAFIA_ATTACKS,
     )
+
     doctor = Role(
         role="Доктор",
         roles_key="doctors",
-        last_interactive="last_treated",
+        processed_users_key="treated_by_doctor",
+        last_interactive_key="last_treated_by_doctor",
         photo="https://gipermed.ru/upload/iblock/4bf/4bfa55f59ceb538bd2c8c437e8f71e5a.jpg",
         grouping=Groupings.civilians,
         purpose="Тебе нужно стараться лечить тех, кому нужна помощь.",
+        message_to_group_after_action="Доктор спешит кому-то на помощь!",
+        message_to_user_after_action="Ты выбрал вылечить {url}",
+        mail_message="Кого вылечить этой ночью?",
+        is_self_selecting=True,
+        state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
     )
+
     angel_of_death = Role(
         role="Ангел смерти",
         roles_key="angels_of_death",
-        last_interactive=None,
+        processed_users_key="killed_by_angel_of_death",
         photo="https://avatars.mds.yandex.net/get-entity_search/10844899/935958285/S600xU_2x",
         purpose="Если ты умрешь на голосовании, сможешь ночью забрать кого-нибудь с собой",
         grouping=Groupings.civilians,
+        extra_data=[ExtraCache("angels_died", False)],
+        message_to_group_after_action="Ангел смерти спускается во имя мести!",
+        message_to_user_after_action="Ты выбрал отомстить {url}",
+        mail_message="Глупые людишки тебя линчевали, кому ты отомстишь?",
+        state_for_waiting_for_action=UserFsm.ANGEL_TAKES_REVENGE,
     )
     policeman = Role(
         role="Комиссар",
         roles_key="policeman",
-        last_interactive=None,
+        processed_users_key="killed_by_policeman",
         photo="https://avatars.mds.yandex.net/get-kinopoisk-image/"
         "1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x",
         grouping=Groupings.civilians,
         purpose="Тебе нужно вычислить мафию.",
+        message_to_group_after_action="Работает местная полиция! Всем жителям приказано сидеть дома!",
+        message_to_user_after_action="Ты выбрал узнать роль {url}",
+        mail_message="Кого проверить этой ночью?",
+        state_for_waiting_for_action=UserFsm.POLICEMAN_CHECKS,
     )
     # policeman = "Комиссар"
     prosecutor = Role(
         role="Прокурор",
         roles_key="prosecutors",
-        last_interactive="last_arrested",
+        processed_users_key="cant_vote",
+        last_interactive_key="last_arrested_by_prosecutor",
         photo="https://avatars.mds.yandex.net/i?"
         "id=b5115d431dafc24be07a55a8b6343540_l-5205087-images-thumbs&n=13",
         grouping=Groupings.civilians,
         purpose="Тебе нельзя допустить, чтобы днем мафия могла говорить.",
+        message_to_group_after_action="По данным разведки потенциальный злоумышленник арестован!",
+        message_to_user_after_action="Ты выбрал арестовать {url}",
+        mail_message="Кого арестовать этой ночью?",
+        state_for_waiting_for_action=UserFsm.PROSECUTOR_ARRESTS,
     )
     # prosecutor = "Прокурор"
     lawyer = Role(
         role="Адвокат",
         roles_key="lawyers",
-        last_interactive="last_forgiven",
+        last_interactive_key="last_forgiven_by_lawyer",
+        processed_users_key="have_alibi",
         photo="https://avatars.mds.yandex.net/get-altay/"
         "5579175/2a0000017e0aa51c3c1fd887206b0156ee34/XXL_height",
         grouping=Groupings.civilians,
         purpose="Тебе нужно защитить мирных жителей от своих же на голосовании.",
+        message_to_group_after_action="Кому-то обеспечена защита лучшими адвокатами города!",
+        message_to_user_after_action="Ты выбрал защитить {url}",
+        mail_message="Кого защитить на голосовании?",
+        state_for_waiting_for_action=UserFsm.LAWYER_PROTECTS,
     )
     # lawyer = "Адвокат"
     civilian = Role(
         role="Мирный житель",
+        processed_users_key=None,
         roles_key="civilians",
-        last_interactive=None,
         photo="https://cdn.culture.ru/c/820179.jpg",
         grouping=Groupings.civilians,
         purpose="Тебе нужно вычислить мафию на голосовании.",
@@ -187,8 +260,8 @@ class Roles(enum.Enum):
     # civilian = "Мирный житель"
     masochist = Role(
         role="Мазохист",
+        processed_users_key=None,
         roles_key="masochists",
-        last_interactive=None,
         photo="https://i.pinimg.com/736x/14/a5/f5/14a5f5eb5dbd73c4707f24d436d80c0b.jpg",
         grouping=Groupings.masochists,
         purpose="Тебе нужно умереть на дневном голосовании.",
@@ -196,8 +269,8 @@ class Roles(enum.Enum):
     # masochist = "Мазохист"
     lucky_gay = Role(
         role="Везунчик",
+        processed_users_key=None,
         roles_key="lucky_guys",
-        last_interactive=None,
         photo="https://avatars.mds.yandex.net/get-mpic/5031100/img_id5520953584482126492.jpeg/orig",
         grouping=Groupings.civilians,
         purpose="Возможно тебе повезет и ты останешься жив после покушения.",
@@ -206,7 +279,7 @@ class Roles(enum.Enum):
     suicide_bomber = Role(
         role="Ночной смертник",
         roles_key="suicide_bombers",
-        last_interactive=None,
+        processed_users_key=None,
         photo="https://sun6-22.userapi.com/impg/zAaADEA19scv86EFl8bY1wUYRCJyBPGg1qamiA/xjMRCUhA20g.jpg?"
         "size=1280x1280&quality=96&"
         "sign=de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag="
@@ -218,18 +291,23 @@ class Roles(enum.Enum):
     bodyguard = Role(
         role="Телохранитель",
         roles_key="bodyguards",
-        last_interactive="last_self_protected",
+        processed_users_key="treated_by_bodyguard",
+        last_interactive_key="last_self_protected_by_bodyguard",
         photo="https://sun6-22.userapi.com/impg/zAaADEA19scv86EFl8bY1wUYRCJyBPGg1qamiA/xjMRCUhA20g.jpg?"
         "size=1280x1280&quality=96&"
         "sign=de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag="
         "EOC9ErRHImjvmda4Qd5Pq59HPf-wUgr77rzHZvabHjc&type=album",
         grouping=Groupings.civilians,
         purpose="Тебе нужно защитить собой лучших специалистов",
+        message_to_group_after_action="Кто-то пожертвовал собой!",
+        message_to_user_after_action="Ты выбрал пожертвовать собой, чтобы спасти {url}",
+        mail_message="За кого пожертвовать собой?",
+        state_for_waiting_for_action=UserFsm.BODYGUARD_PROTECTS,
     )
     prime_minister = Role(
         role="Премьер-министр",
         roles_key="prime_ministers",
-        last_interactive=None,
+        processed_users_key="voted_by_prime",
         photo="https://avatars.mds.yandex.net/i?id=fb2e5e825d183d5344d93bc5636bc4c4_l-5084109-images-thumbs&n=13",
         grouping=Groupings.civilians,
         purpose="Твой голос стоит как 2!",
@@ -239,9 +317,13 @@ class Roles(enum.Enum):
     instigator = Role(
         role="Подстрекатель",
         roles_key="instigators",
-        last_interactive=None,
+        processed_users_key="missed",
         photo="https://avatars.dzeninfra.ru/get-zen_doc/3469057/"
         "pub_620655d2a7947c53d6c601a2_620671b4b495be46b12c0a0c/scale_1200",
         grouping=Groupings.other,
         purpose="Твоя жертва всегда ошибется при выборе на голосовании.",
+        message_to_group_after_action="Кажется, кто-то становится жертвой психологического насилия!",
+        message_to_user_after_action="Ты выбрал прополоскать мозги {url}",
+        mail_message="Кого надоумить на неправильный выбор?",
+        state_for_waiting_for_action=UserFsm.INSTIGATOR_LYING,
     )

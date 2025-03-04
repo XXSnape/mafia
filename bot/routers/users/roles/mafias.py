@@ -2,11 +2,14 @@ from aiogram import Router, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from cache.cache_types import UserCache, GameCache
+from cache.cache_types import UserCache, GameCache, Roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
-from services.actions_at_night import get_user_id_and_inform_players
+from services.actions_at_night import (
+    get_user_id_and_inform_players,
+    take_action_and_register_user,
+)
 from states.states import UserFsm
 from utils.utils import get_state_and_assign
 
@@ -22,16 +25,25 @@ async def mafia_attacks(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    game_state, game_data, died_user_id = (
-        await get_user_id_and_inform_players(
-            callback=callback,
-            callback_data=callback_data,
-            state=state,
-            dispatcher=dispatcher,
-            message_to_group="Мафия выбрала жертву!",
-            message_to_user="Ты выбрал убить {url}",
-        )
+    await take_action_and_register_user(
+        callback=callback,
+        callback_data=callback_data,
+        state=state,
+        dispatcher=dispatcher,
+        # message_to_group="Мафия выбрала жертву!",
+        # message_to_user="Ты выбрал убить {url}",
+        role=Roles.mafia,
     )
+    # game_state, game_data, died_user_id = (
+    #     await get_user_id_and_inform_players(
+    #         callback=callback,
+    #         callback_data=callback_data,
+    #         state=state,
+    #         dispatcher=dispatcher,
+    #         message_to_group="Мафия выбрала жертву!",
+    #         message_to_user="Ты выбрал убить {url}",
+    #     )
+    # )
     # user_data: UserCache = await state.get_data()
     # game_state = await get_state_and_assign(
     #     dispatcher=dispatcher,
@@ -47,7 +59,7 @@ async def mafia_attacks(
     # #     chat_id=died_user_id,
     # #     text="Мафия уже рядом, тебе поможет только чудо",
     # # )
-    game_data["died"].append(died_user_id)
+    # game_data["died"].append(died_user_id)
     # url = game_data["players"][str(died_user_id)]["url"]
     # await callback.message.delete()
     # await callback.message.answer(f"Ты выбрал убить {url}")

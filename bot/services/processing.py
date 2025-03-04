@@ -64,13 +64,7 @@ class Executor:
         game_data: GameCache = await self.state.get_data()
         game_data["pros"].clear()
         game_data["cons"].clear()
-        game_data["recovered"].clear()
         game_data["vote_for"].clear()
-        game_data["died"].clear()
-        game_data["protected"].clear()
-        game_data["self_protected"].clear()
-        game_data["have_alibi"].clear()
-        game_data["missed"].clear()
         for cant_vote_id in game_data["cant_vote"]:
             with suppress(TelegramBadRequest):
                 await self.bot.restrict_chat_member(
@@ -83,6 +77,17 @@ class Executor:
                     ),
                 )
         game_data["cant_vote"].clear()
+        for role in Roles:
+            current_role: Role = role.value
+            if (
+                current_role.processed_users_key
+                and current_role.processed_users_key in game_data
+            ):
+                game_data[current_role.processed_users_key].clear()
+            if current_role.extra_data:
+                for extra in current_role.extra_data:
+                    if extra.is_cleared and extra.key in game_data:
+                        game_data[extra.key].clear()
         await self.state.set_data(game_data)
 
     @check_end_of_game
@@ -112,7 +117,6 @@ class Executor:
             return
         if removed_user in game_data["angels_of_death"]:
             game_data["angels_died"].append(removed_user)
-            print("angel died")
         self.remove_user_from_game(
             game_data=game_data, user_id=removed_user, is_night=False
         )
@@ -124,15 +128,16 @@ class Executor:
     @check_end_of_game
     async def sum_up_after_night(self):
         game_data: GameCache = await self.state.get_data()
-        victims = (
-            set(game_data["died"])
-            - set(game_data["recovered"])
-            - set(game_data["self_protected"])
+        victims = set(game_data["killed_by_mafia"]) | set(
+            game_data["killed_by_angel_of_death"]
+        ) - set(game_data["treated_by_doctor"]) - set(
+            game_data["treated_by_bodyguard"]
         )
-        if game_data["self_protected"]:
+
+        if game_data["treated_by_bodyguard"]:
             if (
                 game_data["bodyguards"][0]
-                not in game_data["recovered"]
+                not in game_data["treated_by_doctor"]
             ):
                 victims.add(game_data["bodyguards"][0])
         text_about_dead = ""

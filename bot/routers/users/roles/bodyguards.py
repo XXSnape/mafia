@@ -2,7 +2,7 @@ from aiogram import Router, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from cache.cache_types import UserCache, GameCache
+from cache.cache_types import UserCache, GameCache, Roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
@@ -41,10 +41,11 @@ async def bodyguard_protects(
         callback_data=callback_data,
         state=state,
         dispatcher=dispatcher,
-        message_to_group="Кто-то пожертвовал собой!",
-        message_to_user="Ты выбрал пожертвовать собой, чтобы спасти {url}",
-        last_processed_user_key="last_self_protected",
-        list_to_process_key="self_protected",
+        # message_to_group="Кто-то пожертвовал собой!",
+        # message_to_user="Ты выбрал пожертвовать собой, чтобы спасти {url}",
+        role=Roles.bodyguard,
+        # last_processed_user_key="last_self_protected",
+        # list_to_process_key="self_protected",
     )
     # game_state, game_data, protected_user_id = (
     #     await get_user_id_and_inform_players(
