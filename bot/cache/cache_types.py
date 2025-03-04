@@ -74,6 +74,7 @@ class GameCache(TypedDict, total=True):
     missed: PlayersIds
     analysts: PlayersIds
     predicted: PlayersIds
+    punishers: PlayersIds
 
     # wait_for: list[int]
     two_voices: PlayersIds
@@ -104,6 +105,7 @@ RolesKeysLiteral = Literal[
     "angels_of_death",
     "angels_died",
     "analysts",
+    "punishers",
 ]
 
 LastProcessedLiteral = Literal[
@@ -169,6 +171,7 @@ class Role:
     extra_buttons_for_actions_at_night: tuple[
         InlineKeyboardButton, ...
     ] = ()
+    can_kill_at_night_and_survive: bool = False
 
 
 class Roles(enum.Enum):
@@ -185,8 +188,17 @@ class Roles(enum.Enum):
         mail_message="Кого убить этой ночью?",
         is_mass_mailing_list=True,
         state_for_waiting_for_action=UserFsm.MAFIA_ATTACKS,
+        can_kill_at_night_and_survive=True,
     )
 
+    punisher = Role(
+        role="Каратель",
+        processed_users_key=None,
+        roles_key="punishers",
+        photo="https://lastfm.freetls.fastly.net/i/u/ar0/d04cdfdf3f65412bc1e7870ec6599ed7.png",
+        grouping=Groupings.civilians,
+        purpose="Спровоцируй мафию и забери её с собой!",
+    )
     doctor = Role(
         role="Доктор",
         roles_key="doctors",
@@ -331,6 +343,7 @@ class Roles(enum.Enum):
         message_to_user_after_action="Ты выбрал узнать роль {url}",
         mail_message="Кого проверить этой ночью?",
         state_for_waiting_for_action=UserFsm.POLICEMAN_CHECKS,
+        can_kill_at_night_and_survive=True,
     )
 
     civilian = Role(

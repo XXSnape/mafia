@@ -44,6 +44,7 @@ async def init_game(message: Message, state: FSMContext):
         "angels_died": [],
         "killed_by_mafia": [],
         "killed_by_don": [],
+        "punishers": [],
         "killed_by_policeman": [],
         "killed_by_angel_of_death": [],
         "treated_by_doctor": [],

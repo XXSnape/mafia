@@ -16,6 +16,8 @@ from cache.cache_types import (
     ChatsAndMessagesIds,
     Roles,
     Role,
+    PlayersIds,
+    RolesKeysLiteral,
 )
 from general.players import Groupings
 from general.exceptions import GameIsOver
@@ -157,6 +159,44 @@ class Executor:
             text=f'Сегодня народ принял тяжелое решение и повесил {user_info["url"]} с ролью {user_info["pretty_role"]}!',
         )
 
+    @staticmethod
+    def get_first_persons(
+        *keys: RolesKeysLiteral, gema_data: GameCache
+    ):
+        ids = []
+        for key in keys:
+            if key in gema_data and gema_data[key]:
+                ids.append(gema_data[key][0])
+        return ids
+
+    async def revenge_of_punisher(
+        self, game_data: GameCache, victims: set
+    ):
+        punishers = game_data.get("punishers")
+        if not punishers:
+            return
+        punisher_id = punishers[0]
+        killed_py_punisher = set()
+        if punisher_id not in victims:
+            return
+        for role in Roles:
+            current_role: Role = role.value
+            if (
+                current_role.can_kill_at_night_and_survive is False
+                or current_role.processed_users_key is None
+            ):
+                continue
+            if punisher_id in game_data.get(
+                current_role.processed_users_key, []
+            ):
+                player_id = game_data[current_role.roles_key][0]
+                killed_py_punisher.add(player_id)
+        await self.bot.send_message(
+            chat_id=punisher_id,
+            text="Все нарушители твоего покоя будут наказаны!",
+        )
+        victims |= killed_py_punisher
+
     @check_end_of_game
     async def sum_up_after_night(self):
         game_data: GameCache = await self.state.get_data()
@@ -166,6 +206,9 @@ class Executor:
         ) - (
             set(game_data["treated_by_doctor"])
             | set(game_data["treated_by_bodyguard"])
+        )
+        await self.revenge_of_punisher(
+            game_data=game_data, victims=victims
         )
         bombers = game_data.get("suicide_bombers", [])[:]
 
