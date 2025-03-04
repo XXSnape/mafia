@@ -92,20 +92,20 @@ class Game:
         )
         await self.mailer.mailing()
         game_data["angels_died"].clear()
-        await asyncio.sleep(13)
+        await asyncio.sleep(9)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
         await self.executor.sum_up_after_night()
-        await asyncio.sleep(5)
+        await asyncio.sleep(4)
         await self.mailer.suggest_vote()
-        await asyncio.sleep(7)
+        await asyncio.sleep(6)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
         result = await self.executor.confirm_final_aim()
         if result:
-            await asyncio.sleep(8)
+            await asyncio.sleep(5)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )

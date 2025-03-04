@@ -8,7 +8,9 @@ from typing import (
 )
 
 from aiogram.fsm.state import State
+from aiogram.types import InlineKeyboardButton
 
+from keyboards.inline.cb.cb_text import DRAW_CB
 from states.states import UserFsm
 
 
@@ -70,6 +72,8 @@ class GameCache(TypedDict, total=True):
     have_alibi: PlayersIds
     cant_vote: PlayersIds
     missed: PlayersIds
+    analysts: PlayersIds
+    predicted: PlayersIds
 
     # wait_for: list[int]
     two_voices: PlayersIds
@@ -99,6 +103,7 @@ RolesKeysLiteral = Literal[
     "prime_ministers",
     "angels_of_death",
     "angels_died",
+    "analysts",
 ]
 
 LastProcessedLiteral = Literal[
@@ -134,6 +139,7 @@ ListToProcessLiteral = Literal[
     "have_alibi",
     "cant_vote",
     "missed",
+    "predicted",
 ]
 
 
@@ -160,6 +166,9 @@ class Role:
     extra_data: list[ExtraCache] | None = None
     state_for_waiting_for_action: State | None = None
     for_notifications: ListToProcessLiteral | None = None
+    extra_buttons_for_actions_at_night: tuple[
+        InlineKeyboardButton, ...
+    ] = ()
 
 
 class Roles(enum.Enum):
@@ -193,6 +202,25 @@ class Roles(enum.Enum):
         state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
     )
 
+    analyst = Role(
+        role="Политический аналитик",
+        processed_users_key="predicted",
+        roles_key="analysts",
+        photo="https://habrastorage.org/files/2e3/371/6a2/2e33716a2bb74f8eb67378334960ebb5.png",
+        grouping=Groupings.civilians,
+        purpose="Тебе нужно на основе ранее полученных данных предсказать, кого повесят на дневном голосовании",
+        is_self_selecting=True,
+        mail_message="Кого повесят сегодня днём?",
+        message_to_group_after_action="Составляется прогноз на завтрашний день",
+        message_to_user_after_action="Ты предположил, что повесят {url}",
+        extra_buttons_for_actions_at_night=(
+            InlineKeyboardButton(
+                text="У жителей не хватит политической воли",
+                callback_data=DRAW_CB,
+            ),
+        ),
+        state_for_waiting_for_action=UserFsm.ANALYST_ASSUMES,
+    )
     suicide_bomber = Role(
         role="Ночной смертник",
         roles_key="suicide_bombers",

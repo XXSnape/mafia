@@ -90,6 +90,21 @@ class Executor:
                         game_data[extra.key].clear()
         await self.state.set_data(game_data)
 
+    async def check_analyst_win(
+        self,
+        analyst_id: int | None,
+        removed_user: list[int],
+        game_data: GameCache,
+    ):
+        if analyst_id and game_data["predicted"] == removed_user:
+            await self.bot.send_message(
+                chat_id=analyst_id, text="Прекрасная дедукция!"
+            )
+        else:
+            await self.bot.send_message(
+                chat_id=analyst_id, text="Сегодня интуиция подвела!"
+            )
+
     @check_end_of_game
     async def sum_up_after_voting(
         self,
@@ -97,24 +112,41 @@ class Executor:
         game_data: GameCache = await self.state.get_data()
         pros = game_data["pros"]
         cons = game_data["cons"]
-        print("pros", pros, "cons", cons)
+        analysts = game_data.get("analysts")
+        analyst = None if analysts is None else analysts[0]
         if len(pros) == len(cons) or len(pros) < len(cons):
+            await self.check_analyst_win(
+                analyst_id=analyst,
+                removed_user=[0],
+                game_data=game_data,
+            )
             await self.bot.send_message(
-                chat_id=game_data["game_chat"],
+                chat_id=self.group_chat_id,
                 text=f"Что ж, такова воля народа! Сегодня днем город не опустел!",
             )
             return
+
         removed_user = game_data["vote_for"][0]
         user_info: UserGameCache = game_data["players"][
             str(removed_user)
         ]
 
         if removed_user in game_data["have_alibi"]:
+            await self.check_analyst_win(
+                analyst_id=analyst,
+                removed_user=[0],
+                game_data=game_data,
+            )
             await self.bot.send_message(
                 chat_id=game_data["game_chat"],
                 text=f"У {user_info['url']} есть алиби, поэтому местные жители отпустили гвоздя программы",
             )
             return
+        await self.check_analyst_win(
+            analyst_id=analyst,
+            removed_user=[removed_user],
+            game_data=game_data,
+        )
         if removed_user in game_data["angels_of_death"]:
             game_data["angels_died"].append(removed_user)
         self.remove_user_from_game(

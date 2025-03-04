@@ -5,8 +5,6 @@ from aiogram.types import CallbackQuery
 from cache.cache_types import (
     UserCache,
     GameCache,
-    LastProcessedLiteral,
-    ListToProcessLiteral,
     Roles,
     Role,
 )
@@ -52,8 +50,6 @@ async def take_action_and_register_user(
     state: FSMContext,
     dispatcher: Dispatcher,
     role: Roles,
-    # message_to_group: str,
-    # message_to_user: str,
 ):
     current_role: Role = role.value
     game_state, game_data, user_id = (

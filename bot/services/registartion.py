@@ -53,6 +53,8 @@ async def init_game(message: Message, state: FSMContext):
         "have_alibi": [],
         "cant_vote": [],
         "missed": [],
+        "analysts": [],
+        "predicted": [],
         "last_treated_by_doctor": [],
         "last_arrested_by_prosecutor": [],
         "last_forgiven_by_lawyer": [],

@@ -8,6 +8,7 @@ from .prosecutors import router as prosecutors_router
 from .lawyers import router as lawyers_router
 from .instigators import router as instigators_router
 from .angels_of_death import router as angels_of_death_router
+from .analysts import router as analysts_router
 
 router = Router(name=__name__)
 router.include_routers(
@@ -19,4 +20,5 @@ router.include_routers(
     lawyers_router,
     instigators_router,
     angels_of_death_router,
+    analysts_router,
 )
