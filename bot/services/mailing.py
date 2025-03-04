@@ -46,11 +46,14 @@ class MailerToPlayers:
         game_data: GameCache = await self.state.get_data()
         for role in Roles:
             current_role: Role = role.value
+
             if (
                 current_role.roles_key not in game_data
             ) or current_role.mail_message is None:
                 continue
             roles = game_data[current_role.roles_key]
+            if not roles:
+                continue
             exclude = []
             player_id = roles[0]
             if current_role.is_self_selecting is False:

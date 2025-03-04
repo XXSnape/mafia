@@ -23,7 +23,7 @@ async def init_game(message: Message, state: FSMContext):
         "pros": [],
         "cons": [],
         "players_ids": [],
-        "players": [],
+        "players": {},
         "prosecutors": [],
         "mafias": [],
         "doctors": [],

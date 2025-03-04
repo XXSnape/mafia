@@ -192,19 +192,6 @@ class Roles(enum.Enum):
         state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
     )
 
-    angel_of_death = Role(
-        role="Ангел смерти",
-        roles_key="angels_of_death",
-        processed_users_key="killed_by_angel_of_death",
-        photo="https://avatars.mds.yandex.net/get-entity_search/10844899/935958285/S600xU_2x",
-        purpose="Если ты умрешь на голосовании, сможешь ночью забрать кого-нибудь с собой",
-        grouping=Groupings.civilians,
-        extra_data=[ExtraCache("angels_died", False)],
-        message_to_group_after_action="Ангел смерти спускается во имя мести!",
-        message_to_user_after_action="Ты выбрал отомстить {url}",
-        mail_message="Глупые людишки тебя линчевали, кому ты отомстишь?",
-        state_for_waiting_for_action=UserFsm.ANGEL_TAKES_REVENGE,
-    )
     policeman = Role(
         role="Комиссар",
         roles_key="policeman",
@@ -217,6 +204,19 @@ class Roles(enum.Enum):
         message_to_user_after_action="Ты выбрал узнать роль {url}",
         mail_message="Кого проверить этой ночью?",
         state_for_waiting_for_action=UserFsm.POLICEMAN_CHECKS,
+    )
+    angel_of_death = Role(
+        role="Ангел смерти",
+        roles_key="angels_of_death",
+        processed_users_key="killed_by_angel_of_death",
+        photo="https://avatars.mds.yandex.net/get-entity_search/10844899/935958285/S600xU_2x",
+        purpose="Если ты умрешь на голосовании, сможешь ночью забрать кого-нибудь с собой",
+        grouping=Groupings.civilians,
+        extra_data=[ExtraCache("angels_died", False)],
+        message_to_group_after_action="Ангел смерти спускается во имя мести!",
+        message_to_user_after_action="Ты выбрал отомстить {url}",
+        mail_message="Глупые людишки тебя линчевали, кому ты отомстишь?",
+        state_for_waiting_for_action=UserFsm.ANGEL_TAKES_REVENGE,
     )
     # policeman = "Комиссар"
     prosecutor = Role(

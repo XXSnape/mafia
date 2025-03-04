@@ -90,9 +90,9 @@ class Game:
             caption=f"Наступает ночь {game_data['number_of_night']}.\n\nЖивые участники:{profiles}",
             reply_markup=get_to_bot_kb("Действовать!"),
         )
-        await self.mailer.mailing(game_data=game_data)
+        await self.mailer.mailing()
         game_data["angels_died"].clear()
-        await asyncio.sleep(6)
+        await asyncio.sleep(18)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )

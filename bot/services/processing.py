@@ -128,11 +128,17 @@ class Executor:
     @check_end_of_game
     async def sum_up_after_night(self):
         game_data: GameCache = await self.state.get_data()
-        victims = set(game_data["killed_by_mafia"]) | set(
-            game_data["killed_by_angel_of_death"]
-        ) - set(game_data["treated_by_doctor"]) - set(
-            game_data["treated_by_bodyguard"]
+        print("mafia", game_data["killed_by_mafia"])
+        print("doc", game_data["treated_by_doctor"])
+        victims = (
+            set(game_data["killed_by_mafia"])
+            | set(game_data["killed_by_angel_of_death"])
+        ) - (
+            set(game_data["treated_by_doctor"])
+            | set(game_data["treated_by_bodyguard"])
         )
+
+        print("victims", victims)
 
         if game_data["treated_by_bodyguard"]:
             if (
