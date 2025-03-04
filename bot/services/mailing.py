@@ -13,6 +13,7 @@ from cache.cache_types import (
     UsersInGame,
     Roles,
     Role,
+    PlayersIds,
 )
 
 from keyboards.inline.callback_factory.recognize_user import (
@@ -278,6 +279,7 @@ class MailerToPlayers:
     async def report_death(
         self,
         chat_id: int,
+        bombers: PlayersIds,
     ):
 
         await get_state_and_assign(
@@ -286,9 +288,12 @@ class MailerToPlayers:
             bot_id=self.bot.id,
             new_state=UserFsm.WAIT_FOR_LATEST_LETTER,
         )
+        message = "К сожалению, тебя убили! Отправь напоследок все, что думаешь!"
+        if chat_id in bombers:
+            message = "Поздравляю с заветным ночным убийством! Не забудь поглумиться над мафией"
         await self.bot.send_message(
             chat_id=chat_id,
-            text="К сожалению, тебя убили! Отправь напоследок все, что думаешь!",
+            text=message,
         )
 
     async def familiarize_players(self):

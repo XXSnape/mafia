@@ -128,8 +128,6 @@ class Executor:
     @check_end_of_game
     async def sum_up_after_night(self):
         game_data: GameCache = await self.state.get_data()
-        print("mafia", game_data["killed_by_mafia"])
-        print("doc", game_data["treated_by_doctor"])
         victims = (
             set(game_data["killed_by_mafia"])
             | set(game_data["killed_by_angel_of_death"])
@@ -137,8 +135,7 @@ class Executor:
             set(game_data["treated_by_doctor"])
             | set(game_data["treated_by_bodyguard"])
         )
-
-        print("victims", victims)
+        bombers = game_data.get("suicide_bombers", [])[:]
 
         if game_data["treated_by_bodyguard"]:
             if (
@@ -186,7 +183,7 @@ class Executor:
             await asyncio.gather(
                 *(
                     self.mailer.report_death(
-                        chat_id=victim_id,
+                        chat_id=victim_id, bombers=bombers
                     )
                     for victim_id in victims
                 )

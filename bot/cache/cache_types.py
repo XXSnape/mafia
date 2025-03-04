@@ -193,6 +193,90 @@ class Roles(enum.Enum):
         state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
     )
 
+    suicide_bomber = Role(
+        role="Ночной смертник",
+        roles_key="suicide_bombers",
+        processed_users_key=None,
+        photo="https://sun6-22.userapi.com/impg/zAaADEA19scv86EFl8bY1wUYRCJyBPGg1qamiA/xjMRCUhA20g.jpg?"
+        "size=1280x1280&quality=96&"
+        "sign=de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag="
+        "EOC9ErRHImjvmda4Qd5Pq59HPf-wUgr77rzHZvabHjc&type=album",
+        grouping=Groupings.suicide_bombers,
+        purpose="Тебе нужно умереть ночью.",
+    )
+    instigator = Role(
+        role="Подстрекатель",
+        roles_key="instigators",
+        processed_users_key="missed",
+        photo="https://avatars.dzeninfra.ru/get-zen_doc/3469057/"
+        "pub_620655d2a7947c53d6c601a2_620671b4b495be46b12c0a0c/scale_1200",
+        grouping=Groupings.other,
+        purpose="Твоя жертва всегда ошибется при выборе на голосовании.",
+        message_to_group_after_action="Кажется, кто-то становится жертвой психологического насилия!",
+        message_to_user_after_action="Ты выбрал прополоскать мозги {url}",
+        mail_message="Кого надоумить на неправильный выбор?",
+        state_for_waiting_for_action=UserFsm.INSTIGATOR_LYING,
+    )
+    prime_minister = Role(
+        role="Премьер-министр",
+        roles_key="prime_ministers",
+        processed_users_key="voted_by_prime",
+        photo="https://avatars.mds.yandex.net/i?id=fb2e5e825d183d5344d93bc5636bc4c4_l-5084109-images-thumbs&n=13",
+        grouping=Groupings.civilians,
+        purpose="Твой голос стоит как 2!",
+    )
+    bodyguard = Role(
+        role="Телохранитель",
+        roles_key="bodyguards",
+        processed_users_key="treated_by_bodyguard",
+        last_interactive_key="last_self_protected_by_bodyguard",
+        photo="https://sun6-22.userapi.com/impg/zAaADEA19scv86EFl8bY1wUYRCJyBPGg1qamiA/xjMRCUhA20g.jpg?"
+        "size=1280x1280&quality=96&"
+        "sign=de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag="
+        "EOC9ErRHImjvmda4Qd5Pq59HPf-wUgr77rzHZvabHjc&type=album",
+        grouping=Groupings.civilians,
+        purpose="Тебе нужно защитить собой лучших специалистов",
+        message_to_group_after_action="Кто-то пожертвовал собой!",
+        message_to_user_after_action="Ты выбрал пожертвовать собой, чтобы спасти {url}",
+        mail_message="За кого пожертвовать собой?",
+        state_for_waiting_for_action=UserFsm.BODYGUARD_PROTECTS,
+    )
+    masochist = Role(
+        role="Мазохист",
+        processed_users_key=None,
+        roles_key="masochists",
+        photo="https://i.pinimg.com/736x/14/a5/f5/14a5f5eb5dbd73c4707f24d436d80c0b.jpg",
+        grouping=Groupings.masochists,
+        purpose="Тебе нужно умереть на дневном голосовании.",
+    )
+    lawyer = Role(
+        role="Адвокат",
+        roles_key="lawyers",
+        last_interactive_key="last_forgiven_by_lawyer",
+        processed_users_key="have_alibi",
+        photo="https://avatars.mds.yandex.net/get-altay/"
+        "5579175/2a0000017e0aa51c3c1fd887206b0156ee34/XXL_height",
+        grouping=Groupings.civilians,
+        purpose="Тебе нужно защитить мирных жителей от своих же на голосовании.",
+        message_to_group_after_action="Кому-то обеспечена защита лучшими адвокатами города!",
+        message_to_user_after_action="Ты выбрал защитить {url}",
+        mail_message="Кого защитить на голосовании?",
+        state_for_waiting_for_action=UserFsm.LAWYER_PROTECTS,
+    )
+    angel_of_death = Role(
+        role="Ангел смерти",
+        roles_key="angels_of_death",
+        processed_users_key="killed_by_angel_of_death",
+        photo="https://avatars.mds.yandex.net/get-entity_search/10844899/935958285/S600xU_2x",
+        purpose="Если ты умрешь на голосовании, сможешь ночью забрать кого-нибудь с собой",
+        grouping=Groupings.civilians,
+        extra_data=[ExtraCache("angels_died", False)],
+        message_to_group_after_action="Ангел смерти спускается во имя мести!",
+        message_to_user_after_action="Ты выбрал отомстить {url}",
+        mail_message="Глупые людишки тебя линчевали, кому ты отомстишь?",
+        state_for_waiting_for_action=UserFsm.ANGEL_TAKES_REVENGE,
+        for_notifications="angels_died",
+    )
     prosecutor = Role(
         role="Прокурор",
         roles_key="prosecutors",
@@ -220,37 +304,7 @@ class Roles(enum.Enum):
         mail_message="Кого проверить этой ночью?",
         state_for_waiting_for_action=UserFsm.POLICEMAN_CHECKS,
     )
-    angel_of_death = Role(
-        role="Ангел смерти",
-        roles_key="angels_of_death",
-        processed_users_key="killed_by_angel_of_death",
-        photo="https://avatars.mds.yandex.net/get-entity_search/10844899/935958285/S600xU_2x",
-        purpose="Если ты умрешь на голосовании, сможешь ночью забрать кого-нибудь с собой",
-        grouping=Groupings.civilians,
-        extra_data=[ExtraCache("angels_died", False)],
-        message_to_group_after_action="Ангел смерти спускается во имя мести!",
-        message_to_user_after_action="Ты выбрал отомстить {url}",
-        mail_message="Глупые людишки тебя линчевали, кому ты отомстишь?",
-        state_for_waiting_for_action=UserFsm.ANGEL_TAKES_REVENGE,
-        for_notifications="angels_died",
-    )
-    # policeman = "Комиссар"
-    # prosecutor = "Прокурор"
-    lawyer = Role(
-        role="Адвокат",
-        roles_key="lawyers",
-        last_interactive_key="last_forgiven_by_lawyer",
-        processed_users_key="have_alibi",
-        photo="https://avatars.mds.yandex.net/get-altay/"
-        "5579175/2a0000017e0aa51c3c1fd887206b0156ee34/XXL_height",
-        grouping=Groupings.civilians,
-        purpose="Тебе нужно защитить мирных жителей от своих же на голосовании.",
-        message_to_group_after_action="Кому-то обеспечена защита лучшими адвокатами города!",
-        message_to_user_after_action="Ты выбрал защитить {url}",
-        mail_message="Кого защитить на голосовании?",
-        state_for_waiting_for_action=UserFsm.LAWYER_PROTECTS,
-    )
-    # lawyer = "Адвокат"
+
     civilian = Role(
         role="Мирный житель",
         processed_users_key=None,
@@ -259,16 +313,6 @@ class Roles(enum.Enum):
         grouping=Groupings.civilians,
         purpose="Тебе нужно вычислить мафию на голосовании.",
     )
-    # civilian = "Мирный житель"
-    masochist = Role(
-        role="Мазохист",
-        processed_users_key=None,
-        roles_key="masochists",
-        photo="https://i.pinimg.com/736x/14/a5/f5/14a5f5eb5dbd73c4707f24d436d80c0b.jpg",
-        grouping=Groupings.masochists,
-        purpose="Тебе нужно умереть на дневном голосовании.",
-    )
-    # masochist = "Мазохист"
     lucky_gay = Role(
         role="Везунчик",
         processed_users_key=None,
@@ -276,56 +320,4 @@ class Roles(enum.Enum):
         photo="https://avatars.mds.yandex.net/get-mpic/5031100/img_id5520953584482126492.jpeg/orig",
         grouping=Groupings.civilians,
         purpose="Возможно тебе повезет и ты останешься жив после покушения.",
-    )
-    # lucky_gay = "Везунчик"
-    suicide_bomber = Role(
-        role="Ночной смертник",
-        roles_key="suicide_bombers",
-        processed_users_key=None,
-        photo="https://sun6-22.userapi.com/impg/zAaADEA19scv86EFl8bY1wUYRCJyBPGg1qamiA/xjMRCUhA20g.jpg?"
-        "size=1280x1280&quality=96&"
-        "sign=de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag="
-        "EOC9ErRHImjvmda4Qd5Pq59HPf-wUgr77rzHZvabHjc&type=album",
-        grouping=Groupings.suicide_bombers,
-        purpose="Тебе нужно умереть ночью.",
-    )
-    # suicide_bomber = "Ночной смертник"
-    bodyguard = Role(
-        role="Телохранитель",
-        roles_key="bodyguards",
-        processed_users_key="treated_by_bodyguard",
-        last_interactive_key="last_self_protected_by_bodyguard",
-        photo="https://sun6-22.userapi.com/impg/zAaADEA19scv86EFl8bY1wUYRCJyBPGg1qamiA/xjMRCUhA20g.jpg?"
-        "size=1280x1280&quality=96&"
-        "sign=de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag="
-        "EOC9ErRHImjvmda4Qd5Pq59HPf-wUgr77rzHZvabHjc&type=album",
-        grouping=Groupings.civilians,
-        purpose="Тебе нужно защитить собой лучших специалистов",
-        message_to_group_after_action="Кто-то пожертвовал собой!",
-        message_to_user_after_action="Ты выбрал пожертвовать собой, чтобы спасти {url}",
-        mail_message="За кого пожертвовать собой?",
-        state_for_waiting_for_action=UserFsm.BODYGUARD_PROTECTS,
-    )
-    prime_minister = Role(
-        role="Премьер-министр",
-        roles_key="prime_ministers",
-        processed_users_key="voted_by_prime",
-        photo="https://avatars.mds.yandex.net/i?id=fb2e5e825d183d5344d93bc5636bc4c4_l-5084109-images-thumbs&n=13",
-        grouping=Groupings.civilians,
-        purpose="Твой голос стоит как 2!",
-    )
-    # bodyguard = "Телохранитель"
-    # prime_minister = "Премьер-министр"
-    instigator = Role(
-        role="Подстрекатель",
-        roles_key="instigators",
-        processed_users_key="missed",
-        photo="https://avatars.dzeninfra.ru/get-zen_doc/3469057/"
-        "pub_620655d2a7947c53d6c601a2_620671b4b495be46b12c0a0c/scale_1200",
-        grouping=Groupings.other,
-        purpose="Твоя жертва всегда ошибется при выборе на голосовании.",
-        message_to_group_after_action="Кажется, кто-то становится жертвой психологического насилия!",
-        message_to_user_after_action="Ты выбрал прополоскать мозги {url}",
-        mail_message="Кого надоумить на неправильный выбор?",
-        state_for_waiting_for_action=UserFsm.INSTIGATOR_LYING,
     )
