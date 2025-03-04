@@ -51,7 +51,12 @@ class MailerToPlayers:
                 current_role.roles_key not in game_data
             ) or current_role.mail_message is None:
                 continue
-            roles = game_data[current_role.roles_key]
+            key = (
+                current_role.for_notifications
+                if current_role.for_notifications
+                else current_role.roles_key
+            )
+            roles = game_data[key]
             if not roles:
                 continue
             exclude = []

@@ -159,6 +159,7 @@ class Role:
     is_mass_mailing_list: bool = False
     extra_data: list[ExtraCache] | None = None
     state_for_waiting_for_action: State | None = None
+    for_notifications: ListToProcessLiteral | None = None
 
 
 class Roles(enum.Enum):
@@ -192,6 +193,20 @@ class Roles(enum.Enum):
         state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
     )
 
+    prosecutor = Role(
+        role="Прокурор",
+        roles_key="prosecutors",
+        processed_users_key="cant_vote",
+        last_interactive_key="last_arrested_by_prosecutor",
+        photo="https://avatars.mds.yandex.net/i?"
+        "id=b5115d431dafc24be07a55a8b6343540_l-5205087-images-thumbs&n=13",
+        grouping=Groupings.civilians,
+        purpose="Тебе нельзя допустить, чтобы днем мафия могла говорить.",
+        message_to_group_after_action="По данным разведки потенциальный злоумышленник арестован!",
+        message_to_user_after_action="Ты выбрал арестовать {url}",
+        mail_message="Кого арестовать этой ночью?",
+        state_for_waiting_for_action=UserFsm.PROSECUTOR_ARRESTS,
+    )
     policeman = Role(
         role="Комиссар",
         roles_key="policeman",
@@ -217,22 +232,9 @@ class Roles(enum.Enum):
         message_to_user_after_action="Ты выбрал отомстить {url}",
         mail_message="Глупые людишки тебя линчевали, кому ты отомстишь?",
         state_for_waiting_for_action=UserFsm.ANGEL_TAKES_REVENGE,
+        for_notifications="angels_died",
     )
     # policeman = "Комиссар"
-    prosecutor = Role(
-        role="Прокурор",
-        roles_key="prosecutors",
-        processed_users_key="cant_vote",
-        last_interactive_key="last_arrested_by_prosecutor",
-        photo="https://avatars.mds.yandex.net/i?"
-        "id=b5115d431dafc24be07a55a8b6343540_l-5205087-images-thumbs&n=13",
-        grouping=Groupings.civilians,
-        purpose="Тебе нельзя допустить, чтобы днем мафия могла говорить.",
-        message_to_group_after_action="По данным разведки потенциальный злоумышленник арестован!",
-        message_to_user_after_action="Ты выбрал арестовать {url}",
-        mail_message="Кого арестовать этой ночью?",
-        state_for_waiting_for_action=UserFsm.PROSECUTOR_ARRESTS,
-    )
     # prosecutor = "Прокурор"
     lawyer = Role(
         role="Адвокат",
