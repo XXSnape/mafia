@@ -13,19 +13,23 @@ from aiogram.types import InlineKeyboardButton
 from keyboards.inline.cb.cb_text import DRAW_CB
 from states.states import UserFsm
 
+Url: TypeAlias = str
+
 
 class UserGameCache(TypedDict):
     full_name: str
-    url: str
+    url: Url
     role: NotRequired[str]
     pretty_role: NotRequired[str]
 
 
-UsersInGame: TypeAlias = dict[str, UserGameCache]
+UserIdStr: TypeAlias = str
+UsersInGame: TypeAlias = dict[UserIdStr, UserGameCache]
 
 PlayersIds: TypeAlias = list[int]
 LivePlayersIds: TypeAlias = PlayersIds
 ChatsAndMessagesIds: TypeAlias = list[list[int]]
+TrackingData: TypeAlias = dict[UserIdStr, list[Url]]
 
 
 class UserCache(TypedDict):
@@ -75,6 +79,9 @@ class GameCache(TypedDict, total=True):
     analysts: PlayersIds
     predicted: PlayersIds
     punishers: PlayersIds
+    journalists: PlayersIds
+    talked: PlayersIds
+    tracking: TrackingData
 
     # wait_for: list[int]
     two_voices: PlayersIds
@@ -90,6 +97,7 @@ from enum import StrEnum
 from typing import NamedTuple
 
 RolesKeysLiteral = Literal[
+    "journalists",
     "mafias",
     "doctors",
     "policeman",
@@ -132,6 +140,7 @@ ListToProcessLiteral = Literal[
     "angels_died",
     "killed_by_mafia",
     "killed_by_don",
+    "talked",
     "killed_by_policeman",
     "killed_by_angel_of_death",
     "treated_by_doctor",
@@ -142,6 +151,7 @@ ListToProcessLiteral = Literal[
     "cant_vote",
     "missed",
     "predicted",
+    "tracking",
 ]
 
 
@@ -149,6 +159,7 @@ ListToProcessLiteral = Literal[
 class ExtraCache:
     key: ListToProcessLiteral
     is_cleared: bool = True
+    data_type: type = list
 
 
 @dataclass
@@ -191,13 +202,36 @@ class Roles(enum.Enum):
         can_kill_at_night_and_survive=True,
     )
 
-    punisher = Role(
-        role="Каратель",
-        processed_users_key=None,
-        roles_key="punishers",
-        photo="https://lastfm.freetls.fastly.net/i/u/ar0/d04cdfdf3f65412bc1e7870ec6599ed7.png",
+    policeman = Role(
+        role="Комиссар",
+        roles_key="policeman",
+        processed_users_key="killed_by_policeman",
+        photo="https://avatars.mds.yandex.net/get-kinopoisk-image/"
+        "1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x",
         grouping=Groupings.civilians,
-        purpose="Спровоцируй мафию и забери её с собой!",
+        purpose="Тебе нужно вычислить мафию.",
+        message_to_group_after_action="Работает местная полиция! Всем жителям приказано сидеть дома!",
+        message_to_user_after_action="Ты выбрал узнать роль {url}",
+        mail_message="Кого проверить этой ночью?",
+        state_for_waiting_for_action=UserFsm.POLICEMAN_CHECKS,
+        can_kill_at_night_and_survive=True,
+    )
+    journalist = Role(
+        role="Журналист",
+        processed_users_key="talked",
+        roles_key="journalists",
+        photo="https://pics.rbc.ru/v2_companies_s3/resized/"
+        "960xH/media/company_press_release_image/"
+        "022eef78-63a5-4a2b-bb88-e4dcae639e34.jpg",
+        grouping=Groupings.civilians,
+        purpose="Ты можешь приходить к местным жителям и узнавать, что они видели",
+        message_to_group_after_action="Что случилось? Отчаянные СМИ спешат выяснить правду!",
+        message_to_user_after_action="Ты выбрал взять интервью у {url}",
+        mail_message="У кого взять интервью этой ночью?",
+        state_for_waiting_for_action=UserFsm.JOURNALIST_TAKES_INTERVIEW,
+        extra_data=[
+            ExtraCache(key="tracking", data_type=dict),
+        ],
     )
     doctor = Role(
         role="Доктор",
@@ -212,6 +246,15 @@ class Roles(enum.Enum):
         mail_message="Кого вылечить этой ночью?",
         is_self_selecting=True,
         state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
+    )
+
+    punisher = Role(
+        role="Каратель",
+        processed_users_key=None,
+        roles_key="punishers",
+        photo="https://lastfm.freetls.fastly.net/i/u/ar0/d04cdfdf3f65412bc1e7870ec6599ed7.png",
+        grouping=Groupings.civilians,
+        purpose="Спровоцируй мафию и забери её с собой!",
     )
 
     analyst = Role(
@@ -330,20 +373,6 @@ class Roles(enum.Enum):
         message_to_user_after_action="Ты выбрал арестовать {url}",
         mail_message="Кого арестовать этой ночью?",
         state_for_waiting_for_action=UserFsm.PROSECUTOR_ARRESTS,
-    )
-    policeman = Role(
-        role="Комиссар",
-        roles_key="policeman",
-        processed_users_key="killed_by_policeman",
-        photo="https://avatars.mds.yandex.net/get-kinopoisk-image/"
-        "1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x",
-        grouping=Groupings.civilians,
-        purpose="Тебе нужно вычислить мафию.",
-        message_to_group_after_action="Работает местная полиция! Всем жителям приказано сидеть дома!",
-        message_to_user_after_action="Ты выбрал узнать роль {url}",
-        mail_message="Кого проверить этой ночью?",
-        state_for_waiting_for_action=UserFsm.POLICEMAN_CHECKS,
-        can_kill_at_night_and_survive=True,
     )
 
     civilian = Role(

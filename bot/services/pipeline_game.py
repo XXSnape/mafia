@@ -92,10 +92,11 @@ class Game:
         )
         await self.mailer.mailing()
         game_data["angels_died"].clear()
-        await asyncio.sleep(9)
+        await asyncio.sleep(35)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
+        await self.mailer.send_promised_information_to_users()
         await self.executor.sum_up_after_night()
         await asyncio.sleep(4)
         await self.mailer.suggest_vote()

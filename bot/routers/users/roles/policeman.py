@@ -2,7 +2,7 @@ from aiogram import Router, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from cache.cache_types import UserCache, GameCache
+from cache.cache_types import UserCache, GameCache, Roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
@@ -28,8 +28,7 @@ async def policeman_checks(
             callback_data=callback_data,
             state=state,
             dispatcher=dispatcher,
-            message_to_group="Работает местная полиция! Всем жителям приказано сидеть дома!",
-            message_to_user="Ты выбрал узнать роль {url}",
+            role=Roles.policeman,
         )
     )
     role = game_data["players"][str(checked_user_id)]["pretty_role"]

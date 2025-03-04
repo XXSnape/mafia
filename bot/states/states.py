@@ -18,4 +18,5 @@ class UserFsm(StatesGroup):
     INSTIGATOR_LYING = State()
     ANGEL_TAKES_REVENGE = State()
     ANALYST_ASSUMES = State()
+    JOURNALIST_TAKES_INTERVIEW = State()
     WAIT_FOR_LATEST_LETTER = State()

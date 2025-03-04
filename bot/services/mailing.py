@@ -89,6 +89,29 @@ class MailerToPlayers:
                 new_state=current_role.state_for_waiting_for_action,
             )
 
+    async def send_promised_information_to_users(self):
+        game_data: GameCache = await self.state.get_data()
+        journalists = game_data.get("journalists", [])
+        if not journalists:
+            return
+        journalist_id = journalists[0]
+        if not game_data["talked"]:
+            return
+        user_id = game_data["talked"][0]
+        visitors = ", ".join(
+            game_data["tracking"].get(str(user_id), [])
+        )
+
+        user_url = game_data["players"][str(user_id)]["url"]
+        message = (
+            f"{user_url} сегодня никто не навещал"
+            if not visitors
+            else f"К {user_url} приходили: {visitors}"
+        )
+        await self.bot.send_message(
+            chat_id=journalist_id, text=message
+        )
+
     async def send_request_to_vote(
         self,
         game_data: GameCache,

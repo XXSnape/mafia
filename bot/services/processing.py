@@ -98,7 +98,9 @@ class Executor:
         removed_user: list[int],
         game_data: GameCache,
     ):
-        if analyst_id and game_data["predicted"] == removed_user:
+        if not analyst_id:
+            return
+        if game_data["predicted"] == removed_user:
             await self.bot.send_message(
                 chat_id=analyst_id, text="Прекрасная дедукция!"
             )
@@ -115,7 +117,7 @@ class Executor:
         pros = game_data["pros"]
         cons = game_data["cons"]
         analysts = game_data.get("analysts")
-        analyst = None if analysts is None else analysts[0]
+        analyst = None if not analysts else analysts[0]
         if len(pros) == len(cons) or len(pros) < len(cons):
             await self.check_analyst_win(
                 analyst_id=analyst,
