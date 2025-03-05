@@ -93,7 +93,7 @@ class Game:
         )
         await self.mailer.mailing()
         game_data["angels_died"].clear()
-        await asyncio.sleep(25)
+        await asyncio.sleep(3)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
@@ -102,13 +102,13 @@ class Game:
         await self.executor.sum_up_after_night()
         await asyncio.sleep(4)
         await self.mailer.suggest_vote()
-        await asyncio.sleep(6)
+        await asyncio.sleep(20)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
         result = await self.executor.confirm_final_aim()
         if result:
-            await asyncio.sleep(5)
+            await asyncio.sleep(15)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
@@ -192,7 +192,7 @@ class Game:
         shuffle(ids)
         roles_tpl = tuple(Roles)
         roles = (
-            roles_tpl[:2]
+            roles_tpl[:3]
             + (AliasesRole.mafia,)
             + (AliasesRole.mafia,)
             + roles_tpl[3:]
@@ -206,6 +206,15 @@ class Game:
             game_data["players"][str(user_id)]["pretty_role"] = (
                 make_pretty(current_role.role)
             )
+            game_data["players"][str(user_id)]["initial_role"] = (
+                make_pretty(current_role.role)
+            )
+            game_data["players"][str(user_id)]["initial_role"] = (
+                make_pretty(current_role.role)
+            )
+            game_data["players"][str(user_id)][
+                "enum_name"
+            ] = role.name
             roles.append(user_id)
         await self.state.set_data(game_data)
 

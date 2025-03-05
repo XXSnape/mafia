@@ -203,7 +203,7 @@ class Executor:
         )
         if removed_user in game_data["angels_of_death"]:
             game_data["angels_died"].append(removed_user)
-        self.remove_user_from_game(
+        await self.remove_user_from_game(
             game_data=game_data, user_id=removed_user, is_night=False
         )
         await self.bot.send_message(
@@ -293,7 +293,7 @@ class Executor:
                     victims.remove(victim_id)
                     continue
 
-            self.remove_user_from_game(
+            await self.remove_user_from_game(
                 game_data=game_data, user_id=victim_id, is_night=True
             )
             url = game_data["players"][str(victim_id)]["url"]
@@ -379,9 +379,8 @@ class Executor:
             )
         )
 
-    @staticmethod
-    def remove_user_from_game(
-        game_data: GameCache, user_id: int, is_night: bool
+    async def remove_user_from_game(
+        self, game_data: GameCache, user_id: int, is_night: bool
     ):
         if user_id in game_data["masochists"]:
             if is_night:
@@ -405,6 +404,14 @@ class Executor:
             roles[current_role.role] = game_data[
                 current_role.roles_key
             ]
-
         user_role = game_data["players"][str(user_id)]["role"]
         roles[user_role].remove(user_id)
+        current_enum = Roles[
+            game_data["players"][str(user_id)]["enum_name"]
+        ]
+        if current_enum.value.if_died:
+            await current_enum.value.if_died(
+                state=self.state,
+                bot=self.bot,
+                current_id=user_id,
+            )

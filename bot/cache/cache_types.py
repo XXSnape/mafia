@@ -9,11 +9,14 @@ from typing import (
     Self,
 )
 
+from aiogram import Bot
+from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.types import InlineKeyboardButton
 
 from keyboards.inline.cb.cb_text import DRAW_CB
 from states.states import UserFsm
+from utils.utils import make_pretty, get_profiles
 from utils.validators import is_not_sleeping_killer
 
 Url: TypeAlias = str
@@ -24,6 +27,8 @@ class UserGameCache(TypedDict):
     url: Url
     role: NotRequired[str]
     pretty_role: NotRequired[str]
+    initial_role: str
+    enum_name: str
 
 
 UserIdStr: TypeAlias = str
@@ -145,6 +150,45 @@ LastProcessedLiteral = Literal[
 ]
 
 
+async def don_died(
+    state: FSMContext,
+    bot: Bot,
+    current_id: int,
+):
+    game_data: GameCache = await state.get_data()
+
+    url = game_data["players"][str(current_id)]["url"]
+    role = game_data["players"][str(current_id)]["pretty_role"]
+
+    mafias = game_data["mafias"]
+    if not mafias:
+        return
+    new_don_id = mafias[0]
+    new_don_url = game_data["players"][str(new_don_id)]["url"]
+    game_data["players"][str(new_don_id)][
+        "role"
+    ] = Roles.don.value.role
+    game_data["players"][str(new_don_id)]["pretty_role"] = (
+        make_pretty(Roles.don.value.role)
+    )
+    game_data["players"][str(new_don_id)][
+        "enum_name"
+    ] = Roles.don.name
+    await state.set_data(game_data)
+    profiles = get_profiles(
+        live_players_ids=game_data["mafias"],
+        players=game_data["players"],
+        role=True,
+    )
+    for mafia_id in mafias:
+        await bot.send_message(
+            chat_id=mafia_id,
+            text=f"Погиб {role} {url}.\n"
+            f"Новый {role} {new_don_url}\n\n"
+            f"Текущие союзники:\n{profiles}",
+        )
+
+
 class Groupings(StrEnum):
     criminals = "criminals"
     civilians = "civilians"
@@ -212,6 +256,7 @@ class Role:
     mailing_being_sent: Callable | None = None
     alias: Alias | None = None
     is_alias: bool = False
+    if_died: Callable | None = None
 
 
 class AliasesRole(enum.Enum):
@@ -248,6 +293,7 @@ class Roles(enum.Enum):
         alias=Alias(
             role=AliasesRole.mafia, is_mass_mailing_list=True
         ),
+        if_died=don_died,
     )
     doctor = Role(
         role="Доктор",
@@ -262,22 +308,6 @@ class Roles(enum.Enum):
         mail_message="Кого вылечить этой ночью?",
         is_self_selecting=True,
         state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
-    )
-    killer = Role(
-        role="Наёмный убийца",
-        roles_key="killers",
-        processed_users_key="killed_by_killer",
-        photo="https://steamuserimages-a.akamaihd.net/ugc/633105202506112549/"
-        "988D53D1D6BF2FAC4665E453F736C438F601DF6D/"
-        "?imw=512&imh=512&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true",
-        grouping=Groupings.criminals,
-        purpose="Ты убиваешь, кого захочешь, а затем восстанавливаешь свои силы целую ночь.",
-        message_to_group_after_action="ЧВК продолжают работать на территории города!",
-        message_to_user_after_action="Ты решился ликвидировать {url}",
-        mail_message="Реши, кому поможешь этой ночью решить проблемы и убить врага!",
-        state_for_waiting_for_action=UserFsm.KILLER_ATTACKS,
-        can_kill_at_night_and_survive=True,
-        mailing_being_sent=is_not_sleeping_killer,
     )
     sleeper = Role(
         role="Клофелинщица",
@@ -295,7 +325,6 @@ class Roles(enum.Enum):
             ExtraCache(key="tracking", data_type=dict),
         ],
     )
-
     policeman = Role(
         role="Комиссар",
         roles_key="policeman",
@@ -310,6 +339,23 @@ class Roles(enum.Enum):
         state_for_waiting_for_action=UserFsm.POLICEMAN_CHECKS,
         can_kill_at_night_and_survive=True,
     )
+    killer = Role(
+        role="Наёмный убийца",
+        roles_key="killers",
+        processed_users_key="killed_by_killer",
+        photo="https://steamuserimages-a.akamaihd.net/ugc/633105202506112549/"
+        "988D53D1D6BF2FAC4665E453F736C438F601DF6D/"
+        "?imw=512&imh=512&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true",
+        grouping=Groupings.criminals,
+        purpose="Ты убиваешь, кого захочешь, а затем восстанавливаешь свои силы целую ночь.",
+        message_to_group_after_action="ЧВК продолжают работать на территории города!",
+        message_to_user_after_action="Ты решился ликвидировать {url}",
+        mail_message="Реши, кому поможешь этой ночью решить проблемы и убить врага!",
+        state_for_waiting_for_action=UserFsm.KILLER_ATTACKS,
+        can_kill_at_night_and_survive=True,
+        mailing_being_sent=is_not_sleeping_killer,
+    )
+
     agent = Role(
         role="Агент 008",
         processed_users_key="tracked",

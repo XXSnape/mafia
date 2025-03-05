@@ -1,19 +1,19 @@
 from collections import Counter
 from contextlib import suppress
+from typing import TYPE_CHECKING
 
-from aiogram import Bot, Dispatcher
+from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.fsm.storage.base import StorageKey
-from sqlalchemy.event import remove
 
-from cache.cache_types import (
-    UsersInGame,
-    UserGameCache,
-    LivePlayersIds,
-    PlayersIds,
-    GameCache,
-)
+if TYPE_CHECKING:
+    from cache.cache_types import (
+        UsersInGame,
+        LivePlayersIds,
+        UserGameCache,
+        PlayersIds,
+    )
 
 
 def get_profile_link(user_id: int | str, full_name: str) -> str:
@@ -21,8 +21,8 @@ def get_profile_link(user_id: int | str, full_name: str) -> str:
 
 
 def get_profiles(
-    live_players_ids: LivePlayersIds,
-    players: UsersInGame,
+    live_players_ids: "LivePlayersIds",
+    players: "UsersInGame",
     role: bool = False,
 ) -> str:
     result = ""
@@ -42,7 +42,7 @@ def get_profiles(
 
 
 def get_profiles_during_registration(
-    live_players_ids: LivePlayersIds, players: UsersInGame
+    live_players_ids: "LivePlayersIds", players: "UsersInGame"
 ) -> str:
     profiles = get_profiles(live_players_ids, players)
     return f"Скорее присоединяйся к игре!\nУчастники:\n{profiles}"
@@ -50,9 +50,9 @@ def get_profiles_during_registration(
 
 def add_voice(
     user_id: int,
-    add_to: PlayersIds,
-    delete_from: PlayersIds,
-    prime_ministers: PlayersIds,
+    add_to: "PlayersIds",
+    delete_from: "PlayersIds",
+    prime_ministers: "PlayersIds",
 ):
     repeat = 2 if user_id in prime_ministers else 1
     for _ in range(repeat):
@@ -86,7 +86,7 @@ async def get_state_and_assign(
     return chat_state
 
 
-def get_the_most_frequently_encountered_id(ids: list[int]):
+def get_the_most_frequently_encountered_id(ids: "PlayersIds"):
     if not ids:
         return None
     if len(ids) <= 1:
