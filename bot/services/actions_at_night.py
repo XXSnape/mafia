@@ -55,12 +55,6 @@ async def get_user_id_and_inform_players(
             "interacting", []
         )
         interacting.append(callback.from_user.id)
-        # game_data["tracking"][str(callback.from_user.id)][
-        #     "sufferers"
-        # ] = sufferers
-        # game_data["tracking"][str(user_id)][
-        #     "interacting"
-        # ] = interacting
 
     if current_role.message_to_user_after_action:
         await callback.message.delete()

@@ -182,19 +182,10 @@ class ExtraCache:
     data_type: type = list
 
 
-# def collect_info_about_mafia(game_data: GameCache, role: "Role"):
-#     players = game_data[role.roles_key]
-#     message = ''
-#     for player_id in enumerate(players, 1):
-#         # mes
-#     message = ''
-#     boss = players[0]
-#     message += ''
-
-
 @dataclass
 class Alias:
-    role: "Role"
+    role: "AliasesRole"
+    is_mass_mailing_list: bool = False
 
 
 @dataclass
@@ -250,10 +241,11 @@ class Roles(enum.Enum):
         message_to_user_after_action="Ты выбрал убить {url}",
         extra_data=[ExtraCache("killed_by_don")],
         mail_message="Кого убить этой ночью?",
-        is_mass_mailing_list=True,
         state_for_waiting_for_action=UserFsm.DON_ATTACKS,
         can_kill_at_night_and_survive=True,
-        alias=Alias(role=AliasesRole.mafia.value),
+        alias=Alias(
+            role=AliasesRole.mafia, is_mass_mailing_list=True
+        ),
     )
     killer = Role(
         role="Наёмный убийца",

@@ -5,6 +5,7 @@ from typing import Literal
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
+from telebot.types import InlineKeyboardMarkup
 
 from cache.cache_types import (
     GameCache,
@@ -47,6 +48,28 @@ class MailerToPlayers:
         self.dispatcher = dispatcher
         self.group_chat_id = group_chat_id
 
+    async def send_survey(
+        self,
+        player_id: int,
+        current_role: Role,
+        markup: InlineKeyboardMarkup,
+        game_data: GameCache,
+    ):
+        sent_survey = await self.bot.send_message(
+            chat_id=player_id,
+            text=current_role.mail_message,
+            reply_markup=markup,
+        )
+        game_data["to_delete"].append(
+            [player_id, sent_survey.message_id]
+        )
+        await get_state_and_assign(
+            dispatcher=self.dispatcher,
+            chat_id=player_id,
+            bot_id=self.bot.id,
+            new_state=current_role.state_for_waiting_for_action,
+        )
+
     async def mailing(self):
         game_data: GameCache = await self.state.get_data()
         for role in Roles:
@@ -84,20 +107,55 @@ class MailerToPlayers:
                 exclude=exclude,
                 extra_buttons=current_role.extra_buttons_for_actions_at_night,
             )
-            sent_survey = await self.bot.send_message(
-                chat_id=player_id,
-                text=current_role.mail_message,
-                reply_markup=markup,
+            await self.send_survey(
+                player_id=player_id,
+                current_role=current_role,
+                markup=markup,
+                game_data=game_data,
             )
-            game_data["to_delete"].append(
-                [player_id, sent_survey.message_id]
-            )
-            await get_state_and_assign(
-                dispatcher=self.dispatcher,
-                chat_id=player_id,
-                bot_id=self.bot.id,
-                new_state=current_role.state_for_waiting_for_action,
-            )
+            if (
+                current_role.alias
+                and current_role.alias.is_mass_mailing_list
+            ):
+                current_role = current_role.alias.role.value
+                for user_id in roles[1:]:
+                    await self.send_survey(
+                        player_id=user_id,
+                        current_role=current_role,
+                        markup=markup,
+                        game_data=game_data,
+                    )
+            # sent_survey = await self.bot.send_message(
+            #     chat_id=player_id,
+            #     text=current_role.mail_message,
+            #     reply_markup=markup,
+            # )
+            # game_data["to_delete"].append(
+            #     [player_id, sent_survey.message_id]
+            # )
+            # await get_state_and_assign(
+            #     dispatcher=self.dispatcher,
+            #     chat_id=player_id,
+            #     bot_id=self.bot.id,
+            #     new_state=current_role.state_for_waiting_for_action,
+            # )
+            # if current_role.alias:
+            #     current_role = current_role.alias.role
+            #     for user_id in roles[1:]:
+            #         sent_survey = await self.bot.send_message(
+            #             chat_id=user_id,
+            #             text=current_role.mail_message,
+            #             reply_markup=markup,
+            #         )
+            #         game_data["to_delete"].append(
+            #             [player_id, sent_survey.message_id]
+            #         )
+            #         await get_state_and_assign(
+            #             dispatcher=self.dispatcher,
+            #             chat_id=player_id,
+            #             bot_id=self.bot.id,
+            #             new_state=current_role.state_for_waiting_for_action,
+            #         )
 
     async def send_info_to_player(
         self, game_data: GameCache, role: Roles, key: str
@@ -258,10 +316,10 @@ class MailerToPlayers:
                 for user_id in roles[1:]:
                     await self.bot.send_photo(
                         chat_id=user_id,
-                        photo=current_role.alias.role.photo,
+                        photo=current_role.alias.role.value.photo,
                         caption=f"Твоя роль - "
-                        f"{make_pretty(current_role.alias.role.role)}!"
-                        f" {current_role.alias.role.purpose}",
+                        f"{make_pretty(current_role.alias.role.value.role)}!"
+                        f" {current_role.alias.role.value.purpose}",
                     )
                     await self.bot.send_message(
                         chat_id=user_id,
