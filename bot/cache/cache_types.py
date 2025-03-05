@@ -247,6 +247,20 @@ class Roles(enum.Enum):
             role=AliasesRole.mafia, is_mass_mailing_list=True
         ),
     )
+    doctor = Role(
+        role="Доктор",
+        roles_key="doctors",
+        processed_users_key="treated_by_doctor",
+        last_interactive_key="last_treated_by_doctor",
+        photo="https://gipermed.ru/upload/iblock/4bf/4bfa55f59ceb538bd2c8c437e8f71e5a.jpg",
+        grouping=Groupings.civilians,
+        purpose="Тебе нужно стараться лечить тех, кому нужна помощь.",
+        message_to_group_after_action="Доктор спешит кому-то на помощь!",
+        message_to_user_after_action="Ты выбрал вылечить {url}",
+        mail_message="Кого вылечить этой ночью?",
+        is_self_selecting=True,
+        state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
+    )
     killer = Role(
         role="Наёмный убийца",
         roles_key="killers",
@@ -262,20 +276,6 @@ class Roles(enum.Enum):
         state_for_waiting_for_action=UserFsm.KILLER_ATTACKS,
         can_kill_at_night_and_survive=True,
         mailing_being_sent=is_not_sleeping_killer,
-    )
-    doctor = Role(
-        role="Доктор",
-        roles_key="doctors",
-        processed_users_key="treated_by_doctor",
-        last_interactive_key="last_treated_by_doctor",
-        photo="https://gipermed.ru/upload/iblock/4bf/4bfa55f59ceb538bd2c8c437e8f71e5a.jpg",
-        grouping=Groupings.civilians,
-        purpose="Тебе нужно стараться лечить тех, кому нужна помощь.",
-        message_to_group_after_action="Доктор спешит кому-то на помощь!",
-        message_to_user_after_action="Ты выбрал вылечить {url}",
-        mail_message="Кого вылечить этой ночью?",
-        is_self_selecting=True,
-        state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
     )
     sleeper = Role(
         role="Клофелинщица",

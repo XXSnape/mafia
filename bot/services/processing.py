@@ -18,13 +18,17 @@ from cache.cache_types import (
     Role,
     PlayersIds,
     RolesKeysLiteral,
+    AliasesRole,
 )
 from general.players import Groupings
 from general.exceptions import GameIsOver
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from services.mailing import MailerToPlayers
 from states.states import GameFsm
-from utils.utils import get_profiles
+from utils.utils import (
+    get_profiles,
+    get_the_most_frequently_encountered_id,
+)
 
 if TYPE_CHECKING:
     from .pipeline_game import Game
@@ -242,11 +246,22 @@ class Executor:
         )
         victims |= killed_py_punisher
 
+    @staticmethod
+    def get_killed_by_mafia(game_data: GameCache):
+        victim_id = get_the_most_frequently_encountered_id(
+            game_data["killed_by_mafia"]
+        )
+        if victim_id is None:
+            if not game_data["killed_by_don"]:
+                return set()
+            return set(game_data["killed_by_don"])
+        return set(victim_id)
+
     @check_end_of_game
     async def sum_up_after_night(self):
         game_data: GameCache = await self.state.get_data()
         victims = (
-            set(game_data["killed_by_mafia"])
+            self.get_killed_by_mafia(game_data)
             | set(game_data["killed_by_angel_of_death"])
             | set(game_data["killed_by_killer"])
         ) - (
@@ -316,20 +331,14 @@ class Executor:
     ) -> bool:
         game_data: GameCache = await self.state.get_data()
         vote_for = game_data["vote_for"]
-        vote_for.sort(reverse=True)
-
-        if (not vote_for) or (
-            len(vote_for) != 1
-            and vote_for.count(vote_for[0])
-            == vote_for.count(vote_for[1])
-        ):
+        aim_id = get_the_most_frequently_encountered_id(vote_for)
+        if aim_id is None:
             await self.bot.send_message(
                 chat_id=self.group_chat_id,
                 text="Доброта или банальная несогласованность? "
                 "Посмотрим, воспользуются ли преступники таким подарком.",
             )
             return False
-        aim_id = vote_for[0]
         url = game_data["players"][str(aim_id)]["url"]
         await self.state.set_state(GameFsm.VOTE)
         sent_survey = await self.bot.send_message(
@@ -388,5 +397,11 @@ class Executor:
             roles[current_role.role] = game_data[
                 current_role.roles_key
             ]
+        for alias_role in AliasesRole:
+            current_role: Role = alias_role.value
+            roles[current_role.role] = game_data[
+                current_role.roles_key
+            ]
+
         user_role = game_data["players"][str(user_id)]["role"]
         roles[user_role].remove(user_id)

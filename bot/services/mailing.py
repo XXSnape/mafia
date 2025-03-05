@@ -52,9 +52,19 @@ class MailerToPlayers:
         self,
         player_id: int,
         current_role: Role,
-        markup: InlineKeyboardMarkup,
         game_data: GameCache,
     ):
+        exclude = []
+        if current_role.is_self_selecting is False:
+            exclude = [player_id]
+        if current_role.last_interactive_key:
+            exclude += game_data[current_role.last_interactive_key]
+        markup = send_selection_to_players_kb(
+            players_ids=game_data["players_ids"],
+            players=game_data["players"],
+            exclude=exclude,
+            extra_buttons=current_role.extra_buttons_for_actions_at_night,
+        )
         sent_survey = await self.bot.send_message(
             chat_id=player_id,
             text=current_role.mail_message,
@@ -93,26 +103,31 @@ class MailerToPlayers:
             roles = game_data[key]
             if not roles:
                 continue
-            exclude = []
-            player_id = roles[0]
-            if current_role.is_self_selecting is False:
-                exclude = [player_id]
-            if current_role.last_interactive_key:
-                exclude += game_data[
-                    current_role.last_interactive_key
-                ]
-            markup = send_selection_to_players_kb(
-                players_ids=game_data["players_ids"],
-                players=game_data["players"],
-                exclude=exclude,
-                extra_buttons=current_role.extra_buttons_for_actions_at_night,
-            )
             await self.send_survey(
-                player_id=player_id,
+                player_id=roles[0],
                 current_role=current_role,
-                markup=markup,
                 game_data=game_data,
             )
+            # exclude = []
+            # player_id = roles[0]
+            # if current_role.is_self_selecting is False:
+            #     exclude = [player_id]
+            # if current_role.last_interactive_key:
+            #     exclude += game_data[
+            #         current_role.last_interactive_key
+            #     ]
+            # markup = send_selection_to_players_kb(
+            #     players_ids=game_data["players_ids"],
+            #     players=game_data["players"],
+            #     exclude=exclude,
+            #     extra_buttons=current_role.extra_buttons_for_actions_at_night,
+            # )
+            # await self.send_survey(
+            #     player_id=player_id,
+            #     current_role=current_role,
+            #     markup=markup,
+            #     game_data=game_data,
+            # )
             if (
                 current_role.alias
                 and current_role.alias.is_mass_mailing_list
@@ -122,7 +137,6 @@ class MailerToPlayers:
                     await self.send_survey(
                         player_id=user_id,
                         current_role=current_role,
-                        markup=markup,
                         game_data=game_data,
                     )
             # sent_survey = await self.bot.send_message(

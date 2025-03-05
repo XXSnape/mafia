@@ -93,7 +93,7 @@ class Game:
         )
         await self.mailer.mailing()
         game_data["angels_died"].clear()
-        await asyncio.sleep(23)
+        await asyncio.sleep(25)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
@@ -134,7 +134,10 @@ class Game:
             elif int(user_id) in game_data["losers"]:
                 losers += text
             elif e.winner == Groupings.criminals:
-                if player["role"] == Roles.don.value.role:
+                if (
+                    player["role"] == Roles.don.value.role
+                    or AliasesRole.mafia.value.role
+                ):
                     winners += text
                     winners_ids.add(user_id)
                 else:
@@ -188,7 +191,7 @@ class Game:
         ids = game_data["players_ids"][:]
         shuffle(ids)
         roles_tpl = tuple(Roles)
-        roles = roles_tpl[:3] + (AliasesRole.mafia,) + roles_tpl[3:]
+        roles = roles_tpl[:2] + (AliasesRole.mafia,) + roles_tpl[3:]
         for user_id, role in zip(ids, roles):
             current_role: Role = role.value
             roles = game_data[current_role.roles_key]

@@ -1,3 +1,4 @@
+from collections import Counter
 from contextlib import suppress
 
 from aiogram import Bot, Dispatcher
@@ -83,3 +84,14 @@ async def get_state_and_assign(
     if new_state:
         await chat_state.set_state(new_state)
     return chat_state
+
+
+def get_the_most_frequently_encountered_id(ids: list[int]):
+    if not ids:
+        return None
+    if len(ids) <= 1:
+        return ids[0]
+    most_common = Counter(ids).most_common()
+    if most_common[0][1] == most_common[1][1]:
+        return None
+    return most_common[0][0]
