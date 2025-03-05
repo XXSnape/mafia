@@ -89,31 +89,73 @@ class MailerToPlayers:
                 new_state=current_role.state_for_waiting_for_action,
             )
 
-    async def send_promised_information_to_users(self):
-        game_data: GameCache = await self.state.get_data()
-        journalists = game_data.get("journalists", [])
-        if not journalists:
+    async def send_info_to_player(
+        self, game_data: GameCache, role: Roles, key: str
+    ):
+        current_role: Role = role.value
+        players = game_data.get(current_role.roles_key, [])
+        if not players:
             return
-        journalist_id = journalists[0]
-        if not game_data["talked"]:
-            return
-        user_id = game_data["talked"][0]
 
+        player_id = players[0]
+        if not game_data[current_role.processed_users_key]:
+            return
+
+        user_id = game_data[current_role.processed_users_key][0]
         visitors = ", ".join(
             game_data["players"][str(user_id)]["url"]
             for user_id in game_data["tracking"]
             .get(str(user_id), {})
-            .get("interacting", [])
+            .get(key, [])
         )
         user_url = game_data["players"][str(user_id)]["url"]
-        message = (
-            f"{user_url} сегодня никто не навещал"
-            if not visitors
-            else f"К {user_url} приходили: {visitors}"
+        if key == "interacting":
+            message = (
+                f"{user_url} сегодня никто не навещал"
+                if not visitors
+                else f"К {user_url} приходили: {visitors}"
+            )
+        else:
+            message = (
+                f"{user_url} cегодня ни к кому не ходил"
+                if not visitors
+                else f"{user_url} навещал: {visitors}"
+            )
+        await self.bot.send_message(chat_id=player_id, text=message)
+
+    async def send_promised_information_to_users(self):
+        game_data: GameCache = await self.state.get_data()
+        await self.send_info_to_player(
+            game_data=game_data,
+            role=Roles.journalist,
+            key="interacting",
         )
-        await self.bot.send_message(
-            chat_id=journalist_id, text=message
+        await self.send_info_to_player(
+            game_data=game_data, role=Roles.agent, key="sufferers"
         )
+        # journalists = game_data.get("journalists", [])
+        # if not journalists:
+        #     return
+        # journalist_id = journalists[0]
+        # if not game_data["talked"]:
+        #     return
+        # user_id = game_data["talked"][0]
+        #
+        # visitors = ", ".join(
+        #     game_data["players"][str(user_id)]["url"]
+        #     for user_id in game_data["tracking"]
+        #     .get(str(user_id), {})
+        #     .get("interacting", [])
+        # )
+        # user_url = game_data["players"][str(user_id)]["url"]
+        # message = (
+        #     f"{user_url} сегодня никто не навещал"
+        #     if not visitors
+        #     else f"К {user_url} приходили: {visitors}"
+        # )
+        # await self.bot.send_message(
+        #     chat_id=journalist_id, text=message
+        # )
 
     async def send_request_to_vote(
         self,

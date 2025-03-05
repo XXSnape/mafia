@@ -68,7 +68,9 @@ class GameCache(TypedDict, total=True):
     vote_for: PlayersIds
     prime_ministers: PlayersIds
     instigators: PlayersIds
+    agents: PlayersIds
 
+    tracked: PlayersIds
     angels_died: PlayersIds
     killed_by_mafia: PlayersIds
     killed_by_don: PlayersIds
@@ -90,6 +92,7 @@ class GameCache(TypedDict, total=True):
 
     # wait_for: list[int]
     two_voices: PlayersIds
+    last_tracked_by_agent: PlayersIds
     last_treated_by_doctor: PlayersIds
     last_arrested_by_prosecutor: PlayersIds
     last_forgiven_by_lawyer: PlayersIds
@@ -118,6 +121,7 @@ RolesKeysLiteral = Literal[
     "angels_died",
     "analysts",
     "punishers",
+    "agents",
 ]
 
 LastProcessedLiteral = Literal[
@@ -125,6 +129,7 @@ LastProcessedLiteral = Literal[
     "last_arrested_by_prosecutor",
     "last_forgiven_by_lawyer",
     "last_self_protected_by_bodyguard",
+    "last_tracked_by_agent",
 ]
 
 
@@ -152,6 +157,7 @@ ListToProcessLiteral = Literal[
     "missed",
     "predicted",
     "tracking",
+    "tracked",
 ]
 
 
@@ -215,6 +221,23 @@ class Roles(enum.Enum):
         mail_message="Кого проверить этой ночью?",
         state_for_waiting_for_action=UserFsm.POLICEMAN_CHECKS,
         can_kill_at_night_and_survive=True,
+    )
+    agent = Role(
+        role="Агент 008",
+        processed_users_key="tracked",
+        last_interactive_key="last_tracked_by_agent",
+        roles_key="agents",
+        photo="https://avatars.mds.yandex.net/i?id="
+        "7b6e30fff5c795d560c07b69e7e9542f044fcaf9e04d4a31-5845211-images-thumbs&n=13",
+        grouping=Groupings.civilians,
+        purpose="Ты можешь следить за кем-нибудь ночью",
+        message_to_group_after_action="Спецслужбы выходят на разведу",
+        message_to_user_after_action="Ты выбрал следить за {url}",
+        mail_message="За кем следить этой ночью?",
+        state_for_waiting_for_action=UserFsm.AGENT_WATCHES,
+        extra_data=[
+            ExtraCache(key="tracking", data_type=dict),
+        ],
     )
     journalist = Role(
         role="Журналист",

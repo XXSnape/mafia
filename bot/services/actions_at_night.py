@@ -37,7 +37,10 @@ async def get_user_id_and_inform_players(
     user_id = game_data["players_ids"][callback_data.user_index]
     url = game_data["players"][str(user_id)]["url"]
 
-    if game_data.get("journalists") and role != Roles.journalist:
+    if (
+        game_data.get("tracking") is not None
+        and role != Roles.journalist
+    ):
 
         suffer_tracking = game_data["tracking"].setdefault(
             str(callback.from_user.id), {}
