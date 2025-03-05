@@ -20,4 +20,5 @@ class UserFsm(StatesGroup):
     ANALYST_ASSUMES = State()
     JOURNALIST_TAKES_INTERVIEW = State()
     AGENT_WATCHES = State()
+    CLOFFELINE_GIRL_PUTS_TO_SLEEP = State()
     WAIT_FOR_LATEST_LETTER = State()

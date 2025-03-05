@@ -90,6 +90,10 @@ class GameCache(TypedDict, total=True):
     talked: PlayersIds
     tracking: TrackingData
 
+    sleepers: PlayersIds
+    cancelled: PlayersIds
+    last_asleep_by_sleeper: PlayersIds
+
     # wait_for: list[int]
     two_voices: PlayersIds
     last_tracked_by_agent: PlayersIds
@@ -104,6 +108,7 @@ class GameCache(TypedDict, total=True):
 from enum import StrEnum
 
 RolesKeysLiteral = Literal[
+    "sleepers",
     "journalists",
     "mafias",
     "doctors",
@@ -130,6 +135,7 @@ LastProcessedLiteral = Literal[
     "last_forgiven_by_lawyer",
     "last_self_protected_by_bodyguard",
     "last_tracked_by_agent",
+    "last_asleep_by_sleeper",
 ]
 
 
@@ -142,6 +148,7 @@ class Groupings(StrEnum):
 
 
 ListToProcessLiteral = Literal[
+    "cancelled",
     "angels_died",
     "killed_by_mafia",
     "killed_by_don",
@@ -207,7 +214,37 @@ class Roles(enum.Enum):
         state_for_waiting_for_action=UserFsm.MAFIA_ATTACKS,
         can_kill_at_night_and_survive=True,
     )
+    sleeper = Role(
+        role="Клофелинщица",
+        roles_key="sleepers",
+        processed_users_key="cancelled",
+        last_interactive_key="last_asleep_by_sleeper",
+        photo="https://masterpiecer-images.s3.yandex.net/c94e9cb6787b11eeb1ce1e5d9776cfa6:upscaled",
+        grouping=Groupings.criminals,
+        purpose="Ты можешь усыпить кого-нибудь во имя мафии.",
+        message_to_group_after_action="Спят взрослые и дети. Не обошлось и без помощи клофелинщиков!",
+        message_to_user_after_action="Ты выбрал усыпить {url}",
+        mail_message="Кого усыпить этой ночью?",
+        state_for_waiting_for_action=UserFsm.CLOFFELINE_GIRL_PUTS_TO_SLEEP,
+        extra_data=[
+            ExtraCache(key="tracking", data_type=dict),
+        ],
+    )
 
+    doctor = Role(
+        role="Доктор",
+        roles_key="doctors",
+        processed_users_key="treated_by_doctor",
+        last_interactive_key="last_treated_by_doctor",
+        photo="https://gipermed.ru/upload/iblock/4bf/4bfa55f59ceb538bd2c8c437e8f71e5a.jpg",
+        grouping=Groupings.civilians,
+        purpose="Тебе нужно стараться лечить тех, кому нужна помощь.",
+        message_to_group_after_action="Доктор спешит кому-то на помощь!",
+        message_to_user_after_action="Ты выбрал вылечить {url}",
+        mail_message="Кого вылечить этой ночью?",
+        is_self_selecting=True,
+        state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
+    )
     policeman = Role(
         role="Комиссар",
         roles_key="policeman",
@@ -255,20 +292,6 @@ class Roles(enum.Enum):
         extra_data=[
             ExtraCache(key="tracking", data_type=dict),
         ],
-    )
-    doctor = Role(
-        role="Доктор",
-        roles_key="doctors",
-        processed_users_key="treated_by_doctor",
-        last_interactive_key="last_treated_by_doctor",
-        photo="https://gipermed.ru/upload/iblock/4bf/4bfa55f59ceb538bd2c8c437e8f71e5a.jpg",
-        grouping=Groupings.civilians,
-        purpose="Тебе нужно стараться лечить тех, кому нужна помощь.",
-        message_to_group_after_action="Доктор спешит кому-то на помощь!",
-        message_to_user_after_action="Ты выбрал вылечить {url}",
-        mail_message="Кого вылечить этой ночью?",
-        is_self_selecting=True,
-        state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
     )
 
     punisher = Role(

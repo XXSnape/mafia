@@ -96,6 +96,7 @@ class Game:
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
+        await self.executor.cancel_action()
         await self.mailer.send_promised_information_to_users()
         await self.executor.sum_up_after_night()
         await asyncio.sleep(4)
@@ -195,60 +196,6 @@ class Game:
                 make_pretty(current_role.role)
             )
             roles.append(user_id)
-        #
-        #
-        # for role in Roles:
-        #     current_role: Role = role.value
-        #     roles = game_data[current_role.roles_key]
-        # mafias = Role(game_data["mafias"], Roles.mafia)
-        # doctors = Role(game_data["doctors"], Roles.doctor)
-        # policeman = Role(game_data["policeman"], Roles.policeman)
-        # civilians = Role(game_data["civilians"], Roles.civilian)
-        # prosecutors = Role(
-        #     game_data["prosecutors"], Roles.prosecutor
-        # )
-        # masochists = Role(game_data["masochists"], Roles.masochist)
-        # lawyers = Role(game_data["lawyers"], Roles.lawyer)
-        # lucky_guys = Role(game_data["lucky_guys"], Roles.lucky_gay)
-        # bodyguards = Role(game_data["bodyguards"], Roles.bodyguard)
-        # instigators = Role(
-        #     game_data["instigators"], Roles.instigator
-        # )
-        # prime_ministers = Role(
-        #     game_data["prime_ministers"], Roles.prime_minister
-        # )
-        # suicide_bombers = Role(
-        #     game_data["suicide_bombers"], Roles.suicide_bomber
-        # )
-        # roles = (
-        #     mafias,
-        #     policeman,
-        #     instigators,
-        #     prime_ministers,
-        #     bodyguards,
-        #     doctors,
-        #     lawyers,
-        #     doctors,
-        #     prosecutors,
-        #     bodyguards,
-        #     suicide_bombers,
-        #     lucky_guys,
-        #     masochists,
-        #     # prosecutors,
-        #     lawyers,
-        #     policeman,
-        #     civilians,
-        # )
-        # for index, user_id in enumerate(ids):
-        #     current_role: Role = roles[index]
-        #     game_data["players"][str(user_id)][
-        #         "role"
-        #     ] = current_role.role
-        #     game_data["players"][str(user_id)]["pretty_role"] = (
-        #         make_pretty(current_role.role)
-        #     )
-        #
-        #     current_role.players.append(user_id)
         await self.state.set_data(game_data)
 
 
