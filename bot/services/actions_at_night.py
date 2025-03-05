@@ -38,13 +38,27 @@ async def get_user_id_and_inform_players(
     url = game_data["players"][str(user_id)]["url"]
 
     if game_data.get("journalists") and role != Roles.journalist:
-        visitors = game_data["tracking"].get(str(user_id), [])
-        visitor_url = game_data["players"][
-            str(callback.from_user.id)
-        ]["url"]
-        game_data["tracking"][str(user_id)] = visitors + [
-            visitor_url
-        ]
+
+        suffer_tracking = game_data["tracking"].setdefault(
+            str(callback.from_user.id), {}
+        )
+        sufferers = suffer_tracking.setdefault("sufferers", [])
+        sufferers.append(user_id)
+
+        interacting_tracking = game_data["tracking"].setdefault(
+            str(user_id), {}
+        )
+        interacting = interacting_tracking.setdefault(
+            "interacting", []
+        )
+        interacting.append(callback.from_user.id)
+        # game_data["tracking"][str(callback.from_user.id)][
+        #     "sufferers"
+        # ] = sufferers
+        # game_data["tracking"][str(user_id)][
+        #     "interacting"
+        # ] = interacting
+
     if current_role.message_to_user_after_action:
         await callback.message.delete()
         await callback.message.answer(

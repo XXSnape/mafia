@@ -98,10 +98,13 @@ class MailerToPlayers:
         if not game_data["talked"]:
             return
         user_id = game_data["talked"][0]
-        visitors = ", ".join(
-            game_data["tracking"].get(str(user_id), [])
-        )
 
+        visitors = ", ".join(
+            game_data["players"][str(user_id)]["url"]
+            for user_id in game_data["tracking"]
+            .get(str(user_id), {})
+            .get("interacting", [])
+        )
         user_url = game_data["players"][str(user_id)]["url"]
         message = (
             f"{user_url} сегодня никто не навещал"

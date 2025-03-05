@@ -29,7 +29,14 @@ UsersInGame: TypeAlias = dict[UserIdStr, UserGameCache]
 PlayersIds: TypeAlias = list[int]
 LivePlayersIds: TypeAlias = PlayersIds
 ChatsAndMessagesIds: TypeAlias = list[list[int]]
-TrackingData: TypeAlias = dict[UserIdStr, list[Url]]
+
+
+class InteractionData(TypedDict):
+    sufferers: PlayersIds
+    interacting: PlayersIds
+
+
+TrackingData: TypeAlias = dict[UserIdStr, InteractionData]
 
 
 class UserCache(TypedDict):
@@ -52,7 +59,6 @@ class GameCache(TypedDict, total=True):
     bodyguards: PlayersIds
     civilians: PlayersIds
     lawyers: PlayersIds
-    # died: PlayersIds
     masochists: PlayersIds
     suicide_bombers: PlayersIds
     winners: PlayersIds
@@ -60,7 +66,6 @@ class GameCache(TypedDict, total=True):
     angels_of_death: PlayersIds
     to_delete: ChatsAndMessagesIds
     vote_for: PlayersIds
-    # protected: PlayersIds
     prime_ministers: PlayersIds
     instigators: PlayersIds
 
@@ -94,7 +99,6 @@ class GameCache(TypedDict, total=True):
 
 
 from enum import StrEnum
-from typing import NamedTuple
 
 RolesKeysLiteral = Literal[
     "journalists",
@@ -121,10 +125,6 @@ LastProcessedLiteral = Literal[
     "last_arrested_by_prosecutor",
     "last_forgiven_by_lawyer",
     "last_self_protected_by_bodyguard",
-    # "last_treated",
-    # "last_arrested",
-    # "last_forgiven",
-    # "last_self_protected",
 ]
 
 

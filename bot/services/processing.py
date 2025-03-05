@@ -104,9 +104,17 @@ class Executor:
             await self.bot.send_message(
                 chat_id=analyst_id, text="Прекрасная дедукция!"
             )
+            await self.bot.send_message(
+                chat_id=self.group_chat_id,
+                text="Все, кто читал прогнозы на день, были готовы к дневным событиям!",
+            )
         else:
             await self.bot.send_message(
                 chat_id=analyst_id, text="Сегодня интуиция подвела!"
+            )
+            await self.bot.send_message(
+                chat_id=self.group_chat_id,
+                text="Обман или чёрный лебедь? Аналитические прогнозы не сбылись!",
             )
 
     @check_end_of_game
