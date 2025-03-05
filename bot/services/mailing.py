@@ -49,8 +49,14 @@ class MailerToPlayers:
             current_role: Role = role.value
 
             if (
-                current_role.roles_key not in game_data
-            ) or current_role.mail_message is None:
+                (current_role.roles_key not in game_data)
+                or current_role.mail_message is None
+                or (
+                    current_role.mailing_being_sent is not None
+                    and current_role.mailing_being_sent(game_data)
+                    is False
+                )
+            ):
                 continue
             key = (
                 current_role.for_notifications

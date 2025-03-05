@@ -11,6 +11,7 @@ from cache.cache_types import (
     UserGameCache,
     LivePlayersIds,
     PlayersIds,
+    GameCache,
 )
 
 

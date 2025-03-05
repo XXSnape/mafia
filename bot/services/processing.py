@@ -248,6 +248,7 @@ class Executor:
         victims = (
             set(game_data["killed_by_mafia"])
             | set(game_data["killed_by_angel_of_death"])
+            | set(game_data["killed_by_killer"])
         ) - (
             set(game_data["treated_by_doctor"])
             | set(game_data["treated_by_bodyguard"])
@@ -273,6 +274,7 @@ class Executor:
                     )
                     victims.remove(victim_id)
                     continue
+
             self.remove_user_from_game(
                 game_data=game_data, user_id=victim_id, is_night=True
             )

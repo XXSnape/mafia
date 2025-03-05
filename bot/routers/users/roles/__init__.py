@@ -12,6 +12,7 @@ from .analysts import router as analysts_router
 from .journalists import router as journalists_router
 from .agents import router as agents_router
 from .sleepers import router as sleepers_router
+from .killers import router as killers_router
 
 router = Router(name=__name__)
 router.include_routers(
@@ -27,4 +28,5 @@ router.include_routers(
     journalists_router,
     agents_router,
     sleepers_router,
+    killers_router,
 )

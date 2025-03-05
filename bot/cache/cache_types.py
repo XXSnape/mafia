@@ -1,4 +1,5 @@
 import enum
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import (
     TypedDict,
@@ -12,6 +13,7 @@ from aiogram.types import InlineKeyboardButton
 
 from keyboards.inline.cb.cb_text import DRAW_CB
 from states.states import UserFsm
+from utils.validators import is_not_sleeping_killer
 
 Url: TypeAlias = str
 
@@ -69,10 +71,12 @@ class GameCache(TypedDict, total=True):
     prime_ministers: PlayersIds
     instigators: PlayersIds
     agents: PlayersIds
+    killers: PlayersIds
 
     tracked: PlayersIds
     angels_died: PlayersIds
     killed_by_mafia: PlayersIds
+    killed_by_killer: PlayersIds
     killed_by_don: PlayersIds
     killed_by_policeman: PlayersIds
     killed_by_angel_of_death: PlayersIds
@@ -108,6 +112,7 @@ class GameCache(TypedDict, total=True):
 from enum import StrEnum
 
 RolesKeysLiteral = Literal[
+    "killers",
     "sleepers",
     "journalists",
     "mafias",
@@ -148,6 +153,7 @@ class Groupings(StrEnum):
 
 
 ListToProcessLiteral = Literal[
+    "killed_by_killer",
     "cancelled",
     "angels_died",
     "killed_by_mafia",
@@ -196,6 +202,7 @@ class Role:
         InlineKeyboardButton, ...
     ] = ()
     can_kill_at_night_and_survive: bool = False
+    mailing_being_sent: Callable | None = None
 
 
 class Roles(enum.Enum):
@@ -214,6 +221,36 @@ class Roles(enum.Enum):
         state_for_waiting_for_action=UserFsm.MAFIA_ATTACKS,
         can_kill_at_night_and_survive=True,
     )
+    killer = Role(
+        role="Наёмный убийца",
+        roles_key="killers",
+        processed_users_key="killed_by_killer",
+        photo="https://steamuserimages-a.akamaihd.net/ugc/633105202506112549/"
+        "988D53D1D6BF2FAC4665E453F736C438F601DF6D/"
+        "?imw=512&imh=512&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true",
+        grouping=Groupings.criminals,
+        purpose="Ты убиваешь, кого захочешь, а затем восстанавливаешь свои силы целую ночь.",
+        message_to_group_after_action="ЧВК продолжают работать на территории города!",
+        message_to_user_after_action="Ты решился ликвидировать {url}",
+        mail_message="Реши, кому поможешь этой ночью решить проблемы и убить врага!",
+        state_for_waiting_for_action=UserFsm.KILLER_ATTACKS,
+        can_kill_at_night_and_survive=True,
+        mailing_being_sent=is_not_sleeping_killer,
+    )
+    doctor = Role(
+        role="Доктор",
+        roles_key="doctors",
+        processed_users_key="treated_by_doctor",
+        last_interactive_key="last_treated_by_doctor",
+        photo="https://gipermed.ru/upload/iblock/4bf/4bfa55f59ceb538bd2c8c437e8f71e5a.jpg",
+        grouping=Groupings.civilians,
+        purpose="Тебе нужно стараться лечить тех, кому нужна помощь.",
+        message_to_group_after_action="Доктор спешит кому-то на помощь!",
+        message_to_user_after_action="Ты выбрал вылечить {url}",
+        mail_message="Кого вылечить этой ночью?",
+        is_self_selecting=True,
+        state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
+    )
     sleeper = Role(
         role="Клофелинщица",
         roles_key="sleepers",
@@ -231,20 +268,6 @@ class Roles(enum.Enum):
         ],
     )
 
-    doctor = Role(
-        role="Доктор",
-        roles_key="doctors",
-        processed_users_key="treated_by_doctor",
-        last_interactive_key="last_treated_by_doctor",
-        photo="https://gipermed.ru/upload/iblock/4bf/4bfa55f59ceb538bd2c8c437e8f71e5a.jpg",
-        grouping=Groupings.civilians,
-        purpose="Тебе нужно стараться лечить тех, кому нужна помощь.",
-        message_to_group_after_action="Доктор спешит кому-то на помощь!",
-        message_to_user_after_action="Ты выбрал вылечить {url}",
-        mail_message="Кого вылечить этой ночью?",
-        is_self_selecting=True,
-        state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
-    )
     policeman = Role(
         role="Комиссар",
         roles_key="policeman",
