@@ -1,12 +1,12 @@
-from aiogram import Router, Dispatcher
+from aiogram import Router, Dispatcher, F
+from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Message
 
 from cache.cache_types import (
+    Roles,
     UserCache,
     GameCache,
-    Roles,
-    AliasesRole,
 )
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
@@ -57,3 +57,33 @@ async def don_attacks(
         role=Roles.don,
     )
     game_data["killed_by_don"].append(user_id)
+
+
+@router.message(
+    StateFilter(UserFsm.DON_ATTACKS, UserFsm.MAFIA_ATTACKS), F.text
+)
+async def mafia_communicate(
+    message: Message,
+    state: FSMContext,
+    dispatcher: Dispatcher,
+):
+    user_data: UserCache = await state.get_data()
+    game_state = await get_state_and_assign(
+        dispatcher=dispatcher,
+        chat_id=user_data["game_chat"],
+        bot_id=message.bot.id,
+    )
+
+    game_data: GameCache = await game_state.get_data()
+    url = game_data["players"][str(message.from_user.id)]["url"]
+    role = game_data["players"][str(message.from_user.id)][
+        "pretty_role"
+    ]
+    for mafia_id in game_data["mafias"]:
+        if mafia_id != message.from_user.id:
+            await message.bot.send_message(
+                chat_id=mafia_id,
+                text=f"{role} {url} передает:\n{message.text}",
+            )
+    if len(game_data["mafias"]) > 1:
+        await message.answer("Сообщение успешно отправлено!")
