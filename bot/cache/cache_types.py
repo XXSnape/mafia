@@ -6,6 +6,7 @@ from typing import (
     TypeAlias,
     NotRequired,
     Literal,
+    Self,
 )
 
 from aiogram.fsm.state import State
@@ -181,6 +182,21 @@ class ExtraCache:
     data_type: type = list
 
 
+# def collect_info_about_mafia(game_data: GameCache, role: "Role"):
+#     players = game_data[role.roles_key]
+#     message = ''
+#     for player_id in enumerate(players, 1):
+#         # mes
+#     message = ''
+#     boss = players[0]
+#     message += ''
+
+
+@dataclass
+class Alias:
+    role: "Role"
+
+
 @dataclass
 class Role:
     role: str
@@ -188,7 +204,7 @@ class Role:
     processed_users_key: ListToProcessLiteral | None
     photo: str
     grouping: str
-    purpose: str
+    purpose: str | Callable | None
     is_self_selecting: bool = False
     mail_message: str | None = None
     message_to_user_after_action: str | None = None
@@ -203,23 +219,41 @@ class Role:
     ] = ()
     can_kill_at_night_and_survive: bool = False
     mailing_being_sent: Callable | None = None
+    alias: Alias | None = None
 
 
-class Roles(enum.Enum):
+class AliasesRole(enum.Enum):
     mafia = Role(
         role="Мафия",
         roles_key="mafias",
         processed_users_key="killed_by_mafia",
         photo="https://i.pinimg.com/736x/a1/10/db/a110db3eaba78bf6423bcea68f330a64.jpg",
         grouping=Groupings.criminals,
-        purpose="Тебе нужно уничтожить всех горожан.",
+        purpose="Тебе нужно уничтожить всех горожан и подчиняться дону.",
+        message_to_user_after_action="Ты выбрал убить {url}",
+        mail_message="Кого убить этой ночью?",
+        state_for_waiting_for_action=UserFsm.MAFIA_ATTACKS,
+        can_kill_at_night_and_survive=True,
+    )
+
+
+class Roles(enum.Enum):
+    don = Role(
+        role="Дон. Верховный главнокомандующий мафии.",
+        roles_key="mafias",
+        processed_users_key="killed_by_mafia",
+        photo="https://avatars.mds.yandex.net/i?id="
+        "a7b2f1eed9cca869784091017f8a66ff_l-7677819-images-thumbs&n=13",
+        grouping=Groupings.criminals,
+        purpose="Тебе нужно руководить мафиозной армией и убивать мирных.",
         message_to_group_after_action="Мафия выбрала жертву!",
         message_to_user_after_action="Ты выбрал убить {url}",
         extra_data=[ExtraCache("killed_by_don")],
         mail_message="Кого убить этой ночью?",
         is_mass_mailing_list=True,
-        state_for_waiting_for_action=UserFsm.MAFIA_ATTACKS,
+        state_for_waiting_for_action=UserFsm.DON_ATTACKS,
         can_kill_at_night_and_survive=True,
+        alias=Alias(role=AliasesRole.mafia.value),
     )
     killer = Role(
         role="Наёмный убийца",

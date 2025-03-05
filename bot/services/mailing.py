@@ -27,7 +27,11 @@ from keyboards.inline.keypads.to_bot import (
     participate_in_social_life,
 )
 from states.states import UserFsm
-from utils.utils import make_pretty, get_state_and_assign
+from utils.utils import (
+    make_pretty,
+    get_state_and_assign,
+    get_profiles,
+)
 
 
 class MailerToPlayers:
@@ -231,10 +235,35 @@ class MailerToPlayers:
         game_data: GameCache = await self.state.get_data()
         for role in Roles:
             current_role: Role = role.value
-            roles = game_data[current_role.roles_key]
-            for user_id in roles:
-                await self.bot.send_photo(
-                    chat_id=user_id,
-                    photo=current_role.photo,
-                    caption=f"Твоя роль - {make_pretty(current_role.role)}! {current_role.purpose}",
+            roles = game_data.get(current_role.roles_key)
+            if not roles:
+                continue
+            await self.bot.send_photo(
+                chat_id=roles[0],
+                photo=current_role.photo,
+                caption=f"Твоя роль - "
+                f"{make_pretty(current_role.role)}! "
+                f"{current_role.purpose}",
+            )
+            if current_role.alias:
+                profiles = get_profiles(
+                    live_players_ids=roles,
+                    players=game_data["players"],
+                    role=True,
                 )
+                await self.bot.send_message(
+                    chat_id=roles[0],
+                    text="Твои союзники!\n\n" + profiles,
+                )
+                for user_id in roles[1:]:
+                    await self.bot.send_photo(
+                        chat_id=user_id,
+                        photo=current_role.alias.role.photo,
+                        caption=f"Твоя роль - "
+                        f"{make_pretty(current_role.alias.role.role)}!"
+                        f" {current_role.alias.role.purpose}",
+                    )
+                    await self.bot.send_message(
+                        chat_id=user_id,
+                        text="Твои союзники!\n\n" + profiles,
+                    )

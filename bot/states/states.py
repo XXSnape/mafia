@@ -22,4 +22,5 @@ class UserFsm(StatesGroup):
     AGENT_WATCHES = State()
     CLOFFELINE_GIRL_PUTS_TO_SLEEP = State()
     KILLER_ATTACKS = State()
+    DON_ATTACKS = State()
     WAIT_FOR_LATEST_LETTER = State()

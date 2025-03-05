@@ -32,7 +32,7 @@ async def mafia_attacks(
         dispatcher=dispatcher,
         # message_to_group="Мафия выбрала жертву!",
         # message_to_user="Ты выбрал убить {url}",
-        role=Roles.mafia,
+        role=Roles.don,
     )
     # game_state, game_data, died_user_id = (
     #     await get_user_id_and_inform_players(

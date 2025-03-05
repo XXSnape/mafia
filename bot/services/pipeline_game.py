@@ -10,6 +10,7 @@ from cache.cache_types import (
     GameCache,
     Role,
     Roles,
+    AliasesRole,
 )
 from general.exceptions import GameIsOver
 from general.players import Groupings
@@ -133,13 +134,13 @@ class Game:
             elif int(user_id) in game_data["losers"]:
                 losers += text
             elif e.winner == Groupings.criminals:
-                if player["role"] == Roles.mafia.value.role:
+                if player["role"] == Roles.don.value.role:
                     winners += text
                     winners_ids.add(user_id)
                 else:
                     losers += text
             else:
-                if player["role"] != Roles.mafia.value.role:
+                if player["role"] != Roles.don.value.role:
                     winners_ids.add(user_id)
                     winners += text
                 else:
@@ -186,7 +187,9 @@ class Game:
         game_data: GameCache = await self.state.get_data()
         ids = game_data["players_ids"][:]
         shuffle(ids)
-        for user_id, role in zip(ids, Roles):
+        roles_tpl = tuple(Roles)
+        roles = roles_tpl[:3] + (AliasesRole.mafia,) + roles_tpl[3:]
+        for user_id, role in zip(ids, roles):
             current_role: Role = role.value
             roles = game_data[current_role.roles_key]
             game_data["players"][str(user_id)][

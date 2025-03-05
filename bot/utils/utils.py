@@ -20,7 +20,9 @@ def get_profile_link(user_id: int | str, full_name: str) -> str:
 
 
 def get_profiles(
-    live_players_ids: LivePlayersIds, players: UsersInGame
+    live_players_ids: LivePlayersIds,
+    players: UsersInGame,
+    role: bool = False,
 ) -> str:
     result = ""
 
@@ -30,7 +32,11 @@ def get_profiles(
     ) in enumerate(live_players_ids, start=1):
         data: UserGameCache
         url = players[str(user_id)]["url"]
-        result += f"\n{index}) {url}"
+        if role:
+            role = players[str(user_id)]["pretty_role"]
+            result += f"\n{index}) {url} - {role}"
+        else:
+            result += f"\n{index}) {url}"
     return result
 
 
