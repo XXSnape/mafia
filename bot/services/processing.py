@@ -41,7 +41,10 @@ def check_end_of_game(async_func: Callable):
         game_data: GameCache = await state.get_data()
         if not game_data["mafias"]:
             raise GameIsOver(winner=Groupings.civilians)
-        if len(game_data["players_ids"]) == 2:
+
+        if len(game_data["mafias"]) > (
+            len(game_data["players_ids"]) - len(game_data["mafias"])
+        ):
             raise GameIsOver(winner=Groupings.criminals)
         return result
 
@@ -255,7 +258,7 @@ class Executor:
             if not game_data["killed_by_don"]:
                 return set()
             return set(game_data["killed_by_don"])
-        return set(victim_id)
+        return {victim_id}
 
     @check_end_of_game
     async def sum_up_after_night(self):

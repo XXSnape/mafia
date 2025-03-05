@@ -191,7 +191,12 @@ class Game:
         ids = game_data["players_ids"][:]
         shuffle(ids)
         roles_tpl = tuple(Roles)
-        roles = roles_tpl[:2] + (AliasesRole.mafia,) + roles_tpl[3:]
+        roles = (
+            roles_tpl[:2]
+            + (AliasesRole.mafia,)
+            + (AliasesRole.mafia,)
+            + roles_tpl[3:]
+        )
         for user_id, role in zip(ids, roles):
             current_role: Role = role.value
             roles = game_data[current_role.roles_key]
