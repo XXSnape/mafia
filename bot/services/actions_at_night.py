@@ -36,6 +36,19 @@ async def get_user_id_and_inform_players(
         )
     user_id = game_data["players_ids"][callback_data.user_index]
     url = game_data["players"][str(user_id)]["url"]
+    if current_role.alias or current_role.is_alias:
+        current_url = game_data["players"][
+            str(callback.from_user.id)
+        ]["url"]
+        pretty_role = game_data["players"][
+            str(callback.from_user.id)
+        ]["pretty_role"]
+        message = f"{pretty_role} {current_url} выбрал {url}"
+        for alias_id in game_data[current_role.roles_key]:
+            if alias_id != callback.from_user.id:
+                await callback.bot.send_message(
+                    chat_id=alias_id, text=message
+                )
 
     if (
         game_data.get("tracking") is not None

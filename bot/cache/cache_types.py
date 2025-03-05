@@ -211,6 +211,7 @@ class Role:
     can_kill_at_night_and_survive: bool = False
     mailing_being_sent: Callable | None = None
     alias: Alias | None = None
+    is_alias: bool = False
 
 
 class AliasesRole(enum.Enum):
@@ -225,6 +226,7 @@ class AliasesRole(enum.Enum):
         mail_message="Кого убить этой ночью?",
         state_for_waiting_for_action=UserFsm.MAFIA_ATTACKS,
         can_kill_at_night_and_survive=True,
+        is_alias=True,
     )
 
 
