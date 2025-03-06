@@ -409,9 +409,12 @@ class Executor:
         current_enum = Roles[
             game_data["players"][str(user_id)]["enum_name"]
         ]
-        if current_enum.value.if_died:
-            await current_enum.value.if_died(
+        if current_enum.value.alias:
+            await current_enum.value.alias.boss_is_dead(
                 state=self.state,
                 bot=self.bot,
                 current_id=user_id,
+                current_enum_name=game_data["players"][str(user_id)][
+                    "enum_name"
+                ],
             )

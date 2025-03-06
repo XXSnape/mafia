@@ -93,7 +93,7 @@ class Game:
         )
         await self.mailer.mailing()
         game_data["angels_died"].clear()
-        await asyncio.sleep(3)
+        await asyncio.sleep(20)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
@@ -127,7 +127,7 @@ class Game:
         losers = "\nПроигравшие:\n"
         winners_ids = set()
         for user_id, player in game_data["players"].items():
-            text = f'{player["url"]} - {player["pretty_role"]}\n'
+            text = f'{player["url"]} - {player["initial_role"]}\n'
             if int(user_id) in game_data["winners"]:
                 winners += text
                 winners_ids.add(user_id)
@@ -193,7 +193,7 @@ class Game:
         roles_tpl = tuple(Roles)
         roles = (
             roles_tpl[:3]
-            + (AliasesRole.mafia,)
+            + (AliasesRole.general,)
             + (AliasesRole.mafia,)
             + roles_tpl[3:]
         )

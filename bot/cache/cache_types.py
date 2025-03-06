@@ -150,43 +150,43 @@ LastProcessedLiteral = Literal[
 ]
 
 
-async def don_died(
-    state: FSMContext,
-    bot: Bot,
-    current_id: int,
-):
-    game_data: GameCache = await state.get_data()
-
-    url = game_data["players"][str(current_id)]["url"]
-    role = game_data["players"][str(current_id)]["pretty_role"]
-
-    mafias = game_data["mafias"]
-    if not mafias:
-        return
-    new_don_id = mafias[0]
-    new_don_url = game_data["players"][str(new_don_id)]["url"]
-    game_data["players"][str(new_don_id)][
-        "role"
-    ] = Roles.don.value.role
-    game_data["players"][str(new_don_id)]["pretty_role"] = (
-        make_pretty(Roles.don.value.role)
-    )
-    game_data["players"][str(new_don_id)][
-        "enum_name"
-    ] = Roles.don.name
-    await state.set_data(game_data)
-    profiles = get_profiles(
-        live_players_ids=game_data["mafias"],
-        players=game_data["players"],
-        role=True,
-    )
-    for mafia_id in mafias:
-        await bot.send_message(
-            chat_id=mafia_id,
-            text=f"Погиб {role} {url}.\n"
-            f"Новый {role} {new_don_url}\n\n"
-            f"Текущие союзники:\n{profiles}",
-        )
+# async def don_died(
+#     state: FSMContext,
+#     bot: Bot,
+#     current_id: int,
+# ):
+#     game_data: GameCache = await state.get_data()
+#
+#     url = game_data["players"][str(current_id)]["url"]
+#     role = game_data["players"][str(current_id)]["pretty_role"]
+#
+#     mafias = game_data["mafias"]
+#     if not mafias:
+#         return
+#     new_don_id = mafias[0]
+#     new_don_url = game_data["players"][str(new_don_id)]["url"]
+#     game_data["players"][str(new_don_id)][
+#         "role"
+#     ] = Roles.don.value.role
+#     game_data["players"][str(new_don_id)]["pretty_role"] = (
+#         make_pretty(Roles.don.value.role)
+#     )
+#     game_data["players"][str(new_don_id)][
+#         "enum_name"
+#     ] = Roles.don.name
+#     await state.set_data(game_data)
+#     profiles = get_profiles(
+#         live_players_ids=game_data["mafias"],
+#         players=game_data["players"],
+#         role=True,
+#     )
+#     for mafia_id in mafias:
+#         await bot.send_message(
+#             chat_id=mafia_id,
+#             text=f"Погиб {role} {url}.\n"
+#             f"Новый {role} {new_don_url}\n\n"
+#             f"Текущие союзники:\n{profiles}",
+#         )
 
 
 class Groupings(StrEnum):
@@ -231,6 +231,46 @@ class Alias:
     role: "AliasesRole"
     is_mass_mailing_list: bool = False
 
+    @staticmethod
+    async def boss_is_dead(
+        state: FSMContext,
+        bot: Bot,
+        current_id: int,
+        current_enum_name: str,
+    ):
+        game_data: GameCache = await state.get_data()
+        current_enum = Roles[current_enum_name].value
+        url = game_data["players"][str(current_id)]["url"]
+        role = game_data["players"][str(current_id)]["pretty_role"]
+
+        players = game_data[current_enum.roles_key]
+        if not players:
+            return
+        new_boss_id = players[0]
+        new_boss_url = game_data["players"][str(new_boss_id)]["url"]
+        game_data["players"][str(new_boss_id)][
+            "role"
+        ] = current_enum.role
+        game_data["players"][str(new_boss_id)]["pretty_role"] = (
+            make_pretty(current_enum.role)
+        )
+        game_data["players"][str(new_boss_id)][
+            "enum_name"
+        ] = current_enum_name
+        await state.set_data(game_data)
+        profiles = get_profiles(
+            live_players_ids=game_data[current_enum.roles_key],
+            players=game_data["players"],
+            role=True,
+        )
+        for player_id in players:
+            await bot.send_message(
+                chat_id=player_id,
+                text=f"Погиб {role} {url}.\n\n"
+                f"Новый {role} {new_boss_url}\n\n"
+                f"Текущие союзники:\n{profiles}",
+            )
+
 
 @dataclass
 class Role:
@@ -256,7 +296,6 @@ class Role:
     mailing_being_sent: Callable | None = None
     alias: Alias | None = None
     is_alias: bool = False
-    if_died: Callable | None = None
 
 
 class AliasesRole(enum.Enum):
@@ -273,17 +312,28 @@ class AliasesRole(enum.Enum):
         can_kill_at_night_and_survive=True,
         is_alias=True,
     )
+    general = Role(
+        role="Генерал",
+        roles_key="policeman",
+        processed_users_key="killed_by_policeman",
+        photo="https://img.clipart-library.com/2/clip-monsters-vs-aliens/clip-monsters-vs-aliens-21.gif",
+        grouping=Groupings.civilians,
+        purpose="Ты правая рука маршала. В случае его смерти вступишь в должность.",
+        state_for_waiting_for_action=UserFsm.POLICEMAN_CHECKS,
+        can_kill_at_night_and_survive=True,
+        is_alias=True,
+    )
 
 
 class Roles(enum.Enum):
     don = Role(
-        role="Дон. Верховный главнокомандующий мафии.",
+        role="Дон. Высшее звание в преступных группировках",
         roles_key="mafias",
         processed_users_key="killed_by_mafia",
         photo="https://avatars.mds.yandex.net/i?id="
         "a7b2f1eed9cca869784091017f8a66ff_l-7677819-images-thumbs&n=13",
         grouping=Groupings.criminals,
-        purpose="Тебе нужно руководить мафиозной армией и убивать мирных.",
+        purpose="Тебе нужно руководить преступниками и убивать мирных.",
         message_to_group_after_action="Мафия выбрала жертву!",
         message_to_user_after_action="Ты выбрал убить {url}",
         extra_data=[ExtraCache("killed_by_don")],
@@ -293,7 +343,6 @@ class Roles(enum.Enum):
         alias=Alias(
             role=AliasesRole.mafia, is_mass_mailing_list=True
         ),
-        if_died=don_died,
     )
     doctor = Role(
         role="Доктор",
@@ -308,6 +357,21 @@ class Roles(enum.Enum):
         mail_message="Кого вылечить этой ночью?",
         is_self_selecting=True,
         state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
+    )
+    policeman = Role(
+        role="Маршал. Верховный главнокомандующий армии",
+        roles_key="policeman",
+        processed_users_key="killed_by_policeman",
+        photo="https://avatars.mds.yandex.net/get-kinopoisk-image/"
+        "1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x",
+        grouping=Groupings.civilians,
+        purpose="Тебе нужно вычислить мафию или уничтожить её. Только ты можешь принимать решения.",
+        message_to_group_after_action="Работает местная полиция! Всем жителям приказано сидеть дома!",
+        message_to_user_after_action="Ты выбрал узнать роль {url}",
+        mail_message="Кого проверить этой ночью?",
+        state_for_waiting_for_action=UserFsm.POLICEMAN_CHECKS,
+        can_kill_at_night_and_survive=True,
+        alias=Alias(role=AliasesRole.general),
     )
     sleeper = Role(
         role="Клофелинщица",
@@ -324,20 +388,6 @@ class Roles(enum.Enum):
         extra_data=[
             ExtraCache(key="tracking", data_type=dict),
         ],
-    )
-    policeman = Role(
-        role="Комиссар",
-        roles_key="policeman",
-        processed_users_key="killed_by_policeman",
-        photo="https://avatars.mds.yandex.net/get-kinopoisk-image/"
-        "1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x",
-        grouping=Groupings.civilians,
-        purpose="Тебе нужно вычислить мафию.",
-        message_to_group_after_action="Работает местная полиция! Всем жителям приказано сидеть дома!",
-        message_to_user_after_action="Ты выбрал узнать роль {url}",
-        mail_message="Кого проверить этой ночью?",
-        state_for_waiting_for_action=UserFsm.POLICEMAN_CHECKS,
-        can_kill_at_night_and_survive=True,
     )
     killer = Role(
         role="Наёмный убийца",

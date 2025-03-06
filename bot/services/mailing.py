@@ -215,29 +215,6 @@ class MailerToPlayers:
         await self.send_info_to_player(
             game_data=game_data, role=Roles.agent, key="sufferers"
         )
-        # journalists = game_data.get("journalists", [])
-        # if not journalists:
-        #     return
-        # journalist_id = journalists[0]
-        # if not game_data["talked"]:
-        #     return
-        # user_id = game_data["talked"][0]
-        #
-        # visitors = ", ".join(
-        #     game_data["players"][str(user_id)]["url"]
-        #     for user_id in game_data["tracking"]
-        #     .get(str(user_id), {})
-        #     .get("interacting", [])
-        # )
-        # user_url = game_data["players"][str(user_id)]["url"]
-        # message = (
-        #     f"{user_url} сегодня никто не навещал"
-        #     if not visitors
-        #     else f"К {user_url} приходили: {visitors}"
-        # )
-        # await self.bot.send_message(
-        #     chat_id=journalist_id, text=message
-        # )
 
     async def send_request_to_vote(
         self,
@@ -339,3 +316,13 @@ class MailerToPlayers:
                         chat_id=user_id,
                         text="Твои союзники!\n\n" + profiles,
                     )
+                    if (
+                        current_role.alias.is_mass_mailing_list
+                        is False
+                    ):
+                        await get_state_and_assign(
+                            dispatcher=self.dispatcher,
+                            chat_id=user_id,
+                            bot_id=self.bot.id,
+                            new_state=current_role.alias.role.value.state_for_waiting_for_action,
+                        )
