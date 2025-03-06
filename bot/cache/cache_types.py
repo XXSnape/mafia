@@ -6,7 +6,6 @@ from typing import (
     TypeAlias,
     NotRequired,
     Literal,
-    Self,
 )
 
 from aiogram import Bot, Dispatcher
@@ -50,6 +49,9 @@ class InteractionData(TypedDict):
 
 
 TrackingData: TypeAlias = dict[UserIdStr, InteractionData]
+NumberOfNight: TypeAlias = int
+
+InteractiveWithHistory: TypeAlias = dict[UserIdStr, NumberOfNight]
 
 
 class UserCache(TypedDict):
@@ -112,7 +114,7 @@ class GameCache(TypedDict, total=True):
     # wait_for: list[int]
     two_voices: PlayersIds
     last_tracked_by_agent: PlayersIds
-    last_treated_by_doctor: PlayersIds
+    last_treated_by_doctor: InteractiveWithHistory
     last_arrested_by_prosecutor: PlayersIds
     last_forgiven_by_lawyer: PlayersIds
     last_self_protected_by_bodyguard: PlayersIds
@@ -238,12 +240,12 @@ class Alias:
             )
 
 
-async def mail_policeman(
-    player_id: int,
-    dispatcher: Dispatcher,
-    bot_id: int,
-):
-    markup = kill_or_check_on_policeman()
+@dataclass
+class InteractiveWith:
+    interactive_key: LastProcessedLiteral
+    is_self_selecting: bool = False
+    other: int = 1
+    self: int = 1
 
 
 @dataclass
@@ -258,6 +260,7 @@ class Role:
     mail_message: str | None = None
     message_to_user_after_action: str | None = None
     message_to_group_after_action: str | None = None
+    interactive_with: InteractiveWith | None = None
     last_interactive_key: LastProcessedLiteral | None = None
     is_mass_mailing_list: bool = False
     extra_data: list[ExtraCache] | None = None
@@ -304,7 +307,7 @@ class AliasesRole(enum.Enum):
         processed_users_key="treated_by_doctor",
         photo="https://cdn.culture.ru/images/e2464a8d-222e-54b1-9016-86f63e902959",
         grouping=Groupings.civilians,
-        purpose="Тебе нужно все всем помогать главврачу. "
+        purpose="Тебе нужно во всем помогать главврачу. "
         "В случае его смерти вступишь в должность.",
         state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
         is_alias=True,
@@ -334,7 +337,12 @@ class Roles(enum.Enum):
         role="Главный врач",
         roles_key="doctors",
         processed_users_key="treated_by_doctor",
-        last_interactive_key="last_treated_by_doctor",
+        interactive_with=InteractiveWith(
+            interactive_key="last_treated_by_doctor",
+            is_self_selecting=True,
+            self=2,
+        ),
+        # last_interactive_key="last_treated_by_doctor",
         photo="https://gipermed.ru/upload/iblock/4bf/4bfa55f59ceb538bd2c8c437e8f71e5a.jpg",
         grouping=Groupings.civilians,
         purpose="Тебе нужно стараться лечить тех, кому нужна помощь. "
@@ -342,7 +350,7 @@ class Roles(enum.Enum):
         message_to_group_after_action="Доктор спешит кому-то на помощь!",
         message_to_user_after_action="Ты выбрал вылечить {url}",
         mail_message="Кого вылечить этой ночью?",
-        is_self_selecting=True,
+        # is_self_selecting=True,
         state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
         alias=Alias(role=AliasesRole.nurse),
     )

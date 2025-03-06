@@ -55,10 +55,24 @@ class MailerToPlayers:
         game_data: GameCache,
     ):
         exclude = []
-        if current_role.is_self_selecting is False:
-            exclude = [player_id]
-        if current_role.last_interactive_key:
-            exclude += game_data[current_role.last_interactive_key]
+        if current_role.interactive_with:
+            current_number = game_data["number_of_night"]
+            if (
+                current_role.interactive_with.is_self_selecting
+                is False
+            ):
+                exclude = [player_id]
+            for processed_user_id, number in game_data[
+                current_role.interactive_with.interactive_key
+            ].items():
+                if int(processed_user_id) == player_id:
+                    constraint = current_role.interactive_with.self
+                else:
+                    constraint = current_role.interactive_with.other
+                if (current_number - number) < constraint + 1:
+                    exclude.append(int(processed_user_id))
+        if game_data["players_ids"] == exclude:
+            return
         markup = send_selection_to_players_kb(
             players_ids=game_data["players_ids"],
             players=game_data["players"],
@@ -76,15 +90,6 @@ class MailerToPlayers:
             current_role=current_role,
             message_id=sent_survey.message_id,
         )
-        # game_data["to_delete"].append(
-        #     [player_id, sent_survey.message_id]
-        # )
-        # await get_state_and_assign(
-        #     dispatcher=self.dispatcher,
-        #     chat_id=player_id,
-        #     bot_id=self.bot.id,
-        #     new_state=current_role.state_for_waiting_for_action,
-        # )
 
     async def save_msg_to_delete_and_change_state(
         self,

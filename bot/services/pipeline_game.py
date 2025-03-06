@@ -193,7 +193,7 @@ class Game:
         roles_tpl = tuple(Roles)
         roles = (
             roles_tpl[:3]
-            + (AliasesRole.nurse,)
+            + (AliasesRole.general,)
             + (AliasesRole.mafia,)
             + roles_tpl[3:]
         )

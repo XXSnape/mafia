@@ -67,7 +67,7 @@ async def init_game(message: Message, state: FSMContext):
         "cancelled": [],
         "last_asleep_by_sleeper": [],
         "last_tracked_by_agent": [],
-        "last_treated_by_doctor": [],
+        "last_treated_by_doctor": {},
         "last_arrested_by_prosecutor": [],
         "last_forgiven_by_lawyer": [],
         "last_self_protected_by_bodyguard": [],
