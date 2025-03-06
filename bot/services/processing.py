@@ -254,6 +254,8 @@ class Executor:
             game_data["killed_by_mafia"]
         )
         if victim_id is None:
+            if not game_data["killed_by_mafia"]:
+                return set()
             if not game_data["killed_by_don"]:
                 return set()
             return set(game_data["killed_by_don"])
@@ -393,6 +395,10 @@ class Executor:
             else:
                 game_data["losers"].append(user_id)
         game_data["players_ids"].remove(user_id)
+        game_data["players"][str(user_id)][
+            "number_died_at_night"
+        ] = game_data["number_of_night"]
+        await self.state.set_data(game_data)
         roles = {}
         for role in Roles:
             current_role: Role = role.value

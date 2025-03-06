@@ -100,10 +100,13 @@ async def take_action_and_register_user(
             role=role,
         )
     )
-    if current_role.interactive_with:
-        game_data[current_role.interactive_with.interactive_key][
-            str(user_id)
-        ] = game_data["number_of_night"]
+    if (
+        current_role.interactive_with
+        and current_role.interactive_with.last_interactive_key
+    ):
+        game_data[
+            current_role.interactive_with.last_interactive_key
+        ][str(user_id)] = game_data["number_of_night"]
     if current_role.processed_users_key:
         game_data[current_role.processed_users_key].append(user_id)
     await state.set_data(game_data)

@@ -55,22 +55,20 @@ class MailerToPlayers:
         game_data: GameCache,
     ):
         exclude = []
-        if current_role.interactive_with:
-            current_number = game_data["number_of_night"]
-            if (
-                current_role.interactive_with.is_self_selecting
-                is False
-            ):
-                exclude = [player_id]
-            for processed_user_id, number in game_data[
-                current_role.interactive_with.interactive_key
-            ].items():
-                if int(processed_user_id) == player_id:
-                    constraint = current_role.interactive_with.self
-                else:
-                    constraint = current_role.interactive_with.other
-                if (current_number - number) < constraint + 1:
-                    exclude.append(int(processed_user_id))
+        current_number = game_data["number_of_night"]
+        if current_role.interactive_with.is_self_selecting is False:
+            exclude = [player_id]
+        for processed_user_id, number in game_data.get(
+            current_role.interactive_with.last_interactive_key, {}
+        ).items():
+            if int(processed_user_id) == player_id:
+                constraint = current_role.interactive_with.self
+            else:
+                constraint = current_role.interactive_with.other
+            if constraint is None:
+                exclude.append(int(processed_user_id))
+            elif (current_number - number) < constraint + 1:
+                exclude.append(int(processed_user_id))
         if game_data["players_ids"] == exclude:
             return
         markup = send_selection_to_players_kb(
@@ -81,7 +79,7 @@ class MailerToPlayers:
         )
         sent_survey = await self.bot.send_message(
             chat_id=player_id,
-            text=current_role.mail_message,
+            text=current_role.interactive_with.mail_message,
             reply_markup=markup,
         )
         await self.save_msg_to_delete_and_change_state(
@@ -111,30 +109,25 @@ class MailerToPlayers:
         for role in Roles:
             current_role: Role = role.value
 
-            if (
-                (current_role.roles_key not in game_data)
-                or current_role.mail_message is None
-                or (
-                    current_role.mailing_being_sent is not None
-                    and current_role.mailing_being_sent(game_data)
-                    is False
-                )
+            if (current_role.roles_key not in game_data) or (
+                current_role.interactive_with is None
             ):
                 continue
-
-            key = (
-                current_role.for_notifications
-                if current_role.for_notifications
-                else current_role.roles_key
-            )
-            roles = game_data[key]
+            if (
+                current_role.interactive_with.players_to_send_messages
+            ):
+                roles = current_role.interactive_with.players_to_send_messages(
+                    game_data
+                )
+            else:
+                roles = game_data[current_role.roles_key]
             if not roles:
                 continue
-            if current_role.own_mailing_markup:
+            if current_role.interactive_with.own_mailing_markup:
                 sent_survey = await self.bot.send_message(
                     chat_id=roles[0],
-                    text=current_role.mail_message,
-                    reply_markup=current_role.own_mailing_markup,
+                    text=current_role.interactive_with.mail_message,
+                    reply_markup=current_role.interactive_with.own_mailing_markup,
                 )
                 await self.save_msg_to_delete_and_change_state(
                     game_data=game_data,

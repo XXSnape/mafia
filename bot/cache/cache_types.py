@@ -20,7 +20,10 @@ from keyboards.inline.keypads.mailing import (
 )
 from states.states import UserFsm
 from utils.utils import make_pretty, get_profiles
-from utils.validators import is_not_sleeping_killer
+from utils.validators import (
+    are_not_sleeping_killers,
+    angel_died_2_nights_ago_or_earlier,
+)
 
 Url: TypeAlias = str
 
@@ -33,6 +36,7 @@ class UserGameCache(TypedDict, total=False):
     initial_role: str
     enum_name: str
     roles_key: str
+    number_died_at_night: int
 
 
 UserIdStr: TypeAlias = str
@@ -109,15 +113,15 @@ class GameCache(TypedDict, total=True):
 
     sleepers: PlayersIds
     cancelled: PlayersIds
-    last_asleep_by_sleeper: PlayersIds
 
+    last_treated_by_doctor: InteractiveWithHistory
+    last_arrested_by_prosecutor: InteractiveWithHistory
+    last_forgiven_by_lawyer: InteractiveWithHistory
+    last_self_protected_by_bodyguard: InteractiveWithHistory
+    last_tracked_by_agent: InteractiveWithHistory
+    last_asleep_by_sleeper: InteractiveWithHistory
     # wait_for: list[int]
     two_voices: PlayersIds
-    last_tracked_by_agent: PlayersIds
-    last_treated_by_doctor: InteractiveWithHistory
-    last_arrested_by_prosecutor: PlayersIds
-    last_forgiven_by_lawyer: PlayersIds
-    last_self_protected_by_bodyguard: PlayersIds
 
     number_of_night: int
 
@@ -241,11 +245,18 @@ class Alias:
 
 
 @dataclass
-class InteractiveWith:
-    interactive_key: LastProcessedLiteral
+class InteractiveWithData:
+    mail_message: str
+    last_interactive_key: LastProcessedLiteral | None = None
     is_self_selecting: bool = False
     other: int = 1
     self: int = 1
+
+    # mailing_being_sent: Callable | None = None
+    # for_notifications: ListToProcessLiteral | None = None
+
+    players_to_send_messages: Callable | None = None
+    own_mailing_markup: InlineKeyboardMarkup | None = None
 
 
 @dataclass
@@ -255,25 +266,27 @@ class Role:
     processed_users_key: ListToProcessLiteral | None
     photo: str
     grouping: str
+
     purpose: str | Callable | None
-    is_self_selecting: bool = False
-    mail_message: str | None = None
+    # is_self_selecting: bool = False
+    # mail_message: str | None = None
+    interactive_with: InteractiveWithData | None = None
     message_to_user_after_action: str | None = None
     message_to_group_after_action: str | None = None
-    interactive_with: InteractiveWith | None = None
-    last_interactive_key: LastProcessedLiteral | None = None
+    # interactive_with: InteractiveWithData | None
+    # last_interactive_key: LastProcessedLiteral | None = None
     is_mass_mailing_list: bool = False
     extra_data: list[ExtraCache] | None = None
     state_for_waiting_for_action: State | None = None
-    for_notifications: ListToProcessLiteral | None = None
+    # for_notifications: ListToProcessLiteral | None = None
     extra_buttons_for_actions_at_night: tuple[
         InlineKeyboardButton, ...
     ] = ()
     can_kill_at_night_and_survive: bool = False
-    mailing_being_sent: Callable | None = None
+    # mailing_being_sent: Callable | None = None
     alias: Alias | None = None
     is_alias: bool = False
-    own_mailing_markup: InlineKeyboardMarkup | None = None
+    # own_mailing_markup: InlineKeyboardMarkup | None = None
 
 
 class AliasesRole(enum.Enum):
@@ -285,7 +298,10 @@ class AliasesRole(enum.Enum):
         grouping=Groupings.criminals,
         purpose="Тебе нужно уничтожить всех горожан и подчиняться дону.",
         message_to_user_after_action="Ты выбрал убить {url}",
-        mail_message="Кого убить этой ночью?",
+        interactive_with=InteractiveWithData(
+            mail_message="Кого убить этой ночью?"
+        ),
+        # mail_message="Кого убить этой ночью?",
         state_for_waiting_for_action=UserFsm.MAFIA_ATTACKS,
         can_kill_at_night_and_survive=True,
         is_alias=True,
@@ -326,7 +342,10 @@ class Roles(enum.Enum):
         message_to_group_after_action="Мафия выбрала жертву!",
         message_to_user_after_action="Ты выбрал убить {url}",
         extra_data=[ExtraCache("killed_by_don")],
-        mail_message="Кого убить этой ночью?",
+        interactive_with=InteractiveWithData(
+            mail_message="Кого убить этой ночью?"
+        ),
+        # mail_message="Кого убить этой ночью?",
         state_for_waiting_for_action=UserFsm.DON_ATTACKS,
         can_kill_at_night_and_survive=True,
         alias=Alias(
@@ -337,8 +356,9 @@ class Roles(enum.Enum):
         role="Главный врач",
         roles_key="doctors",
         processed_users_key="treated_by_doctor",
-        interactive_with=InteractiveWith(
-            interactive_key="last_treated_by_doctor",
+        interactive_with=InteractiveWithData(
+            mail_message="Кого вылечить этой ночью?",
+            last_interactive_key="last_treated_by_doctor",
             is_self_selecting=True,
             self=2,
         ),
@@ -349,42 +369,9 @@ class Roles(enum.Enum):
         "Только ты можешь принимать решения.",
         message_to_group_after_action="Доктор спешит кому-то на помощь!",
         message_to_user_after_action="Ты выбрал вылечить {url}",
-        mail_message="Кого вылечить этой ночью?",
         # is_self_selecting=True,
         state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
         alias=Alias(role=AliasesRole.nurse),
-    )
-    policeman = Role(
-        role="Маршал. Верховный главнокомандующий армии",
-        roles_key="policeman",
-        processed_users_key="killed_by_policeman",
-        photo="https://avatars.mds.yandex.net/get-kinopoisk-image/"
-        "1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x",
-        grouping=Groupings.civilians,
-        purpose="Тебе нужно вычислить мафию или уничтожить её. Только ты можешь принимать решения.",
-        message_to_group_after_action="В город введены войска! Идет перестрелка!",
-        message_to_user_after_action="Ты выбрал убить {url}",
-        mail_message="Какие меры примешь для ликвидации мафии?",
-        state_for_waiting_for_action=UserFsm.POLICEMAN_CHECKS,
-        can_kill_at_night_and_survive=True,
-        alias=Alias(role=AliasesRole.general),
-        own_mailing_markup=kill_or_check_on_policeman(),
-    )
-    sleeper = Role(
-        role="Клофелинщица",
-        roles_key="sleepers",
-        processed_users_key="cancelled",
-        last_interactive_key="last_asleep_by_sleeper",
-        photo="https://masterpiecer-images.s3.yandex.net/c94e9cb6787b11eeb1ce1e5d9776cfa6:upscaled",
-        grouping=Groupings.criminals,
-        purpose="Ты можешь усыпить кого-нибудь во имя мафии.",
-        message_to_group_after_action="Спят взрослые и дети. Не обошлось и без помощи клофелинщиков!",
-        message_to_user_after_action="Ты выбрал усыпить {url}",
-        mail_message="Кого усыпить этой ночью?",
-        state_for_waiting_for_action=UserFsm.CLOFFELINE_GIRL_PUTS_TO_SLEEP,
-        extra_data=[
-            ExtraCache(key="tracking", data_type=dict),
-        ],
     )
     killer = Role(
         role="Наёмный убийца",
@@ -397,16 +384,64 @@ class Roles(enum.Enum):
         purpose="Ты убиваешь, кого захочешь, а затем восстанавливаешь свои силы целую ночь.",
         message_to_group_after_action="ЧВК продолжают работать на территории города!",
         message_to_user_after_action="Ты решился ликвидировать {url}",
-        mail_message="Реши, кому поможешь этой ночью решить проблемы и убить врага!",
+        interactive_with=InteractiveWithData(
+            mail_message="Реши, кому поможешь этой ночью решить проблемы и убить врага!",
+            players_to_send_messages=are_not_sleeping_killers,
+        ),
+        # mail_message="Реши, кому поможешь этой ночью решить проблемы и убить врага!",
         state_for_waiting_for_action=UserFsm.KILLER_ATTACKS,
         can_kill_at_night_and_survive=True,
-        mailing_being_sent=is_not_sleeping_killer,
+        # mailing_being_sent=is_not_sleeping_killer,
+    )
+    sleeper = Role(
+        role="Клофелинщица",
+        roles_key="sleepers",
+        processed_users_key="cancelled",
+        interactive_with=InteractiveWithData(
+            last_interactive_key="last_asleep_by_sleeper",
+            mail_message="Кого усыпить этой ночью?",
+        ),
+        # last_interactive_key="last_asleep_by_sleeper",
+        photo="https://masterpiecer-images.s3.yandex.net/c94e9cb6787b11eeb1ce1e5d9776cfa6:upscaled",
+        grouping=Groupings.criminals,
+        purpose="Ты можешь усыпить кого-нибудь во имя мафии.",
+        message_to_group_after_action="Спят взрослые и дети. Не обошлось и без помощи клофелинщиков!",
+        message_to_user_after_action="Ты выбрал усыпить {url}",
+        # mail_message="Кого усыпить этой ночью?",
+        state_for_waiting_for_action=UserFsm.CLOFFELINE_GIRL_PUTS_TO_SLEEP,
+        extra_data=[
+            ExtraCache(key="tracking", data_type=dict),
+        ],
+    )
+    policeman = Role(
+        role="Маршал. Верховный главнокомандующий армии",
+        roles_key="policeman",
+        processed_users_key="killed_by_policeman",
+        photo="https://avatars.mds.yandex.net/get-kinopoisk-image/"
+        "1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x",
+        grouping=Groupings.civilians,
+        purpose="Тебе нужно вычислить мафию или уничтожить её. Только ты можешь принимать решения.",
+        message_to_group_after_action="В город введены войска! Идет перестрелка!",
+        message_to_user_after_action="Ты выбрал убить {url}",
+        interactive_with=InteractiveWithData(
+            mail_message="Какие меры примешь для ликвидации мафии?",
+            own_mailing_markup=kill_or_check_on_policeman(),
+        ),
+        # mail_message="Какие меры примешь для ликвидации мафии?",
+        state_for_waiting_for_action=UserFsm.POLICEMAN_CHECKS,
+        can_kill_at_night_and_survive=True,
+        alias=Alias(role=AliasesRole.general),
+        # own_mailing_markup=kill_or_check_on_policeman(),
     )
 
     agent = Role(
         role="Агент 008",
         processed_users_key="tracked",
-        last_interactive_key="last_tracked_by_agent",
+        interactive_with=InteractiveWithData(
+            last_interactive_key="last_tracked_by_agent",
+            mail_message="За кем следить этой ночью?",
+        ),
+        # last_interactive_key="last_tracked_by_agent",
         roles_key="agents",
         photo="https://avatars.mds.yandex.net/i?id="
         "7b6e30fff5c795d560c07b69e7e9542f044fcaf9e04d4a31-5845211-images-thumbs&n=13",
@@ -414,7 +449,7 @@ class Roles(enum.Enum):
         purpose="Ты можешь следить за кем-нибудь ночью",
         message_to_group_after_action="Спецслужбы выходят на разведу",
         message_to_user_after_action="Ты выбрал следить за {url}",
-        mail_message="За кем следить этой ночью?",
+        # mail_message="За кем следить этой ночью?",
         state_for_waiting_for_action=UserFsm.AGENT_WATCHES,
         extra_data=[
             ExtraCache(key="tracking", data_type=dict),
@@ -423,6 +458,9 @@ class Roles(enum.Enum):
     journalist = Role(
         role="Журналист",
         processed_users_key="talked",
+        interactive_with=InteractiveWithData(
+            mail_message="У кого взять интервью этой ночью?"
+        ),
         roles_key="journalists",
         photo="https://pics.rbc.ru/v2_companies_s3/resized/"
         "960xH/media/company_press_release_image/"
@@ -431,7 +469,7 @@ class Roles(enum.Enum):
         purpose="Ты можешь приходить к местным жителям и узнавать, что они видели",
         message_to_group_after_action="Что случилось? Отчаянные СМИ спешат выяснить правду!",
         message_to_user_after_action="Ты выбрал взять интервью у {url}",
-        mail_message="У кого взять интервью этой ночью?",
+        # mail_message="У кого взять интервью этой ночью?",
         state_for_waiting_for_action=UserFsm.JOURNALIST_TAKES_INTERVIEW,
         extra_data=[
             ExtraCache(key="tracking", data_type=dict),
@@ -454,8 +492,14 @@ class Roles(enum.Enum):
         photo="https://habrastorage.org/files/2e3/371/6a2/2e33716a2bb74f8eb67378334960ebb5.png",
         grouping=Groupings.civilians,
         purpose="Тебе нужно на основе ранее полученных данных предсказать, кого повесят на дневном голосовании",
-        is_self_selecting=True,
-        mail_message="Кого повесят сегодня днём?",
+        interactive_with=InteractiveWithData(
+            is_self_selecting=True,
+            mail_message="Кого повесят сегодня днём?",
+            self=0,
+            other=0,
+        ),
+        # is_self_selecting=True,
+        # mail_message="Кого повесят сегодня днём?",
         message_to_group_after_action="Составляется прогноз на завтрашний день",
         message_to_user_after_action="Ты предположил, что повесят {url}",
         extra_buttons_for_actions_at_night=(
@@ -487,7 +531,11 @@ class Roles(enum.Enum):
         purpose="Твоя жертва всегда ошибется при выборе на голосовании.",
         message_to_group_after_action="Кажется, кто-то становится жертвой психологического насилия!",
         message_to_user_after_action="Ты выбрал прополоскать мозги {url}",
-        mail_message="Кого надоумить на неправильный выбор?",
+        interactive_with=InteractiveWithData(
+            mail_message="Кого надоумить на неправильный выбор?",
+            other=0,
+        ),
+        # mail_message="Кого надоумить на неправильный выбор?",
         state_for_waiting_for_action=UserFsm.INSTIGATOR_LYING,
     )
     prime_minister = Role(
@@ -502,7 +550,11 @@ class Roles(enum.Enum):
         role="Телохранитель",
         roles_key="bodyguards",
         processed_users_key="treated_by_bodyguard",
-        last_interactive_key="last_self_protected_by_bodyguard",
+        interactive_with=InteractiveWithData(
+            last_interactive_key="last_self_protected_by_bodyguard",
+            mail_message="За кого пожертвовать собой?",
+        ),
+        # last_interactive_key="last_self_protected_by_bodyguard",
         photo="https://sun6-22.userapi.com/impg/zAaADEA19scv86EFl8bY1wUYRCJyBPGg1qamiA/xjMRCUhA20g.jpg?"
         "size=1280x1280&quality=96&"
         "sign=de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag="
@@ -511,7 +563,7 @@ class Roles(enum.Enum):
         purpose="Тебе нужно защитить собой лучших специалистов",
         message_to_group_after_action="Кто-то пожертвовал собой!",
         message_to_user_after_action="Ты выбрал пожертвовать собой, чтобы спасти {url}",
-        mail_message="За кого пожертвовать собой?",
+        # mail_message="За кого пожертвовать собой?",
         state_for_waiting_for_action=UserFsm.BODYGUARD_PROTECTS,
     )
     masochist = Role(
@@ -525,7 +577,12 @@ class Roles(enum.Enum):
     lawyer = Role(
         role="Адвокат",
         roles_key="lawyers",
-        last_interactive_key="last_forgiven_by_lawyer",
+        interactive_with=InteractiveWithData(
+            last_interactive_key="last_forgiven_by_lawyer",
+            mail_message="Кого защитить на голосовании?",
+            self=2,
+        ),
+        # last_interactive_key="last_forgiven_by_lawyer",
         processed_users_key="have_alibi",
         photo="https://avatars.mds.yandex.net/get-altay/"
         "5579175/2a0000017e0aa51c3c1fd887206b0156ee34/XXL_height",
@@ -533,35 +590,42 @@ class Roles(enum.Enum):
         purpose="Тебе нужно защитить мирных жителей от своих же на голосовании.",
         message_to_group_after_action="Кому-то обеспечена защита лучшими адвокатами города!",
         message_to_user_after_action="Ты выбрал защитить {url}",
-        mail_message="Кого защитить на голосовании?",
+        # mail_message="Кого защитить на голосовании?",
         state_for_waiting_for_action=UserFsm.LAWYER_PROTECTS,
     )
     angel_of_death = Role(
         role="Ангел смерти",
         roles_key="angels_of_death",
         processed_users_key="killed_by_angel_of_death",
+        interactive_with=InteractiveWithData(
+            mail_message="Глупые людишки тебя линчевали, кому ты отомстишь?",
+            players_to_send_messages=angel_died_2_nights_ago_or_earlier,
+        ),
         photo="https://avatars.mds.yandex.net/get-entity_search/10844899/935958285/S600xU_2x",
         purpose="Если ты умрешь на голосовании, сможешь ночью забрать кого-нибудь с собой",
         grouping=Groupings.civilians,
         extra_data=[ExtraCache("angels_died", False)],
-        message_to_group_after_action="Ангел смерти спускается во имя мести!",
         message_to_user_after_action="Ты выбрал отомстить {url}",
-        mail_message="Глупые людишки тебя линчевали, кому ты отомстишь?",
+        # mail_message="Глупые людишки тебя линчевали, кому ты отомстишь?",
         state_for_waiting_for_action=UserFsm.ANGEL_TAKES_REVENGE,
-        for_notifications="angels_died",
+        # for_notifications="angels_died",
     )
     prosecutor = Role(
         role="Прокурор",
         roles_key="prosecutors",
         processed_users_key="cant_vote",
-        last_interactive_key="last_arrested_by_prosecutor",
+        interactive_with=InteractiveWithData(
+            last_interactive_key="last_arrested_by_prosecutor",
+            mail_message="Кого арестовать этой ночью?",
+        ),
+        # last_interactive_key="last_arrested_by_prosecutor",
         photo="https://avatars.mds.yandex.net/i?"
         "id=b5115d431dafc24be07a55a8b6343540_l-5205087-images-thumbs&n=13",
         grouping=Groupings.civilians,
         purpose="Тебе нельзя допустить, чтобы днем мафия могла говорить.",
         message_to_group_after_action="По данным разведки потенциальный злоумышленник арестован!",
         message_to_user_after_action="Ты выбрал арестовать {url}",
-        mail_message="Кого арестовать этой ночью?",
+        # mail_message="Кого арестовать этой ночью?",
         state_for_waiting_for_action=UserFsm.PROSECUTOR_ARRESTS,
     )
 
@@ -573,6 +637,7 @@ class Roles(enum.Enum):
         grouping=Groupings.civilians,
         purpose="Тебе нужно вычислить мафию на голосовании.",
     )
+
     lucky_gay = Role(
         role="Везунчик",
         processed_users_key=None,
