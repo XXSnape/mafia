@@ -55,6 +55,18 @@ async def get_user_id_and_inform_players(
                 if alias_id != callback.from_user.id
             )
         )
+        if callback.from_user.id in game_data[
+            "mafias"
+        ] and game_data.get("hackers"):
+            await asyncio.gather(
+                *(
+                    callback.bot.send_message(
+                        chat_id=hacker_id,
+                        text=f"{pretty_role} ??? выбрал {url}",
+                    )
+                    for hacker_id in game_data["hackers"]
+                )
+            )
 
     if (
         game_data.get("tracking") is not None

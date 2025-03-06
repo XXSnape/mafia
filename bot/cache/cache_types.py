@@ -77,6 +77,7 @@ class GameCache(TypedDict, total=True):
     lucky_guys: PlayersIds
     bodyguards: PlayersIds
     civilians: PlayersIds
+    hackers: PlayersIds
     lawyers: PlayersIds
     masochists: PlayersIds
     suicide_bombers: PlayersIds
@@ -129,6 +130,7 @@ class GameCache(TypedDict, total=True):
 from enum import StrEnum
 
 RolesKeysLiteral = Literal[
+    "hackers",
     "killers",
     "sleepers",
     "journalists",
@@ -372,6 +374,14 @@ class Roles(enum.Enum):
         # is_self_selecting=True,
         state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
         alias=Alias(role=AliasesRole.nurse),
+    )
+    hacker = Role(
+        role="Хакер",
+        roles_key="hackers",
+        processed_users_key=None,
+        photo="https://i.pinimg.com/originals/d0/e0/b5/d0e0b5198b0ea334fa243b9afd459f6b.png",
+        grouping=Groupings.civilians,
+        purpose="Ты можешь прослушивать диалоги мафии и узнавать, за кого они голосуют",
     )
     killer = Role(
         role="Наёмный убийца",

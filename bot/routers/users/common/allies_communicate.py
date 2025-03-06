@@ -53,5 +53,13 @@ async def allies_communicate(
             if player_id != message.from_user.id
         )
     )
+    if message.from_user.id in game_data["mafias"] and game_data.get(
+        "hackers"
+    ):
+        for hacker_id in game_data["hackers"]:
+            await message.bot.send_message(
+                chat_id=hacker_id,
+                text=f"{role} ??? передает:\n\n{message.text}",
+            )
     if len(game_data[aliases]) > 1:
         await message.answer("Сообщение успешно отправлено!")

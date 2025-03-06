@@ -93,7 +93,7 @@ class Game:
         )
         await self.mailer.mailing()
         game_data["angels_died"].clear()
-        await asyncio.sleep(21)
+        await asyncio.sleep(35)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
@@ -193,7 +193,7 @@ class Game:
         roles_tpl = tuple(Roles)
         roles = (
             roles_tpl[:3]
-            + (AliasesRole.general,)
+            + (AliasesRole.mafia,)
             + (AliasesRole.mafia,)
             + roles_tpl[3:]
         )
