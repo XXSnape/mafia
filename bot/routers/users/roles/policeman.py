@@ -13,7 +13,7 @@ from keyboards.inline.callback_factory.recognize_user import (
 )
 from keyboards.inline.cb.cb_text import (
     POLICEMAN_KILLS_CB,
-    POLICEMAN_BACKS_CB,
+    PLAYER_BACKS_CB,
     POLICEMAN_CHECKS_CB,
 )
 from keyboards.inline.keypads.mailing import (
@@ -70,7 +70,7 @@ async def policeman_makes_choice(
 
 
 @router.callback_query(
-    UserFsm.POLICEMAN_CHECKS, F.data == POLICEMAN_BACKS_CB
+    UserFsm.POLICEMAN_CHECKS, F.data == PLAYER_BACKS_CB
 )
 async def policeman_cancels_selection(callback: CallbackQuery):
     await callback.message.edit_text(

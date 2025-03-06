@@ -5,7 +5,7 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
 
 if TYPE_CHECKING:
-    from cache.cache_types import UsersInGame
+    from cache.cache_types import UsersInGame, Roles
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
@@ -13,7 +13,7 @@ from keyboards.inline.callback_factory.recognize_user import (
 from keyboards.inline.cb.cb_text import (
     POLICEMAN_CHECKS_CB,
     POLICEMAN_KILLS_CB,
-    POLICEMAN_BACKS_CB,
+    PLAYER_BACKS_CB,
 )
 
 
@@ -52,6 +52,17 @@ def kill_or_check_on_policeman():
     return generate_inline_kb(data_with_buttons=buttons)
 
 
+def choose_fake_role_kb(roles: list["Roles"]):
+    buttons = [
+        InlineKeyboardButton(
+            text=role.value.role, callback_data=role.name
+        )
+        for role in roles
+    ]
+    buttons.append(POLICEMAN_BACK_BTN)
+    return generate_inline_kb(data_with_buttons=buttons)
+
+
 POLICEMAN_BACK_BTN = InlineKeyboardButton(
-    text="Назад⬅️", callback_data=POLICEMAN_BACKS_CB
+    text="Назад⬅️", callback_data=PLAYER_BACKS_CB
 )

@@ -1,5 +1,6 @@
 import asyncio
 from collections.abc import Iterable
+from pprint import pprint
 from typing import Literal
 
 from aiogram import Bot, Dispatcher
@@ -48,8 +49,8 @@ class MailerToPlayers:
         self.dispatcher = dispatcher
         self.group_chat_id = group_chat_id
 
-    async def send_survey(
-        self,
+    @staticmethod
+    def generate_markup(
         player_id: int,
         current_role: Role,
         game_data: GameCache,
@@ -71,12 +72,49 @@ class MailerToPlayers:
                 exclude.append(int(processed_user_id))
         if game_data["players_ids"] == exclude:
             return
-        markup = send_selection_to_players_kb(
+        return send_selection_to_players_kb(
             players_ids=game_data["players_ids"],
             players=game_data["players"],
             exclude=exclude,
             extra_buttons=current_role.extra_buttons_for_actions_at_night,
         )
+
+    async def send_survey(
+        self,
+        player_id: int,
+        current_role: Role,
+        game_data: GameCache,
+    ):
+        # exclude = []
+        # current_number = game_data["number_of_night"]
+        # if current_role.interactive_with.is_self_selecting is False:
+        #     exclude = [player_id]
+        # for processed_user_id, number in game_data.get(
+        #     current_role.interactive_with.last_interactive_key, {}
+        # ).items():
+        #     if int(processed_user_id) == player_id:
+        #         constraint = current_role.interactive_with.self
+        #     else:
+        #         constraint = current_role.interactive_with.other
+        #     if constraint is None:
+        #         exclude.append(int(processed_user_id))
+        #     elif (current_number - number) < constraint + 1:
+        #         exclude.append(int(processed_user_id))
+        # if game_data["players_ids"] == exclude:
+        #     return
+
+        markup = self.generate_markup(
+            player_id=player_id,
+            current_role=current_role,
+            game_data=game_data,
+        )
+
+        # markup = send_selection_to_players_kb(
+        #     players_ids=game_data["players_ids"],
+        #     players=game_data["players"],
+        #     exclude=exclude,
+        #     extra_buttons=current_role.extra_buttons_for_actions_at_night,
+        # )
         sent_survey = await self.bot.send_message(
             chat_id=player_id,
             text=current_role.interactive_with.mail_message,
@@ -106,12 +144,14 @@ class MailerToPlayers:
 
     async def mailing(self):
         game_data: GameCache = await self.state.get_data()
+        pprint(game_data)
         for role in Roles:
+            print("hello")
             current_role: Role = role.value
-
             if (current_role.roles_key not in game_data) or (
                 current_role.interactive_with is None
             ):
+                print(current_role.roles_key, "not in game data")
                 continue
             if (
                 current_role.interactive_with.players_to_send_messages
@@ -121,6 +161,7 @@ class MailerToPlayers:
                 )
             else:
                 roles = game_data[current_role.roles_key]
+                print("roles", roles)
             if not roles:
                 continue
             if current_role.interactive_with.own_mailing_markup:
@@ -135,7 +176,7 @@ class MailerToPlayers:
                     current_role=current_role,
                     message_id=sent_survey.message_id,
                 )
-                return
+                continue
             await self.send_survey(
                 player_id=roles[0],
                 current_role=current_role,
@@ -152,6 +193,7 @@ class MailerToPlayers:
                         current_role=current_role,
                         game_data=game_data,
                     )
+        print("end mail")
 
     async def send_info_to_player(
         self, game_data: GameCache, role: Roles, key: str
@@ -191,6 +233,10 @@ class MailerToPlayers:
         game_data: GameCache = await self.state.get_data()
         if game_data["disclosed_roles"]:
             user_id, role = game_data["disclosed_roles"][0]
+            if game_data.get("forged_roles"):
+                faked_id, faked_role = game_data["forged_roles"][0]
+                if faked_id == user_id:
+                    role = faked_role
             for policeman_id in game_data["policeman"]:
                 url = game_data["players"][str(user_id)]["url"]
                 await self.bot.send_message(

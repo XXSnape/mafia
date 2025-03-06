@@ -90,6 +90,7 @@ class GameCache(TypedDict, total=True):
     instigators: PlayersIds
     agents: PlayersIds
     killers: PlayersIds
+    forgers: PlayersIds
 
     tracked: PlayersIds
     angels_died: PlayersIds
@@ -113,9 +114,11 @@ class GameCache(TypedDict, total=True):
     tracking: TrackingData
 
     disclosed_roles: list
+    forged_roles: list
     sleepers: PlayersIds
     cancelled: PlayersIds
 
+    last_forgers: InteractiveWithHistory
     last_treated_by_doctor: InteractiveWithHistory
     last_arrested_by_prosecutor: InteractiveWithHistory
     last_forgiven_by_lawyer: InteractiveWithHistory
@@ -123,7 +126,7 @@ class GameCache(TypedDict, total=True):
     last_tracked_by_agent: InteractiveWithHistory
     last_asleep_by_sleeper: InteractiveWithHistory
     # wait_for: list[int]
-    two_voices: PlayersIds
+    # two_voices: PlayersIds
 
     number_of_night: int
 
@@ -131,6 +134,7 @@ class GameCache(TypedDict, total=True):
 from enum import StrEnum
 
 RolesKeysLiteral = Literal[
+    "forgers",
     "hackers",
     "killers",
     "sleepers",
@@ -161,6 +165,7 @@ LastProcessedLiteral = Literal[
     "last_self_protected_by_bodyguard",
     "last_tracked_by_agent",
     "last_asleep_by_sleeper",
+    "last_forgers",
 ]
 
 
@@ -173,6 +178,7 @@ class Groupings(StrEnum):
 
 
 ListToProcessLiteral = Literal[
+    "forged_roles",
     "disclosed_roles",
     "killed_by_killer",
     "cancelled",
@@ -376,6 +382,27 @@ class Roles(enum.Enum):
         alias=Alias(role=AliasesRole.general),
         extra_data=[ExtraCache(key="disclosed_roles")],
         # own_mailing_markup=kill_or_check_on_policeman(),
+    )
+    forger = Role(
+        role="Румпельштильцхен",
+        roles_key="forgers",
+        grouping=Groupings.criminals,
+        purpose="Ты должен обманывать комиссара и подделывать документы на свое усмотрение во имя мафии",
+        message_to_group_after_action="Говорят, в лесах завелись персонажи из Шрека, "
+        "подговорённые мафией, дискоординирующие государственную армию!",
+        photo="https://sun9-64.userapi.com/impg/R8WBtzZkQKycXDW5YCvKXUJB03XJnboRa0LDHw/"
+        "yo9Ng0yPqa0.jpg?size=604x302&quality=95&sign"
+        "=0fb255f26d2fd1775b2db1c2001f7a0b&type=album",
+        state_for_waiting_for_action=UserFsm.FORGER_FAKES,
+        processed_users_key=None,
+        interactive_with=InteractiveWithData(
+            last_interactive_key="last_forgers",
+            mail_message="Кому сегодня подделаешь документы?",
+            is_self_selecting=True,
+            self=2,
+            other=2,
+        ),
+        extra_data=[ExtraCache(key="forged_roles")],
     )
     doctor = Role(
         role="Главный врач",
