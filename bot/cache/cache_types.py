@@ -22,7 +22,7 @@ from utils.validators import is_not_sleeping_killer
 Url: TypeAlias = str
 
 
-class UserGameCache(TypedDict):
+class UserGameCache(TypedDict, total=False):
     full_name: str
     url: Url
     role: NotRequired[str]

@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
@@ -44,11 +46,15 @@ async def get_user_id_and_inform_players(
             str(callback.from_user.id)
         ]["pretty_role"]
         message = f"{pretty_role} {current_url} выбрал {url}"
-        for alias_id in game_data[current_role.roles_key]:
-            if alias_id != callback.from_user.id:
-                await callback.bot.send_message(
+        await asyncio.gather(
+            *(
+                callback.bot.send_message(
                     chat_id=alias_id, text=message
                 )
+                for alias_id in game_data[current_role.roles_key]
+                if alias_id != callback.from_user.id
+            )
+        )
 
     if (
         game_data.get("tracking") is not None
