@@ -266,6 +266,7 @@ class Executor:
             self.get_killed_by_mafia(game_data)
             | set(game_data["killed_by_angel_of_death"])
             | set(game_data["killed_by_killer"])
+            | set(game_data["killed_by_policeman"])
         ) - (
             set(game_data["treated_by_doctor"])
             | set(game_data["treated_by_bodyguard"])

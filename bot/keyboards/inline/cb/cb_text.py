@@ -1,3 +1,6 @@
 JOIN_CB = "join"
 FINISH_REGISTRATION_CB = "finish_registration"
 DRAW_CB = "draw"
+POLICEMAN_KILLS_CB = "policeman_kills"
+POLICEMAN_CHECKS_CB = "policeman_checks"
+POLICEMAN_BACKS_CB = "policeman_backs"

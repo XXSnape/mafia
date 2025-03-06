@@ -1,18 +1,25 @@
 from collections.abc import Iterable
+from typing import TYPE_CHECKING
 
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
 
-from cache.cache_types import UsersInGame
+if TYPE_CHECKING:
+    from cache.cache_types import UsersInGame
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
+)
+from keyboards.inline.cb.cb_text import (
+    POLICEMAN_CHECKS_CB,
+    POLICEMAN_KILLS_CB,
+    POLICEMAN_BACKS_CB,
 )
 
 
 def send_selection_to_players_kb(
     players_ids: list[int],
-    players: UsersInGame,
+    players: "UsersInGame",
     extra_buttons: tuple[InlineKeyboardButton, ...] = (),
     exclude: Iterable[int] | int = (),
     user_index_cb: type[CallbackData] = UserActionIndexCbData,
@@ -29,3 +36,22 @@ def send_selection_to_players_kb(
     ]
     buttons += extra_buttons
     return generate_inline_kb(data_with_buttons=buttons)
+
+
+def kill_or_check_on_policeman():
+    buttons = [
+        InlineKeyboardButton(
+            text="Проверить🔍",
+            callback_data=POLICEMAN_CHECKS_CB,
+        ),
+        InlineKeyboardButton(
+            text="Стрелять🔫",
+            callback_data=POLICEMAN_KILLS_CB,
+        ),
+    ]
+    return generate_inline_kb(data_with_buttons=buttons)
+
+
+POLICEMAN_BACK_BTN = InlineKeyboardButton(
+    text="Назад⬅️", callback_data=POLICEMAN_BACKS_CB
+)

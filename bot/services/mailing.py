@@ -70,9 +70,30 @@ class MailerToPlayers:
             text=current_role.mail_message,
             reply_markup=markup,
         )
-        game_data["to_delete"].append(
-            [player_id, sent_survey.message_id]
+        await self.save_msg_to_delete_and_change_state(
+            game_data=game_data,
+            player_id=player_id,
+            current_role=current_role,
+            message_id=sent_survey.message_id,
         )
+        # game_data["to_delete"].append(
+        #     [player_id, sent_survey.message_id]
+        # )
+        # await get_state_and_assign(
+        #     dispatcher=self.dispatcher,
+        #     chat_id=player_id,
+        #     bot_id=self.bot.id,
+        #     new_state=current_role.state_for_waiting_for_action,
+        # )
+
+    async def save_msg_to_delete_and_change_state(
+        self,
+        game_data: GameCache,
+        player_id: int,
+        current_role: Role,
+        message_id: int,
+    ):
+        game_data["to_delete"].append([player_id, message_id])
         await get_state_and_assign(
             dispatcher=self.dispatcher,
             chat_id=player_id,
@@ -95,6 +116,7 @@ class MailerToPlayers:
                 )
             ):
                 continue
+
             key = (
                 current_role.for_notifications
                 if current_role.for_notifications
@@ -103,31 +125,24 @@ class MailerToPlayers:
             roles = game_data[key]
             if not roles:
                 continue
+            if current_role.own_mailing_markup:
+                sent_survey = await self.bot.send_message(
+                    chat_id=roles[0],
+                    text=current_role.mail_message,
+                    reply_markup=current_role.own_mailing_markup,
+                )
+                await self.save_msg_to_delete_and_change_state(
+                    game_data=game_data,
+                    player_id=roles[0],
+                    current_role=current_role,
+                    message_id=sent_survey.message_id,
+                )
+                return
             await self.send_survey(
                 player_id=roles[0],
                 current_role=current_role,
                 game_data=game_data,
             )
-            # exclude = []
-            # player_id = roles[0]
-            # if current_role.is_self_selecting is False:
-            #     exclude = [player_id]
-            # if current_role.last_interactive_key:
-            #     exclude += game_data[
-            #         current_role.last_interactive_key
-            #     ]
-            # markup = send_selection_to_players_kb(
-            #     players_ids=game_data["players_ids"],
-            #     players=game_data["players"],
-            #     exclude=exclude,
-            #     extra_buttons=current_role.extra_buttons_for_actions_at_night,
-            # )
-            # await self.send_survey(
-            #     player_id=player_id,
-            #     current_role=current_role,
-            #     markup=markup,
-            #     game_data=game_data,
-            # )
             if (
                 current_role.alias
                 and current_role.alias.is_mass_mailing_list
@@ -139,37 +154,6 @@ class MailerToPlayers:
                         current_role=current_role,
                         game_data=game_data,
                     )
-            # sent_survey = await self.bot.send_message(
-            #     chat_id=player_id,
-            #     text=current_role.mail_message,
-            #     reply_markup=markup,
-            # )
-            # game_data["to_delete"].append(
-            #     [player_id, sent_survey.message_id]
-            # )
-            # await get_state_and_assign(
-            #     dispatcher=self.dispatcher,
-            #     chat_id=player_id,
-            #     bot_id=self.bot.id,
-            #     new_state=current_role.state_for_waiting_for_action,
-            # )
-            # if current_role.alias:
-            #     current_role = current_role.alias.role
-            #     for user_id in roles[1:]:
-            #         sent_survey = await self.bot.send_message(
-            #             chat_id=user_id,
-            #             text=current_role.mail_message,
-            #             reply_markup=markup,
-            #         )
-            #         game_data["to_delete"].append(
-            #             [player_id, sent_survey.message_id]
-            #         )
-            #         await get_state_and_assign(
-            #             dispatcher=self.dispatcher,
-            #             chat_id=player_id,
-            #             bot_id=self.bot.id,
-            #             new_state=current_role.state_for_waiting_for_action,
-            #         )
 
     async def send_info_to_player(
         self, game_data: GameCache, role: Roles, key: str

@@ -9,12 +9,16 @@ from typing import (
     Self,
 )
 
-from aiogram import Bot
+from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.types import InlineKeyboardButton
+from telebot.types import InlineKeyboardMarkup
 
 from keyboards.inline.cb.cb_text import DRAW_CB
+from keyboards.inline.keypads.mailing import (
+    kill_or_check_on_policeman,
+)
 from states.states import UserFsm
 from utils.utils import make_pretty, get_profiles
 from utils.validators import is_not_sleeping_killer
@@ -234,6 +238,14 @@ class Alias:
             )
 
 
+async def mail_policeman(
+    player_id: int,
+    dispatcher: Dispatcher,
+    bot_id: int,
+):
+    markup = kill_or_check_on_policeman()
+
+
 @dataclass
 class Role:
     role: str
@@ -258,6 +270,7 @@ class Role:
     mailing_being_sent: Callable | None = None
     alias: Alias | None = None
     is_alias: bool = False
+    own_mailing_markup: InlineKeyboardMarkup | None = None
 
 
 class AliasesRole(enum.Enum):
@@ -341,12 +354,13 @@ class Roles(enum.Enum):
         "1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x",
         grouping=Groupings.civilians,
         purpose="Тебе нужно вычислить мафию или уничтожить её. Только ты можешь принимать решения.",
-        message_to_group_after_action="Работает местная полиция! Всем жителям приказано сидеть дома!",
-        message_to_user_after_action="Ты выбрал узнать роль {url}",
-        mail_message="Кого проверить этой ночью?",
+        message_to_group_after_action="В город введены войска! Идет перестрелка!",
+        message_to_user_after_action="Ты выбрал убить {url}",
+        mail_message="Какие меры примешь для ликвидации мафии?",
         state_for_waiting_for_action=UserFsm.POLICEMAN_CHECKS,
         can_kill_at_night_and_survive=True,
         alias=Alias(role=AliasesRole.general),
+        own_mailing_markup=kill_or_check_on_policeman(),
     )
     sleeper = Role(
         role="Клофелинщица",
