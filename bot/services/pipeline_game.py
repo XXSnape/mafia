@@ -193,7 +193,7 @@ class Game:
         roles_tpl = tuple(Roles)
         roles = (
             roles_tpl[:3]
-            + (AliasesRole.general,)
+            + (AliasesRole.nurse,)
             + (AliasesRole.mafia,)
             + roles_tpl[3:]
         )
@@ -215,6 +215,9 @@ class Game:
             game_data["players"][str(user_id)][
                 "enum_name"
             ] = role.name
+            game_data["players"][str(user_id)][
+                "roles_key"
+            ] = current_role.roles_key
             roles.append(user_id)
         await self.state.set_data(game_data)
 

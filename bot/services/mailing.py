@@ -284,6 +284,7 @@ class MailerToPlayers:
         game_data: GameCache = await self.state.get_data()
         for role in Roles:
             current_role: Role = role.value
+
             roles = game_data.get(current_role.roles_key)
             if not roles:
                 continue

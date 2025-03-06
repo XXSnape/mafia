@@ -16,7 +16,6 @@ from cache.cache_types import (
     ChatsAndMessagesIds,
     Roles,
     Role,
-    PlayersIds,
     RolesKeysLiteral,
     AliasesRole,
 )
@@ -42,7 +41,7 @@ def check_end_of_game(async_func: Callable):
         if not game_data["mafias"]:
             raise GameIsOver(winner=Groupings.civilians)
 
-        if len(game_data["mafias"]) > (
+        if len(game_data["mafias"]) >= (
             len(game_data["players_ids"]) - len(game_data["mafias"])
         ):
             raise GameIsOver(winner=Groupings.criminals)
@@ -396,16 +395,13 @@ class Executor:
         roles = {}
         for role in Roles:
             current_role: Role = role.value
-            roles[current_role.role] = game_data[
+            roles[current_role.roles_key] = game_data[
                 current_role.roles_key
             ]
-        for alias_role in AliasesRole:
-            current_role: Role = alias_role.value
-            roles[current_role.role] = game_data[
-                current_role.roles_key
-            ]
-        user_role = game_data["players"][str(user_id)]["role"]
-        roles[user_role].remove(user_id)
+        user_roles_key = game_data["players"][str(user_id)][
+            "roles_key"
+        ]
+        roles[user_roles_key].remove(user_id)
         current_enum = Roles[
             game_data["players"][str(user_id)]["enum_name"]
         ]

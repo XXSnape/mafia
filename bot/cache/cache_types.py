@@ -29,6 +29,7 @@ class UserGameCache(TypedDict):
     pretty_role: NotRequired[str]
     initial_role: str
     enum_name: str
+    roles_key: str
 
 
 UserIdStr: TypeAlias = str
@@ -148,45 +149,6 @@ LastProcessedLiteral = Literal[
     "last_tracked_by_agent",
     "last_asleep_by_sleeper",
 ]
-
-
-# async def don_died(
-#     state: FSMContext,
-#     bot: Bot,
-#     current_id: int,
-# ):
-#     game_data: GameCache = await state.get_data()
-#
-#     url = game_data["players"][str(current_id)]["url"]
-#     role = game_data["players"][str(current_id)]["pretty_role"]
-#
-#     mafias = game_data["mafias"]
-#     if not mafias:
-#         return
-#     new_don_id = mafias[0]
-#     new_don_url = game_data["players"][str(new_don_id)]["url"]
-#     game_data["players"][str(new_don_id)][
-#         "role"
-#     ] = Roles.don.value.role
-#     game_data["players"][str(new_don_id)]["pretty_role"] = (
-#         make_pretty(Roles.don.value.role)
-#     )
-#     game_data["players"][str(new_don_id)][
-#         "enum_name"
-#     ] = Roles.don.name
-#     await state.set_data(game_data)
-#     profiles = get_profiles(
-#         live_players_ids=game_data["mafias"],
-#         players=game_data["players"],
-#         role=True,
-#     )
-#     for mafia_id in mafias:
-#         await bot.send_message(
-#             chat_id=mafia_id,
-#             text=f"Погиб {role} {url}.\n"
-#             f"Новый {role} {new_don_url}\n\n"
-#             f"Текущие союзники:\n{profiles}",
-#         )
 
 
 class Groupings(StrEnum):
@@ -323,6 +285,17 @@ class AliasesRole(enum.Enum):
         can_kill_at_night_and_survive=True,
         is_alias=True,
     )
+    nurse = Role(
+        role="Медсестра",
+        roles_key="doctors",
+        processed_users_key="treated_by_doctor",
+        photo="https://cdn.culture.ru/images/e2464a8d-222e-54b1-9016-86f63e902959",
+        grouping=Groupings.civilians,
+        purpose="Тебе нужно все всем помогать главврачу. "
+        "В случае его смерти вступишь в должность.",
+        state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
+        is_alias=True,
+    )
 
 
 class Roles(enum.Enum):
@@ -345,18 +318,20 @@ class Roles(enum.Enum):
         ),
     )
     doctor = Role(
-        role="Доктор",
+        role="Главный врач",
         roles_key="doctors",
         processed_users_key="treated_by_doctor",
         last_interactive_key="last_treated_by_doctor",
         photo="https://gipermed.ru/upload/iblock/4bf/4bfa55f59ceb538bd2c8c437e8f71e5a.jpg",
         grouping=Groupings.civilians,
-        purpose="Тебе нужно стараться лечить тех, кому нужна помощь.",
+        purpose="Тебе нужно стараться лечить тех, кому нужна помощь. "
+        "Только ты можешь принимать решения.",
         message_to_group_after_action="Доктор спешит кому-то на помощь!",
         message_to_user_after_action="Ты выбрал вылечить {url}",
         mail_message="Кого вылечить этой ночью?",
         is_self_selecting=True,
         state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
+        alias=Alias(role=AliasesRole.nurse),
     )
     policeman = Role(
         role="Маршал. Верховный главнокомандующий армии",
