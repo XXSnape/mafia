@@ -124,7 +124,7 @@ async def policeman_chose_to_check(
     ]
     role = game_data["players"][str(checked_user_id)]["pretty_role"]
     url = game_data["players"][str(checked_user_id)]["url"]
-    text = f"{url} - {role}!"
+    game_data["disclosed_roles"].append([checked_user_id, role])
     await callback.message.delete()
     await callback.bot.send_message(
         chat_id=game_data["game_chat"],
@@ -133,7 +133,10 @@ async def policeman_chose_to_check(
     await asyncio.gather(
         *(
             callback.bot.send_message(
-                chat_id=policeman_id, text=text
+                chat_id=policeman_id,
+                text=f"{game_data['players'][str(callback.from_user.id)]['pretty_role']} "
+                f"{game_data['players'][str(callback.from_user.id)]['url']} "
+                f"решил проверить {url}",
             )
             for policeman_id in game_data[
                 Roles.policeman.value.roles_key

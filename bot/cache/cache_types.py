@@ -112,6 +112,7 @@ class GameCache(TypedDict, total=True):
     talked: PlayersIds
     tracking: TrackingData
 
+    disclosed_roles: list
     sleepers: PlayersIds
     cancelled: PlayersIds
 
@@ -172,6 +173,7 @@ class Groupings(StrEnum):
 
 
 ListToProcessLiteral = Literal[
+    "disclosed_roles",
     "killed_by_killer",
     "cancelled",
     "angels_died",
@@ -354,6 +356,27 @@ class Roles(enum.Enum):
             role=AliasesRole.mafia, is_mass_mailing_list=True
         ),
     )
+    policeman = Role(
+        role="Маршал. Верховный главнокомандующий армии",
+        roles_key="policeman",
+        processed_users_key="killed_by_policeman",
+        photo="https://avatars.mds.yandex.net/get-kinopoisk-image/"
+        "1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x",
+        grouping=Groupings.civilians,
+        purpose="Тебе нужно вычислить мафию или уничтожить её. Только ты можешь принимать решения.",
+        message_to_group_after_action="В город введены войска! Идет перестрелка!",
+        message_to_user_after_action="Ты выбрал убить {url}",
+        interactive_with=InteractiveWithData(
+            mail_message="Какие меры примешь для ликвидации мафии?",
+            own_mailing_markup=kill_or_check_on_policeman(),
+        ),
+        # mail_message="Какие меры примешь для ликвидации мафии?",
+        state_for_waiting_for_action=UserFsm.POLICEMAN_CHECKS,
+        can_kill_at_night_and_survive=True,
+        alias=Alias(role=AliasesRole.general),
+        extra_data=[ExtraCache(key="disclosed_roles")],
+        # own_mailing_markup=kill_or_check_on_policeman(),
+    )
     doctor = Role(
         role="Главный врач",
         roles_key="doctors",
@@ -422,26 +445,6 @@ class Roles(enum.Enum):
         extra_data=[
             ExtraCache(key="tracking", data_type=dict),
         ],
-    )
-    policeman = Role(
-        role="Маршал. Верховный главнокомандующий армии",
-        roles_key="policeman",
-        processed_users_key="killed_by_policeman",
-        photo="https://avatars.mds.yandex.net/get-kinopoisk-image/"
-        "1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x",
-        grouping=Groupings.civilians,
-        purpose="Тебе нужно вычислить мафию или уничтожить её. Только ты можешь принимать решения.",
-        message_to_group_after_action="В город введены войска! Идет перестрелка!",
-        message_to_user_after_action="Ты выбрал убить {url}",
-        interactive_with=InteractiveWithData(
-            mail_message="Какие меры примешь для ликвидации мафии?",
-            own_mailing_markup=kill_or_check_on_policeman(),
-        ),
-        # mail_message="Какие меры примешь для ликвидации мафии?",
-        state_for_waiting_for_action=UserFsm.POLICEMAN_CHECKS,
-        can_kill_at_night_and_survive=True,
-        alias=Alias(role=AliasesRole.general),
-        # own_mailing_markup=kill_or_check_on_policeman(),
     )
 
     agent = Role(

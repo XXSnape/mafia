@@ -189,6 +189,13 @@ class MailerToPlayers:
 
     async def send_promised_information_to_users(self):
         game_data: GameCache = await self.state.get_data()
+        if game_data["disclosed_roles"]:
+            user_id, role = game_data["disclosed_roles"][0]
+            for policeman_id in game_data["policeman"]:
+                url = game_data["players"][str(user_id)]["url"]
+                await self.bot.send_message(
+                    chat_id=policeman_id, text=f"{url} - {role}!"
+                )
         await self.send_info_to_player(
             game_data=game_data,
             role=Roles.journalist,

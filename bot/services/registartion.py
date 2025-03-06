@@ -61,6 +61,7 @@ async def init_game(message: Message, state: FSMContext):
         "missed": [],
         "analysts": [],
         "hackers": [],
+        "disclosed_roles": [],
         "predicted": [],
         "sleepers": [],
         "killers": [],
