@@ -80,6 +80,7 @@ async def init_game(message: Message, state: FSMContext):
         "text_about_checks": "",
         # 'wait_for': [],
         "number_of_night": 0,
+        "traitors": [],
     }
     await state.set_data(game_data)
     await state.set_state(GameFsm.REGISTRATION)

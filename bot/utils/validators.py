@@ -1,3 +1,4 @@
+from functools import partial
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -15,15 +16,29 @@ def remind_commissioner_about_inspections(
     )
 
 
-def are_not_sleeping_killers(game_data: "GameCache") -> "PlayersIds":
+def are_not_sleeping(
+    game_data: "GameCache", key: str, is_equal: bool
+) -> "PlayersIds":
+    if is_equal:
+        if game_data["number_of_night"] % 2 == 0:
+            return game_data[key]
+        return []
     if game_data["number_of_night"] % 2 != 0:
-        return game_data["killers"]
+        return game_data[key]
     return []
 
 
-def is_4_at_night(game_daya: "GameCache") -> "PlayersIds":
-    if game_daya["number_of_night"] == 4:
-        return game_daya["werewolves"]
+are_not_sleeping_killers = partial(
+    are_not_sleeping, key="killers", is_equal=False
+)
+are_not_sleeping_traits = partial(
+    are_not_sleeping, key="traitors", is_equal=True
+)
+
+
+def is_4_at_night(game_data: "GameCache") -> "PlayersIds":
+    if game_data["number_of_night"] == 4:
+        return game_data["werewolves"]
     return []
 
 

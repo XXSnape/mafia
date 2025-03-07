@@ -15,6 +15,8 @@ from .sleepers import router as sleepers_router
 from .killers import router as killers_router
 from .forgers import router as forgers_router
 from .werewolves import router as werewolves_router
+from .traitors import router as traitors_router
+
 
 router = Router(name=__name__)
 router.include_routers(
@@ -33,4 +35,5 @@ router.include_routers(
     killers_router,
     forgers_router,
     werewolves_router,
+    traitors_router,
 )

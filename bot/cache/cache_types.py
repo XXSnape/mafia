@@ -8,7 +8,7 @@ from typing import (
     Literal,
 )
 
-from aiogram import Bot, Dispatcher
+from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.types import InlineKeyboardButton
@@ -22,10 +22,11 @@ from keyboards.inline.keypads.mailing import (
 from states.states import UserFsm
 from utils.utils import make_pretty, get_profiles
 from utils.validators import (
-    are_not_sleeping_killers,
     angel_died_2_nights_ago_or_earlier,
     is_4_at_night,
     remind_commissioner_about_inspections,
+    are_not_sleeping_killers,
+    are_not_sleeping_traits,
 )
 
 Url: TypeAlias = str
@@ -111,6 +112,7 @@ class GameCache(TypedDict, total=True):
     cant_vote: PlayersIds
     missed: PlayersIds
     analysts: PlayersIds
+    traitors: PlayersIds
     predicted: PlayersIds
     punishers: PlayersIds
     journalists: PlayersIds
@@ -139,6 +141,7 @@ class GameCache(TypedDict, total=True):
 from enum import StrEnum
 
 RolesKeysLiteral = Literal[
+    "traitors",
     "werewolves",
     "forgers",
     "hackers",
@@ -324,6 +327,7 @@ class AliasesRole(enum.Enum):
         can_kill_at_night_and_survive=True,
         is_alias=True,
     )
+
     general = Role(
         role="Генерал",
         roles_key="policeman",
@@ -369,6 +373,42 @@ class Roles(enum.Enum):
         alias=Alias(
             role=AliasesRole.mafia, is_mass_mailing_list=True
         ),
+    )
+    traitor = Role(
+        role="Госизменщик",
+        roles_key="traitors",
+        processed_users_key=None,
+        photo="https://i.playground.ru/p/sLHLRFjDy8_89wYe26RIQw.jpeg",
+        grouping=Groupings.criminals,
+        purpose="Ты можешь просыпаться каждую 2-ую ночь и узнавать роль других игроков для .",
+        message_to_group_after_action="Мафия и Даркнет. Что может сочетаться лучше?"
+        " Поддельные ксивы помогают узнавать правду!",
+        message_to_user_after_action="Ты выбрал узнать роль {url}",
+        interactive_with=InteractiveWithData(
+            mail_message="Кого проверишь для мафии?",
+            players_to_send_messages=are_not_sleeping_traits,
+        ),
+        state_for_waiting_for_action=UserFsm.TRAITOR_FINDS_OUT,
+    )
+    killer = Role(
+        role="Наёмный убийца",
+        roles_key="killers",
+        processed_users_key="killed_by_killer",
+        photo="https://steamuserimages-a.akamaihd.net/ugc/633105202506112549/"
+        "988D53D1D6BF2FAC4665E453F736C438F601DF6D/"
+        "?imw=512&imh=512&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true",
+        grouping=Groupings.criminals,
+        purpose="Ты убиваешь, кого захочешь, а затем восстанавливаешь свои силы целую ночь.",
+        message_to_group_after_action="ЧВК продолжают работать на территории города!",
+        message_to_user_after_action="Ты решился ликвидировать {url}",
+        interactive_with=InteractiveWithData(
+            mail_message="Реши, кому поможешь этой ночью решить проблемы и убить врага!",
+            players_to_send_messages=are_not_sleeping_killers,
+        ),
+        # mail_message="Реши, кому поможешь этой ночью решить проблемы и убить врага!",
+        state_for_waiting_for_action=UserFsm.KILLER_ATTACKS,
+        can_kill_at_night_and_survive=True,
+        # mailing_being_sent=is_not_sleeping_killer,
     )
     werewolf = Role(
         role="Оборотень",
@@ -467,26 +507,6 @@ class Roles(enum.Enum):
         photo="https://i.pinimg.com/originals/d0/e0/b5/d0e0b5198b0ea334fa243b9afd459f6b.png",
         grouping=Groupings.civilians,
         purpose="Ты можешь прослушивать диалоги мафии и узнавать, за кого они голосуют",
-    )
-    killer = Role(
-        role="Наёмный убийца",
-        roles_key="killers",
-        processed_users_key="killed_by_killer",
-        photo="https://steamuserimages-a.akamaihd.net/ugc/633105202506112549/"
-        "988D53D1D6BF2FAC4665E453F736C438F601DF6D/"
-        "?imw=512&imh=512&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true",
-        grouping=Groupings.criminals,
-        purpose="Ты убиваешь, кого захочешь, а затем восстанавливаешь свои силы целую ночь.",
-        message_to_group_after_action="ЧВК продолжают работать на территории города!",
-        message_to_user_after_action="Ты решился ликвидировать {url}",
-        interactive_with=InteractiveWithData(
-            mail_message="Реши, кому поможешь этой ночью решить проблемы и убить врага!",
-            players_to_send_messages=are_not_sleeping_killers,
-        ),
-        # mail_message="Реши, кому поможешь этой ночью решить проблемы и убить врага!",
-        state_for_waiting_for_action=UserFsm.KILLER_ATTACKS,
-        can_kill_at_night_and_survive=True,
-        # mailing_being_sent=is_not_sleeping_killer,
     )
     sleeper = Role(
         role="Клофелинщица",

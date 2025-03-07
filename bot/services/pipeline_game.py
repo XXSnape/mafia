@@ -217,8 +217,3 @@ class Game:
             ] = current_role.roles_key
             roles.append(user_id)
         await self.state.set_data(game_data)
-
-
-# class Role(NamedTuple):
-#     players: list[int]
-#     role: str

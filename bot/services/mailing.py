@@ -149,7 +149,7 @@ class MailerToPlayers:
                 continue
             roles = (
                 current_role.interactive_with.players_to_send_messages(
-                    game_data
+                    game_data=game_data
                 )
                 if current_role.interactive_with.players_to_send_messages
                 else game_data[current_role.roles_key]
