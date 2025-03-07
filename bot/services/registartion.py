@@ -60,6 +60,7 @@ async def init_game(message: Message, state: FSMContext):
         "cant_vote": [],
         "forgers": [],
         "missed": [],
+        "werewolves": [],
         "analysts": [],
         "hackers": [],
         "disclosed_roles": [],
@@ -76,6 +77,7 @@ async def init_game(message: Message, state: FSMContext):
         "last_self_protected_by_bodyguard": {},
         "last_tracked_by_agent": {},
         "last_asleep_by_sleeper": {},
+        "text_about_checks": "",
         # 'wait_for': [],
         "number_of_night": 0,
     }

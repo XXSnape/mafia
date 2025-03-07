@@ -93,7 +93,7 @@ class Game:
         )
         await self.mailer.mailing()
         game_data["angels_died"].clear()
-        await asyncio.sleep(30)
+        await asyncio.sleep(15)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
@@ -192,7 +192,7 @@ class Game:
         shuffle(ids)
         roles_tpl = tuple(Roles)
         roles = (
-            roles_tpl[:3]
+            roles_tpl[:4]
             + (AliasesRole.general,)
             + (AliasesRole.mafia,)
             + roles_tpl[3:]
@@ -204,9 +204,6 @@ class Game:
                 "role"
             ] = current_role.role
             game_data["players"][str(user_id)]["pretty_role"] = (
-                make_pretty(current_role.role)
-            )
-            game_data["players"][str(user_id)]["initial_role"] = (
                 make_pretty(current_role.role)
             )
             game_data["players"][str(user_id)]["initial_role"] = (

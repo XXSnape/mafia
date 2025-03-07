@@ -24,4 +24,5 @@ class UserFsm(StatesGroup):
     KILLER_ATTACKS = State()
     DON_ATTACKS = State()
     FORGER_FAKES = State()
+    WEREWOLF_TURNS_INTO = State()
     WAIT_FOR_LATEST_LETTER = State()

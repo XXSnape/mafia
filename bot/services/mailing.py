@@ -6,7 +6,7 @@ from typing import Literal
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
-from telebot.types import InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardMarkup
 
 from cache.cache_types import (
     GameCache,
@@ -85,36 +85,12 @@ class MailerToPlayers:
         current_role: Role,
         game_data: GameCache,
     ):
-        # exclude = []
-        # current_number = game_data["number_of_night"]
-        # if current_role.interactive_with.is_self_selecting is False:
-        #     exclude = [player_id]
-        # for processed_user_id, number in game_data.get(
-        #     current_role.interactive_with.last_interactive_key, {}
-        # ).items():
-        #     if int(processed_user_id) == player_id:
-        #         constraint = current_role.interactive_with.self
-        #     else:
-        #         constraint = current_role.interactive_with.other
-        #     if constraint is None:
-        #         exclude.append(int(processed_user_id))
-        #     elif (current_number - number) < constraint + 1:
-        #         exclude.append(int(processed_user_id))
-        # if game_data["players_ids"] == exclude:
-        #     return
 
         markup = self.generate_markup(
             player_id=player_id,
             current_role=current_role,
             game_data=game_data,
         )
-
-        # markup = send_selection_to_players_kb(
-        #     players_ids=game_data["players_ids"],
-        #     players=game_data["players"],
-        #     exclude=exclude,
-        #     extra_buttons=current_role.extra_buttons_for_actions_at_night,
-        # )
         sent_survey = await self.bot.send_message(
             chat_id=player_id,
             text=current_role.interactive_with.mail_message,
@@ -142,33 +118,69 @@ class MailerToPlayers:
             new_state=current_role.state_for_waiting_for_action,
         )
 
+    async def send_survey_to_aliases(
+        self,
+        current_role: Role,
+        roles: PlayersIds,
+        extra_text: str | None,
+        game_data: GameCache,
+    ):
+        if current_role.alias and len(roles) > 1:
+            alias_role = current_role.alias.role.value
+            for user_id in roles[1:]:
+                if extra_text:
+                    await self.bot.send_message(
+                        chat_id=user_id, text=extra_text
+                    )
+                if current_role.alias.is_mass_mailing_list:
+                    await self.send_survey(
+                        player_id=user_id,
+                        current_role=alias_role,
+                        game_data=game_data,
+                    )
+
     async def mailing(self):
         game_data: GameCache = await self.state.get_data()
-        pprint(game_data)
         for role in Roles:
-            print("hello")
             current_role: Role = role.value
             if (current_role.roles_key not in game_data) or (
                 current_role.interactive_with is None
             ):
-                print(current_role.roles_key, "not in game data")
                 continue
-            if (
-                current_role.interactive_with.players_to_send_messages
-            ):
-                roles = current_role.interactive_with.players_to_send_messages(
+            roles = (
+                current_role.interactive_with.players_to_send_messages(
                     game_data
                 )
-            else:
-                roles = game_data[current_role.roles_key]
-                print("roles", roles)
+                if current_role.interactive_with.players_to_send_messages
+                else game_data[current_role.roles_key]
+            )
             if not roles:
                 continue
+            extra_text = None
+            if current_role.interactive_with.additional_text_func:
+                extra_text = current_role.interactive_with.additional_text_func(
+                    game_data
+                )
+            if extra_text:
+                await self.bot.send_message(
+                    chat_id=roles[0], text=extra_text
+                )
             if current_role.interactive_with.own_mailing_markup:
+                if isinstance(
+                    current_role.interactive_with.own_mailing_markup,
+                    InlineKeyboardMarkup,
+                ):
+                    markup = (
+                        current_role.interactive_with.own_mailing_markup
+                    )
+                else:
+                    markup = current_role.interactive_with.own_mailing_markup(
+                        game_data
+                    )
                 sent_survey = await self.bot.send_message(
                     chat_id=roles[0],
                     text=current_role.interactive_with.mail_message,
-                    reply_markup=current_role.interactive_with.own_mailing_markup,
+                    reply_markup=markup,
                 )
                 await self.save_msg_to_delete_and_change_state(
                     game_data=game_data,
@@ -176,24 +188,24 @@ class MailerToPlayers:
                     current_role=current_role,
                     message_id=sent_survey.message_id,
                 )
+                await self.send_survey_to_aliases(
+                    current_role=current_role,
+                    roles=roles,
+                    extra_text=extra_text,
+                    game_data=game_data,
+                )
                 continue
             await self.send_survey(
                 player_id=roles[0],
                 current_role=current_role,
                 game_data=game_data,
             )
-            if (
-                current_role.alias
-                and current_role.alias.is_mass_mailing_list
-            ):
-                current_role = current_role.alias.role.value
-                for user_id in roles[1:]:
-                    await self.send_survey(
-                        player_id=user_id,
-                        current_role=current_role,
-                        game_data=game_data,
-                    )
-        print("end mail")
+            await self.send_survey_to_aliases(
+                current_role=current_role,
+                roles=roles,
+                extra_text=extra_text,
+                game_data=game_data,
+            )
 
     async def send_info_to_player(
         self, game_data: GameCache, role: Roles, key: str
@@ -237,11 +249,13 @@ class MailerToPlayers:
                 faked_id, faked_role = game_data["forged_roles"][0]
                 if faked_id == user_id:
                     role = faked_role
+            url = game_data["players"][str(user_id)]["url"]
+            text = f"{url} - {role}!"
             for policeman_id in game_data["policeman"]:
-                url = game_data["players"][str(user_id)]["url"]
                 await self.bot.send_message(
-                    chat_id=policeman_id, text=f"{url} - {role}!"
+                    chat_id=policeman_id, text=text
                 )
+            game_data["text_about_checks"] += text + "\n"
         await self.send_info_to_player(
             game_data=game_data,
             role=Roles.journalist,
@@ -250,6 +264,7 @@ class MailerToPlayers:
         await self.send_info_to_player(
             game_data=game_data, role=Roles.agent, key="sufferers"
         )
+        await self.state.set_data(game_data)
 
     async def send_request_to_vote(
         self,
@@ -330,7 +345,7 @@ class MailerToPlayers:
                 f"{make_pretty(current_role.role)}! "
                 f"{current_role.purpose}",
             )
-            if current_role.alias:
+            if current_role.alias and len(roles) > 1:
                 profiles = get_profiles(
                     live_players_ids=roles,
                     players=game_data["players"],

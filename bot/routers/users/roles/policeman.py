@@ -74,8 +74,8 @@ async def policeman_makes_choice(
 )
 async def policeman_cancels_selection(callback: CallbackQuery):
     await callback.message.edit_text(
-        text=Roles.policeman.value.mail_message,
-        reply_markup=Roles.policeman.value.own_mailing_markup,
+        text=Roles.policeman.value.interactive_with.mail_message,
+        reply_markup=Roles.policeman.value.interactive_with.own_mailing_markup,
     )
 
 

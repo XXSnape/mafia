@@ -17,12 +17,15 @@ from telebot.types import InlineKeyboardMarkup
 from keyboards.inline.cb.cb_text import DRAW_CB
 from keyboards.inline.keypads.mailing import (
     kill_or_check_on_policeman,
+    send_transformation_kb,
 )
 from states.states import UserFsm
 from utils.utils import make_pretty, get_profiles
 from utils.validators import (
     are_not_sleeping_killers,
     angel_died_2_nights_ago_or_earlier,
+    is_4_at_night,
+    remind_commissioner_about_inspections,
 )
 
 Url: TypeAlias = str
@@ -91,6 +94,7 @@ class GameCache(TypedDict, total=True):
     agents: PlayersIds
     killers: PlayersIds
     forgers: PlayersIds
+    werewolves: PlayersIds
 
     tracked: PlayersIds
     angels_died: PlayersIds
@@ -117,6 +121,7 @@ class GameCache(TypedDict, total=True):
     forged_roles: list
     sleepers: PlayersIds
     cancelled: PlayersIds
+    text_about_checks: str
 
     last_forgers: InteractiveWithHistory
     last_treated_by_doctor: InteractiveWithHistory
@@ -134,6 +139,7 @@ class GameCache(TypedDict, total=True):
 from enum import StrEnum
 
 RolesKeysLiteral = Literal[
+    "werewolves",
     "forgers",
     "hackers",
     "killers",
@@ -178,6 +184,7 @@ class Groupings(StrEnum):
 
 
 ListToProcessLiteral = Literal[
+    "text_about_checks",
     "forged_roles",
     "disclosed_roles",
     "killed_by_killer",
@@ -262,11 +269,12 @@ class InteractiveWithData:
     other: int = 1
     self: int = 1
 
+    additional_text_func: Callable | None = None
     # mailing_being_sent: Callable | None = None
     # for_notifications: ListToProcessLiteral | None = None
 
     players_to_send_messages: Callable | None = None
-    own_mailing_markup: InlineKeyboardMarkup | None = None
+    own_mailing_markup: InlineKeyboardMarkup | Callable | None = None
 
 
 @dataclass
@@ -362,6 +370,25 @@ class Roles(enum.Enum):
             role=AliasesRole.mafia, is_mass_mailing_list=True
         ),
     )
+    werewolf = Role(
+        role="Оборотень",
+        roles_key="werewolves",
+        processed_users_key=None,
+        photo="https://sun9-42.userapi.com/impf/c303604/v303604068/"
+        "170c/FXQRtSk8e28.jpg?size=484x604&quality=96&sign=bf5555ef2b801954b0b92848975525fd&type=album"
+        "?imw=512&imh=512&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true",
+        grouping=Groupings.civilians,
+        purpose="На 4 ночь ты сможешь превратиться в мафию, маршала или доктора.",
+        # message_to_group_after_action="Кто-то совершает ",
+        # message_to_user_after_action="Ты решился ликвидировать {url}",
+        interactive_with=InteractiveWithData(
+            mail_message="Реши, в кого сегодня превратишься!",
+            players_to_send_messages=is_4_at_night,
+            own_mailing_markup=send_transformation_kb,
+        ),
+        # mail_message="Реши, кому поможешь этой ночью решить проблемы и убить врага!",
+        state_for_waiting_for_action=UserFsm.WEREWOLF_TURNS_INTO,
+    )
     policeman = Role(
         role="Маршал. Верховный главнокомандующий армии",
         roles_key="policeman",
@@ -375,34 +402,21 @@ class Roles(enum.Enum):
         interactive_with=InteractiveWithData(
             mail_message="Какие меры примешь для ликвидации мафии?",
             own_mailing_markup=kill_or_check_on_policeman(),
+            additional_text_func=remind_commissioner_about_inspections,
         ),
         # mail_message="Какие меры примешь для ликвидации мафии?",
         state_for_waiting_for_action=UserFsm.POLICEMAN_CHECKS,
         can_kill_at_night_and_survive=True,
         alias=Alias(role=AliasesRole.general),
-        extra_data=[ExtraCache(key="disclosed_roles")],
+        extra_data=[
+            ExtraCache(key="disclosed_roles"),
+            ExtraCache(
+                key="text_about_checks",
+                is_cleared=False,
+                data_type=str,
+            ),
+        ],
         # own_mailing_markup=kill_or_check_on_policeman(),
-    )
-    forger = Role(
-        role="Румпельштильцхен",
-        roles_key="forgers",
-        grouping=Groupings.criminals,
-        purpose="Ты должен обманывать комиссара и подделывать документы на свое усмотрение во имя мафии",
-        message_to_group_after_action="Говорят, в лесах завелись персонажи из Шрека, "
-        "подговорённые мафией, дискоординирующие государственную армию!",
-        photo="https://sun9-64.userapi.com/impg/R8WBtzZkQKycXDW5YCvKXUJB03XJnboRa0LDHw/"
-        "yo9Ng0yPqa0.jpg?size=604x302&quality=95&sign"
-        "=0fb255f26d2fd1775b2db1c2001f7a0b&type=album",
-        state_for_waiting_for_action=UserFsm.FORGER_FAKES,
-        processed_users_key=None,
-        interactive_with=InteractiveWithData(
-            last_interactive_key="last_forgers",
-            mail_message="Кому сегодня подделаешь документы?",
-            is_self_selecting=True,
-            self=2,
-            other=2,
-        ),
-        extra_data=[ExtraCache(key="forged_roles")],
     )
     doctor = Role(
         role="Главный врач",
@@ -424,6 +438,27 @@ class Roles(enum.Enum):
         # is_self_selecting=True,
         state_for_waiting_for_action=UserFsm.DOCTOR_TREATS,
         alias=Alias(role=AliasesRole.nurse),
+    )
+    forger = Role(
+        role="Румпельштильцхен",
+        roles_key="forgers",
+        grouping=Groupings.criminals,
+        purpose="Ты должен обманывать комиссара и подделывать документы на свое усмотрение во имя мафии",
+        message_to_group_after_action="Говорят, в лесах завелись персонажи из Шрека, "
+        "подговорённые мафией, дискоординирующие государственную армию!",
+        photo="https://sun9-64.userapi.com/impg/R8WBtzZkQKycXDW5YCvKXUJB03XJnboRa0LDHw/"
+        "yo9Ng0yPqa0.jpg?size=604x302&quality=95&sign"
+        "=0fb255f26d2fd1775b2db1c2001f7a0b&type=album",
+        state_for_waiting_for_action=UserFsm.FORGER_FAKES,
+        processed_users_key=None,
+        interactive_with=InteractiveWithData(
+            last_interactive_key="last_forgers",
+            mail_message="Кому сегодня подделаешь документы?",
+            is_self_selecting=True,
+            self=2,
+            other=2,
+        ),
+        extra_data=[ExtraCache(key="forged_roles")],
     )
     hacker = Role(
         role="Хакер",
