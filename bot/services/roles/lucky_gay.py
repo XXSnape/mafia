@@ -22,9 +22,10 @@ class LuckyGay(TreatmentMixin, Role):
         murdered: list[int],
     ):
         send_to_group = False
+
         for lucky_id in game_data[self.roles_key]:
             if lucky_id in murdered:
-                if randint(1, 10) in (1, 2, 3, 4):
+                if randint(1, 10) in ():
                     recovered.append(lucky_id)
                     game_data["messages_after_night"].append(
                         [lucky_id, "Тебе сегодня повезло"]

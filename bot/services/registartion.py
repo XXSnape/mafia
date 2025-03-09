@@ -20,6 +20,7 @@ async def init_game(message: Message, state: FSMContext):
         "cons": [],
         "players_ids": [],
         "players": {},
+        "messages_after_night": [],
         "winners": [],
         "losers": [],
         "to_delete": [],
