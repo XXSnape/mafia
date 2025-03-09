@@ -4,12 +4,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery, Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
 from cache.cache_types import GameCache
-from keyboards.inline.cb.cb_text import (
-    FINISH_REGISTRATION_CB,
-    JOIN_CB,
-)
+from keyboards.inline.cb.cb_text import FINISH_REGISTRATION_CB, JOIN_CB
 from keyboards.inline.keypads.join import get_join_kb
 from services.pipeline_game import Game
 from services.registartion import add_user_to_game, init_game

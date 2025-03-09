@@ -1,10 +1,10 @@
 from cache.cache_types import GameCache
+from cache.roleses import Groupings
 from services.roles.base import (
+    ActiveRoleAtNight,
     AliasRole,
     BossIsDeadMixin,
-    ActiveRoleAtNight,
 )
-from cache.roleses import Groupings
 from states.states import UserFsm
 from utils.utils import get_the_most_frequently_encountered_id
 
@@ -15,7 +15,11 @@ class MafiaAlias(AliasRole):
     purpose = (
         "Тебе нужно уничтожить всех горожан и подчиняться дону."
     )
-
+    is_mass_mailing_list = True
+    message_to_user_after_action = (
+        "Ты выбрал убить {url}. Но Дон может принять другое решение."
+    )
+    grouping = Groupings.criminals
     # state_for_waiting_for_action = UserFsm.MAFIA_ATTACKS
 
     def __init__(self):
@@ -45,6 +49,7 @@ class Mafia(BossIsDeadMixin, ActiveRoleAtNight):
     mail_message = "Кого убить этой ночью?"
     need_to_monitor_interaction = False
     can_kill_at_night = True
+
     alias = MafiaAlias()
 
     def get_victims(self, game_data: GameCache):

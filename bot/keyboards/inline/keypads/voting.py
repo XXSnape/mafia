@@ -1,7 +1,5 @@
 from aiogram.types import InlineKeyboardButton
-
 from cache.cache_types import PlayersIds
-
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.callback_factory.recognize_user import (
     AimedUserCbData,

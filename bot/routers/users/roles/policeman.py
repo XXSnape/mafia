@@ -3,10 +3,8 @@ import asyncio
 from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-
 from cache.cache_types import GameCache, UserCache
 from general.collection_of_roles import Roles
-
 from keyboards.inline.callback_factory.recognize_user import (
     CheckOrKill,
     PoliceActionIndexCbData,
@@ -20,12 +18,10 @@ from keyboards.inline.cb.cb_text import (
 )
 from keyboards.inline.keypads.mailing import (
     POLICEMAN_BACK_BTN,
-    send_selection_to_players_kb,
     kill_or_check_on_policeman,
+    send_selection_to_players_kb,
 )
-from services.actions_at_night import (
-    take_action_and_register_user,
-)
+from services.actions_at_night import take_action_and_register_user
 from services.roles import Policeman
 from states.states import UserFsm
 from utils.utils import get_state_and_assign

@@ -1,9 +1,8 @@
 from aiogram.types import InlineKeyboardButton
-
 from cache.cache_types import GameCache
+from cache.roleses import Groupings
 from keyboards.inline.cb.cb_text import DRAW_CB
 from services.roles.base import ActiveRoleAtNight
-from cache.roleses import Groupings
 from states.states import UserFsm
 
 

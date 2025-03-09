@@ -2,32 +2,14 @@ import asyncio
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
-
-
-from cache.cache_types import (
-    GameCache,
-    LivePlayersIds,
-    UserGameCache,
-    UsersInGame,
-)
+from cache.cache_types import GameCache, LivePlayersIds, UserGameCache, UsersInGame
 from general.collection_of_roles import Roles
+from keyboards.inline.callback_factory.recognize_user import UserVoteIndexCbData
+from keyboards.inline.keypads.mailing import send_selection_to_players_kb
+from keyboards.inline.keypads.to_bot import participate_in_social_life
 from services.roles import Prosecutor
 from services.roles.base import ActiveRoleAtNight, Role
-
-from keyboards.inline.callback_factory.recognize_user import (
-    UserVoteIndexCbData,
-)
-from keyboards.inline.keypads.mailing import (
-    send_selection_to_players_kb,
-)
-from keyboards.inline.keypads.to_bot import (
-    participate_in_social_life,
-)
-from utils.utils import (
-    get_profiles,
-    get_state_and_assign,
-    make_pretty,
-)
+from utils.utils import get_profiles, get_state_and_assign, make_pretty
 
 
 class MailerToPlayers:

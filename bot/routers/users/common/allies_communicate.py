@@ -5,7 +5,7 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from cache.cache_types import GameCache, UserCache
-from services.roles import Mafia, Hacker
+from services.roles import Hacker, Mafia
 from states.states import UserFsm
 from utils.utils import get_state_and_assign
 

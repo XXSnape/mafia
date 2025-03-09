@@ -2,9 +2,7 @@ from aiogram import Dispatcher, Router
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-from keyboards.inline.callback_factory.recognize_user import (
-    UserActionIndexCbData,
-)
+from keyboards.inline.callback_factory.recognize_user import UserActionIndexCbData
 from services.actions_at_night import take_action_and_register_user
 from states.states import UserFsm
 

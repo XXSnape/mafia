@@ -1,10 +1,10 @@
 from abc import ABC
 from typing import Callable, Optional
 
-from aiogram import Dispatcher, Bot
+from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
-from telebot.types import InlineKeyboardButton
+from aiogram.types import InlineKeyboardButton
 
 from cache.cache_types import ExtraCache, GameCache, PlayersIds
 from keyboards.inline.keypads.mailing import (

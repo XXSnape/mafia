@@ -1,7 +1,6 @@
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
-
 from cache.cache_types import (
     GameCache,
     LivePlayersIds,
@@ -9,7 +8,6 @@ from cache.cache_types import (
     UserGameCache,
     UsersInGame,
 )
-
 from states.states import GameFsm
 from utils.utils import get_profile_link, get_state_and_assign
 

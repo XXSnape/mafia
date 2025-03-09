@@ -9,9 +9,7 @@ if TYPE_CHECKING:
     from services.roles import UsersInGame, GameCache
 
 from keyboards.inline.builder import generate_inline_kb
-from keyboards.inline.callback_factory.recognize_user import (
-    UserActionIndexCbData,
-)
+from keyboards.inline.callback_factory.recognize_user import UserActionIndexCbData
 from keyboards.inline.cb.cb_text import (
     PLAYER_BACKS_CB,
     POLICEMAN_CHECKS_CB,

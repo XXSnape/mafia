@@ -4,14 +4,13 @@ from aiogram import Router
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-
 from cache.cache_types import GameCache
-from services.roles import Prosecutor, PrimeMinister
 from keyboards.inline.callback_factory.recognize_user import (
     AimedUserCbData,
     ProsAndCons,
 )
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
+from services.roles import PrimeMinister, Prosecutor
 from states.states import GameFsm
 from utils.utils import add_voice
 

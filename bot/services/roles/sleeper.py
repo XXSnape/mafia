@@ -1,8 +1,8 @@
 from cache.cache_types import ExtraCache, GameCache
-from general.collection_of_roles import Roles
-from services.roles import Policeman, Forger
-from services.roles.base import ActiveRoleAtNight, Role
 from cache.roleses import Groupings
+from general.collection_of_roles import Roles
+from services.roles import Forger, Policeman
+from services.roles.base import ActiveRoleAtNight, Role
 from states.states import UserFsm
 from utils.validators import get_object_id_if_exists
 

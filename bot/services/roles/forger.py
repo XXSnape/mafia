@@ -1,6 +1,6 @@
 from cache.cache_types import ExtraCache
-from services.roles.base import ActiveRoleAtNight
 from cache.roleses import Groupings
+from services.roles.base import ActiveRoleAtNight
 from states.states import UserFsm
 
 

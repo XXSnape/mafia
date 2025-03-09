@@ -8,15 +8,11 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
 from cache.cache_types import (
     ChatsAndMessagesIds,
     GameCache,
     UserGameCache,
 )
-
-from .roles import Lawyer
-from .roles.base import Role, BossIsDeadMixin, AliasRole
 from general.exceptions import GameIsOver
 from general.players import Groupings
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
@@ -24,15 +20,18 @@ from services.mailing import MailerToPlayers
 from states.states import GameFsm, UserFsm
 from utils.utils import (
     get_profiles,
-    get_the_most_frequently_encountered_id,
     get_state_and_assign,
+    get_the_most_frequently_encountered_id,
 )
+
 from .protocols.protocols import (
-    EarliestActionsAfterNight,
     DelayedMessagesAfterNight,
+    EarliestActionsAfterNight,
     ModificationVictims,
     VictimsOfVote,
 )
+from .roles import Lawyer
+from .roles.base import AliasRole, BossIsDeadMixin, Role
 from .roles.base.mixins import TreatmentMixin
 
 if TYPE_CHECKING:
@@ -47,7 +46,7 @@ def check_end_of_game(async_func: Callable):
         if not game_data["mafias"]:
             raise GameIsOver(winner=Groupings.civilians)
 
-        if len(game_data["mafias"]) >= (
+        if len(game_data["mafias"]) > (
             len(game_data["players_ids"]) - len(game_data["mafias"])
         ):
             raise GameIsOver(winner=Groupings.criminals)
@@ -79,14 +78,18 @@ class Executor:
         game_data: GameCache = await self.state.get_data()
         for role in self.all_roles:
             current_role: Role = self.all_roles[role]
-            if current_role.alias.is_mass_mailing_list:
+            if (
+                current_role.alias
+                and current_role.alias.is_mass_mailing_list
+                and current_role.last_interactive_key
+            ):
                 current_night = game_data["number_of_night"]
                 processed_user_id = (
                     current_role.get_processed_user_id(game_data)
                 )
                 if processed_user_id:
                     last_interactive = game_data[
-                        current_role.last_interactive
+                        current_role.last_interactive_key
                     ]
                     excess_players = [
                         user_id_str

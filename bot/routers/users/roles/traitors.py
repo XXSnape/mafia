@@ -3,12 +3,10 @@ import asyncio
 from aiogram import Dispatcher, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-from general.collection_of_roles import Roles
-from services.roles import Traitor, Mafia
 from cache.cache_types import GameCache, UserCache
-from keyboards.inline.callback_factory.recognize_user import (
-    UserActionIndexCbData,
-)
+from general.collection_of_roles import Roles
+from keyboards.inline.callback_factory.recognize_user import UserActionIndexCbData
+from services.roles import Mafia, Traitor
 from states.states import UserFsm
 from utils.utils import get_state_and_assign, make_pretty
 

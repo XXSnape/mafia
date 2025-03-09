@@ -3,13 +3,12 @@ import asyncio
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-
 from cache.cache_types import GameCache, UserCache
 from general.collection_of_roles import Roles
-from services.roles import Hacker, Mafia
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
+from services.roles import Hacker, Mafia
 from services.roles.base import Role
 from utils.utils import get_state_and_assign
 
@@ -116,11 +115,6 @@ async def inform_players_and_trace_actions(
     #     bot_id=callback.bot.id,
     # )
     # game_data: GameCache = await game_state.get_data()
-    if current_role.message_to_group_after_action:
-        await callback.bot.send_message(
-            chat_id=game_data["game_chat"],
-            text=current_role.message_to_group_after_action,
-        )
     # user_id = game_data["players_ids"][callback_data.user_index]
     url = game_data["players"][str(user_id)]["url"]
     await inform_aliases(
@@ -179,7 +173,11 @@ async def inform_players_and_trace_actions(
     #         "interacting", []
     #     )
     #     interacting.append(callback.from_user.id)
-
+    if current_role.message_to_group_after_action:
+        await callback.bot.send_message(
+            chat_id=game_data["game_chat"],
+            text=current_role.message_to_group_after_action,
+        )
     if current_role.message_to_user_after_action:
         await callback.message.delete()
         await callback.message.answer(

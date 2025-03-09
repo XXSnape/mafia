@@ -11,7 +11,7 @@ from .journalist import Journalist
 from .killer import Killer
 from .lawyer import Lawyer
 from .lucky_gay import LuckyGay
-from .mafia import MafiaAlias, Mafia
+from .mafia import Mafia, MafiaAlias
 from .masochist import Masochist
 from .policeman import Policeman, PolicemanAlias
 from .prime_minister import PrimeMinister

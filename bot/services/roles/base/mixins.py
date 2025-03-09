@@ -1,7 +1,7 @@
 from functools import total_ordering
 
 from cache.cache_types import GameCache
-from utils.utils import make_pretty, get_profiles
+from utils.utils import get_profiles, make_pretty
 
 
 class BossIsDeadMixin:

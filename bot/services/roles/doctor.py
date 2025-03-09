@@ -1,9 +1,5 @@
-from services.roles.base import (
-    AliasRole,
-    BossIsDeadMixin,
-    ActiveRoleAtNight,
-)
 from cache.roleses import Groupings
+from services.roles.base import ActiveRoleAtNight, AliasRole, BossIsDeadMixin
 from services.roles.base.mixins import TreatmentMixin
 from states.states import UserFsm
 

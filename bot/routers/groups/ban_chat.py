@@ -1,7 +1,6 @@
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
-
 from cache.cache_types import GameCache
 from services.roles import Prosecutor
 from states.states import GameFsm

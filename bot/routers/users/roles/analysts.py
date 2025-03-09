@@ -1,8 +1,8 @@
 from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-from general.collection_of_roles import Roles
 from cache.cache_types import GameCache, UserCache
+from general.collection_of_roles import Roles
 from keyboards.inline.cb.cb_text import DRAW_CB
 from services.roles import Analyst
 from states.states import UserFsm

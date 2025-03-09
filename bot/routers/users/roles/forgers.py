@@ -1,11 +1,9 @@
 from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-from general.collection_of_roles import Roles
 from cache.cache_types import GameCache, UserCache
-from keyboards.inline.callback_factory.recognize_user import (
-    UserActionIndexCbData,
-)
+from general.collection_of_roles import Roles
+from keyboards.inline.callback_factory.recognize_user import UserActionIndexCbData
 from keyboards.inline.cb.cb_text import PLAYER_BACKS_CB
 from keyboards.inline.keypads.mailing import choose_fake_role_kb
 from services.roles import Forger

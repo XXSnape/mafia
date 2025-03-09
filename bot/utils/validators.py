@@ -2,10 +2,9 @@ from collections.abc import Callable
 from functools import partial, wraps
 from typing import TYPE_CHECKING
 
-
 if TYPE_CHECKING:
-    from services.roles.base import Role
     from services.roles import GameCache, PlayersIds
+    from services.roles.base import Role
 
 
 def get_object_id_if_exists(async_func: Callable):

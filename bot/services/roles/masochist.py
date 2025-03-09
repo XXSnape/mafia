@@ -1,6 +1,6 @@
 from cache.cache_types import GameCache
-from services.roles.base import Role
 from cache.roleses import Groupings
+from services.roles.base import Role
 
 
 class Masochist(Role):

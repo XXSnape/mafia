@@ -1,6 +1,5 @@
 from dataclasses import dataclass
-from typing import TypeAlias, TypedDict, NotRequired
-
+from typing import NotRequired, TypeAlias, TypedDict
 
 # @dataclass
 # class Role:

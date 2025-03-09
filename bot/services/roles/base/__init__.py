@@ -1,2 +1,2 @@
-from .roles import Role, AliasRole, ActiveRoleAtNight
 from .mixins import BossIsDeadMixin
+from .roles import ActiveRoleAtNight, AliasRole, Role

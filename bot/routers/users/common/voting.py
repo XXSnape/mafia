@@ -8,9 +8,7 @@ from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
     UserVoteIndexCbData,
 )
-from keyboards.inline.keypads.to_bot import (
-    participate_in_social_life,
-)
+from keyboards.inline.keypads.to_bot import participate_in_social_life
 from services.roles import Instigator
 from utils.utils import get_state_and_assign
 

@@ -5,16 +5,14 @@ from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
 from cache.cache_types import GameCache, UserGameCache
-from general.collection_of_roles import get_data_with_roles, Roles
-from services.roles.base import Role
-
+from general.collection_of_roles import Roles, get_data_with_roles
 from general.exceptions import GameIsOver
 from general.players import Groupings
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
 from services.mailing import MailerToPlayers
 from services.processing import Executor
+from services.roles.base import Role
 from states.states import GameFsm
 from utils.utils import (
     get_profiles,
@@ -113,7 +111,7 @@ class Game:
             reply_markup=get_to_bot_kb("Действовать!"),
         )
         await self.mailer.mailing()
-        await asyncio.sleep(25)
+        await asyncio.sleep(35)
         # raise GameIsOver(winner=Groupings.criminals)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
