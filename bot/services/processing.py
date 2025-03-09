@@ -158,7 +158,9 @@ class Executor:
         user_info: UserGameCache = game_data["players"][
             str(removed_user_id)
         ]
-        if removed_user_id in game_data.get(Lawyer.roles_key, []):
+        if removed_user_id == Lawyer().get_processed_user_id(
+            game_data
+        ):
             for role in voting_roles:
                 await role.take_action_after_voting(
                     game_data=game_data,
