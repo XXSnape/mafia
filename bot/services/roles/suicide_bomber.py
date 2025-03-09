@@ -5,8 +5,10 @@ from services.roles.base import Role
 
 class SuicideBomber(Role):
     role = "Ночной смертник"
-    photo = ("https://sun6-22.userapi.com/impg/zAaADEA19s"
-             "cv86EFl8bY1wUYRCJyBPGg1qamiA/xjMRCUhA20g.jpg?")
+    photo = (
+        "https://sun6-22.userapi.com/impg/zAaADEA19s"
+        "cv86EFl8bY1wUYRCJyBPGg1qamiA/xjMRCUhA20g.jpg?"
+    )
     "size=1280x1280&quality=96&"
     "sign=de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag="
     "EOC9ErRHImjvmda4Qd5Pq59HPf-wUgr77rzHZvabHjc&type=album"
