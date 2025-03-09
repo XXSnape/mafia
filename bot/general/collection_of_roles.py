@@ -39,8 +39,7 @@ def get_data_with_roles():
 class Roles(enum.Enum):
     don = roles.Mafia()
     doctor = roles.Doctor()
-    analyst = roles.Analyst()
-    civilian = roles.Civilian()
+    prosecutor = roles.Prosecutor()
 
     # werewolf = roles.Werewolf()
     # forger = roles.Forger()
@@ -49,11 +48,11 @@ class Roles(enum.Enum):
     # agent = roles.Agent()
     # journalist = roles.Journalist()
     # punisher = roles.Punisher()
-    # analyst = roles.Analyst()
     # angel_of_death = roles.AngelOfDeath()
     # prosecutor = roles.Prosecutor()
-    # civilian = roles.Civilian()
 
+    # analyst = roles.Analyst()
+    # civilian = roles.Civilian()
     # lawyer = roles.Lawyer()
     # lucky_gay = roles.LuckyGay()
     # traitor = roles.Traitor()

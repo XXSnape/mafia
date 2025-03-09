@@ -2,14 +2,29 @@ import asyncio
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
-from cache.cache_types import GameCache, LivePlayersIds, UserGameCache, UsersInGame
+from cache.cache_types import (
+    GameCache,
+    LivePlayersIds,
+    UserGameCache,
+    UsersInGame,
+)
 from general.collection_of_roles import Roles
-from keyboards.inline.callback_factory.recognize_user import UserVoteIndexCbData
-from keyboards.inline.keypads.mailing import send_selection_to_players_kb
-from keyboards.inline.keypads.to_bot import participate_in_social_life
+from keyboards.inline.callback_factory.recognize_user import (
+    UserVoteIndexCbData,
+)
+from keyboards.inline.keypads.mailing import (
+    send_selection_to_players_kb,
+)
+from keyboards.inline.keypads.to_bot import (
+    participate_in_social_life,
+)
 from services.roles import Prosecutor
 from services.roles.base import ActiveRoleAtNight, Role
-from utils.utils import get_profiles, get_state_and_assign, make_pretty
+from utils.utils import (
+    get_profiles,
+    get_state_and_assign,
+    make_pretty,
+)
 
 
 class MailerToPlayers:
@@ -65,6 +80,7 @@ class MailerToPlayers:
         game_data: GameCache = await self.state.get_data()
         live_players = game_data["players_ids"]
         players = game_data["players"]
+        banned_user = Prosecutor().get_processed_user_id(game_data)
         await asyncio.gather(
             *(
                 self.send_request_to_vote(
@@ -74,12 +90,7 @@ class MailerToPlayers:
                     players=players,
                 )
                 for user_id in live_players
-                if user_id
-                != game_data.get(
-                    str(
-                        Prosecutor().get_processed_user_id(game_data)
-                    )
-                )
+                if user_id != banned_user
             )
         )
 
