@@ -11,8 +11,9 @@ from states.states import UserFsm
 class Prosecutor(ActiveRoleAtNight):
     role = "Прокурор"
     mail_message = "Кого арестовать этой ночью?"
-    photo = "https://avatars.mds.yandex.net/i?"
-    "id=b5115d431dafc24be07a55a8b6343540_l-5205087-images-thumbs&n=13"
+    photo = ("https://avatars.mds.yandex.net/i?"
+             "id=b5115d431dafc24be07a55a8b6343540_l-5205087-"
+             "images-thumbs&n=13")
     grouping = Groupings.civilians
     purpose = (
         "Тебе нельзя допустить, чтобы днем мафия могла говорить."

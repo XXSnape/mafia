@@ -12,9 +12,9 @@ class Forger(ActiveRoleAtNight):
         "Говорят, в лесах завелись персонажи из Шрека, "
     )
     "подговорённые мафией, дискоординирующие государственную армию!"
-    photo = "https://sun9-64.userapi.com/impg/R8WBtzZkQKycXDW5YCvKXUJB03XJnboRa0LDHw/"
-    "yo9Ng0yPqa0.jpg?size=604x302&quality=95&sign"
-    "=0fb255f26d2fd1775b2db1c2001f7a0b&type=album"
+    photo = ("https://sun9-64.userapi.com/impg/R8WBtzZkQKycXDW5YCvKXUJB03XJnboRa0LDHw/yo9Ng0yPqa0.jpg?"
+             "size=604x302&quality=95&sign"
+             "=0fb255f26d2fd1775b2db1c2001f7a0b&type=album")
     need_to_process = False
     do_not_choose_self = 2
     do_not_choose_others = 2

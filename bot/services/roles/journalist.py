@@ -8,9 +8,9 @@ from utils.validators import get_object_id_if_exists
 class Journalist(ActiveRoleAtNight):
     role = "Журналист"
     mail_message = "У кого взять интервью этой ночью?"
-    photo = "https://pics.rbc.ru/v2_companies_s3/resized/"
-    "960xH/media/company_press_release_image/"
-    "022eef78-63a5-4a2b-bb88-e4dcae639e34.jpg"
+    photo = ("https://pics.rbc.ru/v2_companies_s3/resized/960xH/media/"
+             "company_press_release_image/"
+             "022eef78-63a5-4a2b-bb88-e4dcae639e34.jpg")
     grouping = Groupings.civilians
     purpose = "Ты можешь приходить к местным жителям и узнавать, что они видели"
     message_to_group_after_action = (

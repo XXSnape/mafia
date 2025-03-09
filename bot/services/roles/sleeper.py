@@ -10,7 +10,8 @@ from utils.validators import get_object_id_if_exists
 class Sleeper(ActiveRoleAtNight):
     role = "Клофелинщица"
     mail_message = "Кого усыпить этой ночью?"
-    photo = "https://masterpiecer-images.s3.yandex.net/c94e9cb6787b11eeb1ce1e5d9776cfa6:upscaled"
+    photo = ("https://masterpiecer-images.s3.yandex.net/c94e9c"
+             "b6787b11eeb1ce1e5d9776cfa6:upscaled")
     grouping = Groupings.criminals
     purpose = "Ты можешь усыпить кого-нибудь во имя мафии."
     message_to_group_after_action = "Спят взрослые и дети. Не обошлось и без помощи клофелинщиков!"
