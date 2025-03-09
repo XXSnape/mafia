@@ -9,9 +9,11 @@ from states.states import UserFsm
 class Werewolf(ActiveRoleAtNight):
     role = "Оборотень"
     need_to_monitor_interaction = False
-    photo = ("https://sun9-42.userapi.com/impf/c303604/v303604068/170c/FXQRtSk8e28.jpg?size=484x604&quality="
-             "96&sign=bf5555ef2b801954b0b92848975525fd&type=album"
-             "?imw=512&imh=512&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true")
+    photo = (
+        "https://sun9-42.userapi.com/impf/c303604/v303604068/170c/FXQRtSk8e28.jpg?size=484x604&quality="
+        "96&sign=bf5555ef2b801954b0b92848975525fd&type=album"
+        "?imw=512&imh=512&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true"
+    )
     grouping = Groupings.civilians
     purpose = "На 4 ночь ты сможешь превратиться в мафию, маршала или доктора."
     mail_message = "Реши, в кого сегодня превратишься!"
