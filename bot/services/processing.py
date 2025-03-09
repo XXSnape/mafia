@@ -46,7 +46,7 @@ def check_end_of_game(async_func: Callable):
         if not game_data["mafias"]:
             raise GameIsOver(winner=Groupings.civilians)
 
-        if len(game_data["mafias"]) > (
+        if len(game_data["mafias"]) >= (
             len(game_data["players_ids"]) - len(game_data["mafias"])
         ):
             raise GameIsOver(winner=Groupings.criminals)
@@ -190,12 +190,12 @@ class Executor:
             for role in self.all_roles
             if self.all_roles[role].can_kill_at_night
         ]
-        murdered = set()
+        murdered = []
         for role in attacking_roles:
             user_id = role.get_processed_user_id(game_data)
             if user_id:
-                murdered.add(user_id)
-        recovered = set()
+                murdered.append(user_id)
+        recovered = []
 
         healing_roles = [
             self.all_roles[role]

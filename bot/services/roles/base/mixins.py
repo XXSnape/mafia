@@ -56,12 +56,12 @@ class TreatmentMixin:
     def treat(
         self,
         game_data: GameCache,
-        recovered: set[int],
-        murdered: set[int],
+        recovered: list[int],
+        murdered: list[int],
     ):
         recovered_id = self.get_processed_user_id(game_data)
         if recovered_id is not None:
-            recovered.add(recovered_id)
+            recovered.append(recovered_id)
 
     def __eq__(self, other):
         if isinstance(other, TreatmentMixin):

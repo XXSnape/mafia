@@ -8,10 +8,12 @@ from states.states import UserFsm
 class Bodyguard(TreatmentMixin, ActiveRoleAtNight):
     role = "Телохранитель"
     mail_message = "За кого пожертвовать собой?"
-    photo = "https://sun6-22.userapi.com/impg/zAaADEA19scv86EFl8bY1wUYRCJyBPGg1qamiA/xjMRCUhA20g.jpg?"
-    "size=1280x1280&quality=96&"
-    "sign=de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag="
-    "EOC9ErRHImjvmda4Qd5Pq59HPf-wUgr77rzHZvabHjc&type=album"
+    photo = (
+        "https://sun6-22.userapi.com/impg/zAaADEA19scv86EFl8bY1wUYRCJyBPGg1qamiA/"
+        "xjMRCUhA20g.jpg?size=1280x1280&quality=96&sign="
+        "de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag=EOC9ErRHImjvmda4Qd5Pq59H"
+        "Pf-wUgr77rzHZvabHjc&type=album"
+    )
     grouping = Groupings.civilians
     purpose = "Тебе нужно защитить собой лучших специалистов"
     message_to_group_after_action = "Кто-то пожертвовал собой!"
@@ -29,15 +31,16 @@ class Bodyguard(TreatmentMixin, ActiveRoleAtNight):
     def treat(
         self,
         game_data: GameCache,
-        recovered: set[int],
-        murdered: set[int],
+        recovered: list[int],
+        murdered: list[int],
     ):
         recovered_id = self.get_processed_user_id(game_data)
         if not recovered_id:
             return
-        if recovered not in murdered:
+        if recovered_id in recovered:
             return
-        recovered.add(recovered_id)
-        if game_data[self.roles_key][0] in recovered:
-            return
-        murdered.add(game_data[self.roles_key][0])
+        if recovered_id in murdered:
+            recovered.append(recovered_id)
+            if game_data[self.roles_key][0] in recovered:
+                return
+            murdered.append(game_data[self.roles_key][0])
