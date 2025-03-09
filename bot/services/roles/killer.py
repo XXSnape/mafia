@@ -7,9 +7,11 @@ from states.states import UserFsm
 class Killer(ActiveRoleAtNight):
     role = "Наёмный убийца"
     need_to_monitor_interaction = False
-    photo = "https://steamuserimages-a.akamaihd.net/ugc/633105202506112549/"
-    "988D53D1D6BF2FAC4665E453F736C438F601DF6D/"
-    "?imw=512&imh=512&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true"
+    photo = (
+        "https://steamuserimages-a.akamaihd.net/ugc/633105202506112549/988D"
+        "53D1D6BF2FAC4665E453F736C438F601DF6D/"
+        "?imw=512&imh=512&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true"
+    )
     grouping = Groupings.criminals
     purpose = "Ты убиваешь, кого захочешь, а затем восстанавливаешь свои силы целую ночь."
     message_to_group_after_action = (
