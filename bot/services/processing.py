@@ -129,6 +129,13 @@ class Executor:
                     game_data=game_data
                 )
 
+    def get_voting_roles(self):
+        return [
+            self.all_roles[role]
+            for role in self.all_roles
+            if isinstance(self.all_roles[role], VictimsOfVote)
+        ]
+
     @check_end_of_game
     async def sum_up_after_voting(
         self,
@@ -136,11 +143,7 @@ class Executor:
         game_data: GameCache = await self.state.get_data()
         pros = game_data["pros"]
         cons = game_data["cons"]
-        voting_roles = [
-            self.all_roles[role]
-            for role in self.all_roles
-            if isinstance(self.all_roles[role], VictimsOfVote)
-        ]
+        voting_roles = self.get_voting_roles()
         if len(pros) == len(cons) or len(pros) < len(cons):
             for role in voting_roles:
                 await role.take_action_after_voting(

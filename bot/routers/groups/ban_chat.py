@@ -1,4 +1,5 @@
 from aiogram import Router
+from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from cache.cache_types import GameCache
@@ -8,7 +9,7 @@ from states.states import GameFsm
 router = Router(name=__name__)
 
 
-@router.message(GameFsm.STARTED)
+@router.message(StateFilter(GameFsm.STARTED, GameFsm.VOTE))
 async def delete_message_from_non_players(
     message: Message, state: FSMContext
 ):

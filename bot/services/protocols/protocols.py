@@ -25,7 +25,7 @@ class ModificationVictims(Protocol):
         game_data: GameCache,
         attacking_roles: list[Role],
         victims: set[int],
-        recovered: set[int],
+        recovered: list[int],
     ): ...
 
 

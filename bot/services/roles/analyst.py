@@ -33,7 +33,7 @@ class Analyst(ActiveRoleAtNight):
     ):
         extra_buttons = (
             InlineKeyboardButton(
-                text="У жителей не хватит политической воли",
+                text="Никого не повесят",
                 callback_data=DRAW_CB,
             ),
         )
@@ -47,7 +47,7 @@ class Analyst(ActiveRoleAtNight):
         self, game_data: GameCache, user_id: int
     ):
         predicted_id = self.get_processed_user_id(game_data)
-        if not predicted_id:
+        if predicted_id is None:
             return
         analyst_id = game_data[self.roles_key][0]
         if predicted_id == user_id:
