@@ -1,15 +1,13 @@
 import asyncio
 
-from aiogram import F, Dispatcher, Router
+from aiogram import Dispatcher, F, Router
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
-
-from cache.cache_types import UserCache, GameCache
-
+from cache.cache_types import GameCache, UserCache
+from services.roles import Mafia, Hacker
 from states.states import UserFsm
 from utils.utils import get_state_and_assign
-
 
 router = Router(name=__name__)
 
@@ -53,10 +51,10 @@ async def allies_communicate(
             if player_id != message.from_user.id
         )
     )
-    if message.from_user.id in game_data["mafias"] and game_data.get(
-        "hackers"
-    ):
-        for hacker_id in game_data["hackers"]:
+    if message.from_user.id in game_data[
+        Mafia.roles_key
+    ] and game_data.get(Hacker.roles_key):
+        for hacker_id in game_data[Hacker.roles_key]:
             await message.bot.send_message(
                 chat_id=hacker_id,
                 text=f"{role} ??? передает:\n\n{message.text}",

@@ -1,24 +1,15 @@
-from aiogram import Router, Dispatcher, F
+from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-
-from cache.cache_types import (
-    UserCache,
-    GameCache,
-    Roles,
-    AliasesRole,
-)
+from general.collection_of_roles import Roles
+from cache.cache_types import GameCache, UserCache
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
-from keyboards.inline.cb.cb_text import (
-    PLAYER_BACKS_CB,
-)
-from keyboards.inline.keypads.mailing import (
-    choose_fake_role_kb,
-)
-
+from keyboards.inline.cb.cb_text import PLAYER_BACKS_CB
+from keyboards.inline.keypads.mailing import choose_fake_role_kb
 from services.mailing import MailerToPlayers
+from services.roles import Forger
 from states.states import UserFsm
 from utils.utils import get_state_and_assign, make_pretty
 
@@ -52,7 +43,7 @@ async def forger_fakes(
         if data["role"]
         not in (
             Roles.policeman.value.role,
-            AliasesRole.general.value.role,
+            # AliasesRole.general.value.role,
         )
     ]
 
@@ -79,13 +70,11 @@ async def forges_cancels_selection(
     )
     game_data: GameCache = await game_state.get_data()
     game_data["forged_roles"].clear()
-    markup = MailerToPlayers.generate_markup(
-        player_id=callback.from_user.id,
-        current_role=Roles.forger.value,
-        game_data=game_data,
+    markup = Forger().generate_markup(
+        player_id=callback.from_user.id, game_data=game_data
     )
     await callback.message.edit_text(
-        text=Roles.forger.value.interactive_with.mail_message,
+        text=Forger.mail_message,
         reply_markup=markup,
     )
 
@@ -115,7 +104,7 @@ async def forges_selects_documents(
     await callback.message.delete()
     await callback.bot.send_message(
         chat_id=game_data["game_chat"],
-        text=Roles.forger.value.message_to_group_after_action,
+        text=Forger.message_to_group_after_action,
     )
     await callback.message.answer(
         text=f"Ты выбрал подменить документы {url} на {make_pretty(current_enum.value.role)}"

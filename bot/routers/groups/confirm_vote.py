@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
 from cache.cache_types import GameCache
+from services.roles import Prosecutor, PrimeMinister
 from keyboards.inline.callback_factory.recognize_user import (
     AimedUserCbData,
     ProsAndCons,
@@ -29,7 +30,9 @@ async def confirm_vote(
         )
         return
     game_data: GameCache = await state.get_data()
-    if callback.from_user.id in game_data["cant_vote"]:
+    if callback.from_user.id == Prosecutor().get_processed_user_id(
+        game_data
+    ):
         await callback.answer(
             "Ты арестован и не можешь голосовать!", show_alert=True
         )
@@ -39,14 +42,18 @@ async def confirm_vote(
             user_id=callback.from_user.id,
             add_to=game_data["pros"],
             delete_from=game_data["cons"],
-            prime_ministers=game_data["prime_ministers"],
+            prime_ministers=game_data.get(
+                PrimeMinister.roles_key, []
+            ),
         )
     elif callback_data.action == ProsAndCons.cons:
         add_voice(
             user_id=callback.from_user.id,
             add_to=game_data["cons"],
             delete_from=game_data["pros"],
-            prime_ministers=game_data["prime_ministers"],
+            prime_ministers=game_data.get(
+                PrimeMinister.roles_key, []
+            ),
         )
     with suppress(TelegramBadRequest):
         await callback.message.edit_reply_markup(

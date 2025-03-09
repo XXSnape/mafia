@@ -1,19 +1,17 @@
 from contextlib import suppress
 
-from aiogram import Router, Dispatcher
+from aiogram import Dispatcher, Router
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, ChatPermissions
-
-from cache.cache_types import UserCache, GameCache, Roles
+from general.collection_of_roles import Roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from services.actions_at_night import (
-    get_user_id_and_inform_players,
+    inform_players_and_trace_actions,
     take_action_and_register_user,
 )
-
 from states.states import UserFsm
 from utils.utils import get_state_and_assign
 
@@ -37,7 +35,7 @@ async def prosecutor_arrests(
             dispatcher=dispatcher,
             # message_to_group="По данным разведки потенциальный злоумышленник арестован!",
             # message_to_user="Ты выбрал арестовать {url}",
-            role=Roles.prosecutor,
+            # role=Roles.prosecutor,
             # last_processed_user_key="last_arrested",
             # list_to_process_key="cant_vote",
         )

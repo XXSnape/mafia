@@ -1,23 +1,19 @@
-from aiogram import Router, Dispatcher, F, Bot
+from aiogram import Dispatcher, F, Router
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import CallbackQuery, Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from cache.cache_types import GameCache
 from keyboards.inline.cb.cb_text import (
-    JOIN_CB,
     FINISH_REGISTRATION_CB,
+    JOIN_CB,
 )
-
 from keyboards.inline.keypads.join import get_join_kb
-from services.registartion import (
-    init_game,
-    add_user_to_game,
-)
-from states.states import GameFsm
 from services.pipeline_game import Game
+from services.registartion import add_user_to_game, init_game
+from states.states import GameFsm
 from utils.utils import get_profiles_during_registration
 
 router = Router(name=__name__)

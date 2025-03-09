@@ -4,21 +4,21 @@ from typing import TYPE_CHECKING
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
 
-
 if TYPE_CHECKING:
-    from cache.cache_types import UsersInGame, Roles
-    from cache.cache_types import GameCache
+    from general.collection_of_roles import Roles
+    from services.roles import UsersInGame, GameCache
+
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from keyboards.inline.cb.cb_text import (
+    PLAYER_BACKS_CB,
     POLICEMAN_CHECKS_CB,
     POLICEMAN_KILLS_CB,
-    PLAYER_BACKS_CB,
-    WEREWOLF_TO_POLICEMAN_CB,
     WEREWOLF_TO_DOCTOR_CB,
     WEREWOLF_TO_MAFIA_CB,
+    WEREWOLF_TO_POLICEMAN_CB,
 )
 
 

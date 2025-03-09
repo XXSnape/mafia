@@ -1,13 +1,13 @@
-from aiogram import Router, Dispatcher
+from aiogram import Dispatcher, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-
-from cache.cache_types import UserCache, GameCache, Roles
+from general.collection_of_roles import Roles
+from services.roles import GameCache, UserCache
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from services.actions_at_night import (
-    get_user_id_and_inform_players,
+    inform_players_and_trace_actions,
     take_action_and_register_user,
 )
 from states.states import UserFsm

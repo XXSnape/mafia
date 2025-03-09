@@ -1,5 +1,6 @@
 from collections import Counter
 from contextlib import suppress
+from inspect import get_annotations
 from typing import TYPE_CHECKING
 
 from aiogram import Dispatcher
@@ -8,12 +9,20 @@ from aiogram.fsm.state import State
 from aiogram.fsm.storage.base import StorageKey
 
 if TYPE_CHECKING:
-    from cache.cache_types import (
-        UsersInGame,
+    from services.roles import (
         LivePlayersIds,
-        UserGameCache,
         PlayersIds,
+        UserGameCache,
+        UsersInGame,
     )
+
+
+def dependency_injection(func, data: dict):
+    keys = set(get_annotations(func).keys())
+    suitable_keys = keys & set(data.keys())
+    return {
+        key: val for key, val in data.items() if key in suitable_keys
+    }
 
 
 def get_profile_link(user_id: int | str, full_name: str) -> str:

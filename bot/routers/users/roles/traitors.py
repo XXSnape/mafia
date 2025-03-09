@@ -1,10 +1,11 @@
 import asyncio
 
-from aiogram import Router, Dispatcher
+from aiogram import Dispatcher, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-
-from cache.cache_types import Roles, UserCache, GameCache
+from general.collection_of_roles import Roles
+from services.roles import Traitor, Mafia
+from cache.cache_types import GameCache, UserCache
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
@@ -37,12 +38,10 @@ async def traitor_finds_out(
     await callback.message.delete()
     await callback.bot.send_message(
         chat_id=game_data["game_chat"],
-        text=Roles.traitor.value.message_to_group_after_action,
+        text=Traitor.message_to_group_after_action,
     )
     await callback.message.answer(
-        text=Roles.traitor.value.message_to_user_after_action.format(
-            url=url
-        )
+        text=Traitor.message_to_user_after_action.format(url=url)
     )
     await asyncio.gather(
         *(
@@ -50,7 +49,7 @@ async def traitor_finds_out(
                 chat_id=player_id,
                 text=f"{make_pretty(Roles.traitor.value.role)} проверил и узнал, что {url} - {role}",
             )
-            for player_id in game_data["mafias"]
-            + game_data["traitors"]
+            for player_id in game_data[Mafia.roles_key]
+            + game_data[Traitor.roles_key]
         )
     )

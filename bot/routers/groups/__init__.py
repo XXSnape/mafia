@@ -1,9 +1,9 @@
-from aiogram import Router, F
+from aiogram import F, Router
 from aiogram.enums import ChatType
-from .ban_chat import router as ban_chat_router
-from .registration import router as registration_router
-from .confirm_vote import router as confirm_vote_router
 
+from .ban_chat import router as ban_chat_router
+from .confirm_vote import router as confirm_vote_router
+from .registration import router as registration_router
 
 router = Router(name=__name__)
 

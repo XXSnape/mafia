@@ -1,8 +1,6 @@
 from aiogram import types
-
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-
-from keyboards.inline.cb.cb_text import JOIN_CB, FINISH_REGISTRATION_CB
+from keyboards.inline.cb.cb_text import FINISH_REGISTRATION_CB, JOIN_CB
 
 
 def get_join_kb():

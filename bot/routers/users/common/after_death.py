@@ -1,8 +1,8 @@
-from aiogram import Router, F, Dispatcher
+from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
-from cache.cache_types import UserCache, GameCache
+from cache.cache_types import GameCache, UserCache
 
 from states.states import UserFsm
 from utils.utils import get_state_and_assign

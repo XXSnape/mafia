@@ -1,31 +1,25 @@
 import asyncio
 
-from aiogram import Router, Dispatcher, F
+from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-
-from cache.cache_types import (
-    Roles,
-    UserCache,
-    GameCache,
-    AliasesRole,
-)
+from general.collection_of_roles import Roles
+from cache.cache_types import GameCache, UserCache
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from keyboards.inline.cb.cb_text import (
-    WEREWOLF_TO_MAFIA_CB,
     WEREWOLF_TO_DOCTOR_CB,
+    WEREWOLF_TO_MAFIA_CB,
     WEREWOLF_TO_POLICEMAN_CB,
 )
-from services.actions_at_night import (
-    take_action_and_register_user,
-)
+from services.actions_at_night import take_action_and_register_user
+from services.roles import Werewolf
 from states.states import UserFsm
 from utils.utils import (
+    get_profiles,
     get_state_and_assign,
     make_pretty,
-    get_profiles,
 )
 from utils.validators import remind_commissioner_about_inspections
 
@@ -50,15 +44,15 @@ async def werewolf_turns_into(
     data = {
         WEREWOLF_TO_MAFIA_CB: [
             Roles.don,
-            AliasesRole.mafia,
+            # AliasesRole.mafia,
         ],
         WEREWOLF_TO_DOCTOR_CB: [
             Roles.doctor,
-            AliasesRole.nurse,
+            # AliasesRole.nurse,
         ],
         WEREWOLF_TO_POLICEMAN_CB: [
             Roles.policeman,
-            AliasesRole.general,
+            # AliasesRole.general,
         ],
     }
     user_data: UserCache = await state.get_data()
@@ -70,7 +64,7 @@ async def werewolf_turns_into(
 
     user_id = callback.from_user.id
     game_data: GameCache = await game_state.get_data()
-    game_data["werewolves"].remove(user_id)
+    game_data[Werewolf.roles_key].remove(user_id)
     url = game_data["players"][str(user_id)]["url"]
     initial_role = game_data["players"][str(user_id)]["initial_role"]
     current_enums = data[callback.data]

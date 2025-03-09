@@ -3,6 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 from cache.cache_types import GameCache
+from services.roles import Prosecutor
 from states.states import GameFsm
 
 router = Router(name=__name__)
@@ -15,7 +16,9 @@ async def delete_message_from_non_players(
     game_data: GameCache = await state.get_data()
     if (
         message.from_user.id not in game_data["players_ids"]
-    ) or message.from_user.id in game_data["cant_vote"]:
+    ) or message.from_user.id == Prosecutor().get_processed_user_id(
+        game_data
+    ):
         await message.delete()
         # await message.chat.restrict(
         #     user_id=message.from_user.id,

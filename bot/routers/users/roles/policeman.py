@@ -1,29 +1,32 @@
 import asyncio
 
-from aiogram import Router, Dispatcher, F
+from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from cache.cache_types import UserCache, GameCache, Roles
+from cache.cache_types import GameCache, UserCache
+from general.collection_of_roles import Roles
+
 from keyboards.inline.callback_factory.recognize_user import (
-    police_kill_cb_data,
-    PoliceActionIndexCbData,
     CheckOrKill,
+    PoliceActionIndexCbData,
     police_check_cb_data,
+    police_kill_cb_data,
 )
 from keyboards.inline.cb.cb_text import (
-    POLICEMAN_KILLS_CB,
     PLAYER_BACKS_CB,
     POLICEMAN_CHECKS_CB,
+    POLICEMAN_KILLS_CB,
 )
 from keyboards.inline.keypads.mailing import (
-    send_selection_to_players_kb,
     POLICEMAN_BACK_BTN,
+    send_selection_to_players_kb,
+    kill_or_check_on_policeman,
 )
 from services.actions_at_night import (
-    get_user_id_and_inform_players,
     take_action_and_register_user,
 )
+from services.roles import Policeman
 from states.states import UserFsm
 from utils.utils import get_state_and_assign
 
@@ -74,8 +77,8 @@ async def policeman_makes_choice(
 )
 async def policeman_cancels_selection(callback: CallbackQuery):
     await callback.message.edit_text(
-        text=Roles.policeman.value.interactive_with.mail_message,
-        reply_markup=Roles.policeman.value.interactive_with.own_mailing_markup,
+        text=Policeman.mail_message,
+        reply_markup=kill_or_check_on_policeman(),
     )
 
 
@@ -96,7 +99,6 @@ async def policeman_chose_to_kill(
         callback_data=callback_data,
         state=state,
         dispatcher=dispatcher,
-        role=Roles.policeman,
     )
 
 

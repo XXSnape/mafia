@@ -1,17 +1,17 @@
 from random import choice
 
-from aiogram import Router, Dispatcher
+from aiogram import Dispatcher, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-
-from cache.cache_types import UserCache, GameCache
+from cache.cache_types import GameCache, UserCache
 from keyboards.inline.callback_factory.recognize_user import (
-    UserVoteIndexCbData,
     UserActionIndexCbData,
+    UserVoteIndexCbData,
 )
 from keyboards.inline.keypads.to_bot import (
     participate_in_social_life,
 )
+from services.roles import Prosecutor, Instigator
 from utils.utils import get_state_and_assign
 
 router = Router(name=__name__)
@@ -31,7 +31,9 @@ async def vote_for(
         bot_id=callback.bot.id,
     )
     game_data: GameCache = await game_state.get_data()
-    if callback.from_user.id in game_data["missed"]:
+    if callback.from_user.id == Instigator().get_processed_user_id(
+        game_data
+    ):
         ids = game_data["players_ids"][:]
         ids.remove(callback.from_user.id)
         voted_user_id = choice(ids)

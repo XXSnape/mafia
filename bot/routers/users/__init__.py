@@ -1,5 +1,6 @@
-from aiogram import Router, F
+from aiogram import F, Router
 from aiogram.enums import ChatType
+
 from .common import router as common_router
 from .roles import router as roles_router
 

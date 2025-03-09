@@ -6,19 +6,16 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from cache.cache_types import (
-    GameCache,
-    Role,
-    Roles,
-    AliasesRole,
-)
+from cache.cache_types import GameCache, UserGameCache
+from general.collection_of_roles import get_data_with_roles, Roles
+from services.roles.base import Role
+
 from general.exceptions import GameIsOver
 from general.players import Groupings
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
+from mypy.state import state
 from services.mailing import MailerToPlayers
-from services.processing import (
-    Executor,
-)
+from services.processing import Executor
 from states.states import GameFsm
 from utils.utils import (
     get_profiles,
@@ -48,6 +45,7 @@ class Game:
             dispatcher=self.dispatcher,
             group_chat_id=self.group_chat_id,
         )
+        self.roles = {}
         self.executor = Executor(
             message=message,
             state=state,
@@ -56,15 +54,39 @@ class Game:
             mailer=self.mailer,
         )
 
+    def init_existing_roles(self, game_data: GameCache):
+        all_roles = get_data_with_roles()
+        existing = set(
+            player_data["enum_name"]
+            for player_id, player_data in game_data[
+                "players"
+            ].items()
+        )
+        not_existing = set(
+            role for role in all_roles if role not in existing
+        )
+        for role in not_existing:
+            all_roles.pop(role)
+        self.roles = all_roles
+        for role in self.roles:
+            self.roles[role](
+                dispatcher=self.dispatcher,
+                bot=self.bot,
+                state=self.state,
+            )
+        self.mailer.all_roles = all_roles
+        self.executor.all_roles = all_roles
+
     async def start_game(
         self,
     ):
 
         await self.message.delete()
-
         await self.state.set_state(GameFsm.STARTED)
         await self.select_roles()
-        await self.mailer.familiarize_players()
+        game_data: GameCache = await self.state.get_data()
+        await self.mailer.familiarize_players(game_data)
+        self.init_existing_roles(game_data)
         await self.message.answer(
             text="Игра начинается!",
             reply_markup=get_to_bot_kb(),
@@ -92,23 +114,29 @@ class Game:
             reply_markup=get_to_bot_kb("Действовать!"),
         )
         await self.mailer.mailing()
-        game_data["angels_died"].clear()
-        await asyncio.sleep(15)
+        await asyncio.sleep(25)
+        # raise GameIsOver(winner=Groupings.criminals)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
-        await self.executor.cancel_action()
-        await self.mailer.send_promised_information_to_users()
+        await self.executor.start_earliest_actions()
+        # await self.executor.cancel_action()
+        # await self.mailer.send_promised_information_to_users()
+        await self.executor.send_promised_messages(
+            game_data=game_data
+        )
+
         await self.executor.sum_up_after_night()
+
         await asyncio.sleep(4)
         await self.mailer.suggest_vote()
-        await asyncio.sleep(4)
+        await asyncio.sleep(10)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
         result = await self.executor.confirm_final_aim()
         if result:
-            await asyncio.sleep(15)
+            await asyncio.sleep(10)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
@@ -135,8 +163,9 @@ class Game:
                 losers += text
             elif e.winner == Groupings.criminals:
                 if (
-                    player["role"] == Roles.don.value.role
-                    or AliasesRole.mafia.value.role
+                    player["role"]
+                    == Roles.don.value.role
+                    # or AliasesRole.mafia.value.role
                 ):
                     winners += text
                     winners_ids.add(user_id)
@@ -186,34 +215,41 @@ class Game:
         )
         await state.clear()
 
+    def initialization_by_role(
+        self, game_data: GameCache, role: Role
+    ):
+        if (
+            role.is_alias is False
+            and role.roles_key not in game_data
+        ):
+            game_data[role.roles_key] = []
+            if role.processed_users_key:
+                game_data[role.processed_users_key] = []
+            if role.last_interactive_key:
+                game_data[role.last_interactive_key] = {}
+            if role.processed_by_boss:
+                game_data[role.processed_by_boss] = []
+            if role.extra_data:
+                for extra in role.extra_data:
+                    game_data[extra.key] = extra.data_type()
+
     async def select_roles(self):
         game_data: GameCache = await self.state.get_data()
         ids = game_data["players_ids"][:]
         shuffle(ids)
         roles_tpl = tuple(Roles)
-        roles = (
-            roles_tpl[:4]
-            + (AliasesRole.general,)
-            + (AliasesRole.mafia,)
-            + roles_tpl[3:]
-        )
-        for user_id, role in zip(ids, roles):
+        for user_id, role in zip(ids, roles_tpl):
             current_role: Role = role.value
+            self.initialization_by_role(game_data, role=current_role)
             roles = game_data[current_role.roles_key]
-            game_data["players"][str(user_id)][
-                "role"
-            ] = current_role.role
-            game_data["players"][str(user_id)]["pretty_role"] = (
-                make_pretty(current_role.role)
-            )
-            game_data["players"][str(user_id)]["initial_role"] = (
-                make_pretty(current_role.role)
-            )
-            game_data["players"][str(user_id)][
-                "enum_name"
-            ] = role.name
-            game_data["players"][str(user_id)][
-                "roles_key"
-            ] = current_role.roles_key
+            user_data: UserGameCache = {
+                "role": current_role.role,
+                "pretty_role": make_pretty(current_role.role),
+                "initial_role": make_pretty(current_role.role),
+                "enum_name": role.name,
+                "roles_key": current_role.roles_key,
+                "user_id": user_id,
+            }
+            game_data["players"][str(user_id)].update(user_data)
             roles.append(user_id)
         await self.state.set_data(game_data)

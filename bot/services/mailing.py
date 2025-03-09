@@ -1,22 +1,18 @@
 import asyncio
-from collections.abc import Iterable
-from pprint import pprint
-from typing import Literal
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State
-from aiogram.types import InlineKeyboardMarkup
+
 
 from cache.cache_types import (
     GameCache,
-    RolesKeysLiteral,
     LivePlayersIds,
+    UserGameCache,
     UsersInGame,
-    Roles,
-    Role,
-    PlayersIds,
 )
+from general.collection_of_roles import Roles
+from services.roles import Prosecutor
+from services.roles.base import ActiveRoleAtNight, Role
 
 from keyboards.inline.callback_factory.recognize_user import (
     UserVoteIndexCbData,
@@ -30,9 +26,9 @@ from keyboards.inline.keypads.to_bot import (
 )
 from states.states import UserFsm
 from utils.utils import (
-    make_pretty,
-    get_state_and_assign,
     get_profiles,
+    get_state_and_assign,
+    make_pretty,
 )
 
 
@@ -48,223 +44,15 @@ class MailerToPlayers:
         self.bot = bot
         self.dispatcher = dispatcher
         self.group_chat_id = group_chat_id
-
-    @staticmethod
-    def generate_markup(
-        player_id: int,
-        current_role: Role,
-        game_data: GameCache,
-    ):
-        exclude = []
-        current_number = game_data["number_of_night"]
-        if current_role.interactive_with.is_self_selecting is False:
-            exclude = [player_id]
-        for processed_user_id, number in game_data.get(
-            current_role.interactive_with.last_interactive_key, {}
-        ).items():
-            if int(processed_user_id) == player_id:
-                constraint = current_role.interactive_with.self
-            else:
-                constraint = current_role.interactive_with.other
-            if constraint is None:
-                exclude.append(int(processed_user_id))
-            elif (current_number - number) < constraint + 1:
-                exclude.append(int(processed_user_id))
-        if game_data["players_ids"] == exclude:
-            return
-        return send_selection_to_players_kb(
-            players_ids=game_data["players_ids"],
-            players=game_data["players"],
-            exclude=exclude,
-            extra_buttons=current_role.extra_buttons_for_actions_at_night,
-        )
-
-    async def send_survey(
-        self,
-        player_id: int,
-        current_role: Role,
-        game_data: GameCache,
-    ):
-
-        markup = self.generate_markup(
-            player_id=player_id,
-            current_role=current_role,
-            game_data=game_data,
-        )
-        sent_survey = await self.bot.send_message(
-            chat_id=player_id,
-            text=current_role.interactive_with.mail_message,
-            reply_markup=markup,
-        )
-        await self.save_msg_to_delete_and_change_state(
-            game_data=game_data,
-            player_id=player_id,
-            current_role=current_role,
-            message_id=sent_survey.message_id,
-        )
-
-    async def save_msg_to_delete_and_change_state(
-        self,
-        game_data: GameCache,
-        player_id: int,
-        current_role: Role,
-        message_id: int,
-    ):
-        game_data["to_delete"].append([player_id, message_id])
-        await get_state_and_assign(
-            dispatcher=self.dispatcher,
-            chat_id=player_id,
-            bot_id=self.bot.id,
-            new_state=current_role.state_for_waiting_for_action,
-        )
-
-    async def send_survey_to_aliases(
-        self,
-        current_role: Role,
-        roles: PlayersIds,
-        extra_text: str | None,
-        game_data: GameCache,
-    ):
-        if current_role.alias and len(roles) > 1:
-            alias_role = current_role.alias.role.value
-            for user_id in roles[1:]:
-                if extra_text:
-                    await self.bot.send_message(
-                        chat_id=user_id, text=extra_text
-                    )
-                if current_role.alias.is_mass_mailing_list:
-                    await self.send_survey(
-                        player_id=user_id,
-                        current_role=alias_role,
-                        game_data=game_data,
-                    )
+        self.all_roles = {}
 
     async def mailing(self):
         game_data: GameCache = await self.state.get_data()
-        for role in Roles:
-            current_role: Role = role.value
-            if (current_role.roles_key not in game_data) or (
-                current_role.interactive_with is None
-            ):
+        for role in self.all_roles:
+            current_role: Role = self.all_roles[role]
+            if isinstance(current_role, ActiveRoleAtNight) is False:
                 continue
-            roles = (
-                current_role.interactive_with.players_to_send_messages(
-                    game_data=game_data
-                )
-                if current_role.interactive_with.players_to_send_messages
-                else game_data[current_role.roles_key]
-            )
-            if not roles:
-                continue
-            extra_text = None
-            if current_role.interactive_with.additional_text_func:
-                extra_text = current_role.interactive_with.additional_text_func(
-                    game_data
-                )
-            if extra_text:
-                await self.bot.send_message(
-                    chat_id=roles[0], text=extra_text
-                )
-            if current_role.interactive_with.own_mailing_markup:
-                if isinstance(
-                    current_role.interactive_with.own_mailing_markup,
-                    InlineKeyboardMarkup,
-                ):
-                    markup = (
-                        current_role.interactive_with.own_mailing_markup
-                    )
-                else:
-                    markup = current_role.interactive_with.own_mailing_markup(
-                        game_data
-                    )
-                sent_survey = await self.bot.send_message(
-                    chat_id=roles[0],
-                    text=current_role.interactive_with.mail_message,
-                    reply_markup=markup,
-                )
-                await self.save_msg_to_delete_and_change_state(
-                    game_data=game_data,
-                    player_id=roles[0],
-                    current_role=current_role,
-                    message_id=sent_survey.message_id,
-                )
-                await self.send_survey_to_aliases(
-                    current_role=current_role,
-                    roles=roles,
-                    extra_text=extra_text,
-                    game_data=game_data,
-                )
-                continue
-            await self.send_survey(
-                player_id=roles[0],
-                current_role=current_role,
-                game_data=game_data,
-            )
-            await self.send_survey_to_aliases(
-                current_role=current_role,
-                roles=roles,
-                extra_text=extra_text,
-                game_data=game_data,
-            )
-
-    async def send_info_to_player(
-        self, game_data: GameCache, role: Roles, key: str
-    ):
-        current_role: Role = role.value
-        players = game_data.get(current_role.roles_key, [])
-        if not players:
-            return
-
-        player_id = players[0]
-        if not game_data[current_role.processed_users_key]:
-            return
-
-        user_id = game_data[current_role.processed_users_key][0]
-        visitors = ", ".join(
-            game_data["players"][str(user_id)]["url"]
-            for user_id in game_data["tracking"]
-            .get(str(user_id), {})
-            .get(key, [])
-        )
-        user_url = game_data["players"][str(user_id)]["url"]
-        if key == "interacting":
-            message = (
-                f"{user_url} сегодня никто не навещал"
-                if not visitors
-                else f"К {user_url} приходили: {visitors}"
-            )
-        else:
-            message = (
-                f"{user_url} cегодня ни к кому не ходил"
-                if not visitors
-                else f"{user_url} навещал: {visitors}"
-            )
-        await self.bot.send_message(chat_id=player_id, text=message)
-
-    async def send_promised_information_to_users(self):
-        game_data: GameCache = await self.state.get_data()
-        if game_data["disclosed_roles"]:
-            user_id, role = game_data["disclosed_roles"][0]
-            if game_data.get("forged_roles"):
-                faked_id, faked_role = game_data["forged_roles"][0]
-                if faked_id == user_id:
-                    role = faked_role
-            url = game_data["players"][str(user_id)]["url"]
-            text = f"{url} - {role}!"
-            for policeman_id in game_data["policeman"]:
-                await self.bot.send_message(
-                    chat_id=policeman_id, text=text
-                )
-            game_data["text_about_checks"] += text + "\n"
-        await self.send_info_to_player(
-            game_data=game_data,
-            role=Roles.journalist,
-            key="interacting",
-        )
-        await self.send_info_to_player(
-            game_data=game_data, role=Roles.agent, key="sufferers"
-        )
-        await self.state.set_data(game_data)
+            await current_role.mailing(game_data=game_data)
 
     async def send_request_to_vote(
         self,
@@ -306,38 +94,22 @@ class MailerToPlayers:
                     players=players,
                 )
                 for user_id in live_players
-                if user_id not in game_data["cant_vote"]
+                if user_id
+                != game_data.get(
+                    str(
+                        Prosecutor().get_processed_user_id(game_data)
+                    )
+                )
             )
         )
 
-    async def report_death(
-        self,
-        chat_id: int,
-        bombers: PlayersIds,
-    ):
-
-        await get_state_and_assign(
-            dispatcher=self.dispatcher,
-            chat_id=chat_id,
-            bot_id=self.bot.id,
-            new_state=UserFsm.WAIT_FOR_LATEST_LETTER,
-        )
-        message = "К сожалению, тебя убили! Отправь напоследок все, что думаешь!"
-        if chat_id in bombers:
-            message = "Поздравляю с заветным ночным убийством! Не забудь поглумиться над мафией"
-        await self.bot.send_message(
-            chat_id=chat_id,
-            text=message,
-        )
-
-    async def familiarize_players(self):
-        game_data: GameCache = await self.state.get_data()
-        for role in Roles:
-            current_role: Role = role.value
-
-            roles = game_data.get(current_role.roles_key)
-            if not roles:
+    async def familiarize_players(self, game_data: GameCache):
+        for user_id, player_data in game_data["players"].items():
+            player_data: UserGameCache
+            current_role = Roles[player_data["enum_name"]].value
+            if current_role.is_alias:
                 continue
+            roles = game_data[current_role.roles_key]
             await self.bot.send_photo(
                 chat_id=roles[0],
                 photo=current_role.photo,
@@ -358,22 +130,21 @@ class MailerToPlayers:
                 for user_id in roles[1:]:
                     await self.bot.send_photo(
                         chat_id=user_id,
-                        photo=current_role.alias.role.value.photo,
+                        photo=current_role.alias.photo,
                         caption=f"Твоя роль - "
-                        f"{make_pretty(current_role.alias.role.value.role)}!"
-                        f" {current_role.alias.role.value.purpose}",
+                        f"{make_pretty(current_role.alias.role)}!"
+                        f" {current_role.alias.purpose}",
                     )
                     await self.bot.send_message(
                         chat_id=user_id,
                         text="Твои союзники!\n\n" + profiles,
                     )
                     if (
-                        current_role.alias.is_mass_mailing_list
-                        is False
+                        current_role.alias.state_for_waiting_for_action
                     ):
                         await get_state_and_assign(
                             dispatcher=self.dispatcher,
                             chat_id=user_id,
                             bot_id=self.bot.id,
-                            new_state=current_role.alias.role.value.state_for_waiting_for_action,
+                            new_state=current_role.alias.state_for_waiting_for_action,
                         )

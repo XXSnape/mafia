@@ -1,8 +1,28 @@
-from functools import partial
+from collections.abc import Callable
+from functools import partial, wraps
 from typing import TYPE_CHECKING
 
+
 if TYPE_CHECKING:
-    from cache.cache_types import GameCache, PlayersIds
+    from services.roles.base import Role
+    from services.roles import GameCache, PlayersIds
+
+
+def get_object_id_if_exists(async_func: Callable):
+    @wraps(async_func)
+    async def wrapper(role: "Role", *args, **kwargs):
+        game_data: GameCache = await role.state.get_data()
+        players = game_data.get(role.roles_key)
+        if not players:
+            return
+        processed_users = game_data[role.processed_users_key]
+        if not processed_users:
+            return
+        return await async_func(
+            role, *args, **kwargs, user_id=processed_users[0]
+        )
+
+    return wrapper
 
 
 def remind_commissioner_about_inspections(

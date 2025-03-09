@@ -4,7 +4,6 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.strategy import FSMStrategy
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
 from general import settings
 from general.log import configure_logging
 from routers.groups import router as groups_router

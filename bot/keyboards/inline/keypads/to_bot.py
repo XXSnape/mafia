@@ -1,6 +1,7 @@
+from functools import partial
+
 from aiogram import types
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from functools import partial
 
 
 def get_to_bot_kb(text="Ознакомиться с ролью"):
