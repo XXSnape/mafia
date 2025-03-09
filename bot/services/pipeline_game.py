@@ -1,4 +1,5 @@
 import asyncio
+from pprint import pprint
 from random import shuffle
 
 from aiogram import Dispatcher
