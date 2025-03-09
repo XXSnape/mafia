@@ -13,7 +13,6 @@ from services.roles.base import Role
 from general.exceptions import GameIsOver
 from general.players import Groupings
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
-from mypy.state import state
 from services.mailing import MailerToPlayers
 from services.processing import Executor
 from states.states import GameFsm

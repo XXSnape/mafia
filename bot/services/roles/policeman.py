@@ -8,7 +8,6 @@ from cache.roleses import Groupings
 from keyboards.inline.keypads.mailing import (
     kill_or_check_on_policeman,
 )
-from services.roles.base.mixins import VictimsMixin
 from states.states import UserFsm
 from utils.validators import remind_commissioner_about_inspections
 

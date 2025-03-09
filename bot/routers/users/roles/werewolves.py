@@ -5,15 +5,11 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from general.collection_of_roles import Roles
 from cache.cache_types import GameCache, UserCache
-from keyboards.inline.callback_factory.recognize_user import (
-    UserActionIndexCbData,
-)
 from keyboards.inline.cb.cb_text import (
     WEREWOLF_TO_DOCTOR_CB,
     WEREWOLF_TO_MAFIA_CB,
     WEREWOLF_TO_POLICEMAN_CB,
 )
-from services.actions_at_night import take_action_and_register_user
 from services.roles import Werewolf
 from states.states import UserFsm
 from utils.utils import (

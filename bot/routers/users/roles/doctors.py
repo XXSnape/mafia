@@ -2,16 +2,13 @@ from aiogram import Dispatcher, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from general.collection_of_roles import Roles
-from services.roles import GameCache, UserCache
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from services.actions_at_night import (
-    inform_players_and_trace_actions,
     take_action_and_register_user,
 )
 from states.states import UserFsm
-from utils.utils import get_state_and_assign
 
 router = Router(name=__name__)
 

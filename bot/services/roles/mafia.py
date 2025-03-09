@@ -1,11 +1,10 @@
-from cache.cache_types import ExtraCache, GameCache
+from cache.cache_types import GameCache
 from services.roles.base import (
     AliasRole,
     BossIsDeadMixin,
     ActiveRoleAtNight,
 )
 from cache.roleses import Groupings
-from services.roles.base.mixins import VictimsMixin
 from states.states import UserFsm
 from utils.utils import get_the_most_frequently_encountered_id
 

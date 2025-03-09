@@ -8,7 +8,6 @@ from keyboards.inline.callback_factory.recognize_user import (
 )
 from keyboards.inline.cb.cb_text import PLAYER_BACKS_CB
 from keyboards.inline.keypads.mailing import choose_fake_role_kb
-from services.mailing import MailerToPlayers
 from services.roles import Forger
 from states.states import UserFsm
 from utils.utils import get_state_and_assign, make_pretty

@@ -1,7 +1,6 @@
 from aiogram.types import InlineKeyboardButton
 
 from cache.cache_types import GameCache
-from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.cb.cb_text import DRAW_CB
 from services.roles.base import ActiveRoleAtNight
 from cache.roleses import Groupings

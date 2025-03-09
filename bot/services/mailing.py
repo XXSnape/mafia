@@ -21,10 +21,8 @@ from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
 from keyboards.inline.keypads.to_bot import (
-    get_to_bot_kb,
     participate_in_social_life,
 )
-from states.states import UserFsm
 from utils.utils import (
     get_profiles,
     get_state_and_assign,

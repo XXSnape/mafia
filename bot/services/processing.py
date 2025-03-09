@@ -1,13 +1,12 @@
 import asyncio
 from collections.abc import Callable
 from contextlib import suppress
-from random import randint
 from typing import TYPE_CHECKING
 
-from aiogram import Bot, Dispatcher
+from aiogram import Dispatcher
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
-from aiogram.types import ChatPermissions, Message
+from aiogram.types import Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from cache.cache_types import (
@@ -15,8 +14,8 @@ from cache.cache_types import (
     GameCache,
     UserGameCache,
 )
-from general.collection_of_roles import Roles
-from .roles import LuckyGay, Lawyer
+
+from .roles import Lawyer
 from .roles.base import Role, BossIsDeadMixin, AliasRole
 from general.exceptions import GameIsOver
 from general.players import Groupings
@@ -26,7 +25,6 @@ from states.states import GameFsm, UserFsm
 from utils.utils import (
     get_profiles,
     get_the_most_frequently_encountered_id,
-    dependency_injection,
     get_state_and_assign,
 )
 from .protocols.protocols import (
@@ -35,7 +33,7 @@ from .protocols.protocols import (
     ModificationVictims,
     VictimsOfVote,
 )
-from .roles.base.mixins import VictimsMixin, TreatmentMixin
+from .roles.base.mixins import TreatmentMixin
 
 if TYPE_CHECKING:
     from .pipeline_game import Game

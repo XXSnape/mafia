@@ -1,7 +1,6 @@
 from cache.cache_types import GameCache
 from services.roles.base import ActiveRoleAtNight
 from cache.roleses import Groupings
-from services.roles.base.mixins import VictimsMixin
 from states.states import UserFsm
 
 

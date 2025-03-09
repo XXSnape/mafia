@@ -10,13 +10,11 @@ from cache.cache_types import ExtraCache, GameCache, PlayersIds
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
-from states.states import UserFsm
 from utils.utils import (
     get_profiles,
     get_state_and_assign,
     get_the_most_frequently_encountered_id,
 )
-from utils.validators import get_object_id_if_exists
 
 
 class Role(ABC):

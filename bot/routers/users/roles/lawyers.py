@@ -6,7 +6,6 @@ from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from services.actions_at_night import (
-    inform_players_and_trace_actions,
     take_action_and_register_user,
 )
 from states.states import UserFsm

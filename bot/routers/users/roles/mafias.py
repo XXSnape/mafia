@@ -1,12 +1,4 @@
-from aiogram import Dispatcher, Router
-from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery
-from general.collection_of_roles import Roles
-from keyboards.inline.callback_factory.recognize_user import (
-    UserActionIndexCbData,
-)
-from services.actions_at_night import take_action_and_register_user
-from states.states import UserFsm
+from aiogram import Router
 
 router = Router(name=__name__)
 
