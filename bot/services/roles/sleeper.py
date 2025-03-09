@@ -1,6 +1,5 @@
 from cache.cache_types import ExtraCache, GameCache
 from cache.roleses import Groupings
-from general.collection_of_roles import Roles
 from services.roles import Forger, Policeman
 from services.roles.base import ActiveRoleAtNight, Role
 from states.states import UserFsm
@@ -28,15 +27,17 @@ class Sleeper(ActiveRoleAtNight):
         )
 
     @get_object_id_if_exists
-    async def earliest_actions_after_night(self, user_id: int):
+    async def earliest_actions_after_night(
+        self, user_id: int, all_roles: dict[str, Role]
+    ):
         game_data: GameCache = await self.state.get_data()
         euthanized_user_id = user_id
         user_role = game_data["players"][str(euthanized_user_id)][
             "role"
         ]
         send_message = False
-        for role in Roles:
-            current_role: Role = role.value
+        for role in all_roles:
+            current_role: Role = all_roles[role]
             if (
                 current_role.role == Policeman.role
                 and game_data["disclosed_roles"]

@@ -117,7 +117,9 @@ class Executor:
         for role in self.all_roles:
             current_role = self.all_roles[role]
             if isinstance(current_role, EarliestActionsAfterNight):
-                await current_role.earliest_actions_after_night()
+                await current_role.earliest_actions_after_night(
+                    all_roles=self.all_roles
+                )
 
     async def send_promised_messages(self, game_data: GameCache):
         for role in self.all_roles:

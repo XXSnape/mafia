@@ -6,7 +6,9 @@ from services.roles.base import Role
 
 @runtime_checkable
 class EarliestActionsAfterNight(Protocol):
-    async def earliest_actions_after_night(self): ...
+    async def earliest_actions_after_night(
+        self, all_roles: dict[str, Role]
+    ): ...
 
 
 @runtime_checkable

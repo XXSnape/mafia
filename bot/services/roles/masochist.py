@@ -18,6 +18,7 @@ class Masochist(Role):
                 chat_id=user_id, text=message
             )
             game_data["winners"].append(user_id)
+            return
         await super().report_death(
             game_data=game_data, is_night=is_night, user_id=user_id
         )
