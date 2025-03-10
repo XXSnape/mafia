@@ -6,7 +6,6 @@ from aiogram.types import InlineKeyboardButton
 
 
 if TYPE_CHECKING:
-    from general.collection_of_roles import Roles
     from services.roles import UsersInGame, GameCache
 
 from keyboards.inline.builder import generate_inline_kb

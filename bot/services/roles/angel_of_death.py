@@ -23,6 +23,12 @@ class AngelOfDeath(ActiveRoleAtNight):
         if user_id in game_data.get(self.roles_key, []):
             game_data["angels_died"].append(user_id)
 
+    def get_processed_user_id(self, game_data: GameCache):
+        result = super().get_processed_user_id(game_data=game_data)
+        if result:
+            game_data["angels_died"].clear()
+        return result
+
     async def mailing(self, game_data: GameCache):
         if "angels_died" not in game_data:
             return
@@ -34,7 +40,7 @@ class AngelOfDeath(ActiveRoleAtNight):
                 - game_data["players"][str(angel_id)][
                     "number_died_at_night"
                 ]
-            ) in (1, 2):
+            ) == 1:
                 angels.append(angel_id)
 
         for angel_id in angels:
