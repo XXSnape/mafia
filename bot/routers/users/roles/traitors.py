@@ -26,7 +26,7 @@ async def traitor_finds_out(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    _, game_data, user_id = get_game_state_data_and_user_id(
+    _, game_data, user_id = await get_game_state_data_and_user_id(
         callback=callback,
         callback_data=callback_data,
         state=state,

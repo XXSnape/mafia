@@ -1,4 +1,4 @@
-from cache.cache_types import ExtraCache
+from cache.cache_types import ExtraCache, GameCache
 from cache.roleses import Groupings
 from services.roles.base import ActiveRoleAtNight
 from states.states import UserFsm
@@ -22,6 +22,12 @@ class Forger(ActiveRoleAtNight):
     mail_message = "Кому сегодня подделаешь документы?"
     extra_data = [ExtraCache(key="forged_roles")]
     is_self_selecting = True
+
+    def cancel_actions(self, game_data: GameCache, user_id: int):
+        if game_data["forged_roles"]:
+            game_data["forged_roles"].clear()
+            return True
+        return False
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.FORGER_FAKES

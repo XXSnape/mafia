@@ -4,7 +4,7 @@ from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from cache.cache_types import GameCache, UserCache
-from general.collection_of_roles import Roles
+from general.collection_of_roles import Roles, get_data_with_roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
@@ -202,7 +202,8 @@ async def take_action_and_register_user(
     enum_name = game_data["players"][str(callback.from_user.id)][
         "enum_name"
     ]
-    current_role: Role = Roles[enum_name].value
+    all_roles = get_data_with_roles()
+    current_role: Role = all_roles[enum_name]
     await inform_players_and_trace_actions(
         callback=callback,
         game_data=game_data,
@@ -211,9 +212,13 @@ async def take_action_and_register_user(
     )
 
     if current_role.last_interactive_key:
-        game_data[current_role.last_interactive_key][
-            str(user_id)
-        ] = game_data["number_of_night"]
+        current_night = game_data["number_of_night"]
+        nights = game_data[
+            current_role.last_interactive_key
+        ].setdefault(str(user_id), [])
+        if current_night not in nights:
+            nights.append(current_night)
+
     if current_role.processed_users_key:
         game_data[current_role.processed_users_key].append(user_id)
     if (

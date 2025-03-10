@@ -1,5 +1,9 @@
 from cache.roleses import Groupings
-from services.roles.base import ActiveRoleAtNight, AliasRole, BossIsDeadMixin
+from services.roles.base import (
+    ActiveRoleAtNight,
+    AliasRole,
+    BossIsDeadMixin,
+)
 from services.roles.base.mixins import TreatmentMixin
 from states.states import UserFsm
 
@@ -22,6 +26,11 @@ class DoctorAlias(AliasRole):
     @property
     def processed_users_key(cls):
         return Doctor.processed_users_key
+
+    @classmethod
+    @property
+    def last_interactive_key(cls):
+        return Doctor.last_interactive_key
 
 
 class Doctor(TreatmentMixin, BossIsDeadMixin, ActiveRoleAtNight):

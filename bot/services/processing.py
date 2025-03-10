@@ -12,6 +12,7 @@ from cache.cache_types import (
     ChatsAndMessagesIds,
     GameCache,
     UserGameCache,
+    LastInteraction,
 )
 from general.exceptions import GameIsOver
 from general.players import Groupings
@@ -88,17 +89,18 @@ class Executor:
                     current_role.get_processed_user_id(game_data)
                 )
                 if processed_user_id:
-                    last_interactive = game_data[
+                    last_interactive: LastInteraction = game_data[
                         current_role.last_interactive_key
                     ]
                     excess_players = [
                         user_id_str
-                        for user_id_str, night in last_interactive.items()
-                        if night == current_night
+                        for user_id_str, nights in last_interactive.items()
+                        if nights
+                        and nights[-1] == current_night
                         and str(processed_user_id) != user_id_str
                     ]
                     for user_id_str in excess_players:
-                        last_interactive.pop(user_id_str)
+                        last_interactive[user_id_str].pop()
 
             if current_role.processed_users_key in game_data:
                 game_data[current_role.processed_users_key].clear()

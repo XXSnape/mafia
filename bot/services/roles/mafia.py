@@ -35,6 +35,11 @@ class MafiaAlias(AliasRole):
     def processed_users_key(cls):
         return Mafia.processed_users_key
 
+    @classmethod
+    @property
+    def last_interactive_key(cls):
+        return Mafia.last_interactive_key
+
 
 class Mafia(BossIsDeadMixin, ActiveRoleAtNight):
     role = "Дон. Высшее звание в преступных группировках"

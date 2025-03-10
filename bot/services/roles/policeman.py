@@ -33,6 +33,11 @@ class PolicemanAlias(AliasRole):
     def processed_users_key(cls):
         return Policeman.processed_users_key
 
+    @classmethod
+    @property
+    def last_interactive_key(cls):
+        return Policeman.last_interactive_key
+
 
 class Policeman(BossIsDeadMixin, ActiveRoleAtNight):
     role = "Маршал. Верховный главнокомандующий армии"
@@ -58,6 +63,14 @@ class Policeman(BossIsDeadMixin, ActiveRoleAtNight):
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.POLICEMAN_CHECKS
+
+    def cancel_actions(self, game_data: GameCache, user_id: int):
+        if game_data["disclosed_roles"]:
+            game_data["disclosed_roles"].clear()
+            return True
+        return super().cancel_actions(
+            game_data=game_data, user_id=user_id
+        )
 
     async def send_delayed_messages_after_night(
         self, game_data: GameCache

@@ -4,9 +4,14 @@ from typing import Callable, Optional
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardButton
 
-from cache.cache_types import ExtraCache, GameCache, PlayersIds
+from cache.cache_types import (
+    ExtraCache,
+    GameCache,
+    PlayersIds,
+    LastInteraction,
+)
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
@@ -102,6 +107,39 @@ class Role(ABC):
                 chat_id=user_id, text=message
             )
 
+    def cancel_actions(self, game_data: GameCache, user_id: int):
+        suffers = (
+            game_data["tracking"]
+            .get(str(user_id), {})
+            .get("sufferers", [])
+        )
+        if not suffers:
+            return False
+        for suffer in suffers:
+            game_data[self.processed_users_key].remove(suffer)
+        if self.processed_by_boss:
+            game_data[self.processed_by_boss].clear()
+        if self.last_interactive_key:
+            data: LastInteraction = game_data[
+                self.last_interactive_key
+            ]
+            if self.is_alias is False and (
+                self.alias is None
+                or self.alias.is_mass_mailing_list is False
+            ):
+                for suffer in suffers:
+                    suffer_interaction = data[str(suffer)]
+                    suffer_interaction.pop()
+            else:
+                processed_user_id = self.get_processed_user_id(
+                    game_data
+                )
+                for suffer in suffers:
+                    if suffer != processed_user_id:
+                        suffer_interaction = data[str(suffer)]
+                        suffer_interaction.pop()
+        return True
+
 
 class AliasRole(Role):
     is_alias = True
@@ -192,17 +230,24 @@ class ActiveRoleAtNight(Role):
         current_number = game_data["number_of_night"]
         if self.is_self_selecting is False:
             exclude = [player_id]
-        for processed_user_id, number in game_data.get(
+        for processed_user_id, numbers in game_data.get(
             self.last_interactive_key, {}
         ).items():
+            if not numbers:
+                continue
+            last_number_of_night = numbers[-1]
             if int(processed_user_id) == player_id:
                 constraint = self.do_not_choose_self
             else:
                 constraint = self.do_not_choose_others
             if constraint is None:
                 exclude.append(int(processed_user_id))
-            elif (current_number - number) < constraint + 1:
+            elif (
+                current_number - last_number_of_night
+                < constraint + 1
+            ):
                 exclude.append(int(processed_user_id))
+
         if game_data["players_ids"] == exclude:
             return
         return send_selection_to_players_kb(

@@ -112,11 +112,13 @@ async def policeman_chose_to_check(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    _, game_data, checked_user_id = get_game_state_data_and_user_id(
-        callback=callback,
-        callback_data=callback_data,
-        state=state,
-        dispatcher=dispatcher,
+    _, game_data, checked_user_id = (
+        await get_game_state_data_and_user_id(
+            callback=callback,
+            callback_data=callback_data,
+            state=state,
+            dispatcher=dispatcher,
+        )
     )
     role = game_data["players"][str(checked_user_id)]["pretty_role"]
     url = game_data["players"][str(checked_user_id)]["url"]
