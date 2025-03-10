@@ -29,13 +29,11 @@ async def forger_fakes(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    game_state, game_data, user_id = (
-        await get_game_state_data_and_user_id(
-            callback=callback,
-            callback_data=callback_data,
-            state=state,
-            dispatcher=dispatcher,
-        )
+    _, game_data, user_id = await get_game_state_data_and_user_id(
+        callback=callback,
+        callback_data=callback_data,
+        state=state,
+        dispatcher=dispatcher,
     )
 
     url = game_data["players"][str(user_id)]["url"]
@@ -60,7 +58,7 @@ async def forges_cancels_selection(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    game_state, game_data = await get_game_state_and_data(
+    _, game_data = await get_game_state_and_data(
         callback=callback, state=state, dispatcher=dispatcher
     )
     game_data["forged_roles"].clear()
@@ -79,7 +77,7 @@ async def forges_selects_documents(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    game_state, game_data = await get_game_state_and_data(
+    _, game_data = await get_game_state_and_data(
         callback=callback, state=state, dispatcher=dispatcher
     )
     all_roles = get_data_with_roles()

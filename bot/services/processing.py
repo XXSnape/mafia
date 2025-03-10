@@ -46,7 +46,7 @@ def check_end_of_game(async_func: Callable):
         if not game_data["mafias"]:
             raise GameIsOver(winner=Groupings.civilians)
 
-        if len(game_data["mafias"]) >= (
+        if len(game_data["mafias"]) > (  # TODO <=
             len(game_data["players_ids"]) - len(game_data["mafias"])
         ):
             raise GameIsOver(winner=Groupings.criminals)

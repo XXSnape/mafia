@@ -5,7 +5,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from cache.cache_types import GameCache, UserCache
 from general.collection_of_roles import Roles
-from keyboards.inline.callback_factory.recognize_user import UserActionIndexCbData
+from keyboards.inline.callback_factory.recognize_user import (
+    UserActionIndexCbData,
+)
+from services.actions_at_night import get_game_state_data_and_user_id
 from services.roles import Mafia, Traitor
 from states.states import UserFsm
 from utils.utils import get_state_and_assign, make_pretty
@@ -23,14 +26,12 @@ async def traitor_finds_out(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    user_data: UserCache = await state.get_data()
-    game_state = await get_state_and_assign(
+    _, game_data, user_id = get_game_state_data_and_user_id(
+        callback=callback,
+        callback_data=callback_data,
+        state=state,
         dispatcher=dispatcher,
-        chat_id=user_data["game_chat"],
-        bot_id=callback.bot.id,
     )
-    game_data: GameCache = await game_state.get_data()
-    user_id = game_data["players_ids"][callback_data.user_index]
     url = game_data["players"][str(user_id)]["url"]
     role = game_data["players"][str(user_id)]["pretty_role"]
     await callback.message.delete()
@@ -45,7 +46,7 @@ async def traitor_finds_out(
         *(
             callback.bot.send_message(
                 chat_id=player_id,
-                text=f"{make_pretty(Roles.traitor.value.role)} проверил и узнал, что {url} - {role}",
+                text=f"{make_pretty(Traitor.role)} проверил и узнал, что {url} - {role}",
             )
             for player_id in game_data[Mafia.roles_key]
             + game_data[Traitor.roles_key]

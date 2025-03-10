@@ -21,7 +21,11 @@ from keyboards.inline.keypads.mailing import (
     kill_or_check_on_policeman,
     send_selection_to_players_kb,
 )
-from services.actions_at_night import take_action_and_register_user
+from services.actions_at_night import (
+    take_action_and_register_user,
+    get_game_state_and_data,
+    get_game_state_data_and_user_id,
+)
 from services.roles import Policeman
 from states.states import UserFsm
 from utils.utils import get_state_and_assign
@@ -48,13 +52,11 @@ async def policeman_makes_choice(
             "Кого будешь проверять?",
         ],
     }
-    user_data: UserCache = await state.get_data()
-    game_state = await get_state_and_assign(
+    _, game_data = await get_game_state_and_data(
+        callback=callback,
+        state=state,
         dispatcher=dispatcher,
-        chat_id=user_data["game_chat"],
-        bot_id=callback.bot.id,
     )
-    game_data: GameCache = await game_state.get_data()
     police_action = data[callback.data]
     markup = send_selection_to_players_kb(
         players_ids=game_data["players_ids"],
@@ -110,16 +112,12 @@ async def policeman_chose_to_check(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    user_data: UserCache = await state.get_data()
-    game_state = await get_state_and_assign(
+    _, game_data, checked_user_id = get_game_state_data_and_user_id(
+        callback=callback,
+        callback_data=callback_data,
+        state=state,
         dispatcher=dispatcher,
-        chat_id=user_data["game_chat"],
-        bot_id=callback.bot.id,
     )
-    game_data: GameCache = await game_state.get_data()
-    checked_user_id = game_data["players_ids"][
-        callback_data.user_index
-    ]
     role = game_data["players"][str(checked_user_id)]["pretty_role"]
     url = game_data["players"][str(checked_user_id)]["url"]
     game_data["disclosed_roles"].append([checked_user_id, role])
