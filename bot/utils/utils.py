@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 
 def dependency_injection(func, data: dict):
     keys = set(get_annotations(func).keys())
+    print("func", func, "keys", keys)
     suitable_keys = keys & set(data.keys())
     return {
         key: val for key, val in data.items() if key in suitable_keys

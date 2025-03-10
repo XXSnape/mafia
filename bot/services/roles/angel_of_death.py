@@ -1,10 +1,11 @@
 from cache.cache_types import ExtraCache, GameCache
 from cache.roleses import Groupings
 from services.roles.base import ActiveRoleAtNight
+from services.roles.base.mixins import MurderAfterNight
 from states.states import UserFsm
 
 
-class AngelOfDeath(ActiveRoleAtNight):
+class AngelOfDeath(MurderAfterNight, ActiveRoleAtNight):
     role = "Ангел смерти"
     mail_message = (
         "Глупые людишки тебя линчевали, кому ты отомстишь?"

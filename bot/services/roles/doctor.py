@@ -1,11 +1,13 @@
+from cache.cache_types import GameCache
 from cache.roleses import Groupings
 from services.roles.base import (
     ActiveRoleAtNight,
     AliasRole,
     BossIsDeadMixin,
 )
-from services.roles.base.mixins import TreatmentMixin
+from services.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
+from utils.validators import get_processed_user_id_if_exists
 
 
 class DoctorAlias(AliasRole):
@@ -33,7 +35,9 @@ class DoctorAlias(AliasRole):
         return Doctor.last_interactive_key
 
 
-class Doctor(TreatmentMixin, BossIsDeadMixin, ActiveRoleAtNight):
+class Doctor(
+    ProcedureAfterNight, BossIsDeadMixin, ActiveRoleAtNight
+):
     role = "Главный врач"
     mail_message = "Кого вылечить этой ночью?"
     is_self_selecting = True
@@ -48,6 +52,16 @@ class Doctor(TreatmentMixin, BossIsDeadMixin, ActiveRoleAtNight):
     )
     message_to_user_after_action = "Ты выбрал вылечить {url}"
     alias = DoctorAlias()
+    number_in_order = 4
+
+    @get_processed_user_id_if_exists
+    async def procedure_after_night(
+        self,
+        game_data: GameCache,
+        processed_user_id: int,
+        recovered: list[int],
+    ):
+        recovered.append(processed_user_id)
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.DOCTOR_TREATS

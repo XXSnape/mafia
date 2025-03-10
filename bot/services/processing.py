@@ -23,6 +23,7 @@ from utils.utils import (
     get_profiles,
     get_state_and_assign,
     get_the_most_frequently_encountered_id,
+    dependency_injection,
 )
 
 from .protocols.protocols import (
@@ -33,7 +34,7 @@ from .protocols.protocols import (
 )
 from .roles import Lawyer
 from .roles.base import AliasRole, BossIsDeadMixin, Role
-from .roles.base.mixins import TreatmentMixin
+from .roles.base.mixins import ProcedureAfterNight
 
 if TYPE_CHECKING:
     from .pipeline_game import Game
@@ -115,21 +116,21 @@ class Executor:
         game_data["vote_for"].clear()
         await self.state.set_data(game_data)
 
-    async def start_earliest_actions(self):
-        for role in self.all_roles:
-            current_role = self.all_roles[role]
-            if isinstance(current_role, EarliestActionsAfterNight):
-                await current_role.earliest_actions_after_night(
-                    all_roles=self.all_roles
-                )
-
-    async def send_promised_messages(self, game_data: GameCache):
-        for role in self.all_roles:
-            current_role = self.all_roles[role]
-            if isinstance(current_role, DelayedMessagesAfterNight):
-                await current_role.send_delayed_messages_after_night(
-                    game_data=game_data
-                )
+    # async def start_earliest_actions(self):
+    #     for role in self.all_roles:
+    #         current_role = self.all_roles[role]
+    #         if isinstance(current_role, EarliestActionsAfterNight):
+    #             await current_role.earliest_actions_after_night(
+    #                 all_roles=self.all_roles
+    #             )
+    #
+    # async def send_promised_messages(self, game_data: GameCache):
+    #     for role in self.all_roles:
+    #         current_role = self.all_roles[role]
+    #         if isinstance(current_role, DelayedMessagesAfterNight):
+    #             await current_role.send_delayed_messages_after_night(
+    #                 game_data=game_data
+    #             )
 
     def get_voting_roles(self):
         return [
@@ -194,41 +195,65 @@ class Executor:
     @check_end_of_game
     async def sum_up_after_night(self):
         game_data: GameCache = await self.state.get_data()
-        attacking_roles = [
+        roles: list[ProcedureAfterNight] = [
             self.all_roles[role]
             for role in self.all_roles
-            if self.all_roles[role].can_kill_at_night
+            if isinstance(self.all_roles[role], ProcedureAfterNight)
         ]
-        murdered = []
-        for role in attacking_roles:
-            user_id = role.get_processed_user_id(game_data)
-            if user_id:
-                murdered.append(user_id)
+        roles.sort()
+        victims = set()
         recovered = []
-
-        healing_roles = [
-            self.all_roles[role]
-            for role in self.all_roles
-            if isinstance(self.all_roles[role], TreatmentMixin)
-        ]
-        healing_roles.sort()
-        for heal_role in healing_roles:
-            heal_role: TreatmentMixin
-            heal_role.treat(
-                game_data=game_data,
-                recovered=recovered,
-                murdered=murdered,
-            )
-        victims = set(murdered) - set(recovered)
-        for role in self.all_roles:
-            current_role = self.all_roles[role]
-            if isinstance(current_role, ModificationVictims):
-                await current_role.change_victims(
-                    game_data=game_data,
-                    attacking_roles=attacking_roles,
-                    victims=victims,
-                    recovered=recovered,
+        murdered = []
+        args = {
+            "recovered": recovered,
+            "murdered": murdered,
+            "victims": victims,
+            "game_data": game_data,
+        }
+        for role in roles:
+            await role.procedure_after_night(
+                **dependency_injection(
+                    func=role.procedure_after_night, data=args
                 )
+            )
+        victims |= set(murdered) - set(recovered)
+
+        #
+        # attacking_roles = [
+        #     self.all_roles[role]
+        #     for role in self.all_roles
+        #     if self.all_roles[role].can_kill_at_night
+        # ]
+        # murdered = []
+        # for role in attacking_roles:
+        #     user_id = role.get_processed_user_id(game_data)
+        #     if user_id:
+        #         murdered.append(user_id)
+        # recovered = []
+        #
+        # healing_roles = [
+        #     self.all_roles[role]
+        #     for role in self.all_roles
+        #     if isinstance(self.all_roles[role], TreatmentMixin)
+        # ]
+        # healing_roles.sort()
+        # for heal_role in healing_roles:
+        #     heal_role: TreatmentMixin
+        #     heal_role.treat(
+        #         game_data=game_data,
+        #         recovered=recovered,
+        #         murdered=murdered,
+        #     )
+        # victims = set(murdered) - set(recovered)
+        # for role in self.all_roles:
+        #     current_role = self.all_roles[role]
+        #     if isinstance(current_role, ModificationVictims):
+        #         await current_role.change_victims(
+        #             game_data=game_data,
+        #             attacking_roles=attacking_roles,
+        #             victims=victims,
+        #             recovered=recovered,
+        #         )
 
         text_about_dead = ""
         for victim_id in victims:

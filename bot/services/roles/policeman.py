@@ -10,6 +10,7 @@ from services.roles.base import (
     AliasRole,
     BossIsDeadMixin,
 )
+from services.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
 from utils.validators import remind_commissioner_about_inspections
 
@@ -39,7 +40,9 @@ class PolicemanAlias(AliasRole):
         return Policeman.last_interactive_key
 
 
-class Policeman(BossIsDeadMixin, ActiveRoleAtNight):
+class Policeman(
+    ProcedureAfterNight, BossIsDeadMixin, ActiveRoleAtNight
+):
     role = "Маршал. Верховный главнокомандующий армии"
     photo = "https://avatars.mds.yandex.net/get-kinopoisk-image/1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x"
     grouping = Groupings.civilians
@@ -60,9 +63,28 @@ class Policeman(BossIsDeadMixin, ActiveRoleAtNight):
             data_type=str,
         ),
     ]
+    number_in_order = 2
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.POLICEMAN_CHECKS
+
+    async def procedure_after_night(
+        self, game_data: GameCache, murdered: list[int]
+    ):
+        if game_data["disclosed_roles"]:
+            user_id, role = game_data["disclosed_roles"][0]
+            url = game_data["players"][str(user_id)]["url"]
+            text = f"{url} - {role}!"
+            for policeman_id in game_data[self.roles_key]:
+                await self.bot.send_message(
+                    chat_id=policeman_id, text=text
+                )
+            game_data["text_about_checks"] += text + "\n"
+            await self.state.set_data(game_data)
+        else:
+            processed_user_id = self.get_processed_user_id(game_data)
+            if processed_user_id:
+                murdered.append(processed_user_id)
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
         if game_data["disclosed_roles"]:
@@ -72,23 +94,23 @@ class Policeman(BossIsDeadMixin, ActiveRoleAtNight):
             game_data=game_data, user_id=user_id
         )
 
-    async def send_delayed_messages_after_night(
-        self, game_data: GameCache
-    ):
-        if game_data["disclosed_roles"]:
-            user_id, role = game_data["disclosed_roles"][0]
-            if game_data.get("forged_roles"):
-                faked_id, faked_role = game_data["forged_roles"][0]
-                if faked_id == user_id:
-                    role = faked_role
-            url = game_data["players"][str(user_id)]["url"]
-            text = f"{url} - {role}!"
-            for policeman_id in game_data[self.roles_key]:
-                await self.bot.send_message(
-                    chat_id=policeman_id, text=text
-                )
-            game_data["text_about_checks"] += text + "\n"
-            await self.state.set_data(game_data)
+    # async def send_delayed_messages_after_night(
+    #     self, game_data: GameCache
+    # ):
+    #     if game_data["disclosed_roles"]:
+    #         user_id, role = game_data["disclosed_roles"][0]
+    #         if game_data.get("forged_roles"):
+    #             faked_id, faked_role = game_data["forged_roles"][0]
+    #             if faked_id == user_id:
+    #                 role = faked_role
+    #         url = game_data["players"][str(user_id)]["url"]
+    #         text = f"{url} - {role}!"
+    #         for policeman_id in game_data[self.roles_key]:
+    #             await self.bot.send_message(
+    #                 chat_id=policeman_id, text=text
+    #             )
+    #         game_data["text_about_checks"] += text + "\n"
+    #         await self.state.set_data(game_data)
 
     def generate_markup(
         self,

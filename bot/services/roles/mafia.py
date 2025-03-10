@@ -5,8 +5,10 @@ from services.roles.base import (
     AliasRole,
     BossIsDeadMixin,
 )
+from services.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
 from utils.utils import get_the_most_frequently_encountered_id
+from utils.validators import get_processed_user_id_if_exists
 
 
 class MafiaAlias(AliasRole):
@@ -41,7 +43,7 @@ class MafiaAlias(AliasRole):
         return Mafia.last_interactive_key
 
 
-class Mafia(BossIsDeadMixin, ActiveRoleAtNight):
+class Mafia(ProcedureAfterNight, BossIsDeadMixin, ActiveRoleAtNight):
     role = "Дон. Высшее звание в преступных группировках"
     photo = (
         "https://avatars.mds.yandex.net/i?id="
@@ -56,6 +58,15 @@ class Mafia(BossIsDeadMixin, ActiveRoleAtNight):
     can_kill_at_night = True
 
     alias = MafiaAlias()
+
+    @get_processed_user_id_if_exists
+    async def procedure_after_night(
+        self,
+        game_data: GameCache,
+        murdered: list[int],
+        processed_user_id: int,
+    ):
+        murdered.append(processed_user_id)
 
     def get_victims(self, game_data: GameCache):
         victim_id = get_the_most_frequently_encountered_id(

@@ -1,11 +1,13 @@
 from cache.cache_types import GameCache
 from cache.roleses import Groupings
 from services.roles.base import ActiveRoleAtNight
-from services.roles.base.mixins import TreatmentMixin
+from services.roles.base.mixins import (
+    ProcedureAfterNight,
+)
 from states.states import UserFsm
 
 
-class Bodyguard(TreatmentMixin, ActiveRoleAtNight):
+class Bodyguard(ProcedureAfterNight, ActiveRoleAtNight):
     role = "Телохранитель"
     mail_message = "За кого пожертвовать собой?"
     photo = (
@@ -21,14 +23,14 @@ class Bodyguard(TreatmentMixin, ActiveRoleAtNight):
         "Ты выбрал пожертвовать собой, чтобы спасти {url}"
     )
     can_treat = True
-    number_in_order_of_treatment = 3
+    number_in_order = 3
 
     def __init__(self):
         self.state_for_waiting_for_action = (
             UserFsm.BODYGUARD_PROTECTS
         )
 
-    def treat(
+    async def procedure_after_night(
         self,
         game_data: GameCache,
         recovered: list[int],
@@ -44,3 +46,20 @@ class Bodyguard(TreatmentMixin, ActiveRoleAtNight):
             if game_data[self.roles_key][0] in recovered:
                 return
             murdered.append(game_data[self.roles_key][0])
+
+    # def treat(
+    #     self,
+    #     game_data: GameCache,
+    #     recovered: list[int],
+    #     murdered: list[int],
+    # ):
+    #     recovered_id = self.get_processed_user_id(game_data)
+    #     if not recovered_id:
+    #         return
+    #     if recovered_id in recovered:
+    #         return
+    #     if recovered_id in murdered:
+    #         recovered.append(recovered_id)
+    #         if game_data[self.roles_key][0] in recovered:
+    #             return
+    #         murdered.append(game_data[self.roles_key][0])

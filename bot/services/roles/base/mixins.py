@@ -1,7 +1,9 @@
+from abc import ABC, abstractmethod
 from functools import total_ordering
 
 from cache.cache_types import GameCache
 from utils.utils import get_profiles, make_pretty
+from utils.validators import get_processed_user_id_if_exists
 
 
 class BossIsDeadMixin:
@@ -50,31 +52,31 @@ class VictimsMixin:
 
 
 @total_ordering
-class TreatmentMixin:
-    number_in_order_of_treatment: int = 1
+class ProcedureAfterNight(ABC):
+    number_in_order: int = 1
 
-    def treat(
-        self,
-        game_data: GameCache,
-        recovered: list[int],
-        murdered: list[int],
-    ):
-        recovered_id = self.get_processed_user_id(game_data)
-        if recovered_id is not None:
-            recovered.append(recovered_id)
+    @abstractmethod
+    async def procedure_after_night(self, *args, **kwargs):
+        pass
 
     def __eq__(self, other):
-        if isinstance(other, TreatmentMixin):
-            return (
-                self.number_in_order_of_treatment
-                == other.number_in_order_of_treatment
-            )
+        if isinstance(other, ProcedureAfterNight):
+            return self.number_in_order == other.number_in_order
         return NotImplemented
 
     def __lt__(self, other):
-        if isinstance(other, TreatmentMixin):
-            return (
-                self.number_in_order_of_treatment
-                < other.number_in_order_of_treatment
-            )
+        if isinstance(other, ProcedureAfterNight):
+            return self.number_in_order < other.number_in_order
         return NotImplemented
+
+
+class MurderAfterNight(ProcedureAfterNight):
+
+    @get_processed_user_id_if_exists
+    async def procedure_after_night(
+        self,
+        game_data: GameCache,
+        murdered: list[int],
+        processed_user_id: int,
+    ):
+        murdered.append(processed_user_id)

@@ -5,10 +5,12 @@ from aiogram.types import ChatPermissions
 from cache.cache_types import GameCache
 from cache.roleses import Groupings
 from services.roles.base import ActiveRoleAtNight
+from services.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
+from utils.validators import get_processed_user_id_if_exists
 
 
-class Prosecutor(ActiveRoleAtNight):
+class Prosecutor(ProcedureAfterNight, ActiveRoleAtNight):
     role = "Прокурор"
     mail_message = "Кого арестовать этой ночью?"
     photo = (
@@ -25,21 +27,34 @@ class Prosecutor(ActiveRoleAtNight):
     )
     message_to_user_after_action = "Ты выбрал арестовать {url}"
 
-    async def take_action_after_voting(
-        self, game_data: GameCache, user_id: int
+    @get_processed_user_id_if_exists
+    async def procedure_after_night(
+        self, game_data: GameCache, processed_user_id: int
     ):
-        cant_vote_id = self.get_processed_user_id(game_data)
-        if cant_vote_id:
-            with suppress(TelegramBadRequest):
-                await self.bot.restrict_chat_member(
-                    chat_id=game_data["game_chat"],
-                    user_id=cant_vote_id,
-                    permissions=ChatPermissions(
-                        can_send_messages=True,
-                        can_send_other_messages=True,
-                        can_send_polls=True,
-                    ),
-                )
+        with suppress(TelegramBadRequest):
+            await self.bot.restrict_chat_member(
+                chat_id=game_data["game_chat"],
+                user_id=processed_user_id,
+                permissions=ChatPermissions(can_send_messages=False),
+            )
+
+    @get_processed_user_id_if_exists
+    async def take_action_after_voting(
+        self,
+        game_data: GameCache,
+        user_id: int,
+        processed_user_id: int,
+    ):
+        with suppress(TelegramBadRequest):
+            await self.bot.restrict_chat_member(
+                chat_id=game_data["game_chat"],
+                user_id=processed_user_id,
+                permissions=ChatPermissions(
+                    can_send_messages=True,
+                    can_send_other_messages=True,
+                    can_send_polls=True,
+                ),
+            )
 
     def __init__(self):
         self.state_for_waiting_for_action = (

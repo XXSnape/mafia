@@ -1,10 +1,11 @@
 from cache.cache_types import ExtraCache, GameCache
 from cache.roleses import Groupings
 from services.roles.base import ActiveRoleAtNight
+from services.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
 
 
-class Forger(ActiveRoleAtNight):
+class Forger(ProcedureAfterNight, ActiveRoleAtNight):
     role = "Румпельштильцхен"
     grouping = Groupings.criminals
     purpose = "Ты должен обманывать комиссара и подделывать документы на свое усмотрение во имя мафии"
@@ -22,6 +23,15 @@ class Forger(ActiveRoleAtNight):
     mail_message = "Кому сегодня подделаешь документы?"
     extra_data = [ExtraCache(key="forged_roles")]
     is_self_selecting = True
+
+    async def procedure_after_night(self, game_data: GameCache):
+        if (
+            game_data["disclosed_roles"]
+            and game_data["forged_roles"]
+        ):
+            game_data["disclosed_roles"][:] = game_data[
+                "forged_roles"
+            ]
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
         if game_data["forged_roles"]:

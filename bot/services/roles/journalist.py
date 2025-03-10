@@ -1,11 +1,12 @@
 from cache.cache_types import ExtraCache, GameCache
 from cache.roleses import Groupings
 from services.roles.base import ActiveRoleAtNight
+from services.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
 from utils.validators import get_processed_user_id_if_exists
 
 
-class Journalist(ActiveRoleAtNight):
+class Journalist(ProcedureAfterNight, ActiveRoleAtNight):
     role = "Журналист"
     mail_message = "У кого взять интервью этой ночью?"
     photo = (
@@ -25,7 +26,7 @@ class Journalist(ActiveRoleAtNight):
     is_self_selecting = True
 
     @get_processed_user_id_if_exists
-    async def send_delayed_messages_after_night(
+    async def procedure_after_night(
         self, game_data: GameCache, processed_user_id: int
     ):
         visitors = ", ".join(
@@ -46,6 +47,29 @@ class Journalist(ActiveRoleAtNight):
         await self.bot.send_message(
             chat_id=game_data[self.roles_key][0], text=message
         )
+
+    # @get_processed_user_id_if_exists
+    # async def send_delayed_messages_after_night(
+    #     self, game_data: GameCache, processed_user_id: int
+    # ):
+    #     visitors = ", ".join(
+    #         game_data["players"][str(user_id)]["url"]
+    #         for user_id in game_data["tracking"]
+    #         .get(str(processed_user_id), {})
+    #         .get("interacting", [])
+    #         if user_id != game_data[self.roles_key][0]
+    #     )
+    #     user_url = game_data["players"][str(processed_user_id)][
+    #         "url"
+    #     ]
+    #     message = (
+    #         f"{user_url} сегодня никто не навещал"
+    #         if not visitors
+    #         else f"К {user_url} приходили: {visitors}"
+    #     )
+    #     await self.bot.send_message(
+    #         chat_id=game_data[self.roles_key][0], text=message
+    #     )
 
     def __init__(self):
         self.state_for_waiting_for_action = (
