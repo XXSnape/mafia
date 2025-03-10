@@ -7,18 +7,21 @@ if TYPE_CHECKING:
     from services.roles.base import Role
 
 
-def get_object_id_if_exists(async_func: Callable):
+def get_processed_user_id_if_exists(async_func: Callable):
     @wraps(async_func)
     async def wrapper(role: "Role", *args, **kwargs):
         game_data: GameCache = await role.state.get_data()
         players = game_data.get(role.roles_key)
         if not players:
             return
-        processed_users = game_data[role.processed_users_key]
-        if not processed_users:
+        processed_user_id = role.get_processed_user_id(game_data)
+        if processed_user_id is None:
             return
         return await async_func(
-            role, *args, **kwargs, user_id=processed_users[0]
+            role,
+            *args,
+            **kwargs,
+            processed_user_id=processed_user_id
         )
 
     return wrapper

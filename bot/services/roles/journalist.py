@@ -2,7 +2,7 @@ from cache.cache_types import ExtraCache, GameCache
 from cache.roleses import Groupings
 from services.roles.base import ActiveRoleAtNight
 from states.states import UserFsm
-from utils.validators import get_object_id_if_exists
+from utils.validators import get_processed_user_id_if_exists
 
 
 class Journalist(ActiveRoleAtNight):
@@ -22,18 +22,22 @@ class Journalist(ActiveRoleAtNight):
     extra_data = [
         ExtraCache(key="tracking", data_type=dict),
     ]
+    is_self_selecting = True
 
-    @get_object_id_if_exists
+    @get_processed_user_id_if_exists
     async def send_delayed_messages_after_night(
-        self, game_data: GameCache, user_id: int
+        self, game_data: GameCache, processed_user_id: int
     ):
         visitors = ", ".join(
             game_data["players"][str(user_id)]["url"]
             for user_id in game_data["tracking"]
-            .get(str(user_id), {})
+            .get(str(processed_user_id), {})
             .get("interacting", [])
+            if user_id != game_data[self.roles_key][0]
         )
-        user_url = game_data["players"][str(user_id)]["url"]
+        user_url = game_data["players"][str(processed_user_id)][
+            "url"
+        ]
         message = (
             f"{user_url} сегодня никто не навещал"
             if not visitors

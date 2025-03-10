@@ -3,7 +3,7 @@ from cache.roleses import Groupings
 from services.roles import Forger, Policeman
 from services.roles.base import ActiveRoleAtNight, Role
 from states.states import UserFsm
-from utils.validators import get_object_id_if_exists
+from utils.validators import get_processed_user_id_if_exists
 
 
 class Sleeper(ActiveRoleAtNight):
@@ -26,12 +26,12 @@ class Sleeper(ActiveRoleAtNight):
             UserFsm.CLOFFELINE_GIRL_PUTS_TO_SLEEP
         )
 
-    @get_object_id_if_exists
+    @get_processed_user_id_if_exists
     async def earliest_actions_after_night(
-        self, user_id: int, all_roles: dict[str, Role]
+        self, processed_user_id: int, all_roles: dict[str, Role]
     ):
         game_data: GameCache = await self.state.get_data()
-        euthanized_user_id = user_id
+        euthanized_user_id = processed_user_id
         user_role = game_data["players"][str(euthanized_user_id)][
             "role"
         ]

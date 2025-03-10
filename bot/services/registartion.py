@@ -21,6 +21,7 @@ async def init_game(message: Message, state: FSMContext):
         "players_ids": [],
         "players": {},
         "messages_after_night": [],
+        "forged_roles": [],
         "winners": [],
         "losers": [],
         "to_delete": [],

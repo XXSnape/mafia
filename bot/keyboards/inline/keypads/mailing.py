@@ -4,12 +4,15 @@ from typing import TYPE_CHECKING
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
 
+
 if TYPE_CHECKING:
     from general.collection_of_roles import Roles
     from services.roles import UsersInGame, GameCache
 
 from keyboards.inline.builder import generate_inline_kb
-from keyboards.inline.callback_factory.recognize_user import UserActionIndexCbData
+from keyboards.inline.callback_factory.recognize_user import (
+    UserActionIndexCbData,
+)
 from keyboards.inline.cb.cb_text import (
     PLAYER_BACKS_CB,
     POLICEMAN_CHECKS_CB,
@@ -76,11 +79,9 @@ def kill_or_check_on_policeman():
     return generate_inline_kb(data_with_buttons=buttons)
 
 
-def choose_fake_role_kb(roles: list["Roles"]):
+def choose_fake_role_kb(roles: list[tuple[str, str]]):
     buttons = [
-        InlineKeyboardButton(
-            text=role.value.role, callback_data=role.name
-        )
+        InlineKeyboardButton(text=role[0], callback_data=role[1])
         for role in roles
     ]
     buttons.append(POLICEMAN_BACK_BTN)

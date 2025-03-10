@@ -4,6 +4,7 @@ from cache.roleses import Groupings
 from keyboards.inline.cb.cb_text import DRAW_CB
 from services.roles.base import ActiveRoleAtNight
 from states.states import UserFsm
+from utils.validators import get_processed_user_id_if_exists
 
 
 class Analyst(ActiveRoleAtNight):
@@ -43,14 +44,15 @@ class Analyst(ActiveRoleAtNight):
             extra_buttons=extra_buttons,
         )
 
+    @get_processed_user_id_if_exists
     async def take_action_after_voting(
-        self, game_data: GameCache, user_id: int
+        self,
+        game_data: GameCache,
+        user_id: int,
+        processed_user_id: int,
     ):
-        predicted_id = self.get_processed_user_id(game_data)
-        if predicted_id is None:
-            return
         analyst_id = game_data[self.roles_key][0]
-        if predicted_id == user_id:
+        if processed_user_id == user_id:
             await self.bot.send_message(
                 chat_id=analyst_id, text="Прекрасная дедукция!"
             )
