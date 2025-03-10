@@ -29,7 +29,7 @@ class Punisher(Role):
             if not killed_id:
                 continue
             killer_id = game_data[role.roles_key][0]
-            if killer_id == punisher_id:
+            if killed_id == punisher_id:
                 treated_by_bodyguard = (
                     Bodyguard().get_processed_user_id(game_data)
                 )

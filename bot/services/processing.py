@@ -219,8 +219,9 @@ class Executor:
             )
         victims = set(murdered) - set(recovered)
         for role in self.all_roles:
-            if isinstance(role, ModificationVictims):
-                await role.change_victims(
+            current_role = self.all_roles[role]
+            if isinstance(current_role, ModificationVictims):
+                await current_role.change_victims(
                     game_data=game_data,
                     attacking_roles=attacking_roles,
                     victims=victims,
