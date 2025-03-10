@@ -1,7 +1,15 @@
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
 from cache.cache_types import ExtraCache, GameCache
 from cache.roleses import Groupings
-from keyboards.inline.keypads.mailing import kill_or_check_on_policeman
-from services.roles.base import ActiveRoleAtNight, AliasRole, BossIsDeadMixin
+from keyboards.inline.keypads.mailing import (
+    kill_or_check_on_policeman,
+)
+from services.roles.base import (
+    ActiveRoleAtNight,
+    AliasRole,
+    BossIsDeadMixin,
+)
 from states.states import UserFsm
 from utils.validators import remind_commissioner_about_inspections
 
@@ -69,10 +77,20 @@ class Policeman(BossIsDeadMixin, ActiveRoleAtNight):
             game_data["text_about_checks"] += text + "\n"
             await self.state.set_data(game_data)
 
-    async def mailing(self, game_data: GameCache):
-        if self.processed_users_key not in game_data:
-            return
-        policeman = game_data[self.roles_key]
+    def generate_markup(
+        self,
+        player_id: int,
+        game_data: GameCache,
+        extra_buttons: tuple[InlineKeyboardButton, ...] = (),
+    ):
+        return kill_or_check_on_policeman()
+
+    async def mailing(
+        self,
+        game_data: GameCache,
+        own_markup: InlineKeyboardMarkup | None = None,
+    ):
+        policeman = self.get_roles(game_data)
         if not policeman:
             return
         for policeman_id in policeman:
@@ -82,13 +100,4 @@ class Policeman(BossIsDeadMixin, ActiveRoleAtNight):
                     game_data=game_data
                 ),
             )
-        sent_survey = await self.bot.send_message(
-            chat_id=policeman[0],
-            text=self.mail_message,
-            reply_markup=kill_or_check_on_policeman(),
-        )
-        await self.save_msg_to_delete_and_change_state(
-            game_data=game_data,
-            player_id=policeman[0],
-            message_id=sent_survey.message_id,
-        )
+        await super().mailing(game_data=game_data)

@@ -112,7 +112,7 @@ class Game:
             reply_markup=get_to_bot_kb("Действовать!"),
         )
         await self.mailer.mailing()
-        await asyncio.sleep(23)
+        await asyncio.sleep(10)
         # raise GameIsOver(winner=Groupings.criminals)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]

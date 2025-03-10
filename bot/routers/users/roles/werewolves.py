@@ -10,9 +10,22 @@ from keyboards.inline.cb.cb_text import (
     WEREWOLF_TO_MAFIA_CB,
     WEREWOLF_TO_POLICEMAN_CB,
 )
-from services.roles import Werewolf
+from services.actions_at_night import get_game_state_and_data
+from services.roles import (
+    Werewolf,
+    Mafia,
+    MafiaAlias,
+    Doctor,
+    DoctorAlias,
+    Policeman,
+    PolicemanAlias,
+)
 from states.states import UserFsm
-from utils.utils import get_profiles, get_state_and_assign, make_pretty
+from utils.utils import (
+    get_profiles,
+    get_state_and_assign,
+    make_pretty,
+)
 from utils.validators import remind_commissioner_about_inspections
 
 router = Router(name=__name__)
@@ -35,41 +48,39 @@ async def werewolf_turns_into(
 ):
     data = {
         WEREWOLF_TO_MAFIA_CB: [
-            Roles.don,
-            # AliasesRole.mafia,
+            [Mafia(), "don"],
+            [MafiaAlias(), "mafia"],
         ],
         WEREWOLF_TO_DOCTOR_CB: [
-            Roles.doctor,
-            # AliasesRole.nurse,
+            [Doctor(), "doctor"],
+            [DoctorAlias(), "nurse"],
         ],
         WEREWOLF_TO_POLICEMAN_CB: [
-            Roles.policeman,
-            # AliasesRole.general,
+            [Policeman(), "policeman"],
+            [PolicemanAlias(), "general"],
         ],
     }
-    user_data: UserCache = await state.get_data()
-    game_state = await get_state_and_assign(
-        dispatcher=dispatcher,
-        chat_id=user_data["game_chat"],
-        bot_id=callback.bot.id,
+    game_state, game_data = await get_game_state_and_data(
+        callback=callback, state=state, dispatcher=dispatcher
     )
 
     user_id = callback.from_user.id
-    game_data: GameCache = await game_state.get_data()
     game_data[Werewolf.roles_key].remove(user_id)
     url = game_data["players"][str(user_id)]["url"]
+
     initial_role = game_data["players"][str(user_id)]["initial_role"]
-    current_enums = data[callback.data]
-    roles_key = current_enums[0].value.roles_key
+
+    current_roles = data[callback.data]
+    roles_key = current_roles[0][0].roles_key
     game_data[roles_key].append(callback.from_user.id)
     await callback.message.delete()
     are_there_many_senders = False
     if len(game_data[roles_key]) == 1:
-        enum_name = current_enums[0].name
-        new_role = current_enums[0].value
+        enum_name = current_roles[0][1]
+        new_role = current_roles[0][0]
     else:
-        enum_name = current_enums[1].name
-        new_role = current_enums[1].value
+        enum_name = current_roles[1][1]
+        new_role = current_roles[1][0]
         are_there_many_senders = True
     game_data["players"][str(user_id)]["role"] = new_role.role
     game_data["players"][str(user_id)]["pretty_role"] = make_pretty(
@@ -88,7 +99,7 @@ async def werewolf_turns_into(
     await callback.bot.send_photo(
         chat_id=game_data["game_chat"],
         photo=new_role.photo,
-        caption=f"{make_pretty(Roles.werewolf.value.role)} принял решение превратиться в {make_pretty(new_role.role)}. "
+        caption=f"{make_pretty(Werewolf.role)} принял решение превратиться в {make_pretty(new_role.role)}. "
         f"Уже со следующего дня изменения в миропорядке вступят в силу.",
     )
     if are_there_many_senders:

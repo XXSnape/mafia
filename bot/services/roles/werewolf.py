@@ -1,4 +1,4 @@
-from aiogram.types import InlineKeyboardButton
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from cache.cache_types import GameCache
 from cache.roleses import Groupings
 from keyboards.inline.keypads.mailing import send_transformation_kb
@@ -31,6 +31,12 @@ class Werewolf(ActiveRoleAtNight):
     ):
         return send_transformation_kb(game_data)
 
-    async def mailing(self, game_data: GameCache):
+    async def mailing(
+        self,
+        game_data: GameCache,
+        own_markup: InlineKeyboardMarkup | None = None,
+    ):
         if game_data["number_of_night"] == 2:  # TODO 4
-            await self.mailing(game_data)
+            await super().mailing(
+                game_data=game_data,
+            )

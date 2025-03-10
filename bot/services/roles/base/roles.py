@@ -4,7 +4,7 @@ from typing import Callable, Optional
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
-from aiogram.types import InlineKeyboardButton
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from cache.cache_types import ExtraCache, GameCache, PlayersIds
 from keyboards.inline.keypads.mailing import (
@@ -212,10 +212,16 @@ class ActiveRoleAtNight(Role):
             extra_buttons=extra_buttons,
         )
 
-    async def mailing(self, game_data: GameCache):
+    def get_roles(self, game_data: GameCache):
         if self.processed_users_key not in game_data:
             return
         roles = game_data[self.roles_key]
+        if not roles:
+            return
+        return roles
+
+    async def mailing(self, game_data: GameCache):
+        roles = self.get_roles(game_data)
         if not roles:
             return
         await self.send_survey(
