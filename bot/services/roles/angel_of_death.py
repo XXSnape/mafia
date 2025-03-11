@@ -26,10 +26,22 @@ class AngelOfDeath(MurderAfterNight, ActiveRoleAtNight):
 
     def get_processed_user_id(self, game_data: GameCache):
         result = super().get_processed_user_id(game_data=game_data)
-        print("result", result)
         if result:
             game_data["angels_died"].clear()
         return result
+
+    async def report_death(
+        self, game_data: GameCache, is_night: bool, user_id: int
+    ):
+        if is_night is False:
+            await self.bot.send_message(
+                chat_id=user_id,
+                text="Тебя линчевали на голосовании, не забудь отомстить обидчикам!",
+            )
+            return
+        await super().report_death(
+            game_data=game_data, is_night=is_night, user_id=user_id
+        )
 
     async def mailing(self, game_data: GameCache):
         if "angels_died" not in game_data:

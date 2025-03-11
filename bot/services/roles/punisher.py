@@ -15,22 +15,27 @@ class Punisher(ProcedureAfterNight, Role):
     async def procedure_after_night(
         self,
         game_data: GameCache,
-        attacking_roles: list[Role],  # TODO all roles
+        all_roles: dict[str, Role],  # TODO all roles
         victims: set[int],
         recovered: list[int],
+        murdered: list[int],
     ):
         punishers = game_data.get(self.roles_key)
         if not punishers:
             return
         punisher_id = punishers[0]
         killed_py_punisher = set()
-        if punisher_id not in victims:
+
+        if punisher_id not in set(murdered) - set(recovered):
             return
-        for role in attacking_roles:
-            killed_id = role.get_processed_user_id(game_data)
+        for role in all_roles:
+            current_role = all_roles[role]
+            if current_role.can_kill_at_night is False:
+                continue
+            killed_id = current_role.get_processed_user_id(game_data)
             if not killed_id:
                 continue
-            killer_id = game_data[role.roles_key][0]
+            killer_id = game_data[current_role.roles_key][0]
             if killed_id == punisher_id:
                 treated_by_bodyguard = (
                     Bodyguard().get_processed_user_id(game_data)
@@ -44,7 +49,6 @@ class Punisher(ProcedureAfterNight, Role):
                     )
                 if killer_id not in recovered:
                     killed_py_punisher.add(killer_id)
-
         await self.bot.send_message(
             chat_id=punisher_id,
             text="Все нарушители твоего покоя будут наказаны!",
