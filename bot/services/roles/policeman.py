@@ -1,4 +1,3 @@
-from contextlib import suppress
 
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
@@ -72,13 +71,6 @@ class Policeman(
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.POLICEMAN_CHECKS
 
-    def deleting_notification_messages(
-        self, game_data: GameCache, suffer_id: int
-    ):
-        game_data["messages_after_night"].remove(
-            [suffer_id, ROLE_IS_KNOWN]
-        )
-
     async def procedure_after_night(
         self, game_data: GameCache, murdered: list[int]
     ):
@@ -99,6 +91,9 @@ class Policeman(
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
         if game_data["disclosed_roles"]:
+            game_data["messages_after_night"].remove(
+                [game_data["disclosed_roles"][0][0], ROLE_IS_KNOWN]
+            )
             game_data["disclosed_roles"].clear()
             return True
         return super().cancel_actions(

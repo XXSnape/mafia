@@ -115,6 +115,7 @@ class Executor:
         game_data["pros"].clear()
         game_data["cons"].clear()
         game_data["vote_for"].clear()
+        game_data["messages_after_night"].clear()
         await self.state.set_data(game_data)
 
     def get_voting_roles(self):

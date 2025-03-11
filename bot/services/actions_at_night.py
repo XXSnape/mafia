@@ -16,6 +16,7 @@ from utils.utils import get_state_and_assign
 def save_notification_message(
     game_data: GameCache, user_id: int, message: str
 ):
+    print("hello", [user_id, message])
     game_data["messages_after_night"].append([user_id, message])
 
 
