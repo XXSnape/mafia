@@ -72,6 +72,10 @@ def add_voice(
             add_to.append(user_id)
 
 
+def make_build(string: str) -> str:
+    return f"<b>{string}</b>"
+
+
 def make_pretty(string: str) -> str:
     return f"<b><i><u>{string}</u></i></b>"
 
