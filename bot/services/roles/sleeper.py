@@ -38,6 +38,8 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
             "enum_name"
         ]
         role: Role = all_roles[user_role]
+        if isinstance(role, ActiveRoleAtNight) is False:
+            return
         send_message = role.cancel_actions(
             game_data=game_data, user_id=processed_user_id
         )

@@ -476,6 +476,7 @@ PlayersIds: TypeAlias = list[int]
 UserIdStr: TypeAlias = str
 Role: TypeAlias = str
 UserIdInt: TypeAlias = int
+Message: TypeAlias = str
 
 
 class UserGameCache(TypedDict, total=False):
@@ -493,7 +494,7 @@ class UserGameCache(TypedDict, total=False):
 UsersInGame: TypeAlias = dict[UserIdStr, UserGameCache]
 LivePlayersIds: TypeAlias = PlayersIds
 ChatsAndMessagesIds: TypeAlias = list[list[int]]
-MessagesAfterNight: TypeAlias = list[list[int, str]]
+MessagesAfterNight: TypeAlias = list[list[UserIdInt | Message]]
 
 
 class InteractionData(TypedDict):

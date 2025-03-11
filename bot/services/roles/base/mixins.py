@@ -44,13 +44,6 @@ class BossIsDeadMixin:
             )
 
 
-class VictimsMixin:
-    def get_victims(self, game_data: GameCache):
-        if game_data[self.processed_users_key]:
-            return set(game_data[self.processed_users_key][0])
-        return set()
-
-
 class ProcedureAfterNight(ABC):
     number_in_order: int = 1
 

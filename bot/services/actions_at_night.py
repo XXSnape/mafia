@@ -9,8 +9,14 @@ from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from services.roles import Hacker, Mafia
-from services.roles.base import Role
+from services.roles.base import Role, ActiveRoleAtNight
 from utils.utils import get_state_and_assign
+
+
+def save_notification_message(
+    game_data: GameCache, user_id: int, message: str
+):
+    game_data["messages_after_night"].append([user_id, message])
 
 
 def trace_all_actions(
@@ -98,7 +104,7 @@ async def inform_players_and_trace_actions(
     callback: CallbackQuery,
     game_data: GameCache,
     user_id: int,
-    current_role: Role,
+    current_role: ActiveRoleAtNight,
 ):
     url = game_data["players"][str(user_id)]["url"]
     await inform_aliases(
@@ -120,6 +126,12 @@ async def inform_players_and_trace_actions(
         await callback.message.answer(
             current_role.message_to_user_after_action.format(url=url)
         )
+    if current_role.notification_message:
+        save_notification_message(
+            game_data=game_data,
+            user_id=user_id,
+            message=current_role.notification_message,
+        )
 
 
 async def take_action_and_register_user(
@@ -140,7 +152,7 @@ async def take_action_and_register_user(
         "enum_name"
     ]
     all_roles = get_data_with_roles()
-    current_role: Role = all_roles[enum_name]
+    current_role: ActiveRoleAtNight = all_roles[enum_name]
     await inform_players_and_trace_actions(
         callback=callback,
         game_data=game_data,

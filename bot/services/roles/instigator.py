@@ -15,6 +15,7 @@ class Instigator(ActiveRoleAtNight):
         "Ты выбрал прополоскать мозги {url}"
     )
     mail_message = "Кого надоумить на неправильный выбор?"
+    notification_message = None
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.INSTIGATOR_LYING

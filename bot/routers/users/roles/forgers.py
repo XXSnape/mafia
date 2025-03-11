@@ -15,7 +15,7 @@ from services.actions_at_night import (
 )
 from services.roles import Forger, Policeman, PolicemanAlias
 from states.states import UserFsm
-from utils.utils import get_state_and_assign, make_pretty
+from utils.utils import make_pretty
 
 router = Router(name=__name__)
 

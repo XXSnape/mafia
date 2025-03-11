@@ -23,7 +23,6 @@ class Journalist(ProcedureAfterNight, ActiveRoleAtNight):
     extra_data = [
         ExtraCache(key="tracking", data_type=dict),
     ]
-    is_self_selecting = True
 
     @get_processed_user_id_if_exists
     async def procedure_after_night(

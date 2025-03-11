@@ -2,7 +2,6 @@ from cache.cache_types import GameCache
 from cache.roleses import Groupings
 from services.roles.base import ActiveRoleAtNight
 from services.roles.base.mixins import (
-    ProcedureAfterNight,
     MurderAfterNight,
 )
 from states.states import UserFsm
@@ -24,6 +23,7 @@ class Killer(MurderAfterNight, ActiveRoleAtNight):
     message_to_user_after_action = "Ты решился ликвидировать {url}"
     mail_message = "Реши, кому поможешь этой ночью решить проблемы и убить врага!"
     can_kill_at_night = True
+    notification_message = None
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.KILLER_ATTACKS

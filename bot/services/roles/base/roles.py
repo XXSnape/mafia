@@ -1,4 +1,5 @@
 from abc import ABC
+from contextlib import suppress
 from typing import Callable, Optional
 
 from aiogram import Bot, Dispatcher
@@ -19,6 +20,7 @@ from utils.utils import (
     get_profiles,
     get_state_and_assign,
     get_the_most_frequently_encountered_id,
+    make_pretty,
 )
 
 
@@ -107,39 +109,6 @@ class Role(ABC):
                 chat_id=user_id, text=message
             )
 
-    def cancel_actions(self, game_data: GameCache, user_id: int):
-        suffers = (
-            game_data["tracking"]
-            .get(str(user_id), {})
-            .get("sufferers", [])
-        )
-        if not suffers:
-            return False
-        for suffer in suffers:
-            game_data[self.processed_users_key].remove(suffer)
-        if self.processed_by_boss:
-            game_data[self.processed_by_boss].clear()
-        if self.last_interactive_key:
-            data: LastInteraction = game_data[
-                self.last_interactive_key
-            ]
-            if self.is_alias is False and (
-                self.alias is None
-                or self.alias.is_mass_mailing_list is False
-            ):
-                for suffer in suffers:
-                    suffer_interaction = data[str(suffer)]
-                    suffer_interaction.pop()
-            else:
-                processed_user_id = self.get_processed_user_id(
-                    game_data
-                )
-                for suffer in suffers:
-                    if suffer != processed_user_id:
-                        suffer_interaction = data[str(suffer)]
-                        suffer_interaction.pop()
-        return True
-
 
 class AliasRole(Role):
     is_alias = True
@@ -171,6 +140,56 @@ class ActiveRoleAtNight(Role):
     is_self_selecting: bool = False
     do_not_choose_others: int = 1
     do_not_choose_self: int = 1
+
+    @classmethod
+    @property
+    def notification_message(cls) -> str:
+        return f"С тобой этой ночью взаимодействовал {make_pretty(cls.role)}"
+
+    def deleting_notification_messages(
+        self, game_data: GameCache, suffer_id: int
+    ):
+        if self.notification_message:
+            game_data["messages_after_night"].remove(
+                [suffer_id, self.notification_message]
+            )
+
+    def cancel_actions(self, game_data: GameCache, user_id: int):
+
+        suffers = (
+            game_data["tracking"]
+            .get(str(user_id), {})
+            .get("sufferers", [])
+        )
+        if not suffers:
+            return False
+        for suffer in suffers:
+            game_data[self.processed_users_key].remove(suffer)
+            self.deleting_notification_messages(
+                game_data=game_data, suffer_id=suffer
+            )
+        if self.processed_by_boss:
+            game_data[self.processed_by_boss].clear()
+        if self.last_interactive_key:
+            data: LastInteraction = game_data[
+                self.last_interactive_key
+            ]
+            if self.is_alias is False and (
+                self.alias is None
+                or self.alias.is_mass_mailing_list is False
+            ):
+                for suffer in suffers:
+                    suffer_interaction = data[str(suffer)]
+                    suffer_interaction.pop()
+            else:
+                processed_user_id = self.get_processed_user_id(
+                    game_data
+                )
+                for suffer in suffers:
+                    if suffer != processed_user_id:
+                        suffer_interaction = data[str(suffer)]
+                        suffer_interaction.pop()
+        return True
 
     async def send_survey(
         self,

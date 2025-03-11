@@ -114,17 +114,9 @@ class Game:
         )
         await self.mailer.mailing()
         await asyncio.sleep(20)
-        # raise GameIsOver(winner=Groupings.criminals)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
-        # await self.executor.start_earliest_actions()
-        # await self.executor.cancel_action()
-        # await self.mailer.send_promised_information_to_users()
-        # await self.executor.send_promised_messages(
-        #     game_data=game_data
-        # )
-
         await self.executor.sum_up_after_night()
 
         await asyncio.sleep(4)

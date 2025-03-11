@@ -1,7 +1,10 @@
+from contextlib import suppress
+
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from cache.cache_types import ExtraCache, GameCache
 from cache.roleses import Groupings
+from constants.output import ROLE_IS_KNOWN
 from keyboards.inline.keypads.mailing import (
     kill_or_check_on_policeman,
 )
@@ -64,9 +67,17 @@ class Policeman(
         ),
     ]
     number_in_order = 2
+    notification_message = None
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.POLICEMAN_CHECKS
+
+    def deleting_notification_messages(
+        self, game_data: GameCache, suffer_id: int
+    ):
+        game_data["messages_after_night"].remove(
+            [suffer_id, ROLE_IS_KNOWN]
+        )
 
     async def procedure_after_night(
         self, game_data: GameCache, murdered: list[int]

@@ -23,6 +23,7 @@ class Forger(ProcedureAfterNight, ActiveRoleAtNight):
     mail_message = "Кому сегодня подделаешь документы?"
     extra_data = [ExtraCache(key="forged_roles")]
     is_self_selecting = True
+    notification_message = "Твои документы подделаны!"
 
     async def procedure_after_night(self, game_data: GameCache):
         if (

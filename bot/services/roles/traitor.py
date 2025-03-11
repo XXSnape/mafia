@@ -1,5 +1,6 @@
 from cache.cache_types import GameCache
 from cache.roleses import Groupings
+from constants.output import ROLE_IS_KNOWN
 from services.roles.base import ActiveRoleAtNight
 from states.states import UserFsm
 
@@ -16,6 +17,7 @@ class Traitor(ActiveRoleAtNight):
     )
     message_to_user_after_action = "Ты выбрал узнать роль {url}"
     mail_message = "Кого проверишь для мафии?"
+    notification_message = ROLE_IS_KNOWN
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.TRAITOR_FINDS_OUT

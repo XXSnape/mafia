@@ -94,6 +94,18 @@ class MailerToPlayers:
             )
         )
 
+    async def send_messages_after_night(self, game_data: GameCache):
+        messages = game_data["messages_after_night"]
+        if messages:
+            await asyncio.gather(
+                *(
+                    self.bot.send_message(
+                        chat_id=user_id, text=message
+                    )
+                    for user_id, message in messages
+                )
+            )
+
     async def familiarize_players(self, game_data: GameCache):
         for user_id, player_data in game_data["players"].items():
             player_data: UserGameCache
