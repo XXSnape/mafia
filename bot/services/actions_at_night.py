@@ -100,22 +100,6 @@ async def inform_players_and_trace_actions(
     user_id: int,
     current_role: Role,
 ):
-    # game_state, game_data, user_id = (
-    #     await get_game_state_data_and_user_id(
-    #         callback=callback,
-    #         callback_data=callback_data,
-    #         state=state,
-    #         dispatcher=dispatcher,
-    #     )
-    # )
-    # user_data: UserCache = await state.get_data()
-    # game_state = await get_state_and_assign(
-    #     dispatcher=dispatcher,
-    #     chat_id=user_data["game_chat"],
-    #     bot_id=callback.bot.id,
-    # )
-    # game_data: GameCache = await game_state.get_data()
-    # user_id = game_data["players_ids"][callback_data.user_index]
     url = game_data["players"][str(user_id)]["url"]
     await inform_aliases(
         current_role=current_role,
@@ -123,56 +107,9 @@ async def inform_players_and_trace_actions(
         callback=callback,
         url=url,
     )
-    # if current_role.alias or current_role.is_alias:
-    #     current_url = game_data["players"][
-    #         str(callback.from_user.id)
-    #     ]["url"]
-    #     pretty_role = game_data["players"][
-    #         str(callback.from_user.id)
-    #     ]["pretty_role"]
-    #     message = f"{pretty_role} {current_url} выбрал {url}"
-    #     await asyncio.gather(
-    #         *(
-    #             callback.bot.send_message(
-    #                 chat_id=alias_id, text=message
-    #             )
-    #             for alias_id in game_data[current_role.roles_key]
-    #             if alias_id != callback.from_user.id
-    #         )
-    #     )
-    #     if callback.from_user.id in game_data[
-    #         "mafias"
-    #     ] and game_data.get("hackers"):
-    #         await asyncio.gather(
-    #             *(
-    #                 callback.bot.send_message(
-    #                     chat_id=hacker_id,
-    #                     text=f"{pretty_role} ??? выбрал {url}",
-    #                 )
-    #                 for hacker_id in game_data["hackers"]
-    #             )
-    #         )
     trace_all_actions(
         callback=callback, game_data=game_data, user_id=user_id
     )
-    # if (
-    #     game_data.get("tracking") is not None
-    #     and role != Roles.journalist
-    # ):
-    #
-    #     suffer_tracking = game_data["tracking"].setdefault(
-    #         str(callback.from_user.id), {}
-    #     )
-    #     sufferers = suffer_tracking.setdefault("sufferers", [])
-    #     sufferers.append(user_id)
-    #
-    #     interacting_tracking = game_data["tracking"].setdefault(
-    #         str(user_id), {}
-    #     )
-    #     interacting = interacting_tracking.setdefault(
-    #         "interacting", []
-    #     )
-    #     interacting.append(callback.from_user.id)
     if current_role.message_to_group_after_action:
         await callback.bot.send_message(
             chat_id=game_data["game_chat"],

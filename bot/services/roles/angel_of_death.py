@@ -26,6 +26,7 @@ class AngelOfDeath(MurderAfterNight, ActiveRoleAtNight):
 
     def get_processed_user_id(self, game_data: GameCache):
         result = super().get_processed_user_id(game_data=game_data)
+        print("result", result)
         if result:
             game_data["angels_died"].clear()
         return result

@@ -135,7 +135,7 @@ class Game:
         )
         result = await self.executor.confirm_final_aim()
         if result:
-            await asyncio.sleep(20)
+            await asyncio.sleep(25)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )

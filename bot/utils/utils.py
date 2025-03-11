@@ -2,7 +2,7 @@ from collections import Counter
 from contextlib import suppress
 from inspect import get_annotations
 from typing import TYPE_CHECKING
-
+from collections.abc import Callable
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
@@ -17,9 +17,8 @@ if TYPE_CHECKING:
     )
 
 
-def dependency_injection(func, data: dict):
+def dependency_injection(func: Callable, data: dict):
     keys = set(get_annotations(func).keys())
-    print("func", func, "keys", keys)
     suitable_keys = keys & set(data.keys())
     return {
         key: val for key, val in data.items() if key in suitable_keys

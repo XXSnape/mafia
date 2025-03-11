@@ -25,10 +25,10 @@ from services.actions_at_night import (
     take_action_and_register_user,
     get_game_state_and_data,
     get_game_state_data_and_user_id,
+    trace_all_actions,
 )
 from services.roles import Policeman
 from states.states import UserFsm
-from utils.utils import get_state_and_assign
 
 router = Router(name=__name__)
 
@@ -127,6 +127,11 @@ async def policeman_chose_to_check(
     await callback.bot.send_message(
         chat_id=game_data["game_chat"],
         text="Армия насильно заставила кого-то показать документы",
+    )
+    trace_all_actions(
+        callback=callback,
+        game_data=game_data,
+        user_id=checked_user_id,
     )
     await asyncio.gather(
         *(

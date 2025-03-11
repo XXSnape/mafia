@@ -210,6 +210,7 @@ class Executor:
             "murdered": murdered,
             "victims": victims,
             "game_data": game_data,
+            "all_roles": self.all_roles,
         }
         for role in roles:
             await role.procedure_after_night(

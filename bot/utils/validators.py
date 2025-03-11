@@ -11,9 +11,6 @@ def get_processed_user_id_if_exists(async_func: Callable):
     @wraps(async_func)
     async def wrapper(role: "Role", *args, **kwargs):
         game_data: GameCache = await role.state.get_data()
-        players = game_data.get(role.roles_key)
-        if not players:
-            return
         processed_user_id = role.get_processed_user_id(game_data)
         if processed_user_id is None:
             return

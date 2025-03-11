@@ -27,7 +27,7 @@ class LuckyGay(ProcedureAfterNight, Role):
 
         for lucky_id in game_data[self.roles_key]:
             if lucky_id in murdered:
-                if randint(1, 10) in ():
+                if randint(1, 10) in range(1, 5):
                     recovered.append(lucky_id)
                     game_data["messages_after_night"].append(
                         [lucky_id, "Тебе сегодня повезло"]
