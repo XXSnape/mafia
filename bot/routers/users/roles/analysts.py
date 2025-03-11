@@ -2,6 +2,7 @@ from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from cache.cache_types import GameCache, UserCache
+from constants.output import NUMBER_OF_NIGHT
 from general.collection_of_roles import Roles
 from keyboards.inline.cb.cb_text import DRAW_CB
 from services.actions_at_night import get_game_state_and_data
@@ -26,7 +27,8 @@ async def analyst_assumes_draw(
     game_data[Analyst.processed_users_key].append(0)
     await callback.message.delete()
     await callback.message.answer(
-        text="Ты предположил, что никого не повесят днём"
+        text=NUMBER_OF_NIGHT.format(game_data["number_of_night"])
+        + "Ты предположил, что никого не повесят днём"
     )
     await callback.bot.send_message(
         chat_id=game_data["game_chat"],

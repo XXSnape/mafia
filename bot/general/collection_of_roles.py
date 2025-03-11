@@ -40,7 +40,7 @@ class Roles(enum.Enum):
     don = roles.Mafia()
     sleeper = roles.Sleeper()
     policeman = roles.Policeman()
-    doctor = roles.Doctor()
+    forger = roles.Forger()
     # sleeper = roles.Sleeper()
     # punisher = roles.Punisher()
     # killer = roles.Killer()

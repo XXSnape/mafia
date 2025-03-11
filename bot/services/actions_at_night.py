@@ -4,6 +4,7 @@ from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from cache.cache_types import GameCache, UserCache
+from constants.output import NUMBER_OF_NIGHT
 from general.collection_of_roles import Roles, get_data_with_roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
@@ -14,10 +15,15 @@ from utils.utils import get_state_and_assign
 
 
 def save_notification_message(
-    game_data: GameCache, user_id: int, message: str
+    game_data: GameCache,
+    processed_user_id: int,
+    message: str,
+    current_user_id: int,
 ):
-    print("hello", [user_id, message])
-    game_data["messages_after_night"].append([user_id, message])
+    if processed_user_id != current_user_id:
+        game_data["messages_after_night"].append(
+            [processed_user_id, message]
+        )
 
 
 def trace_all_actions(
@@ -49,7 +55,10 @@ async def inform_aliases(
         pretty_role = game_data["players"][
             str(callback.from_user.id)
         ]["pretty_role"]
-        message = f"{pretty_role} {current_url} выбрал {url}"
+        message = (
+            NUMBER_OF_NIGHT.format(game_data["number_of_night"])
+            + f"{pretty_role} {current_url} выбрал {url}"
+        )
         await asyncio.gather(
             *(
                 callback.bot.send_message(
@@ -125,13 +134,17 @@ async def inform_players_and_trace_actions(
     if current_role.message_to_user_after_action:
         await callback.message.delete()
         await callback.message.answer(
-            current_role.message_to_user_after_action.format(url=url)
+            NUMBER_OF_NIGHT.format(game_data["number_of_night"])
+            + current_role.message_to_user_after_action.format(
+                url=url
+            )
         )
     if current_role.notification_message:
         save_notification_message(
             game_data=game_data,
-            user_id=user_id,
+            processed_user_id=user_id,
             message=current_role.notification_message,
+            current_user_id=callback.from_user.id,
         )
 
 

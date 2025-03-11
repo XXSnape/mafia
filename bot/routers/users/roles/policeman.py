@@ -4,7 +4,7 @@ from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from cache.cache_types import GameCache, UserCache
-from constants.output import ROLE_IS_KNOWN
+from constants.output import ROLE_IS_KNOWN, NUMBER_OF_NIGHT
 from general.collection_of_roles import Roles
 from keyboards.inline.callback_factory.recognize_user import (
     CheckOrKill,
@@ -137,14 +137,18 @@ async def policeman_chose_to_check(
     )
     save_notification_message(
         game_data=game_data,
-        user_id=checked_user_id,
+        processed_user_id=checked_user_id,
         message=ROLE_IS_KNOWN,
+        current_user_id=callback.from_user.id,
     )
     await asyncio.gather(
         *(
             callback.bot.send_message(
                 chat_id=policeman_id,
-                text=f"{game_data['players'][str(callback.from_user.id)]['pretty_role']} "
+                text=NUMBER_OF_NIGHT.format(
+                    game_data["number_of_night"]
+                )
+                + f"{game_data['players'][str(callback.from_user.id)]['pretty_role']} "
                 f"{game_data['players'][str(callback.from_user.id)]['url']} "
                 f"решил проверить {url}",
             )

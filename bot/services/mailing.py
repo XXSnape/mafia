@@ -1,4 +1,6 @@
 import asyncio
+from itertools import groupby
+from operator import itemgetter
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
@@ -8,6 +10,7 @@ from cache.cache_types import (
     UserGameCache,
     UsersInGame,
 )
+from constants.output import NUMBER_OF_NIGHT
 from general.collection_of_roles import Roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserVoteIndexCbData,
@@ -24,6 +27,7 @@ from utils.utils import (
     get_profiles,
     get_state_and_assign,
     make_pretty,
+    make_build,
 )
 
 
@@ -97,12 +101,23 @@ class MailerToPlayers:
     async def send_messages_after_night(self, game_data: GameCache):
         messages = game_data["messages_after_night"]
         if messages:
+            group_iter = groupby(messages, key=itemgetter(0))
+            number_of_night = make_build(
+                f"События ночи {game_data['number_of_night']}:\n\n"
+            )
             await asyncio.gather(
                 *(
                     self.bot.send_message(
-                        chat_id=user_id, text=message
+                        chat_id=user_id,
+                        text=number_of_night
+                        + "\n\n".join(
+                            f"{number}) {message[1]}"
+                            for number, message in enumerate(
+                                messages, start=1
+                            )
+                        ),
                     )
-                    for user_id, message in messages
+                    for user_id, messages in group_iter
                 )
             )
 

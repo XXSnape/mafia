@@ -4,6 +4,7 @@ from aiogram import Dispatcher, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from cache.cache_types import GameCache, UserCache
+from constants.output import NUMBER_OF_NIGHT
 from general.collection_of_roles import Roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
@@ -11,6 +12,7 @@ from keyboards.inline.callback_factory.recognize_user import (
 from services.actions_at_night import (
     get_game_state_data_and_user_id,
     trace_all_actions,
+    save_notification_message,
 )
 from services.roles import Mafia, Traitor
 from states.states import UserFsm
@@ -48,11 +50,20 @@ async def traitor_finds_out(
     trace_all_actions(
         callback=callback, game_data=game_data, user_id=user_id
     )
+    save_notification_message(
+        game_data=game_data,
+        processed_user_id=user_id,
+        message=Traitor.notification_message,
+        current_user_id=callback.from_user.id,
+    )
     await asyncio.gather(
         *(
             callback.bot.send_message(
                 chat_id=player_id,
-                text=f"{make_pretty(Traitor.role)} проверил и узнал, что {url} - {role}",
+                text=NUMBER_OF_NIGHT.format(
+                    game_data["number_of_night"]
+                )
+                + f"{make_pretty(Traitor.role)} проверил и узнал, что {url} - {role}",
             )
             for player_id in game_data[Mafia.roles_key]
             + game_data[Traitor.roles_key]

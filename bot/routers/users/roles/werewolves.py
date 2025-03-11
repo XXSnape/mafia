@@ -4,6 +4,7 @@ from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from cache.cache_types import GameCache, UserCache
+from constants.output import NUMBER_OF_NIGHT
 from general.collection_of_roles import Roles
 from keyboards.inline.cb.cb_text import (
     WEREWOLF_TO_DOCTOR_CB,
@@ -112,7 +113,10 @@ async def werewolf_turns_into(
             *(
                 callback.bot.send_message(
                     chat_id=player_id,
-                    text=f"{initial_role} {url} превратился в {make_pretty(new_role.role)}\n"
+                    text=NUMBER_OF_NIGHT.format(
+                        game_data["number_of_night"]
+                    )
+                    + f"{initial_role} {url} превратился в {make_pretty(new_role.role)}\n"
                     f"Текущие союзники:\n{profiles}",
                 )
                 for player_id in game_data[roles_key]

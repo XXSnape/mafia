@@ -2,6 +2,7 @@ from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from cache.cache_types import GameCache, UserCache
+from constants.output import NUMBER_OF_NIGHT
 from general.collection_of_roles import Roles, get_data_with_roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
@@ -12,6 +13,7 @@ from services.actions_at_night import (
     get_game_state_data_and_user_id,
     get_game_state_and_data,
     trace_all_actions,
+    save_notification_message,
 )
 from services.roles import Forger, Policeman, PolicemanAlias
 from states.states import UserFsm
@@ -88,6 +90,12 @@ async def forges_selects_documents(
     trace_all_actions(
         callback=callback, game_data=game_data, user_id=user_id
     )
+    save_notification_message(
+        game_data=game_data,
+        processed_user_id=user_id,
+        message=Forger.notification_message,
+        current_user_id=callback.from_user.id,
+    )
     url = game_data["players"][str(user_id)]["url"]
     await callback.message.delete()
     await callback.bot.send_message(
@@ -95,5 +103,6 @@ async def forges_selects_documents(
         text=Forger.message_to_group_after_action,
     )
     await callback.message.answer(
-        text=f"Ты выбрал подменить документы {url} на {pretty_role}"
+        text=NUMBER_OF_NIGHT.format(game_data["number_of_night"])
+        + f"Ты выбрал подменить документы {url} на {pretty_role}"
     )
