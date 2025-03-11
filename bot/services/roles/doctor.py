@@ -52,7 +52,6 @@ class Doctor(
     )
     message_to_user_after_action = "Ты выбрал вылечить {url}"
     alias = DoctorAlias()
-    number_in_order = 4
 
     @get_processed_user_id_if_exists
     async def procedure_after_night(

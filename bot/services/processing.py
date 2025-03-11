@@ -1,6 +1,7 @@
 import asyncio
 from collections.abc import Callable
 from contextlib import suppress
+from operator import attrgetter
 from typing import TYPE_CHECKING
 
 from aiogram import Dispatcher
@@ -200,7 +201,7 @@ class Executor:
             for role in self.all_roles
             if isinstance(self.all_roles[role], ProcedureAfterNight)
         ]
-        roles.sort()
+        roles.sort(key=attrgetter("number_in_order"))
         victims = set()
         recovered = []
         murdered = []

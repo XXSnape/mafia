@@ -51,23 +51,12 @@ class VictimsMixin:
         return set()
 
 
-@total_ordering
 class ProcedureAfterNight(ABC):
     number_in_order: int = 1
 
     @abstractmethod
     async def procedure_after_night(self, *args, **kwargs):
         pass
-
-    def __eq__(self, other):
-        if isinstance(other, ProcedureAfterNight):
-            return self.number_in_order == other.number_in_order
-        return NotImplemented
-
-    def __lt__(self, other):
-        if isinstance(other, ProcedureAfterNight):
-            return self.number_in_order < other.number_in_order
-        return NotImplemented
 
 
 class MurderAfterNight(ProcedureAfterNight):
