@@ -29,20 +29,21 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
 
     @get_processed_user_id_if_exists
     async def procedure_after_night(
-        self, processed_user_id: int, all_roles: dict[str, Role]
+        self,
+        all_roles: dict[str, Role],
+        game_data: GameCache,
+        processed_user_id: int,
     ):
-        game_data: GameCache = await self.state.get_data()
-        euthanized_user_id = processed_user_id
         user_role = game_data["players"][str(processed_user_id)][
             "enum_name"
         ]
         role: Role = all_roles[user_role]
         send_message = role.cancel_actions(
-            game_data=game_data, user_id=euthanized_user_id
+            game_data=game_data, user_id=processed_user_id
         )
         if send_message:
             await self.bot.send_message(
-                chat_id=euthanized_user_id,
+                chat_id=processed_user_id,
                 text="Сложно поверить, но все твои действия ночью были лишь сном!",
             )
 

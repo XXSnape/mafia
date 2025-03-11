@@ -40,7 +40,15 @@ class Roles(enum.Enum):
     don = roles.Mafia()
     doctor = roles.Doctor()
     policeman = roles.Policeman()
-    angel_of_death = roles.AngelOfDeath()
+    punisher = roles.Punisher()
+    # killer = roles.Killer()
+
+    # sleeper = roles.Sleeper()
+    # agent = roles.Agent()
+    # lucky_gay = roles.LuckyGay()
+    # bodyguard = roles.Bodyguard()
+    # policeman = roles.Policeman()
+    # angel_of_death = roles.AngelOfDeath()
     # general = roles.PolicemanAlias()
     # journalist = roles.Journalist()
 
