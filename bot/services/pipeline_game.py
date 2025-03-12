@@ -9,11 +9,11 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from cache.cache_types import GameCache, UserGameCache
 from general.collection_of_roles import Roles, get_data_with_roles
 from general.exceptions import GameIsOver
-from general.players import Groupings
+from services.roles.base.roles import Groupings
+
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
 from services.mailing import MailerToPlayers
 from services.processing import Executor
-from services.roles import Mafia, Doctor, Policeman
 from services.roles.base import Role
 from states.states import GameFsm
 from utils.utils import (
@@ -46,7 +46,7 @@ class Game:
             dispatcher=self.dispatcher,
             group_chat_id=self.group_chat_id,
         )
-        self.roles = {}
+        self.all_roles = {}
         self.executor = Executor(
             message=message,
             state=state,
@@ -68,9 +68,9 @@ class Game:
         )
         for role in not_existing:
             all_roles.pop(role)
-        self.roles = all_roles
-        for role in self.roles:
-            self.roles[role](
+        self.all_roles = all_roles
+        for role in self.all_roles:
+            self.all_roles[role](
                 dispatcher=self.dispatcher,
                 bot=self.bot,
                 state=self.state,
@@ -106,7 +106,7 @@ class Game:
         game_data["number_of_night"] += 1
         await self.state.set_data(game_data)
         players = get_live_players(
-            game_data=game_data, all_roles=self.roles
+            game_data=game_data, all_roles=self.all_roles
         )
         night_starts_text = make_build(
             f"Наступает ночь {game_data['number_of_night']}"
@@ -124,7 +124,7 @@ class Game:
         )
         await self.executor.sum_up_after_night()
         players_after_night = get_live_players(
-            game_data=game_data, all_roles=self.roles
+            game_data=game_data, all_roles=self.all_roles
         )
         await self.message.answer_photo(
             photo="https://i.pinimg.com/originals/b1/80/98/b18098074864e4b1bf5cc8412ced6421.jpg",

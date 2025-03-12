@@ -27,9 +27,10 @@ from utils.utils import (
 
 
 class Groupings(StrEnum):
-    criminals = "😈"
-    civilians = "🙂"
-    other = "👽"
+    criminals = "Мафия😈"
+    civilians = "Мирные жители🙂"
+    killer = "Независимые наёмники🔪"
+    other = "Иные👽"
 
 
 class Role(ABC):

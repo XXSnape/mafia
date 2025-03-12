@@ -1,5 +1,9 @@
 from dataclasses import dataclass
-from typing import NotRequired, TypeAlias, TypedDict
+from typing import NotRequired, TypeAlias, TypedDict, Literal
+
+
+# from general.collection_of_roles import RolesLiteral
+
 
 # @dataclass
 # class Role:
@@ -477,6 +481,34 @@ UserIdStr: TypeAlias = str
 Role: TypeAlias = str
 UserIdInt: TypeAlias = int
 Message: TypeAlias = str
+RolesLiteral = Literal[
+    "don",
+    "doctor",
+    "policeman",
+    "traitor",
+    "killer",
+    "werewolf",
+    "forger",
+    "hacker",
+    "sleeper",
+    "agent",
+    "journalist",
+    "punisher",
+    "analyst",
+    "suicide_bomber",
+    "instigator",
+    "prime_minister",
+    "bodyguard",
+    "masochist",
+    "lawyer",
+    "angel_of_death",
+    "prosecutor",
+    "civilian",
+    "lucky_gay",
+    "mafia",
+    "nurse",
+    "general",
+]
 
 
 class UserGameCache(TypedDict, total=False):
@@ -485,7 +517,7 @@ class UserGameCache(TypedDict, total=False):
     role: NotRequired[Role]
     pretty_role: NotRequired[str]
     initial_role: str
-    enum_name: str
+    enum_name: RolesLiteral
     roles_key: str
     number_died_at_night: int
     user_id: int
@@ -514,7 +546,7 @@ class UserCache(TypedDict):
     game_chat: int
 
 
-class GameCache(TypedDict, total=True):
+class GameCache(TypedDict, total=False):
     owner: int
     game_chat: int
     messages_after_night: MessagesAfterNight

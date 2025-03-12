@@ -17,7 +17,7 @@ def get_live_players(
     return (
         f"{make_build('💗Живые игроки:')}\n"
         f"{profiles}\n\n"
-        f"{make_build('Состав группировок:')}"
+        f"{make_build('Состав группировок:')}\n"
         f"{live_roles}\n\n"
     )
 

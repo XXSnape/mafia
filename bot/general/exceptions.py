@@ -1,4 +1,4 @@
-from general.players import Groupings
+from services.roles.base.roles import Groupings
 
 
 class GameIsOver(Exception):

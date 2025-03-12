@@ -1,9 +1,24 @@
 import enum
+from typing import overload, Literal
 
+from cache.cache_types import RolesLiteral
 from services import roles
+from services.roles.base import Role, ActiveRoleAtNight
 
 
-def get_data_with_roles():
+@overload
+def get_data_with_roles(role_name: None) -> dict[str, Role]: ...
+
+
+@overload
+def get_data_with_roles(
+    role_name: RolesLiteral,
+) -> Role | ActiveRoleAtNight: ...
+
+
+def get_data_with_roles(
+    role_name: RolesLiteral | None = None,
+):
     all_roles = {
         "don": roles.Mafia(),
         "doctor": roles.Doctor(),
@@ -32,14 +47,15 @@ def get_data_with_roles():
         "nurse": roles.DoctorAlias(),
         "general": roles.PolicemanAlias(),
     }
-
+    if role_name:
+        return all_roles[role_name]
     return all_roles
 
 
 class Roles(enum.Enum):
     don = roles.Mafia()
-    forger = roles.Forger()
-    # masochist = roles.Masochist()
+    # forger = roles.Forger()
+    doctor = roles.Doctor()
     policeman = roles.Policeman()
     general = roles.PolicemanAlias()
     # sleeper = roles.Sleeper()

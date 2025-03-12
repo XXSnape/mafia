@@ -15,7 +15,7 @@ class Killer(MurderAfterNight, ActiveRoleAtNight):
         "53D1D6BF2FAC4665E453F736C438F601DF6D/"
         "?imw=512&imh=512&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true"
     )
-    grouping = Groupings.other
+    grouping = Groupings.killer
     purpose = "Ты убиваешь, кого захочешь, а затем восстанавливаешь свои силы целую ночь."
     message_to_group_after_action = (
         "ЧВК продолжают работать на территории города!"

@@ -120,6 +120,11 @@ def get_results_of_goal_identification(game_data: GameCache):
 def get_results_of_voting(
     game_data: GameCache, removed_user_id: UserIdInt
 ):
+    if not removed_user_id:
+        return make_build(
+            "Доброта или банальная несогласованность? Посмотрим, воспользуются ли преступники таким подарком."
+        )
+
     user_url = game_data["players"][str(removed_user_id)]["url"]
     pros = len(game_data["pros"])
     cons = len(game_data["cons"])

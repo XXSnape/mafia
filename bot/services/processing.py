@@ -16,12 +16,11 @@ from cache.cache_types import (
     LastInteraction,
 )
 from general.exceptions import GameIsOver
-from general.players import Groupings
+from .roles.base.roles import Groupings
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from services.mailing import MailerToPlayers
 from states.states import GameFsm, UserFsm
 from utils.utils import (
-    get_profiles,
     get_state_and_assign,
     get_the_most_frequently_encountered_id,
     dependency_injection,
@@ -30,12 +29,9 @@ from utils.utils import (
 )
 
 from .protocols.protocols import (
-    DelayedMessagesAfterNight,
-    EarliestActionsAfterNight,
-    ModificationVictims,
     VictimsOfVote,
 )
-from .roles import Lawyer
+from .roles import Lawyer, Mafia, Killer
 from .roles.base import AliasRole, BossIsDeadMixin, Role
 from .roles.base.mixins import ProcedureAfterNight
 
@@ -48,12 +44,23 @@ def check_end_of_game(async_func: Callable):
         result = await async_func(self)
         state = self.state
         game_data: GameCache = await state.get_data()
-        if not game_data["mafias"]:
-            raise GameIsOver(winner=Groupings.civilians)
-
-        if len(game_data["mafias"]) > (  # TODO <=
-            len(game_data["players_ids"]) - len(game_data["mafias"])
-        ):
+        players_count = len(game_data["players_ids"])
+        if not game_data[Mafia.roles_key]:
+            if not game_data.get(Killer.roles_key):
+                raise GameIsOver(winner=Groupings.civilians)
+            killers_count = len(game_data.get(Killer.roles_key))
+            if killers_count >= players_count - killers_count:
+                raise GameIsOver(winner=Groupings.killer)
+        criminals_count = 0
+        for role in self.all_roles:
+            current_role: Role = self.all_roles[role]
+            if current_role.grouping == Groupings.criminals:
+                if current_role.is_alias:
+                    continue
+                criminals_count += len(
+                    game_data[current_role.roles_key]
+                )
+        if criminals_count >= players_count - criminals_count:
             raise GameIsOver(winner=Groupings.criminals)
         return result
 
@@ -148,9 +155,7 @@ class Executor:
                     user_id=0,
                 )
             await self.bot.send_message(
-                chat_id=self.group_chat_id,
-                text=result_text
-                + "Что ж, такова воля народа! Сегодня днем город не опустел!",
+                chat_id=self.group_chat_id, text=result_text
             )
             return
         user_info: UserGameCache = game_data["players"][
@@ -251,11 +256,6 @@ class Executor:
             text=text,
         )
         if aim_id is None:
-            await self.bot.send_message(
-                chat_id=self.group_chat_id,
-                text="Доброта или банальная несогласованность? "
-                "Посмотрим, воспользуются ли преступники таким подарком.",
-            )
             return False
         url = game_data["players"][str(aim_id)]["url"]
         await self.state.set_state(GameFsm.VOTE)
