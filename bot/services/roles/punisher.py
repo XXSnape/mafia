@@ -1,5 +1,5 @@
 from cache.cache_types import GameCache
-from cache.roleses import Groupings
+from services.roles.base.roles import Groupings
 from services.roles import Bodyguard
 from services.roles.base import Role
 from services.roles.base.mixins import ProcedureAfterNight
@@ -8,7 +8,6 @@ from services.roles.base.mixins import ProcedureAfterNight
 class Punisher(ProcedureAfterNight, Role):
     role = "Каратель"
     photo = "https://lastfm.freetls.fastly.net/i/u/ar0/d04cdfdf3f65412bc1e7870ec6599ed7.png"
-    grouping = Groupings.civilians
     purpose = "Спровоцируй мафию и забери её с собой!"
     number_in_order = 4
 

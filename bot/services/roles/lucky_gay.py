@@ -1,7 +1,7 @@
 from random import randint
 
 from cache.cache_types import GameCache
-from cache.roleses import Groupings
+from services.roles.base.roles import Groupings
 from services.roles.base import Role
 from services.roles.base.mixins import (
     ProcedureAfterNight,
@@ -11,7 +11,6 @@ from services.roles.base.mixins import (
 class LuckyGay(ProcedureAfterNight, Role):
     role = "Везунчик"
     photo = "https://avatars.mds.yandex.net/get-mpic/5031100/img_id5520953584482126492.jpeg/orig"
-    grouping = Groupings.civilians
     purpose = (
         "Возможно тебе повезет и ты останешься жив после покушения."
     )

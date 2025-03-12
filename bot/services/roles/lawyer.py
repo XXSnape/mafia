@@ -1,4 +1,4 @@
-from cache.roleses import Groupings
+from services.roles.base.roles import Groupings
 from services.roles.base import ActiveRoleAtNight
 from states.states import UserFsm
 
@@ -11,7 +11,6 @@ class Lawyer(ActiveRoleAtNight):
         "https://avatars.mds.yandex.net/get-altay/"
         "5579175/2a0000017e0aa51c3c1fd887206b0156ee34/XXL_height"
     )
-    grouping = Groupings.civilians
     purpose = "Тебе нужно защитить мирных жителей от своих же на голосовании."
     message_to_group_after_action = (
         "Кому-то обеспечена защита лучшими адвокатами города!"

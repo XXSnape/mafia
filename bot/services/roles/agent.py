@@ -1,5 +1,5 @@
 from cache.cache_types import ExtraCache, GameCache
-from cache.roleses import Groupings
+from services.roles.base.roles import Groupings
 from services.roles.base import ActiveRoleAtNight
 from services.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
@@ -10,7 +10,6 @@ class Agent(ProcedureAfterNight, ActiveRoleAtNight):
     role = "Агент 008"
     mail_message = "За кем следить этой ночью?"
     photo = "https://avatars.mds.yandex.net/i?id=7b6e30fff5c795d560c07b69e7e9542f044fcaf9e04d4a31-5845211-images-thumbs&n=13"
-    grouping = Groupings.civilians
     purpose = "Ты можешь следить за кем-нибудь ночью"
     message_to_group_after_action = "Спецслужбы выходят на разведу"
     message_to_user_after_action = "Ты выбрал следить за {url}"

@@ -1,5 +1,5 @@
 from cache.cache_types import GameCache
-from cache.roleses import Groupings
+from services.roles.base.roles import Groupings
 from services.roles.base import Role
 
 
@@ -9,7 +9,7 @@ class SuicideBomber(Role):
         "https://sun6-22.userapi.com/impg/zAaADEA19s"
         "cv86EFl8bY1wUYRCJyBPGg1qamiA/xjMRCUhA20g.jpg?size=1280x1280&quality=96&sign=de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag=EOC9ErRHImjvmda4Qd5Pq59HPf-wUgr77rzHZvabHjc&type=album"
     )
-    grouping = Groupings.suicide_bombers
+    grouping = Groupings.other
     purpose = "Тебе нужно умереть ночью."
 
     async def report_death(

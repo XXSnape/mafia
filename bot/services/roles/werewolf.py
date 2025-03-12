@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from cache.cache_types import GameCache
-from cache.roleses import Groupings
+from services.roles.base.roles import Groupings
 from keyboards.inline.keypads.mailing import send_transformation_kb
 from services.roles.base import ActiveRoleAtNight
 from states.states import UserFsm
@@ -14,7 +14,6 @@ class Werewolf(ActiveRoleAtNight):
         "96&sign=bf5555ef2b801954b0b92848975525fd&type=album"
         "?imw=512&imh=512&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true"
     )
-    grouping = Groupings.civilians
     purpose = "На 4 ночь ты сможешь превратиться в мафию, маршала или доктора."
     mail_message = "Реши, в кого сегодня превратишься!"
 

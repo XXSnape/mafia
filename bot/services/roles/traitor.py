@@ -1,5 +1,5 @@
 from cache.cache_types import GameCache
-from cache.roleses import Groupings
+from services.roles.base.roles import Groupings
 from constants.output import ROLE_IS_KNOWN
 from services.roles.base import ActiveRoleAtNight
 from states.states import UserFsm

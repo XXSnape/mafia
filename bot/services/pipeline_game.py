@@ -21,6 +21,7 @@ from utils.utils import (
     get_state_and_assign,
     make_pretty,
 )
+from utils.live_players import get_live_players
 
 
 class Game:
@@ -102,14 +103,13 @@ class Game:
     ):
         game_data: GameCache = await self.state.get_data()
         game_data["number_of_night"] += 1
-        profiles = get_profiles(
-            live_players_ids=game_data["players_ids"],
-            players=game_data["players"],
-        )
         await self.state.set_data(game_data)
+        players = get_live_players(
+            game_data=game_data, all_roles=self.roles
+        )
         await self.message.answer_photo(
             photo="https://i.pinimg.com/originals/f0/43/ed/f043edcac9690fdec845925508006459.jpg",
-            caption=f"Наступает ночь {game_data['number_of_night']}.\n\nЖивые участники:{profiles}",
+            caption=f"Наступает ночь {game_data['number_of_night']}.\n\n{players}",
             reply_markup=get_to_bot_kb("Действовать!"),
         )
         await self.mailer.mailing()
@@ -118,7 +118,13 @@ class Game:
             to_delete=game_data["to_delete"]
         )
         await self.executor.sum_up_after_night()
-
+        players_after_night = get_live_players(
+            game_data=game_data, all_roles=self.roles
+        )
+        await self.message.answer_photo(
+            photo="https://i.pinimg.com/originals/b1/80/98/b18098074864e4b1bf5cc8412ced6421.jpg",
+            caption=f"Пришло время провести следственные мероприятия жителям города!\n\n{players_after_night}",
+        )
         await asyncio.sleep(4)
         await self.mailer.suggest_vote()
         await asyncio.sleep(3)
@@ -228,7 +234,7 @@ class Game:
         game_data: GameCache = await self.state.get_data()
         ids = game_data["players_ids"][:]
         shuffle(ids)
-        roles_tpl = tuple(Roles)
+        roles_tpl = tuple(Roles) + (Roles.general,)
         for user_id, role in zip(ids, roles_tpl):
             current_role: Role = role.value
             self.initialization_by_role(game_data, role=current_role)

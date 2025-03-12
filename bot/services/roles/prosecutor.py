@@ -3,7 +3,7 @@ from contextlib import suppress
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import ChatPermissions
 from cache.cache_types import GameCache
-from cache.roleses import Groupings
+from services.roles.base.roles import Groupings
 from services.roles.base import ActiveRoleAtNight
 from services.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
@@ -18,7 +18,6 @@ class Prosecutor(ProcedureAfterNight, ActiveRoleAtNight):
         "id=b5115d431dafc24be07a55a8b6343540_l-5205087-"
         "images-thumbs&n=13"
     )
-    grouping = Groupings.civilians
     purpose = (
         "Тебе нельзя допустить, чтобы днем мафия могла говорить."
     )

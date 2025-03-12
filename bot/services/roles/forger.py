@@ -1,5 +1,5 @@
 from cache.cache_types import ExtraCache, GameCache
-from cache.roleses import Groupings
+from services.roles.base.roles import Groupings
 from services.roles.base import ActiveRoleAtNight
 from services.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm

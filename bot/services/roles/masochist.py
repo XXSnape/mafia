@@ -1,12 +1,12 @@
 from cache.cache_types import GameCache
-from cache.roleses import Groupings
+from services.roles.base.roles import Groupings
 from services.roles.base import Role
 
 
 class Masochist(Role):
     role = "Мазохист"
     photo = "https://i.pinimg.com/736x/14/a5/f5/14a5f5eb5dbd73c4707f24d436d80c0b.jpg"
-    grouping = Groupings.masochists
+    grouping = Groupings.other
     purpose = "Тебе нужно умереть на дневном голосовании."
 
     async def report_death(

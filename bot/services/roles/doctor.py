@@ -1,5 +1,5 @@
 from cache.cache_types import GameCache
-from cache.roleses import Groupings
+from services.roles.base.roles import Groupings
 from services.roles.base import (
     ActiveRoleAtNight,
     AliasRole,
@@ -44,7 +44,6 @@ class Doctor(
     can_treat = True
     do_not_choose_self = 2
     photo = "https://gipermed.ru/upload/iblock/4bf/4bfa55f59ceb538bd2c8c437e8f71e5a.jpg"
-    grouping = Groupings.civilians
     purpose = "Тебе нужно стараться лечить тех, кому нужна помощь. "
     "Только ты можешь принимать решения."
     message_to_group_after_action = (

@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardButton
 from cache.cache_types import GameCache
-from cache.roleses import Groupings
+from services.roles.base.roles import Groupings
 from keyboards.inline.cb.cb_text import DRAW_CB
 from services.roles.base import ActiveRoleAtNight
 from states.states import UserFsm
@@ -10,7 +10,6 @@ from utils.validators import get_processed_user_id_if_exists
 class Analyst(ActiveRoleAtNight):
     role = "Политический аналитик"
     photo = "https://habrastorage.org/files/2e3/371/6a2/2e33716a2bb74f8eb67378334960ebb5.png"
-    grouping = Groupings.civilians
     purpose = "Тебе нужно на основе ранее полученных данных предсказать, кого повесят на дневном голосовании"
     do_not_choose_others = 0
     do_not_choose_self = 0

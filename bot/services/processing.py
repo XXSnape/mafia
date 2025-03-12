@@ -217,21 +217,21 @@ class Executor:
             ]
             text_about_dead += f"Ночью был убит {role} - {url}!\n\n"
 
-        live_players = get_profiles(
-            live_players_ids=game_data["players_ids"],
-            players=game_data["players"],
-        )
+        # live_players = get_profiles(
+        #     live_players_ids=game_data["players_ids"],
+        #     players=game_data["players"],
+        # )
         text_about_dead = (
             text_about_dead or "Сегодня ночью все выжили!"
         )
         await self.bot.send_message(
             chat_id=self.group_chat_id, text=text_about_dead
         )
-        await self.bot.send_photo(
-            chat_id=self.group_chat_id,
-            photo="https://i.pinimg.com/originals/b1/80/98/b18098074864e4b1bf5cc8412ced6421.jpg",
-            caption="Живые игроки:\n" + live_players,
-        )
+        # await self.bot.send_photo(
+        #     chat_id=self.group_chat_id,
+        #     photo="https://i.pinimg.com/originals/b1/80/98/b18098074864e4b1bf5cc8412ced6421.jpg",
+        #     caption="Живые игроки:\n" + live_players,
+        # )
         await self.mailer.send_messages_after_night(
             game_data=game_data
         )

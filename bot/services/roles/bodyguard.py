@@ -1,5 +1,5 @@
 from cache.cache_types import GameCache
-from cache.roleses import Groupings
+from services.roles.base.roles import Groupings
 from services.roles.base import ActiveRoleAtNight
 from services.roles.base.mixins import (
     ProcedureAfterNight,
@@ -16,7 +16,6 @@ class Bodyguard(ProcedureAfterNight, ActiveRoleAtNight):
         "de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag=EOC9ErRHImjvmda4Qd5Pq59H"
         "Pf-wUgr77rzHZvabHjc&type=album"
     )
-    grouping = Groupings.civilians
     purpose = "Тебе нужно защитить собой лучших специалистов"
     message_to_group_after_action = "Кто-то пожертвовал собой!"
     message_to_user_after_action = (

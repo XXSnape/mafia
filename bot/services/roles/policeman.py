@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from cache.cache_types import ExtraCache, GameCache
-from cache.roleses import Groupings
+from services.roles.base.roles import Groupings
 from constants.output import ROLE_IS_KNOWN
 from keyboards.inline.keypads.mailing import (
     kill_or_check_on_policeman,
@@ -46,7 +46,6 @@ class Policeman(
 ):
     role = "Маршал. Верховный главнокомандующий армии"
     photo = "https://avatars.mds.yandex.net/get-kinopoisk-image/1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x"
-    grouping = Groupings.civilians
     need_to_monitor_interaction = False
     purpose = "Тебе нужно вычислить мафию или уничтожить её. Только ты можешь принимать решения."
     message_to_group_after_action = (

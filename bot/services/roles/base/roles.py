@@ -1,5 +1,6 @@
 from abc import ABC
 from contextlib import suppress
+from enum import StrEnum
 from typing import Callable, Optional
 
 from aiogram import Bot, Dispatcher
@@ -16,12 +17,19 @@ from cache.cache_types import (
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
+
 from utils.utils import (
     get_profiles,
     get_state_and_assign,
     get_the_most_frequently_encountered_id,
     make_pretty,
 )
+
+
+class Groupings(StrEnum):
+    criminals = "😈"
+    civilians = "🙂"
+    other = "👽"
 
 
 class Role(ABC):
@@ -31,7 +39,7 @@ class Role(ABC):
     role: str
     need_to_process: bool = False
     photo: str
-    grouping: str
+    grouping: Groupings = Groupings.civilians
     purpose: str | Callable | None
     message_to_user_after_action: str | None = None
     message_to_group_after_action: str | None = None

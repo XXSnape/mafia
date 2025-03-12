@@ -1,5 +1,5 @@
 from cache.cache_types import ExtraCache, GameCache
-from cache.roleses import Groupings
+from services.roles.base.roles import Groupings
 from services.roles.base import ActiveRoleAtNight
 from services.roles.base.mixins import MurderAfterNight
 from states.states import UserFsm
@@ -13,7 +13,7 @@ class AngelOfDeath(MurderAfterNight, ActiveRoleAtNight):
     need_to_monitor_interaction = False
     photo = "https://avatars.mds.yandex.net/get-entity_search/10844899/935958285/S600xU_2x"
     purpose = "Если ты умрешь на голосовании, сможешь ночью забрать кого-нибудь с собой"
-    grouping = Groupings.civilians
+    grouping = Groupings.other
     extra_data = [ExtraCache("angels_died", False)]
     message_to_user_after_action = "Ты выбрал отомстить {url}"
     can_kill_at_night = True
