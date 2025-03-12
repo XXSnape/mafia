@@ -20,6 +20,7 @@ from utils.utils import (
     get_profiles,
     get_state_and_assign,
     make_pretty,
+    make_build,
 )
 from utils.live_players import get_live_players
 
@@ -107,11 +108,15 @@ class Game:
         players = get_live_players(
             game_data=game_data, all_roles=self.roles
         )
+        night_starts_text = make_build(
+            f"Наступает ночь {game_data['number_of_night']}"
+        )
         await self.message.answer_photo(
             photo="https://i.pinimg.com/originals/f0/43/ed/f043edcac9690fdec845925508006459.jpg",
-            caption=f"Наступает ночь {game_data['number_of_night']}.\n\n{players}",
+            caption=f"{night_starts_text}.\n\n{players}",
             reply_markup=get_to_bot_kb("Действовать!"),
         )
+
         await self.mailer.mailing()
         await asyncio.sleep(5)
         await self.executor.delete_messages_from_to_delete(
@@ -123,17 +128,18 @@ class Game:
         )
         await self.message.answer_photo(
             photo="https://i.pinimg.com/originals/b1/80/98/b18098074864e4b1bf5cc8412ced6421.jpg",
-            caption=f"Пришло время провести следственные мероприятия жителям города!\n\n{players_after_night}",
+            caption=f"{make_build('Пришло время провести следственные мероприятия жителям города!')}\n\n"
+            f"{players_after_night}",
         )
         await asyncio.sleep(4)
         await self.mailer.suggest_vote()
-        await asyncio.sleep(15)
+        await asyncio.sleep(10)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
         result = await self.executor.confirm_final_aim()
         if result:
-            await asyncio.sleep(3)
+            await asyncio.sleep(10)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )

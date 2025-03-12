@@ -10,7 +10,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.fsm.storage.base import StorageKey
 from collections import defaultdict
-from cache.cache_types import GameCache
+from cache.cache_types import GameCache, UserIdInt
 
 if TYPE_CHECKING:
     from services.roles import (
@@ -93,7 +93,6 @@ def get_results_of_goal_identification(game_data: GameCache):
     )
 
     vote_for = game_data["vote_for"]
-    all_voting_ids = set(voting_id for voting_id, _ in vote_for)
     voting = defaultdict(list)
     for voting_id, voted_id in vote_for:
         voting[game_data["players"][str(voted_id)]["url"]].append(
@@ -115,20 +114,19 @@ def get_results_of_goal_identification(game_data: GameCache):
                 voting_person for voting_person in voting_people
             )
         )
-    abstaining = set(game_data["players_ids"]) - all_voting_ids
-    if not abstaining:
-        abstaining_text = make_build(
-            "\n\n😯Сегодня проголосовали все!"
-        )
-    else:
-        abstaining_text = (
-            f"\n\n🤐Воздержавшиеся игроки ({len(abstaining)})\n● "
-            + "\n● ".join(
-                game_data["players"][str(abstaining_id)]["url"]
-                for abstaining_id in abstaining
-            )
-        )
-    return result + result_voting + abstaining_text
+    return result + result_voting
+
+
+def get_results_of_voting(
+    game_data: GameCache, removed_user_id: UserIdInt
+):
+    user_url = game_data["players"][str(removed_user_id)]["url"]
+    pros = len(game_data["pros"])
+    cons = len(game_data["cons"])
+    return (
+        make_build(f"Подводим итоги судьбы {user_url}:\n")
+        + f"✅За линчевание - {pros} 🚫Против - {cons}\n\n"
+    )
 
 
 async def get_state_and_assign(
