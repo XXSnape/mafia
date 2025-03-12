@@ -41,7 +41,9 @@ async def vote_for(
         ids.remove(callback.from_user.id)
         ids.remove(voted_user_id)
         voted_user_id = choice(ids)
-    game_data["vote_for"].append(voted_user_id)
+    game_data["vote_for"].append(
+        [callback.from_user.id, voted_user_id]
+    )
     voting_url = game_data["players"][str(callback.from_user.id)][
         "url"
     ]

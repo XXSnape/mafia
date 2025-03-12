@@ -50,10 +50,10 @@ def get_live_roles(game_data: GameCache, all_roles: dict[str, Role]):
     for grouping, roles in gropings.items():
         if not roles:
             continue
-        grouping_roles = "\n●".join(role for role, _ in roles)
+        grouping_roles = "\n● ".join(role for role, _ in roles)
         total = sum(count for _, count in roles)
         total_text = make_build(f"- {total}:")
         result += (
-            f"\n{grouping.value} {total_text}\n●{grouping_roles}\n"
+            f"\n{grouping.value} {total_text}\n● {grouping_roles}\n"
         )
     return result

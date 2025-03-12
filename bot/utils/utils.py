@@ -1,12 +1,16 @@
 from collections import Counter
 from contextlib import suppress
 from inspect import get_annotations
+from itertools import groupby
+from operator import itemgetter
 from typing import TYPE_CHECKING
 from collections.abc import Callable
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.fsm.storage.base import StorageKey
+from collections import defaultdict
+from cache.cache_types import GameCache
 
 if TYPE_CHECKING:
     from services.roles import (
@@ -78,6 +82,53 @@ def make_build(string: str) -> str:
 
 def make_pretty(string: str) -> str:
     return f"<b><i><u>{string}</u></i></b>"
+
+
+def get_results_of_goal_identification(game_data: GameCache):
+    def sorting_by_voting(voting_data):
+        return len(voting_data[1])
+
+    result = make_build(
+        f"❗️Результаты голосования дня {game_data['number_of_night']}:"
+    )
+
+    vote_for = game_data["vote_for"]
+    all_voting_ids = set(voting_id for voting_id, _ in vote_for)
+    voting = defaultdict(list)
+    for voting_id, voted_id in vote_for:
+        voting[game_data["players"][str(voted_id)]["url"]].append(
+            game_data["players"][str(voting_id)]["url"]
+        )
+
+    result_voting = ""
+    if not voting:
+        result_voting = make_build(
+            "\n\n😯Сегодня нет потенциальных жертв!"
+        )
+        return result + result_voting
+    for voted, voting_people in sorted(
+        voting.items(), key=sorting_by_voting, reverse=True
+    ):
+        result_voting += (
+            f"\n\n📝Голосовавшие за {voted} ({len(voting_people)}):\n● "
+            + "\n● ".join(
+                voting_person for voting_person in voting_people
+            )
+        )
+    abstaining = set(game_data["players_ids"]) - all_voting_ids
+    if not abstaining:
+        abstaining_text = make_build(
+            "\n\n😯Сегодня проголосовали все!"
+        )
+    else:
+        abstaining_text = (
+            f"\n\n🤐Воздержавшиеся игроки ({len(abstaining)})\n● "
+            + "\n● ".join(
+                game_data["players"][str(abstaining_id)]["url"]
+                for abstaining_id in abstaining
+            )
+        )
+    return result + result_voting + abstaining_text
 
 
 async def get_state_and_assign(

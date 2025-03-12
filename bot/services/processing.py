@@ -25,6 +25,7 @@ from utils.utils import (
     get_state_and_assign,
     get_the_most_frequently_encountered_id,
     dependency_injection,
+    get_results_of_goal_identification,
 )
 
 from .protocols.protocols import (
@@ -241,7 +242,16 @@ class Executor:
     ) -> bool:
         game_data: GameCache = await self.state.get_data()
         vote_for = game_data["vote_for"]
-        aim_id = get_the_most_frequently_encountered_id(vote_for)
+        aim_id = get_the_most_frequently_encountered_id(
+            [voted for _, voted in vote_for]
+        )
+        text = get_results_of_goal_identification(
+            game_data=game_data
+        )
+        await self.bot.send_message(
+            chat_id=self.group_chat_id,
+            text=text,
+        )
         if aim_id is None:
             await self.bot.send_message(
                 chat_id=self.group_chat_id,

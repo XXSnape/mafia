@@ -113,7 +113,7 @@ class Game:
             reply_markup=get_to_bot_kb("Действовать!"),
         )
         await self.mailer.mailing()
-        await asyncio.sleep(25)
+        await asyncio.sleep(5)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
@@ -127,13 +127,13 @@ class Game:
         )
         await asyncio.sleep(4)
         await self.mailer.suggest_vote()
-        await asyncio.sleep(3)
+        await asyncio.sleep(15)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
         result = await self.executor.confirm_final_aim()
         if result:
-            await asyncio.sleep(30)
+            await asyncio.sleep(3)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )

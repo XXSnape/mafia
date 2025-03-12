@@ -507,6 +507,7 @@ NumberOfNight: TypeAlias = int
 
 LastInteraction: TypeAlias = dict[UserIdStr, list[NumberOfNight]]
 DisclosedRoles = list[list[UserIdStr, Role]]
+VotedFor: TypeAlias = list[list[UserIdInt]]
 
 
 class UserCache(TypedDict):
@@ -525,7 +526,7 @@ class GameCache(TypedDict, total=True):
     tracking: TrackingData
     text_about_checks: str
     to_delete: ChatsAndMessagesIds
-    vote_for: PlayersIds
+    vote_for: VotedFor
     winners: PlayersIds
     losers: PlayersIds
     number_of_night: NumberOfNight
