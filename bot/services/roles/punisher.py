@@ -10,6 +10,8 @@ class Punisher(ProcedureAfterNight, Role):
     photo = "https://lastfm.freetls.fastly.net/i/u/ar0/d04cdfdf3f65412bc1e7870ec6599ed7.png"
     purpose = "Спровоцируй мафию и забери её с собой!"
     number_in_order = 4
+    payment_for_treatment = 0
+    payment_for_murder = 0
 
     async def procedure_after_night(
         self,
@@ -48,9 +50,29 @@ class Punisher(ProcedureAfterNight, Role):
                     )
                 if killer_id not in recovered:
                     killed_py_punisher.add(killer_id)
-        await self.bot.send_message(
-            chat_id=punisher_id,
-            text="Все нарушители твоего покоя будут наказаны!",
+                    if current_role.grouping != Groupings.civilians:
+                        money = 26
+                    else:
+                        money = 0
+                    url = game_data["players"][str(killer_id)]["url"]
+                    role = game_data["players"][str(killer_id)][
+                        "role"
+                    ]
+                    for punisher_id in game_data[self.roles_key]:
+                        game_data["players"][str(punisher_id)][
+                            "money"
+                        ] += money
+                        game_data["players"][str(punisher_id)][
+                            "achievements"
+                        ].append(
+                            f'Ночь {game_data["number_of_night"]}. '
+                            f"Убийство {url} ({role}) - {money}💵"
+                        )
+        game_data["messages_after_night"].append(
+            [
+                punisher_id,
+                "Все нарушители твоего покоя будут наказаны!",
+            ]
         )
         victims |= killed_py_punisher
 

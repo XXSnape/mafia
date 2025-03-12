@@ -2,6 +2,7 @@ import asyncio
 from collections.abc import Callable
 from contextlib import suppress
 from operator import attrgetter
+from pprint import pprint
 from typing import TYPE_CHECKING
 
 from aiogram import Dispatcher
@@ -30,6 +31,7 @@ from utils.utils import (
 
 from .protocols.protocols import (
     VictimsOfVote,
+    AchievementCalculator,
 )
 from .roles import Lawyer, Mafia, Killer
 from .roles.base import AliasRole, BossIsDeadMixin, Role
@@ -227,7 +229,7 @@ class Executor:
             role = game_data["players"][str(victim_id)][
                 "pretty_role"
             ]
-            text_about_dead += f"Ночью был убит {role} - {url}!\n\n"
+            text_about_dead += f"Убит {role} - {url}!\n\n"
 
         text_about_dead = (
             text_about_dead or "Сегодня ночью все выжили!"
@@ -235,10 +237,18 @@ class Executor:
         await self.bot.send_message(
             chat_id=self.group_chat_id, text=text_about_dead
         )
-
+        for role in roles:
+            if isinstance(role, AchievementCalculator):
+                await role.accrual_of_overnight_rewards(
+                    **dependency_injection(
+                        func=role.accrual_of_overnight_rewards,
+                        data=args,
+                    )
+                )
         await self.mailer.send_messages_after_night(
             game_data=game_data
         )
+        await self.state.set_data(game_data)
 
     async def confirm_final_aim(
         self,

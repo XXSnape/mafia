@@ -21,6 +21,8 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
         ExtraCache(key="tracking", data_type=dict),
     ]
     number_in_order = 0
+    payment_for_treatment = 8
+    payment_for_murder = 8
 
     def __init__(self):
         self.state_for_waiting_for_action = (
@@ -38,7 +40,24 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
             "enum_name"
         ]
         role: Role = all_roles[user_role]
+        is_active_role = False
         if isinstance(role, ActiveRoleAtNight) is False:
+            money = 0
+        else:
+            money = role.payment_for_murder
+            is_active_role = True
+        for sleeper_id in game_data[self.roles_key]:
+            url = game_data["players"][str(processed_user_id)]["url"]
+            user_role = game_data["players"][str(sleeper_id)]["url"]
+            game_data["players"][str(sleeper_id)]["money"] += money
+            game_data["players"][str(sleeper_id)][
+                "achievements"
+            ].append(
+                f'Ночь {game_data["number_of_night"]}. '
+                f"Усыпление {url} ({user_role}) - {money}💵"
+            )
+
+        if not is_active_role:
             return
         send_message = role.cancel_actions(
             game_data=game_data, user_id=processed_user_id

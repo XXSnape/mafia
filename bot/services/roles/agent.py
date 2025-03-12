@@ -1,8 +1,11 @@
 from cache.cache_types import ExtraCache, GameCache
-from services.roles.base import ActiveRoleAtNight
+from services.roles.base import ActiveRoleAtNight, Role
 from services.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
-from utils.validators import get_processed_user_id_if_exists
+from utils.validators import (
+    get_processed_user_id_if_exists,
+    get_processed_role_and_user_if_exists,
+)
 
 
 class Agent(ProcedureAfterNight, ActiveRoleAtNight):
@@ -38,27 +41,31 @@ class Agent(ProcedureAfterNight, ActiveRoleAtNight):
             chat_id=game_data[self.roles_key][0], text=message
         )
 
-    # @get_processed_user_id_if_exists
-    # async def send_delayed_messages_after_night(
-    #     self, game_data: GameCache, processed_user_id: int
-    # ):
-    #     visitors = ", ".join(
-    #         game_data["players"][str(user_id)]["url"]
-    #         for user_id in game_data["tracking"]
-    #         .get(str(processed_user_id), {})
-    #         .get("sufferers", [])
-    #     )
-    #     user_url = game_data["players"][str(processed_user_id)][
-    #         "url"
-    #     ]
-    #     message = (
-    #         f"{user_url} cегодня ни к кому не ходил"
-    #         if not visitors
-    #         else f"{user_url} навещал: {visitors}"
-    #     )
-    #     await self.bot.send_message(
-    #         chat_id=game_data[self.roles_key][0], text=message
-    #     )
+    @get_processed_user_id_if_exists
+    async def accrual_of_overnight_rewards(
+        self,
+        *,
+        game_data: GameCache,
+        all_roles: dict[str, Role],
+        user_url: str,
+        processed_user_id: int,
+    ):
+        visitors = len(
+            game_data["tracking"]
+            .get(str(processed_user_id), {})
+            .get("sufferers", [])
+        )
+        if not visitors:
+            return
+        money = 6 * visitors
+        for agent_id in game_data[self.roles_key]:
+            game_data["players"][str(agent_id)]["money"] += money
+            game_data["players"][str(agent_id)][
+                "achievements"
+            ].append(
+                f'Ночь {game_data["number_of_night"]}.'
+                f"Слежка за {user_url} - {money}💵"
+            )
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.AGENT_WATCHES

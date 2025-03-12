@@ -58,7 +58,10 @@ async def add_user_to_game(
             user_id=tg_obj.from_user.id,
             full_name=tg_obj.from_user.full_name,
         ),
+        "money": 0,
+        "achievements": [],
     }
     game_data["players_ids"].append(tg_obj.from_user.id)
     game_data["players"][str(tg_obj.from_user.id)] = user_game_data
+    await state.set_data(game_data)
     return game_data["players_ids"], game_data["players"]

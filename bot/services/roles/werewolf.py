@@ -14,8 +14,10 @@ class Werewolf(ActiveRoleAtNight):
         "96&sign=bf5555ef2b801954b0b92848975525fd&type=album"
         "?imw=512&imh=512&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true"
     )
-    purpose = "На 4 ночь ты сможешь превратиться в мафию, маршала или доктора."
+    purpose = "На 4ую ночь ты сможешь превратиться в мафию, маршала или доктора."
     mail_message = "Реши, в кого сегодня превратишься!"
+    payment_for_treatment = 11
+    payment_for_murder = 12
 
     def __init__(self):
         self.state_for_waiting_for_action = (

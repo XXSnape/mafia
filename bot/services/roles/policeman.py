@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from cache.cache_types import ExtraCache, GameCache
-from services.roles.base.roles import Groupings
+from services.roles.base.roles import Groupings, Role
 from constants.output import ROLE_IS_KNOWN
 from keyboards.inline.keypads.mailing import (
     kill_or_check_on_policeman,
@@ -13,12 +13,17 @@ from services.roles.base import (
 )
 from services.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
-from utils.validators import remind_commissioner_about_inspections
+from utils.validators import (
+    remind_commissioner_about_inspections,
+    get_processed_role_and_user_if_exists,
+)
 
 
 class PolicemanAlias(AliasRole):
     role = "Генерал"
     photo = "https://img.clipart-library.com/2/clip-monsters-vs-aliens/clip-monsters-vs-aliens-21.gif"
+    payment_for_treatment = 11
+    payment_for_murder = 14
 
     purpose = "Ты правая рука маршала. В случае его смерти вступишь в должность."
 
@@ -65,9 +70,38 @@ class Policeman(
     ]
     number_in_order = 2
     notification_message = None
+    payment_for_treatment = 18
+    payment_for_murder = 20
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.POLICEMAN_CHECKS
+
+    @get_processed_role_and_user_if_exists
+    async def accrual_of_overnight_rewards(
+        self,
+        *,
+        game_data: GameCache,
+        all_roles: dict[str, Role],
+        victims: set[int],
+        processed_role: Role,
+        user_url: str,
+        processed_user_id: int,
+    ):
+        if processed_user_id not in victims:
+            return
+        payment = (
+            0
+            if processed_role.grouping == Groupings.civilians
+            else processed_role.payment_for_murder
+        )
+        for player_id in game_data[self.roles_key]:
+            game_data["players"][str(player_id)]["money"] += payment
+            game_data["players"][str(player_id)][
+                "achievements"
+            ].append(
+                f'Ночь {game_data["number_of_night"]}. '
+                f"Убийство {user_url} ({processed_role.role}) - {payment}💵"
+            )
 
     async def procedure_after_night(
         self, game_data: GameCache, murdered: list[int]

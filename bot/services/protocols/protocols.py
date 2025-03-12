@@ -36,6 +36,18 @@ class VictimsOfVote(Protocol):
     ): ...
 
 
+@runtime_checkable
+class AchievementCalculator(Protocol):
+    # @abstractmethod
+    async def accrual_of_overnight_rewards(
+        self,
+        *,
+        game_data: GameCache,
+        all_roles: dict[str, "Role"],
+        **kwargs,
+    ): ...
+
+
 # @runtime_checkable
 # class AfterDeaths(Protocol):
 #     async def

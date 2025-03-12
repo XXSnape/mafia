@@ -17,7 +17,6 @@ from services.processing import Executor
 from services.roles.base import Role
 from states.states import GameFsm
 from utils.utils import (
-    get_profiles,
     get_state_and_assign,
     make_pretty,
     make_build,
@@ -118,7 +117,7 @@ class Game:
         )
 
         await self.mailer.mailing()
-        await asyncio.sleep(5)
+        await asyncio.sleep(24)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
@@ -149,37 +148,40 @@ class Game:
 
     async def give_out_rewards(self, e: GameIsOver):
         game_data: GameCache = await self.state.get_data()
-        result = ""
-        if e.winner is Groupings.criminals:
-            result = "Игра завершена! Местная мафия подчинила город себе!\n"
-        elif e.winner is Groupings.civilians:
-            result = "Игра завершена! Вся преступная верхушка обезглавлена, город может спать спокойно!\n"
+        result = f"Игра завершена! Победившая группировка: {e.winner.value}"
         winners = "\nПобедители:\n"
         losers = "\nПроигравшие:\n"
-        winners_ids = set()
+        neutral = "\nСтатус-кво"
+
+        victory_bonus = {
+            Groupings.civilians: 40,
+            Groupings.criminals: 60,
+            Groupings.killer: 100,
+        }
+
         for user_id, player in game_data["players"].items():
-            text = f'{player["url"]} - {player["initial_role"]}\n'
-            if int(user_id) in game_data["winners"]:
-                winners += text
-                winners_ids.add(user_id)
+            enum_name = player["enum_name"]
+            current_role: Role = self.all_roles[enum_name]
+            text = f'{player["url"]} - {player["initial_role"]}'
+            is_winner = None
+            if current_role.grouping == e.winner:
+                is_winner = True
+                player["money"] += victory_bonus[e.winner]
+            elif current_role.grouping != Groupings.other:
+                is_winner = False
+                player["money"] = 0
+            elif int(user_id) in game_data["winners"]:
+                is_winner = True
             elif int(user_id) in game_data["losers"]:
+                is_winner = False
+            text += f' ({player["money"]}💵)\n\n'
+            if is_winner:
+                winners += text
+            elif is_winner is False:
                 losers += text
-            elif e.winner == Groupings.criminals:
-                if (
-                    player["role"]
-                    == Roles.don.value.role
-                    # or AliasesRole.mafia.value.role
-                ):
-                    winners += text
-                    winners_ids.add(user_id)
-                else:
-                    losers += text
             else:
-                if player["role"] != Roles.don.value.role:
-                    winners_ids.add(user_id)
-                    winners += text
-                else:
-                    losers += text
+                neutral += text
+            player["is_winner"] = is_winner
         await self.bot.send_message(
             chat_id=self.group_chat_id,
             text=result + winners + losers,
@@ -191,8 +193,8 @@ class Game:
             *(
                 self.reset_state(
                     chat_id=int(user_id),
-                    is_win=user_id in winners_ids,
-                    role=player["pretty_role"],
+                    player_data=player,
+                    count_of_nights=game_data["number_of_night"],
                 )
                 for user_id, player in game_data["players"].items()
             )
@@ -203,13 +205,31 @@ class Game:
     async def reset_state(
         self,
         chat_id: int,
-        is_win: bool,
-        role: str,
+        player_data: UserGameCache,
+        count_of_nights: int,
     ):
-        if is_win:
-            text = f"Поздравлю! Ты победил в роли {role}"
-        else:
-            text = f"К несчастью, ты проиграл в роли {role}"
+        nights_lived = f"Ночей прожито: {player_data.get('number_died_at_night', count_of_nights)} из {count_of_nights}\n"
+        payments = f"Выплаты за игру: {player_data['money']}\n"
+        common_text = nights_lived + payments
+        win_or_not = {
+            True: f"Поздравлю! Ты победил в роли {player_data['initial_role']}!\n",
+            False: f"К сожалению, ты проиграл в роли {player_data['initial_role']}!\n",
+            None: "Ты завершил игру в нейтральном статусе!\n",
+        }
+        text = win_or_not[player_data["is_winner"]] + common_text
+        if (
+            player_data["is_winner"] is True
+            or player_data["is_winner"] is None
+        ):
+            achievements = "\n---".join(
+                achievement
+                for achievement in player_data["achievements"]
+            )
+            if achievements:
+                text += f"Твои достижения за игру: {achievements}"
+            else:
+                text += "У тебя нет достижений за игру!"
+
         await self.bot.send_message(chat_id=chat_id, text=text)
         state = await get_state_and_assign(
             dispatcher=self.dispatcher,
@@ -240,7 +260,7 @@ class Game:
         game_data: GameCache = await self.state.get_data()
         ids = game_data["players_ids"][:]
         shuffle(ids)
-        roles_tpl = tuple(Roles) + (Roles.general,)
+        roles_tpl = tuple(Roles)
         for user_id, role in zip(ids, roles_tpl):
             current_role: Role = role.value
             self.initialization_by_role(game_data, role=current_role)

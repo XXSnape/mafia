@@ -24,6 +24,8 @@ class Forger(ProcedureAfterNight, ActiveRoleAtNight):
     extra_data = [ExtraCache(key="forged_roles")]
     is_self_selecting = True
     notification_message = "Твои документы подделаны!"
+    payment_for_treatment = 0
+    payment_for_murder = 11
 
     async def procedure_after_night(self, game_data: GameCache):
         if (
@@ -33,6 +35,19 @@ class Forger(ProcedureAfterNight, ActiveRoleAtNight):
             game_data["disclosed_roles"][:] = game_data[
                 "forged_roles"
             ]
+            policeman = game_data["policemans"][0]
+            url = game_data["players"][str(policeman)]["url"]
+            money = 14
+            for forger_id in game_data[self.roles_key]:
+                game_data["players"][str(forger_id)][
+                    "money"
+                ] += money
+                game_data["players"][str(forger_id)][
+                    "achievements"
+                ].append(
+                    f'Ночь {game_data["number_of_night"]}. '
+                    f"Маршалу {url} попались подделанные документы  - {money}💵"
+                )
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
         if game_data["forged_roles"]:

@@ -6,3 +6,4 @@ class Civilian(Role):
     role = "Мирный житель"
     photo = "https://cdn.culture.ru/c/820179.jpg"
     purpose = "Тебе нужно вычислить мафию на голосовании."
+    payment_for_night_spent = 12

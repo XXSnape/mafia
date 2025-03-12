@@ -50,6 +50,10 @@ class Role(ABC):
     can_kill_at_night: bool = False
     can_treat: bool = False
 
+    payment_for_treatment = 5
+    payment_for_murder = 5
+    payment_for_night_spent = 2
+
     alias: Optional["AliasRole"] = None
 
     is_alias: bool = False
@@ -149,6 +153,8 @@ class ActiveRoleAtNight(Role):
     is_self_selecting: bool = False
     do_not_choose_others: int = 1
     do_not_choose_self: int = 1
+    payment_for_treatment = 10
+    payment_for_murder = 10
 
     @classmethod
     @property

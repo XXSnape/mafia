@@ -1,7 +1,11 @@
 from abc import ABC, abstractmethod
 from functools import total_ordering
+from typing import TYPE_CHECKING
 
 from cache.cache_types import GameCache
+
+if TYPE_CHECKING:
+    from services.roles.base import Role
 from utils.utils import get_profiles, make_pretty
 from utils.validators import get_processed_user_id_if_exists
 

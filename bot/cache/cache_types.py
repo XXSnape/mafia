@@ -510,6 +510,9 @@ RolesLiteral = Literal[
     "general",
 ]
 
+Money: TypeAlias = int
+Achievements: TypeAlias = list[str]
+
 
 class UserGameCache(TypedDict, total=False):
     full_name: str
@@ -521,6 +524,9 @@ class UserGameCache(TypedDict, total=False):
     roles_key: str
     number_died_at_night: int
     user_id: int
+    money: Money
+    is_winner: bool
+    achievements: Achievements
 
 
 UsersInGame: TypeAlias = dict[UserIdStr, UserGameCache]

@@ -13,6 +13,7 @@ from collections import defaultdict
 from cache.cache_types import GameCache, UserIdInt
 
 if TYPE_CHECKING:
+    from services.roles.base import Role
     from services.roles import (
         LivePlayersIds,
         PlayersIds,
@@ -132,6 +133,23 @@ def get_results_of_voting(
         make_build(f"Подводим итоги судьбы {user_url}:\n")
         + f"✅За линчевание - {pros} 🚫Против - {cons}\n\n"
     )
+
+
+def record_accrual(
+    game_data: GameCache,
+    roles_key: str,
+    processed_role: "Role",
+    user_url: str,
+    action: str,
+):
+    for player_id in game_data[roles_key]:
+        game_data["players"][str(player_id)][
+            "money"
+        ] += processed_role.payment_for_treatment
+        game_data["players"][str(player_id)]["achievements"].append(
+            f'Ночь {game_data["number_of_night"]}. '
+            f"{action} {user_url} ({processed_role.role}) - {processed_role.payment_for_treatment}💵"
+        )
 
 
 async def get_state_and_assign(

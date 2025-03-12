@@ -1,6 +1,5 @@
 from aiogram.types import InlineKeyboardButton
 from cache.cache_types import GameCache
-from services.roles.base.roles import Groupings
 from keyboards.inline.cb.cb_text import DRAW_CB
 from services.roles.base import ActiveRoleAtNight
 from states.states import UserFsm
@@ -21,6 +20,8 @@ class Analyst(ActiveRoleAtNight):
     message_to_user_after_action = (
         "Ты предположил, что повесят {url}"
     )
+    payment_for_treatment = 5
+    payment_for_murder = 5
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.ANALYST_ASSUMES

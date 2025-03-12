@@ -16,6 +16,8 @@ class Instigator(ActiveRoleAtNight):
     )
     mail_message = "Кого надоумить на неправильный выбор?"
     notification_message = None
+    payment_for_treatment = 7
+    payment_for_murder = 11
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.INSTIGATOR_LYING

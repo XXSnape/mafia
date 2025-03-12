@@ -18,6 +18,8 @@ class Traitor(ActiveRoleAtNight):
     message_to_user_after_action = "Ты выбрал узнать роль {url}"
     mail_message = "Кого проверишь для мафии?"
     notification_message = ROLE_IS_KNOWN
+    payment_for_treatment = 0
+    payment_for_murder = 15
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.TRAITOR_FINDS_OUT

@@ -1,4 +1,5 @@
-from services.roles.base.roles import Groupings
+from cache.cache_types import GameCache
+from services.roles.base.roles import Groupings, Role
 from services.roles.base import (
     ActiveRoleAtNight,
     AliasRole,
@@ -9,6 +10,7 @@ from services.roles.base.mixins import (
     MurderAfterNight,
 )
 from states.states import UserFsm
+from utils.validators import get_processed_role_and_user_if_exists
 
 
 class MafiaAlias(AliasRole):
@@ -23,6 +25,8 @@ class MafiaAlias(AliasRole):
     )
     grouping = Groupings.criminals
     notification_message = None
+    payment_for_treatment = 0
+    payment_for_murder = 13
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.MAFIA_ATTACKS
@@ -57,11 +61,40 @@ class Mafia(MurderAfterNight, BossIsDeadMixin, ActiveRoleAtNight):
     need_to_monitor_interaction = False
     can_kill_at_night = True
     notification_message = None
+    payment_for_treatment = 0
+    payment_for_murder = 20
 
     alias = MafiaAlias()
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.MAFIA_ATTACKS
+
+    @get_processed_role_and_user_if_exists
+    async def accrual_of_overnight_rewards(
+        self,
+        *,
+        game_data: GameCache,
+        all_roles: dict[str, Role],
+        victims: set[int],
+        processed_role: Role,
+        user_url: str,
+        processed_user_id: int,
+    ):
+        if processed_user_id not in victims:
+            return
+        payment = (
+            0
+            if processed_role.grouping == Groupings.criminals
+            else processed_role.payment_for_murder
+        )
+        for player_id in game_data[self.roles_key]:
+            game_data["players"][str(player_id)]["money"] += payment
+            game_data["players"][str(player_id)][
+                "achievements"
+            ].append(
+                f'Ночь {game_data["number_of_night"]}. '
+                f"Убийство {user_url} ({processed_role.role}) - {payment}💵"
+            )
 
     # alias = Alias(
     #     role=AliasesRole.mafia, is_mass_mailing_list=True
