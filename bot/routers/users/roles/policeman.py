@@ -18,7 +18,7 @@ from keyboards.inline.cb.cb_text import (
     POLICEMAN_KILLS_CB,
 )
 from keyboards.inline.keypads.mailing import (
-    POLICEMAN_BACK_BTN,
+    BACK_BTN,
     kill_or_check_on_policeman,
     send_selection_to_players_kb,
 )
@@ -63,7 +63,7 @@ async def policeman_makes_choice(
     markup = send_selection_to_players_kb(
         players_ids=game_data["players_ids"],
         players=game_data["players"],
-        extra_buttons=(POLICEMAN_BACK_BTN,),
+        extra_buttons=(BACK_BTN,),
         exclude=callback.from_user.id,
         user_index_cb=police_action[0],
     )

@@ -13,7 +13,7 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
         "https://masterpiecer-images.s3.yandex.net/c94e9c"
         "b6787b11eeb1ce1e5d9776cfa6:upscaled"
     )
-    grouping = Groupings.other
+    grouping = Groupings.civilians
     purpose = "Ты можешь усыпить кого-нибудь"
     message_to_group_after_action = "Спят взрослые и дети. Не обошлось и без помощи клофелинщиков!"
     message_to_user_after_action = "Ты выбрал усыпить {url}"

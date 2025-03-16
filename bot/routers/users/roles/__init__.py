@@ -10,6 +10,7 @@ from .base_roles import router as base_roles_router
 # from .sleepers import router as sleepers_router
 # from .killers import router as killers_router
 from .forgers import router as forgers_router
+from .instigators import router as instigators_router
 
 # from .bodyguards import router as bodyguards_router
 # from .doctors import router as doctors_router
@@ -42,4 +43,5 @@ router.include_routers(
     forgers_router,
     werewolves_router,
     traitors_router,
+    instigators_router,
 )

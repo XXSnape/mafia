@@ -83,10 +83,10 @@ def choose_fake_role_kb(roles: list[tuple[str, str]]):
         InlineKeyboardButton(text=role[0], callback_data=role[1])
         for role in roles
     ]
-    buttons.append(POLICEMAN_BACK_BTN)
+    buttons.append(BACK_BTN)
     return generate_inline_kb(data_with_buttons=buttons)
 
 
-POLICEMAN_BACK_BTN = InlineKeyboardButton(
+BACK_BTN = InlineKeyboardButton(
     text="Назад⬅️", callback_data=PLAYER_BACKS_CB
 )

@@ -3,7 +3,7 @@ import asyncio
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-from cache.cache_types import GameCache, UserCache
+from cache.cache_types import GameCache, UserCache, UserIdInt
 from constants.output import NUMBER_OF_NIGHT
 from general.collection_of_roles import Roles, get_data_with_roles
 from keyboards.inline.callback_factory.recognize_user import (
@@ -102,7 +102,7 @@ async def get_game_state_data_and_user_id(
     callback_data: UserActionIndexCbData,
     state: FSMContext,
     dispatcher: Dispatcher,
-):
+) -> tuple[FSMContext, GameCache, UserIdInt]:
     game_state, game_data = await get_game_state_and_data(
         callback=callback, state=state, dispatcher=dispatcher
     )
@@ -190,4 +190,4 @@ async def take_action_and_register_user(
     ):
         game_data[current_role.processed_by_boss].append(user_id)
     await state.set_data(game_data)
-    return game_data, user_id
+    return game_state, game_data, user_id

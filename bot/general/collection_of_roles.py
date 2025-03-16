@@ -54,9 +54,10 @@ def get_data_with_roles(
 
 class Roles(enum.Enum):
     don = roles.Mafia()
-    journalist = roles.Journalist()
+    # journalist = roles.Journalist()
     doctor = roles.Doctor()
-    policeman = roles.Policeman()
+    # policeman = roles.Policeman()
+    instigator = roles.Instigator()
     # general = roles.PolicemanAlias()
     # sleeper = roles.Sleeper()
     # sleeper = roles.Sleeper()

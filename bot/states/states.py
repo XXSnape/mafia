@@ -15,6 +15,8 @@ class UserFsm(StatesGroup):
     PROSECUTOR_ARRESTS = State()
     LAWYER_PROTECTS = State()
     BODYGUARD_PROTECTS = State()
+    INSTIGATOR_CHOOSES_SUBJECT = State()
+    INSTIGATOR_CHOOSES_OBJECT = State()
     INSTIGATOR_LYING = State()
     ANGEL_TAKES_REVENGE = State()
     ANALYST_ASSUMES = State()

@@ -11,6 +11,7 @@ from keyboards.inline.callback_factory.recognize_user import (
 from keyboards.inline.keypads.to_bot import (
     participate_in_social_life,
 )
+from services.actions_at_night import get_game_state_data_and_user_id
 from services.roles import Instigator
 from utils.utils import get_state_and_assign
 
@@ -24,23 +25,20 @@ async def vote_for(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    user_data: UserCache = await state.get_data()
-    game_state = await get_state_and_assign(
-        dispatcher=dispatcher,
-        chat_id=user_data["game_chat"],
-        bot_id=callback.bot.id,
+    game_state, game_data, voted_user_id = (
+        await get_game_state_data_and_user_id(
+            callback=callback,
+            callback_data=callback_data,
+            state=state,
+            dispatcher=dispatcher,
+        )
     )
-    game_data: GameCache = await game_state.get_data()
-    voted_user_id = game_data["players_ids"][
-        callback_data.user_index
-    ]
-    if callback.from_user.id == Instigator().get_processed_user_id(
-        game_data
+    deceived_user = game_data.get(Instigator.extra_data[0].key)
+    if (
+        deceived_user
+        and callback.from_user.id == deceived_user[0][0]
     ):
-        ids = game_data["players_ids"][:]
-        ids.remove(callback.from_user.id)
-        ids.remove(voted_user_id)
-        voted_user_id = choice(ids)
+        voted_user_id = deceived_user[0][1]
     game_data["vote_for"].append(
         [callback.from_user.id, voted_user_id]
     )
