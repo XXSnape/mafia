@@ -153,6 +153,7 @@ class Executor:
         if len(pros) == len(cons) or len(pros) < len(cons):
             for role in voting_roles:
                 await role.take_action_after_voting(
+                    all_roles=self.all_roles,
                     game_data=game_data,
                     user_id=0,
                 )
@@ -168,6 +169,7 @@ class Executor:
         ):
             for role in voting_roles:
                 await role.take_action_after_voting(
+                    all_roles=self.all_roles,
                     game_data=game_data,
                     user_id=0,
                 )
@@ -178,6 +180,7 @@ class Executor:
             return
         for role in voting_roles:
             await role.take_action_after_voting(
+                all_roles=self.all_roles,
                 game_data=game_data,
                 user_id=removed_user_id,
             )

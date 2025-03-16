@@ -478,7 +478,7 @@ class ExtraCache:
 Url: TypeAlias = str
 PlayersIds: TypeAlias = list[int]
 UserIdStr: TypeAlias = str
-Role: TypeAlias = str
+RoleName: TypeAlias = str
 UserIdInt: TypeAlias = int
 Message: TypeAlias = str
 RolesLiteral = Literal[
@@ -517,7 +517,7 @@ Achievements: TypeAlias = list[str]
 class UserGameCache(TypedDict, total=False):
     full_name: str
     url: Url
-    role: NotRequired[Role]
+    role: NotRequired[RoleName]
     pretty_role: NotRequired[str]
     initial_role: str
     enum_name: RolesLiteral
@@ -544,7 +544,7 @@ TrackingData: TypeAlias = dict[UserIdStr, InteractionData]
 NumberOfNight: TypeAlias = int
 
 LastInteraction: TypeAlias = dict[UserIdStr, list[NumberOfNight]]
-DisclosedRoles = list[list[UserIdStr, Role]]
+DisclosedRoles = list[list[UserIdStr, RoleName]]
 VotedFor: TypeAlias = list[list[UserIdInt]]
 
 

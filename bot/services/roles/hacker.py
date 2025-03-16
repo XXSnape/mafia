@@ -1,4 +1,3 @@
-from services.roles.base.roles import Groupings
 from services.roles.base import Role
 
 
@@ -8,3 +7,4 @@ class Hacker(Role):
     purpose = "Ты можешь прослушивать диалоги мафии и узнавать, за кого они голосуют"
     payment_for_murder = 16
     payment_for_treatment = 15
+    payment_for_night_spent = 7
