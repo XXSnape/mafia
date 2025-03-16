@@ -67,14 +67,14 @@ class Bodyguard(ProcedureAfterNight, ActiveRoleAtNight):
             and game_data[self.roles_key][0] in recovered
         ):
             return
-        for player_id in game_data[self.roles_key]:
-            game_data["players"][str(player_id)]["money"] += (
-                processed_role.payment_for_treatment * 5
-            )
-            game_data["players"][str(player_id)][
-                "achievements"
-            ].append(
-                f'Ночь {game_data["number_of_night"]}. '
-                f"Пожертвование собой ради {user_url} ({processed_role.role}) - "
-                f"{processed_role.payment_for_treatment * 7}💵"
-            )
+        if processed_role.grouping != Groupings.civilians:
+            money = 0
+        else:
+            money = processed_role.payment_for_treatment * 7
+        self.add_money_to_all_allies(
+            game_data=game_data,
+            money=money,
+            beginning_message="Пожертвование собой ради",
+            user_url=user_url,
+            processed_role=processed_role,
+        )

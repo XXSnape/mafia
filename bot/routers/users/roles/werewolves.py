@@ -105,7 +105,7 @@ async def werewolf_turns_into(
     )
     if are_there_many_senders:
         profiles = get_profiles(
-            live_players_ids=game_data[roles_key],
+            players_ids=game_data[roles_key],
             players=game_data["players"],
             role=True,
         )

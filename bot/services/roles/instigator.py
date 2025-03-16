@@ -24,5 +24,5 @@ class Instigator(ActiveRoleAtNight):
         )
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
-        game_data[self.extra_data.key].clear()
+        game_data[self.extra_data[0].key].clear()
         super().cancel_actions(game_data=game_data, user_id=user_id)

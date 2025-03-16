@@ -80,18 +80,17 @@ class Doctor(
     ):
         if processed_user_id not in murdered:
             return
-        for doctor_id in game_data[self.roles_key]:
-            game_data["players"][str(doctor_id)][
-                "money"
-            ] += processed_role.payment_for_treatment
-            game_data["players"][str(doctor_id)][
-                "achievements"
-            ].append(
-                f'Ночь {game_data["number_of_night"]}. '
-                f"Лечение {user_url} ({processed_role.role}) - {processed_role.payment_for_treatment}💵"
-            )
+        if processed_role.grouping != Groupings.civilians:
+            money = 0
+        else:
+            money = processed_role.payment_for_treatment
+        self.add_money_to_all_allies(
+            game_data=game_data,
+            money=money,
+            beginning_message="Лечение",
+            user_url=user_url,
+            processed_role=processed_role,
+        )
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.DOCTOR_TREATS
-
-    # alias = Alias(role=AliasesRole.nurse)

@@ -3,7 +3,10 @@ from services.roles.base.roles import Groupings
 from services.roles.base import ActiveRoleAtNight, Role
 from services.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
-from utils.validators import get_processed_user_id_if_exists
+from utils.validators import (
+    get_processed_user_id_if_exists,
+    get_processed_role_and_user_if_exists,
+)
 
 
 class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
@@ -40,24 +43,7 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
             "enum_name"
         ]
         role: Role = all_roles[user_role]
-        is_active_role = False
         if isinstance(role, ActiveRoleAtNight) is False:
-            money = 0
-        else:
-            money = role.payment_for_murder
-            is_active_role = True
-        for sleeper_id in game_data[self.roles_key]:
-            url = game_data["players"][str(processed_user_id)]["url"]
-            user_role = game_data["players"][str(sleeper_id)]["url"]
-            game_data["players"][str(sleeper_id)]["money"] += money
-            game_data["players"][str(sleeper_id)][
-                "achievements"
-            ].append(
-                f'Ночь {game_data["number_of_night"]}. '
-                f"Усыпление {url} ({user_role}) - {money}💵"
-            )
-
-        if not is_active_role:
             return
         send_message = role.cancel_actions(
             game_data=game_data, user_id=processed_user_id
@@ -67,3 +53,27 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
                 chat_id=processed_user_id,
                 text="Сложно поверить, но все твои действия ночью были лишь сном!",
             )
+
+    @get_processed_role_and_user_if_exists
+    async def accrual_of_overnight_rewards(
+        self,
+        *,
+        game_data: GameCache,
+        all_roles: dict[str, "Role"],
+        processed_role: Role,
+        user_url: str,
+        processed_user_id: int,
+    ):
+        if (
+            isinstance(processed_role, ActiveRoleAtNight) is False
+        ) or processed_role.grouping == Groupings.civilians:
+            money = 0
+        else:
+            money = processed_role.payment_for_murder
+        self.add_money_to_all_allies(
+            game_data=game_data,
+            money=money,
+            user_url=user_url,
+            processed_role=processed_role,
+            beginning_message="Усыпление",
+        )

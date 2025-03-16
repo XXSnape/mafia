@@ -7,6 +7,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from cache.cache_types import GameCache, UserGameCache
+from constants.output import MONEY_SYM
 from general.collection_of_roles import Roles, get_data_with_roles
 from general.exceptions import GameIsOver
 from services.roles.base.roles import Groupings
@@ -20,6 +21,7 @@ from utils.utils import (
     get_state_and_assign,
     make_pretty,
     make_build,
+    get_profiles,
 )
 from utils.live_players import get_live_players
 
@@ -147,41 +149,42 @@ class Game:
         await self.executor.clear_data_after_all_actions()
 
     async def give_out_rewards(self, e: GameIsOver):
+        def sorting_winners_by_money(user_id: str):
+            return game_data["players"][user_id]["money"]
+
         game_data: GameCache = await self.state.get_data()
-        result = f"Игра завершена! Победившая группировка: {e.winner.value}"
-        winners = "\nПобедители:\n"
-        losers = "\nПроигравшие:\n"
-        neutral = "\nСтатус-кво"
-
-        victory_bonus = {
-            Groupings.civilians: 40,
-            Groupings.criminals: 60,
-            Groupings.killer: 100,
-        }
-
+        result = make_build(
+            f"🚩Игра завершена! Победившая группировка: {e.winner.value.name}\n\n"
+        )
+        winners = []
+        losers = []
         for user_id, player in game_data["players"].items():
             enum_name = player["enum_name"]
             current_role: Role = self.all_roles[enum_name]
-            text = f'{player["url"]} - {player["initial_role"]}'
-            is_winner = None
-            if current_role.grouping == e.winner:
-                is_winner = True
-                player["money"] += victory_bonus[e.winner]
-            elif current_role.grouping != Groupings.other:
-                is_winner = False
-                player["money"] = 0
-            elif int(user_id) in game_data["winners"]:
-                is_winner = True
-            elif int(user_id) in game_data["losers"]:
-                is_winner = False
-            text += f' ({player["money"]}💵)\n\n'
+            is_winner = current_role.earn_money_for_winning(
+                winning_group=e.winner,
+                game_data=game_data,
+                user_id=user_id,
+            )
             if is_winner:
-                winners += text
-            elif is_winner is False:
-                losers += text
+                winners.append(user_id)
             else:
-                neutral += text
-            player["is_winner"] = is_winner
+                losers.append(user_id)
+        winners.sort(key=sorting_winners_by_money, reverse=True)
+        winners = make_build("🔥Победители:\n") + get_profiles(
+            players_ids=winners,
+            players=game_data["players"],
+            initial_role=True,
+            money_need=True,
+            role=True,
+        )
+        losers = make_build("\n\n🚫Проигравшие:\n") + get_profiles(
+            players_ids=losers,
+            players=game_data["players"],
+            initial_role=True,
+            money_need=True,
+            role=True,
+        )
         await self.bot.send_message(
             chat_id=self.group_chat_id,
             text=result + winners + losers,
@@ -192,48 +195,43 @@ class Game:
         await asyncio.gather(
             *(
                 self.reset_state(
-                    chat_id=int(user_id),
-                    player_data=player,
-                    count_of_nights=game_data["number_of_night"],
+                    user_id=int(user_id),
+                    player_data=player_data,
                 )
-                for user_id, player in game_data["players"].items()
+                for user_id, player_data in game_data[
+                    "players"
+                ].items()
             )
         )
         await self.state.clear()
-        return
 
     async def reset_state(
         self,
-        chat_id: int,
+        user_id: int,
         player_data: UserGameCache,
-        count_of_nights: int,
     ):
-        nights_lived = f"Ночей прожито: {player_data.get('number_died_at_night', count_of_nights)} из {count_of_nights}\n"
-        payments = f"Выплаты за игру: {player_data['money']}\n"
-        common_text = nights_lived + payments
-        win_or_not = {
-            True: f"Поздравлю! Ты победил в роли {player_data['initial_role']}!\n",
-            False: f"К сожалению, ты проиграл в роли {player_data['initial_role']}!\n",
-            None: "Ты завершил игру в нейтральном статусе!\n",
-        }
-        text = win_or_not[player_data["is_winner"]] + common_text
-        if (
-            player_data["is_winner"] is True
-            or player_data["is_winner"] is None
-        ):
-            achievements = "\n---".join(
-                achievement
-                for achievement in player_data["achievements"]
-            )
-            if achievements:
-                text += f"Твои достижения за игру: {achievements}"
+        result_of_game, *achivements = player_data["achievements"]
+        money = player_data["money"]
+        text = result_of_game
+        if money != 0:
+            if not achivements:
+                achivements_text = make_build(
+                    "\nУ тебя нет достижений за игру!"
+                )
             else:
-                text += "У тебя нет достижений за игру!"
-
-        await self.bot.send_message(chat_id=chat_id, text=text)
+                achivements_text = make_build(
+                    "\nТвои достижения:\n● "
+                ) + "\n● ".join(
+                    achievement for achievement in achivements
+                )
+            text += achivements_text
+        text += make_build(
+            f"\n\nИтого: {player_data['money']}{MONEY_SYM}"
+        )
+        await self.bot.send_message(chat_id=user_id, text=text)
         state = await get_state_and_assign(
             dispatcher=self.dispatcher,
-            chat_id=chat_id,
+            chat_id=user_id,
             bot_id=self.bot.id,
         )
         await state.clear()

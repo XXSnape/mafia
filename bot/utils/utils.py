@@ -11,6 +11,7 @@ from aiogram.fsm.state import State
 from aiogram.fsm.storage.base import StorageKey
 from collections import defaultdict
 from cache.cache_types import GameCache, UserIdInt
+from constants.output import MONEY_SYM
 
 if TYPE_CHECKING:
     from services.roles.base import Role
@@ -35,21 +36,32 @@ def get_profile_link(user_id: int | str, full_name: str) -> str:
 
 
 def get_profiles(
-    live_players_ids: "LivePlayersIds",
+    players_ids: "LivePlayersIds",
     players: "UsersInGame",
     role: bool = False,
+    initial_role: bool = False,
+    money_need: bool = False,
 ) -> str:
     result = ""
 
     for (
         index,
         user_id,
-    ) in enumerate(live_players_ids, start=1):
+    ) in enumerate(players_ids, start=1):
         data: UserGameCache
         url = players[str(user_id)]["url"]
         if role:
-            role = players[str(user_id)]["pretty_role"]
-            result += f"\n{index}) {url} - {role}"
+            if initial_role:
+                role = players[str(user_id)]["initial_role"]
+            else:
+                role = players[str(user_id)]["pretty_role"]
+            if money_need:
+                money = players[str(user_id)]["money"]
+                result += (
+                    f"\n{index}) {url} - {role} ({money}{MONEY_SYM})"
+                )
+            else:
+                result += f"\n{index}) {url} - {role}"
         else:
             result += f"\n{index}) {url}"
     return result

@@ -54,16 +54,15 @@ class Prosecutor(ProcedureAfterNight, ActiveRoleAtNight):
         money = (
             0
             if processed_role.grouping == Groupings.civilians
-            else 12
+            else 20
         )
-        for player_id in game_data[self.roles_key]:
-            game_data["players"][str(player_id)]["money"] += money
-            game_data["players"][str(player_id)][
-                "achievements"
-            ].append(
-                f'Ночь {game_data["number_of_night"]}. '
-                f"Арест {user_url} ({processed_role.role}) - {money}💵"
-            )
+        self.add_money_to_all_allies(
+            game_data=game_data,
+            money=money,
+            user_url=user_url,
+            processed_role=processed_role,
+            beginning_message="Арест",
+        )
 
     @get_processed_user_id_if_exists
     async def take_action_after_voting(

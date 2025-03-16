@@ -238,13 +238,12 @@ class Executor:
             chat_id=self.group_chat_id, text=text_about_dead
         )
         for role in roles:
-            if isinstance(role, AchievementCalculator):
-                await role.accrual_of_overnight_rewards(
-                    **dependency_injection(
-                        func=role.accrual_of_overnight_rewards,
-                        data=args,
-                    )
+            await role.accrual_of_overnight_rewards(
+                **dependency_injection(
+                    func=role.accrual_of_overnight_rewards,
+                    data=args,
                 )
+            )
         await self.mailer.send_messages_after_night(
             game_data=game_data
         )

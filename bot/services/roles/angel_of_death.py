@@ -39,16 +39,14 @@ class AngelOfDeath(MurderAfterNight, ActiveRoleAtNight):
     ):
         if processed_user_id not in victims:
             return
-        for angel_id in game_data[self.roles_key]:
-            game_data["players"][str(angel_id)]["money"] += (
-                processed_role.payment_for_murder * 2
-            )
-            game_data["players"][str(angel_id)][
-                "achievements"
-            ].append(
-                f'Ночь {game_data["number_of_night"]}. '
-                f"Убийство {user_url} ({processed_role.role}) - {processed_role.payment_for_murder * 2}💵"
-            )
+        money = processed_role.payment_for_murder * 2
+        self.add_money_to_all_allies(
+            game_data=game_data,
+            money=money,
+            beginning_message="Отомщённое убийство",
+            user_url=user_url,
+            processed_role=processed_role,
+        )
 
     def get_processed_user_id(self, game_data: GameCache):
         result = super().get_processed_user_id(game_data=game_data)

@@ -8,7 +8,7 @@ def get_live_players(
     game_data: GameCache, all_roles: dict[str, Role]
 ):
     profiles = get_profiles(
-        live_players_ids=game_data["players_ids"],
+        players_ids=game_data["players_ids"],
         players=game_data["players"],
     )
     live_roles = get_live_roles(
@@ -53,7 +53,5 @@ def get_live_roles(game_data: GameCache, all_roles: dict[str, Role]):
         grouping_roles = "\n● ".join(role for role, _ in roles)
         total = sum(count for _, count in roles)
         total_text = make_build(f"- {total}:")
-        result += (
-            f"\n{grouping.value} {total_text}\n● {grouping_roles}\n"
-        )
+        result += f"\n{grouping.value.name} {total_text}\n● {grouping_roles}\n"
     return result

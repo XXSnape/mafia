@@ -89,19 +89,18 @@ class Policeman(
     ):
         if processed_user_id not in victims:
             return
-        payment = (
+        money = (
             0
             if processed_role.grouping == Groupings.civilians
             else processed_role.payment_for_murder
         )
-        for player_id in game_data[self.roles_key]:
-            game_data["players"][str(player_id)]["money"] += payment
-            game_data["players"][str(player_id)][
-                "achievements"
-            ].append(
-                f'Ночь {game_data["number_of_night"]}. '
-                f"Убийство {user_url} ({processed_role.role}) - {payment}💵"
-            )
+        self.add_money_to_all_allies(
+            game_data=game_data,
+            money=money,
+            user_url=user_url,
+            processed_role=processed_role,
+            beginning_message="Убийство",
+        )
 
     async def procedure_after_night(
         self, game_data: GameCache, murdered: list[int]

@@ -2,6 +2,7 @@ from cache.cache_types import ExtraCache, GameCache
 from services.roles.base import ActiveRoleAtNight, Role
 from services.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
+from utils.utils import make_build
 from utils.validators import (
     get_processed_user_id_if_exists,
     get_processed_role_and_user_if_exists,
@@ -41,12 +42,13 @@ class Agent(ProcedureAfterNight, ActiveRoleAtNight):
             chat_id=game_data[self.roles_key][0], text=message
         )
 
-    @get_processed_user_id_if_exists
+    @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(
         self,
         *,
         game_data: GameCache,
         all_roles: dict[str, Role],
+        processed_role: Role,
         user_url: str,
         processed_user_id: int,
     ):
@@ -58,14 +60,13 @@ class Agent(ProcedureAfterNight, ActiveRoleAtNight):
         if not visitors:
             return
         money = 6 * visitors
-        for agent_id in game_data[self.roles_key]:
-            game_data["players"][str(agent_id)]["money"] += money
-            game_data["players"][str(agent_id)][
-                "achievements"
-            ].append(
-                f'Ночь {game_data["number_of_night"]}.'
-                f"Слежка за {user_url} - {money}💵"
-            )
+        self.add_money_to_all_allies(
+            game_data=game_data,
+            money=money,
+            beginning_message="Слежка за",
+            user_url=user_url,
+            processed_role=processed_role,
+        )
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.AGENT_WATCHES

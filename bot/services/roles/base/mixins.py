@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from functools import total_ordering
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from cache.cache_types import GameCache
+from constants.output import MONEY_SYM
 
 if TYPE_CHECKING:
     from services.roles.base import Role
@@ -35,7 +36,7 @@ class BossIsDeadMixin:
         ] = enum_name
         await self.state.set_data(game_data)
         profiles = get_profiles(
-            live_players_ids=game_data[self.roles_key],
+            players_ids=game_data[self.roles_key],
             players=game_data["players"],
             role=True,
         )
@@ -54,6 +55,37 @@ class ProcedureAfterNight(ABC):
     @abstractmethod
     async def procedure_after_night(self, *args, **kwargs):
         pass
+
+    @abstractmethod
+    async def accrual_of_overnight_rewards(
+        self,
+        *,
+        game_data: GameCache,
+        all_roles: dict[str, "Role"],
+        **kwargs,
+    ):
+        pass
+
+    def add_money_to_all_allies(
+        self,
+        game_data: GameCache,
+        money: int,
+        custom_message: str | None = None,
+        beginning_message: str | None = None,
+        user_url: str | None = None,
+        processed_role: Optional["Role"] = None,
+    ):
+        for player_id in game_data[self.roles_key]:
+            game_data["players"][str(player_id)]["money"] += money
+            if custom_message:
+                message = custom_message
+            else:
+                message = f"{beginning_message} {user_url} ({make_pretty(processed_role.role)}) - {money}{MONEY_SYM}"
+            game_data["players"][str(player_id)][
+                "achievements"
+            ].append(
+                f'Ночь {game_data["number_of_night"]}.\n{message}'
+            )
 
 
 class MurderAfterNight(ProcedureAfterNight):

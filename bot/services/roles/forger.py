@@ -35,19 +35,30 @@ class Forger(ProcedureAfterNight, ActiveRoleAtNight):
             game_data["disclosed_roles"][:] = game_data[
                 "forged_roles"
             ]
-            policeman = game_data["policemans"][0]
+
+    async def accrual_of_overnight_rewards(
+        self,
+        *,
+        game_data: GameCache,
+        all_roles: dict[str, "Role"],
+    ):
+        from .policeman import Policeman
+
+        if (
+            game_data["disclosed_roles"]
+            and game_data["disclosed_roles"]
+            == game_data["forged_roles"]
+        ):
+            policeman = game_data[Policeman.roles_key][0]
             url = game_data["players"][str(policeman)]["url"]
             money = 14
-            for forger_id in game_data[self.roles_key]:
-                game_data["players"][str(forger_id)][
-                    "money"
-                ] += money
-                game_data["players"][str(forger_id)][
-                    "achievements"
-                ].append(
-                    f'Ночь {game_data["number_of_night"]}. '
-                    f"Маршалу {url} попались подделанные документы  - {money}💵"
-                )
+            self.add_money_to_all_allies(
+                game_data=game_data,
+                money=money,
+                user_url=url,
+                processed_role=Policeman(),
+                beginning_message="Спецоперация по подделке документов прошла успешно. Обманут",
+            )
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
         if game_data["forged_roles"]:

@@ -70,17 +70,14 @@ class Journalist(ProcedureAfterNight, ActiveRoleAtNight):
         )
         if not visitors:
             return
-        money = 4 * visitors
-        for journalist_id in game_data[self.roles_key]:
-            game_data["players"][str(journalist_id)][
-                "money"
-            ] += money
-            game_data["players"][str(journalist_id)][
-                "achievements"
-            ].append(
-                f'Ночь {game_data["number_of_night"]}.'
-                f"Интервью с {user_url} - {money}💵"
-            )
+        money = 3 * visitors
+        self.add_money_to_all_allies(
+            game_data=game_data,
+            money=money,
+            user_url=user_url,
+            processed_role=processed_role,
+            beginning_message="Интервью с",
+        )
 
     def __init__(self):
         self.state_for_waiting_for_action = (

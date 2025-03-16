@@ -1,5 +1,7 @@
+import enum
 from abc import ABC
 from contextlib import suppress
+from dataclasses import dataclass
 from enum import StrEnum
 from typing import Callable, Optional
 
@@ -14,6 +16,7 @@ from cache.cache_types import (
     PlayersIds,
     LastInteraction,
 )
+from constants.output import MONEY_SYM
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
@@ -23,14 +26,21 @@ from utils.utils import (
     get_state_and_assign,
     get_the_most_frequently_encountered_id,
     make_pretty,
+    make_build,
 )
 
 
-class Groupings(StrEnum):
-    criminals = "Мафия😈"
-    civilians = "Мирные жители🙂"
-    killer = "Независимые наёмники🔪"
-    other = "Иные👽"
+@dataclass(frozen=True)
+class Group:
+    name: str
+    payment: int | None
+
+
+class Groupings(enum.Enum):
+    criminals = Group(name="Мафия😈", payment=30)
+    civilians = Group(name="Мирные жители🙂", payment=20)
+    killer = Group(name="Независимые наёмники🔪", payment=35)
+    other = Group(name="Иные👽", payment=None)
 
 
 class Role(ABC):
@@ -91,6 +101,52 @@ class Role(ABC):
         if cls.alias and cls.alias.is_mass_mailing_list:
             return f"processed_boss_{cls.__name__}"
 
+    def earn_money_for_winning(
+        self,
+        winning_group: Groupings,
+        game_data: GameCache,
+        user_id: str,
+    ) -> bool:
+        user_data = game_data["players"][user_id]
+        count_of_nights = game_data["number_of_night"]
+        nights_lived = user_data.get(
+            "number_died_at_night", count_of_nights
+        )
+        nights_lived_text = make_build(
+            f"Ночей прожито: {nights_lived} из {count_of_nights}"
+        )
+        achivements = user_data["achievements"]
+        if winning_group == self.grouping:
+
+            money_for_victory = self.grouping.value.payment * (
+                len(game_data["players"]) // 4
+            )
+            money_for_nights = (
+                self.payment_for_night_spent * nights_lived
+            )
+            user_data["money"] += (
+                money_for_victory + money_for_nights
+            )
+            achivements.insert(
+                0,
+                make_build(
+                    f"🔥🔥🔥Поздравляю! Ты победил в роли {user_data['initial_role']} ({money_for_victory}{MONEY_SYM})!\n\n"
+                )
+                + f"{nights_lived_text} ({money_for_nights}{MONEY_SYM})\n",
+            )
+            return True
+        else:
+            user_data["money"] = 0
+            money_for_nights = 0
+            achivements.insert(
+                0,
+                make_build(
+                    f"🚫К сожалению, ты проиграл в роли {user_data['initial_role']} (0{MONEY_SYM})!\n\n"
+                )
+                + f"{nights_lived_text} ({money_for_nights} {MONEY_SYM})",
+            )
+            return False
+
     def get_processed_user_id(self, game_data: GameCache):
         if self.processed_by_boss:
             processed_id = get_the_most_frequently_encountered_id(
@@ -133,7 +189,7 @@ class AliasRole(Role):
         url = game_data["players"][str(current_id)]["url"]
         role = game_data["players"][str(current_id)]["pretty_role"]
         profiles = get_profiles(
-            live_players_ids=game_data[self.roles_key],
+            players_ids=game_data[self.roles_key],
             players=game_data["players"],
             role=True,
         )

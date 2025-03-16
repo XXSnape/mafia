@@ -137,7 +137,7 @@ class MailerToPlayers:
             )
             if current_role.alias and len(roles) > 1:
                 profiles = get_profiles(
-                    live_players_ids=roles,
+                    players_ids=roles,
                     players=game_data["players"],
                     role=True,
                 )
