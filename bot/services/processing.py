@@ -181,6 +181,16 @@ class Executor:
                 game_data=game_data,
                 user_id=removed_user_id,
             )
+        for user_id in set(pros):
+            current_role = self.all_roles[
+                game_data["players"][str(user_id)]["enum_name"]
+            ]
+            current_role.earn_money_for_voting(
+                voted_role=self.all_roles[user_info["enum_name"]],
+                voted_user=user_info,
+                game_data=game_data,
+                user_id=user_id,
+            )
         await self.remove_user_from_game(
             game_data=game_data,
             user_id=removed_user_id,
@@ -192,6 +202,7 @@ class Executor:
             + f"Сегодня народ принял тяжелое решение и повесил "
             f'{user_info["url"]} с ролью {user_info["pretty_role"]}!',
         )
+        await self.state.set_data(game_data)
 
     @check_end_of_game
     async def sum_up_after_night(self):

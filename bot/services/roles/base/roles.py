@@ -3,7 +3,7 @@ from abc import ABC
 from contextlib import suppress
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Callable, Optional
+from typing import Callable, Optional, Self
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
@@ -15,6 +15,7 @@ from cache.cache_types import (
     GameCache,
     PlayersIds,
     LastInteraction,
+    UserGameCache,
 )
 from constants.output import MONEY_SYM
 from keyboards.inline.keypads.mailing import (
@@ -146,6 +147,39 @@ class Role(ABC):
                 + f"{nights_lived_text} ({money_for_nights} {MONEY_SYM})",
             )
             return False
+
+    def get_money_for_voting(
+        self,
+        voted_role: Self,
+    ):
+        if (
+            self.grouping == Groupings.civilians
+            and voted_role.grouping == Groupings.other
+        ):
+            return 0
+        elif self.grouping != voted_role.grouping:
+            return voted_role.payment_for_murder
+        else:
+            return 0
+
+    def earn_money_for_voting(
+        self,
+        voted_role: Self,
+        voted_user: UserGameCache,
+        game_data: GameCache,
+        user_id: int,
+    ) -> None:
+        user_data = game_data["players"][str(user_id)]
+        number_of_day = game_data["number_of_night"]
+        earned_money = self.get_money_for_voting(
+            voted_role=voted_role
+        )
+        user_data["money"] += earned_money
+        achivements = user_data["achievements"]
+        achivements.append(
+            f"🌟День {number_of_day}.\nПовешение {voted_user['url']} ("
+            f"{voted_user['pretty_role']}) - {earned_money}{MONEY_SYM}"
+        )
 
     def get_processed_user_id(self, game_data: GameCache):
         if self.processed_by_boss:

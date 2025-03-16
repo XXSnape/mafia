@@ -84,7 +84,7 @@ class ProcedureAfterNight(ABC):
             game_data["players"][str(player_id)][
                 "achievements"
             ].append(
-                f'Ночь {game_data["number_of_night"]}.\n{message}'
+                f'🌃Ночь {game_data["number_of_night"]}.\n{message}'
             )
 
 

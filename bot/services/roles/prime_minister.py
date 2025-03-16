@@ -11,3 +11,6 @@ class PrimeMinister(Role):
     purpose = "Твой голос стоит как 2!"
     payment_for_treatment = 12
     payment_for_murder = 12
+
+    def get_money_for_voting(self, voted_role: Role):
+        return super().get_money_for_voting(voted_role) * 2
