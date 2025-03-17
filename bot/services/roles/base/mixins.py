@@ -59,9 +59,9 @@ class SuicideRoleMixin:
         winning_group: Groupings,
         user_id: UserIdStr,
     ):
-        if user_id in self._winners:
+        if int(user_id) in self._winners:
             payment = 30 * (len(game_data["players"]) // 4)
-            payment -= 5 * (nights_lived - 1)
+            payment -= 5 * nights_lived
             if payment < 5:
                 payment = 5
             return payment, 0

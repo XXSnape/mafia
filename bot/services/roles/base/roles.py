@@ -125,7 +125,7 @@ class Role(ABC):
             "number_died_at_night", count_of_nights
         )
         nights_lived_text = make_build(
-            f"Ночей прожито: {nights_lived} из {count_of_nights}"
+            f"Дней и ночей прожито: {nights_lived} из {count_of_nights}"
         )
         achivements = user_data["achievements"]
         money_for_victory, money_for_nights = (

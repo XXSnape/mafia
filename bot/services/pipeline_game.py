@@ -117,7 +117,7 @@ class Game:
         )
 
         await self.mailer.mailing()
-        await asyncio.sleep(24)
+        await asyncio.sleep(4)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
@@ -130,9 +130,9 @@ class Game:
             caption=f"{make_build('Пришло время провести следственные мероприятия жителям города!')}\n\n"
             f"{players_after_night}",
         )
-        await asyncio.sleep(4)
+        await asyncio.sleep(1)
         await self.mailer.suggest_vote()
-        await asyncio.sleep(12)
+        await asyncio.sleep(8)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
@@ -214,11 +214,11 @@ class Game:
         if money != 0:
             if not achivements:
                 achivements_text = make_build(
-                    "\nУ тебя нет достижений за игру!"
+                    "\nУ тебя нет активных действий за игру!"
                 )
             else:
                 achivements_text = make_build(
-                    "\nТвои достижения:\n● "
+                    "\nОтчет об активных действиях, повлиявших на исход:\n\n● "
                 ) + "\n● ".join(
                     achievement for achievement in achivements
                 )

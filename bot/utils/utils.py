@@ -139,8 +139,8 @@ def get_results_of_voting(
     pros = len(game_data["pros"])
     cons = len(game_data["cons"])
     return (
-        make_build(f"Подводим итоги судьбы {user_url}:\n")
-        + f"✅За линчевание - {pros} 🚫Против - {cons}\n\n"
+        make_build(f"Подводим итоги судьбы {user_url}:\n\n")
+        + f"✅За линчевание - {pros}\n🚫Против - {cons}\n\n"
     )
 
 

@@ -335,7 +335,7 @@ class Executor:
         game_data["players_ids"].remove(user_id)
         game_data["players"][str(user_id)][
             "number_died_at_night"
-        ] = game_data["number_of_night"]
+        ] = (game_data["number_of_night"] - 1)
         game_data[role.roles_key].remove(user_id)
         if isinstance(role, BossIsDeadMixin):
             await role.boss_is_dead(current_id=user_id)
