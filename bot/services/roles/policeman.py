@@ -68,7 +68,7 @@ class Policeman(
             data_type=str,
         ),
     ]
-    number_in_order = 2
+    number_in_order_after_night = 2
     notification_message = None
     payment_for_treatment = 18
     payment_for_murder = 20

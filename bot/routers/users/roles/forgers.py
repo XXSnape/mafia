@@ -16,6 +16,7 @@ from services.actions_at_night import (
 )
 from services.roles import Forger, Policeman, PolicemanAlias
 from states.states import UserFsm
+from utils.tg import delete_message
 from utils.utils import make_pretty
 
 router = Router(name=__name__)
@@ -95,7 +96,7 @@ async def forges_selects_documents(
         current_user_id=callback.from_user.id,
     )
     url = game_data["players"][str(user_id)]["url"]
-    await callback.message.delete()
+    await delete_message(callback.message)
     await callback.bot.send_message(
         chat_id=game_data["game_chat"],
         text=Forger.message_to_group_after_action,

@@ -23,7 +23,7 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
     extra_data = [
         ExtraCache(key="tracking", data_type=dict),
     ]
-    number_in_order = 0
+    number_in_order_after_night = 0
     payment_for_treatment = 8
     payment_for_murder = 8
 

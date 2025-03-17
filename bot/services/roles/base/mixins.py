@@ -69,7 +69,7 @@ class SuicideRoleMixin:
 
 
 class ProcedureAfterNight(ABC):
-    number_in_order: int = 1
+    number_in_order_after_night: int = 1
 
     @abstractmethod
     async def procedure_after_night(self, *args, **kwargs):
@@ -96,3 +96,14 @@ class MurderAfterNight(ProcedureAfterNight):
         processed_user_id: int,
     ):
         murdered.append(processed_user_id)
+
+
+class ProcedureAfterVoting(ABC):
+    number_in_order_after_voting: int = 1
+
+    @abstractmethod
+    async def take_action_after_voting(
+        self,
+        game_data: GameCache,
+        **kwargs,
+    ): ...

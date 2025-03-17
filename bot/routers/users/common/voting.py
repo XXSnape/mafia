@@ -1,4 +1,7 @@
+from contextlib import suppress
+
 from aiogram import Dispatcher, Router
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from keyboards.inline.callback_factory.recognize_user import (
@@ -10,6 +13,7 @@ from keyboards.inline.keypads.to_bot import (
 )
 from services.actions_at_night import get_game_state_data_and_user_id
 from services.roles import Instigator
+from utils.tg import delete_message
 from utils.utils import get_state_and_assign
 
 router = Router(name=__name__)
@@ -43,7 +47,7 @@ async def vote_for(
         "url"
     ]
     voted_url = game_data["players"][str(voted_user_id)]["url"]
-    await callback.message.delete()
+    await delete_message(callback.message)
     await callback.message.answer(
         f"Ты выбрал голосовать за {voted_url}"
     )

@@ -56,8 +56,8 @@ class Roles(enum.Enum):
     don = roles.Mafia()
     # journalist = roles.Journalist()
     doctor = roles.Doctor()
-    masochist = roles.Masochist()
-    policeman = roles.Policeman()
+    analyst = roles.Analyst()
+    lawyer = roles.Lawyer()
 
     # doctor = roles.Doctor()
     # civilian = roles.Civilian()

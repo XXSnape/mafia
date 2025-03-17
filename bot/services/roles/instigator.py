@@ -1,10 +1,11 @@
 from cache.cache_types import ExtraCache, GameCache
+from services.roles.base.mixins import ProcedureAfterVoting
 from services.roles.base.roles import Groupings, Role
 from services.roles.base import ActiveRoleAtNight
 from states.states import UserFsm
 
 
-class Instigator(ActiveRoleAtNight):
+class Instigator(ProcedureAfterVoting, ActiveRoleAtNight):
     role = "Подстрекатель"
     photo = "https://avatars.dzeninfra.ru/get-zen_doc/3469057/pub_620655d2a7947c53d6c601a2_620671b4b495be46b12c0a0c/scale_1200"
     grouping = Groupings.civilians
@@ -23,8 +24,8 @@ class Instigator(ActiveRoleAtNight):
 
     async def take_action_after_voting(
         self,
-        all_roles: dict[str, Role],
         game_data: GameCache,
+        all_roles: dict[str, Role],
         **kwargs,
     ):
         vote_for = game_data["vote_for"]

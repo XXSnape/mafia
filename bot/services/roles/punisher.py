@@ -9,7 +9,7 @@ class Punisher(ProcedureAfterNight, Role):
     role = "Каратель"
     photo = "https://lastfm.freetls.fastly.net/i/u/ar0/d04cdfdf3f65412bc1e7870ec6599ed7.png"
     purpose = "Спровоцируй мафию и забери её с собой!"
-    number_in_order = 4
+    number_in_order_after_night = 4
     payment_for_treatment = 0
     payment_for_murder = 0
 

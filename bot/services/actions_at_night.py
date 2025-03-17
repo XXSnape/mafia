@@ -11,6 +11,7 @@ from keyboards.inline.callback_factory.recognize_user import (
 )
 from services.roles import Hacker, Mafia
 from services.roles.base import Role, ActiveRoleAtNight
+from utils.tg import delete_message
 from utils.utils import get_state_and_assign
 
 
@@ -132,7 +133,7 @@ async def inform_players_and_trace_actions(
             text=current_role.message_to_group_after_action,
         )
     if current_role.message_to_user_after_action:
-        await callback.message.delete()
+        await delete_message(callback.message)
         await callback.message.answer(
             NUMBER_OF_NIGHT.format(game_data["number_of_night"])
             + current_role.message_to_user_after_action.format(

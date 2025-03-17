@@ -13,7 +13,7 @@ class LuckyGay(ProcedureAfterNight, Role):
     purpose = (
         "Возможно тебе повезет и ты останешься жив после покушения."
     )
-    number_in_order = 2
+    number_in_order_after_night = 2
     payment_for_treatment = 6
 
     async def procedure_after_night(

@@ -54,7 +54,7 @@ async def confirm_vote(
                 PrimeMinister.roles_key, []
             ),
         )
-    with suppress(TelegramBadRequest):
+    with suppress(TelegramBadRequest, AttributeError):
         await callback.message.edit_reply_markup(
             reply_markup=get_vote_for_aim_kb(
                 user_id=callback_data.user_id,

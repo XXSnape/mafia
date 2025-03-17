@@ -5,7 +5,10 @@ from aiogram.types import ChatPermissions
 from cache.cache_types import GameCache
 from services.roles.base.roles import Groupings, Role
 from services.roles.base import ActiveRoleAtNight
-from services.roles.base.mixins import ProcedureAfterNight
+from services.roles.base.mixins import (
+    ProcedureAfterNight,
+    ProcedureAfterVoting,
+)
 from states.states import UserFsm
 from utils.validators import (
     get_processed_user_id_if_exists,
@@ -13,7 +16,9 @@ from utils.validators import (
 )
 
 
-class Prosecutor(ProcedureAfterNight, ActiveRoleAtNight):
+class Prosecutor(
+    ProcedureAfterVoting, ProcedureAfterNight, ActiveRoleAtNight
+):
     role = "Прокурор"
     mail_message = "Кого арестовать этой ночью?"
     photo = (

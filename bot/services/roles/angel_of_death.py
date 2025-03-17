@@ -1,12 +1,17 @@
 from cache.cache_types import ExtraCache, GameCache
 from services.roles.base.roles import Groupings, Role
 from services.roles.base import ActiveRoleAtNight
-from services.roles.base.mixins import MurderAfterNight
+from services.roles.base.mixins import (
+    MurderAfterNight,
+    ProcedureAfterVoting,
+)
 from states.states import UserFsm
 from utils.validators import get_processed_role_and_user_if_exists
 
 
-class AngelOfDeath(MurderAfterNight, ActiveRoleAtNight):
+class AngelOfDeath(
+    ProcedureAfterVoting, MurderAfterNight, ActiveRoleAtNight
+):
     role = "Ангел смерти"
     mail_message = (
         "Глупые людишки тебя линчевали, кому ты отомстишь?"
@@ -21,8 +26,9 @@ class AngelOfDeath(MurderAfterNight, ActiveRoleAtNight):
     payment_for_night_spent = 5
 
     async def take_action_after_voting(
-        self, game_data: GameCache, removed_user_id: int, **kwargs
+        self, game_data: GameCache, removed_user: list[int], **kwargs
     ):
+        removed_user_id = removed_user[0]
         if removed_user_id in game_data.get(self.roles_key, []):
             game_data["angels_died"].append(removed_user_id)
 

@@ -30,6 +30,7 @@ from services.actions_at_night import (
 )
 from services.roles import Policeman
 from states.states import UserFsm
+from utils.tg import delete_message
 
 router = Router(name=__name__)
 
@@ -124,7 +125,7 @@ async def policeman_chose_to_check(
     role = game_data["players"][str(checked_user_id)]["pretty_role"]
     url = game_data["players"][str(checked_user_id)]["url"]
     game_data["disclosed_roles"].append([checked_user_id, role])
-    await callback.message.delete()
+    await delete_message(callback.message)
     await callback.bot.send_message(
         chat_id=game_data["game_chat"],
         text="Армия насильно заставила кого-то показать документы",

@@ -16,6 +16,7 @@ from services.actions_at_night import (
 )
 from services.roles import Instigator
 from states.states import UserFsm
+from utils.tg import delete_message
 
 router = Router(name=__name__)
 
@@ -100,7 +101,7 @@ async def instigator_chooses_object(
     deceived_user.append(user_id)
     subject_url = game_data["players"][str(deceived_user[0])]["url"]
     object_id = game_data["players"][str(deceived_user[1])]["url"]
-    await callback.message.delete()
+    await delete_message(callback.message)
     await callback.message.answer(
         text=f"Днём {subject_url} проголосует за {object_id}, если попытается голосовать"
     )

@@ -26,6 +26,7 @@ from utils.utils import (
     dependency_injection,
     get_results_of_goal_identification,
     get_results_of_voting,
+    make_build,
 )
 
 from .protocols.protocols import (
@@ -148,42 +149,36 @@ class Executor:
             game_data=game_data, removed_user_id=removed_user_id
         )
         voting_roles = self.get_voting_roles()
+        voting_roles.sort(
+            key=attrgetter("number_in_order_after_voting")
+        )
         kwargs = {
             "all_roles": self.all_roles,
             "game_data": game_data,
         }
-        if len(pros) == len(cons) or len(pros) < len(cons):
-            for role in voting_roles:
-                await role.take_action_after_voting(
-                    **kwargs,
-                    removed_user_id=0,
-                )
-            await self.bot.send_message(
-                chat_id=self.group_chat_id, text=result_text
+        is_not_there_removed = len(pros) == len(cons) or len(
+            pros
+        ) < len(cons)
+        if is_not_there_removed:
+            removed_user = [0]
+        else:
+            removed_user = [removed_user_id]
+        for role in voting_roles:
+            await role.take_action_after_voting(
+                **kwargs,
+                removed_user=removed_user,
             )
+        if removed_user_id is None or is_not_there_removed:
+            await self.bot.send_message(
+                chat_id=self.group_chat_id,
+                text=result_text,
+            )
+            return
+        if removed_user_id != removed_user[0]:
             return
         user_info: UserGameCache = game_data["players"][
             str(removed_user_id)
         ]
-        if removed_user_id == Lawyer().get_processed_user_id(
-            game_data
-        ):
-            for role in voting_roles:
-                await role.take_action_after_voting(
-                    **kwargs,
-                    removed_user_id=0,
-                    protected_user_id=removed_user_id,
-                )
-            await self.bot.send_message(
-                chat_id=game_data["game_chat"],
-                text=f"У {user_info['url']} есть алиби, поэтому местные жители отпустили гвоздя программы",
-            )
-            return
-        for role in voting_roles:
-            await role.take_action_after_voting(
-                **kwargs,
-                removed_user_id=removed_user_id,
-            )
         for user_id in set(pros):
             current_role = self.all_roles[
                 game_data["players"][str(user_id)]["enum_name"]
@@ -215,7 +210,7 @@ class Executor:
             for role in self.all_roles
             if isinstance(self.all_roles[role], ProcedureAfterNight)
         ]
-        roles.sort(key=attrgetter("number_in_order"))
+        roles.sort(key=attrgetter("number_in_order_after_night"))
         victims = set()
         recovered = []
         murdered = []

@@ -14,6 +14,7 @@ from services.actions_at_night import (
 )
 from services.roles import Mafia, Traitor
 from states.states import UserFsm
+from utils.tg import delete_message
 from utils.utils import make_pretty
 
 router = Router(name=__name__)
@@ -37,7 +38,7 @@ async def traitor_finds_out(
     )
     url = game_data["players"][str(user_id)]["url"]
     role = game_data["players"][str(user_id)]["pretty_role"]
-    await callback.message.delete()
+    await delete_message(callback.message)
     await callback.bot.send_message(
         chat_id=game_data["game_chat"],
         text=Traitor.message_to_group_after_action,

@@ -1,11 +1,12 @@
 from cache.cache_types import GameCache
+from services.roles.base.mixins import ProcedureAfterVoting
 from services.roles.base.roles import Groupings, Role
 from services.roles.base import ActiveRoleAtNight
 from states.states import UserFsm
 from utils.validators import get_processed_role_and_user_if_exists
 
 
-class Lawyer(ActiveRoleAtNight):
+class Lawyer(ProcedureAfterVoting, ActiveRoleAtNight):
     role = "Адвокат"
     mail_message = "Кого защитить на голосовании?"
     do_not_choose_self = 2
@@ -18,6 +19,7 @@ class Lawyer(ActiveRoleAtNight):
         "Кому-то обеспечена защита лучшими адвокатами города!"
     )
     message_to_user_after_action = "Ты выбрал защитить {url}"
+    number_in_order_after_voting = 0
 
     @get_processed_role_and_user_if_exists
     async def take_action_after_voting(
@@ -25,15 +27,22 @@ class Lawyer(ActiveRoleAtNight):
         game_data: GameCache,
         processed_role: Role,
         user_url: str,
-        protected_user_id: int | None = None,
+        removed_user: list[int],
+        processed_user_id: int,
         **kwargs,
     ):
-        if protected_user_id is None:
+        if removed_user[0] != processed_user_id:
             return
+        removed_user[:] = [0]
         if processed_role.grouping == Groupings.civilians:
             money = int(processed_role.payment_for_treatment * 1.5)
         else:
             money = 0
+
+        await self.bot.send_message(
+            chat_id=game_data["game_chat"],
+            text=f"У {user_url} есть алиби, поэтому местные жители отпустили гвоздя программы",
+        )
         self.add_money_to_all_allies(
             game_data=game_data,
             money=money,

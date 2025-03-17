@@ -3,11 +3,12 @@ from cache.cache_types import GameCache
 from constants.output import MONEY_SYM
 from keyboards.inline.cb.cb_text import DRAW_CB
 from services.roles.base import ActiveRoleAtNight, Role
+from services.roles.base.mixins import ProcedureAfterVoting
 from states.states import UserFsm
 from utils.validators import get_processed_user_id_if_exists
 
 
-class Analyst(ActiveRoleAtNight):
+class Analyst(ProcedureAfterVoting, ActiveRoleAtNight):
     role = "Политический аналитик"
     photo = "https://habrastorage.org/files/2e3/371/6a2/2e33716a2bb74f8eb67378334960ebb5.png"
     purpose = "Тебе нужно на основе ранее полученных данных предсказать, кого повесят на дневном голосовании"
@@ -49,28 +50,29 @@ class Analyst(ActiveRoleAtNight):
     async def take_action_after_voting(
         self,
         game_data: GameCache,
-        removed_user_id: int,
+        removed_user: list[int],
         processed_user_id: int,
         **kwargs,
     ):
         number_of_day = game_data["number_of_night"]
+        removed_user = removed_user[0]
         url = (
             None
-            if removed_user_id == 0
-            else game_data["players"][str(removed_user_id)]["url"]
+            if removed_user == 0
+            else game_data["players"][str(removed_user)]["url"]
         )
         role = (
             None
-            if removed_user_id == 0
-            else game_data["players"][str(removed_user_id)][
+            if removed_user == 0
+            else game_data["players"][str(removed_user)][
                 "pretty_role"
             ]
         )
-        if processed_user_id == removed_user_id:
+        if processed_user_id == removed_user:
             money = 22
             to_group = "Все, кто читал прогнозы на день, были готовы к дневным событиям!"
             achievement = (
-                "Удача! Действительно никого не повесили"
+                f"Удача! Действительно никого не повесили - {money}{MONEY_SYM}"
                 if url is None
                 else f"Удачный прогноз! Был повешен {url} ({role}) - {money}{MONEY_SYM}"
             )
@@ -78,7 +80,7 @@ class Analyst(ActiveRoleAtNight):
             money = 0
             to_group = "Обман или чёрный лебедь? Аналитические прогнозы не сбылись!"
             achievement = (
-                "Неудача! Никого не повесили"
+                f"Неудача! Никого не повесили - {money}{MONEY_SYM}"
                 if url is None
                 else f"Неудачный прогноз! Был повешен {url} ({role}) - {money}{MONEY_SYM}"
             )

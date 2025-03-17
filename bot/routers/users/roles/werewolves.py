@@ -20,6 +20,7 @@ from services.roles import (
     PolicemanAlias,
 )
 from states.states import UserFsm
+from utils.tg import delete_message
 from utils.utils import (
     get_profiles,
     make_pretty,
@@ -71,7 +72,7 @@ async def werewolf_turns_into(
     current_roles = data[callback.data]
     roles_key = current_roles[0][0].roles_key
     game_data[roles_key].append(callback.from_user.id)
-    await callback.message.delete()
+    await delete_message(callback.message)
     are_there_many_senders = False
     if len(game_data[roles_key]) == 1:
         enum_name = current_roles[0][1]
