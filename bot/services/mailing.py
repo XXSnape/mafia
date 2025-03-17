@@ -10,7 +10,6 @@ from cache.cache_types import (
     UserGameCache,
     UsersInGame,
 )
-from constants.output import NUMBER_OF_NIGHT
 from general.collection_of_roles import Roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserVoteIndexCbData,

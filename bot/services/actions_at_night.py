@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from cache.cache_types import GameCache, UserCache, UserIdInt
 from constants.output import NUMBER_OF_NIGHT
-from general.collection_of_roles import Roles, get_data_with_roles
+from general.collection_of_roles import get_data_with_roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )

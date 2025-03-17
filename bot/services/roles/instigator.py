@@ -1,5 +1,4 @@
 from cache.cache_types import ExtraCache, GameCache
-from constants.output import MONEY_SYM
 from services.roles.base.roles import Groupings, Role
 from services.roles.base import ActiveRoleAtNight
 from states.states import UserFsm
@@ -26,7 +25,7 @@ class Instigator(ActiveRoleAtNight):
         self,
         all_roles: dict[str, Role],
         game_data: GameCache,
-        user_id: int,
+        **kwargs,
     ):
         vote_for = game_data["vote_for"]
         deceived_user = game_data[self.extra_data[0].key]
@@ -35,23 +34,20 @@ class Instigator(ActiveRoleAtNight):
         victim, aim = deceived_user[0]
         if not [victim, aim] in vote_for:
             return
-        aim_data = game_data["players"][str(user_id)]
-        role = all_roles[
-            game_data["players"][str(user_id)]["enum_name"]
-        ]
-        number_of_day = game_data["number_of_night"]
-        if role.grouping not in Groupings.civilians:
+        aim_data = game_data["players"][str(aim)]
+        role = all_roles[game_data["players"][str(aim)]["enum_name"]]
+        if role.grouping != Groupings.civilians:
             money = role.payment_for_murder * 2
         else:
             money = 0
-        for player_id in game_data[self.roles_key]:
-            game_data["players"][str(player_id)]["money"] += money
-            game_data["players"][str(player_id)][
-                "achievements"
-            ].append(
-                f"День {number_of_day}. Помощь в голосовании за "
-                f"{aim_data['url']} ({aim_data['pretty_role']}) - {money}{MONEY_SYM}"
-            )
+        self.add_money_to_all_allies(
+            game_data=game_data,
+            money=money,
+            beginning_message="Помощь в голосовании за",
+            user_url=aim_data["url"],
+            processed_role=role,
+            at_night=False,
+        )
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
         game_data[self.extra_data[0].key].clear()

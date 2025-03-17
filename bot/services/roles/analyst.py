@@ -49,22 +49,24 @@ class Analyst(ActiveRoleAtNight):
     async def take_action_after_voting(
         self,
         game_data: GameCache,
-        all_roles: dict[str, Role],
-        user_id: int,
+        removed_user_id: int,
         processed_user_id: int,
+        **kwargs,
     ):
         number_of_day = game_data["number_of_night"]
         url = (
             None
-            if user_id == 0
-            else game_data["players"][str(user_id)]["url"]
+            if removed_user_id == 0
+            else game_data["players"][str(removed_user_id)]["url"]
         )
         role = (
             None
-            if user_id == 0
-            else game_data["players"][str(user_id)]["pretty_role"]
+            if removed_user_id == 0
+            else game_data["players"][str(removed_user_id)][
+                "pretty_role"
+            ]
         )
-        if processed_user_id == user_id:
+        if processed_user_id == removed_user_id:
             money = 22
             to_group = "Все, кто читал прогнозы на день, были готовы к дневным событиям!"
             achievement = (

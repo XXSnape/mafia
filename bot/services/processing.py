@@ -2,7 +2,6 @@ import asyncio
 from collections.abc import Callable
 from contextlib import suppress
 from operator import attrgetter
-from pprint import pprint
 from typing import TYPE_CHECKING
 
 from aiogram import Dispatcher
@@ -31,7 +30,6 @@ from utils.utils import (
 
 from .protocols.protocols import (
     VictimsOfVote,
-    AchievementCalculator,
 )
 from .roles import Lawyer, Mafia, Killer
 from .roles.base import AliasRole, BossIsDeadMixin, Role
@@ -150,12 +148,15 @@ class Executor:
             game_data=game_data, removed_user_id=removed_user_id
         )
         voting_roles = self.get_voting_roles()
+        kwargs = {
+            "all_roles": self.all_roles,
+            "game_data": game_data,
+        }
         if len(pros) == len(cons) or len(pros) < len(cons):
             for role in voting_roles:
                 await role.take_action_after_voting(
-                    all_roles=self.all_roles,
-                    game_data=game_data,
-                    user_id=0,
+                    **kwargs,
+                    removed_user_id=0,
                 )
             await self.bot.send_message(
                 chat_id=self.group_chat_id, text=result_text
@@ -169,9 +170,9 @@ class Executor:
         ):
             for role in voting_roles:
                 await role.take_action_after_voting(
-                    all_roles=self.all_roles,
-                    game_data=game_data,
-                    user_id=0,
+                    **kwargs,
+                    removed_user_id=0,
+                    protected_user_id=removed_user_id,
                 )
             await self.bot.send_message(
                 chat_id=game_data["game_chat"],
@@ -180,9 +181,8 @@ class Executor:
             return
         for role in voting_roles:
             await role.take_action_after_voting(
-                all_roles=self.all_roles,
-                game_data=game_data,
-                user_id=removed_user_id,
+                **kwargs,
+                removed_user_id=removed_user_id,
             )
         for user_id in set(pros):
             current_role = self.all_roles[

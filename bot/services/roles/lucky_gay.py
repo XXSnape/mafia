@@ -1,7 +1,6 @@
 from random import randint
 
 from cache.cache_types import GameCache
-from services.roles.base.roles import Groupings
 from services.roles.base import Role
 from services.roles.base.mixins import (
     ProcedureAfterNight,

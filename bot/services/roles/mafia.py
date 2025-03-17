@@ -6,7 +6,6 @@ from services.roles.base import (
     BossIsDeadMixin,
 )
 from services.roles.base.mixins import (
-    ProcedureAfterNight,
     MurderAfterNight,
 )
 from states.states import UserFsm

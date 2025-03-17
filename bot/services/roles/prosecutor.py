@@ -68,8 +68,8 @@ class Prosecutor(ProcedureAfterNight, ActiveRoleAtNight):
     async def take_action_after_voting(
         self,
         game_data: GameCache,
-        user_id: int,
         processed_user_id: int,
+        **kwargs,
     ):
         with suppress(TelegramBadRequest):
             await self.bot.restrict_chat_member(

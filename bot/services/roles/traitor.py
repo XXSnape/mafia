@@ -20,6 +20,7 @@ class Traitor(ActiveRoleAtNight):
     notification_message = ROLE_IS_KNOWN
     payment_for_treatment = 0
     payment_for_murder = 15
+    payment_for_night_spent = 16
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.TRAITOR_FINDS_OUT

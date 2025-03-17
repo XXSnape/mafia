@@ -1,8 +1,6 @@
 from collections import Counter
 from contextlib import suppress
 from inspect import get_annotations
-from itertools import groupby
-from operator import itemgetter
 from typing import TYPE_CHECKING
 from collections.abc import Callable
 from aiogram import Dispatcher
@@ -48,7 +46,6 @@ def get_profiles(
         index,
         user_id,
     ) in enumerate(players_ids, start=1):
-        data: UserGameCache
         url = players[str(user_id)]["url"]
         if role:
             if initial_role:

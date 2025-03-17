@@ -1,9 +1,6 @@
-from random import choice
-
 from aiogram import Dispatcher, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-from cache.cache_types import GameCache, UserCache
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
     UserVoteIndexCbData,

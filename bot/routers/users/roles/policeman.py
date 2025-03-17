@@ -3,7 +3,6 @@ import asyncio
 from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-from cache.cache_types import GameCache, UserCache
 from constants.output import ROLE_IS_KNOWN, NUMBER_OF_NIGHT
 from general.collection_of_roles import Roles
 from keyboards.inline.callback_factory.recognize_user import (

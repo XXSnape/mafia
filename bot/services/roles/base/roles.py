@@ -1,8 +1,6 @@
 import enum
 from abc import ABC
-from contextlib import suppress
 from dataclasses import dataclass
-from enum import StrEnum
 from typing import Callable, Optional, Self
 
 from aiogram import Bot, Dispatcher
@@ -102,6 +100,19 @@ class Role(ABC):
         if cls.alias and cls.alias.is_mass_mailing_list:
             return f"processed_boss_{cls.__name__}"
 
+    def get_money_for_victory_and_nights(
+        self,
+        game_data: GameCache,
+        winning_group: Groupings,
+        nights_lived: int,
+        user_id: str,
+    ):
+        if winning_group != self.grouping:
+            return 0, 0
+        return self.grouping.value.payment * (
+            len(game_data["players"]) // 4
+        ), (self.payment_for_night_spent * nights_lived)
+
     def earn_money_for_winning(
         self,
         winning_group: Groupings,
@@ -117,14 +128,15 @@ class Role(ABC):
             f"Ночей прожито: {nights_lived} из {count_of_nights}"
         )
         achivements = user_data["achievements"]
-        if winning_group == self.grouping:
-
-            money_for_victory = self.grouping.value.payment * (
-                len(game_data["players"]) // 4
+        money_for_victory, money_for_nights = (
+            self.get_money_for_victory_and_nights(
+                game_data=game_data,
+                winning_group=winning_group,
+                nights_lived=nights_lived,
+                user_id=user_id,
             )
-            money_for_nights = (
-                self.payment_for_night_spent * nights_lived
-            )
+        )
+        if money_for_victory:
             user_data["money"] += (
                 money_for_victory + money_for_nights
             )
@@ -138,13 +150,12 @@ class Role(ABC):
             return True
         else:
             user_data["money"] = 0
-            money_for_nights = 0
             achivements.insert(
                 0,
                 make_build(
                     f"🚫К сожалению, ты проиграл в роли {user_data['initial_role']} (0{MONEY_SYM})!\n\n"
                 )
-                + f"{nights_lived_text} ({money_for_nights} {MONEY_SYM})",
+                + f"{nights_lived_text} (0 {MONEY_SYM})",
             )
             return False
 
@@ -157,10 +168,33 @@ class Role(ABC):
             and voted_role.grouping == Groupings.other
         ):
             return 0
+        elif self.grouping == Groupings.other:
+            return 0
         elif self.grouping != voted_role.grouping:
-            return voted_role.payment_for_murder
+            return voted_role.payment_for_murder // 2
         else:
             return 0
+
+    def add_money_to_all_allies(
+        self,
+        game_data: GameCache,
+        money: int,
+        beginning_message: str | None = None,
+        user_url: str | None = None,
+        processed_role: Optional["Role"] = None,
+        at_night: bool = True,
+    ):
+        for player_id in game_data[self.roles_key]:
+            game_data["players"][str(player_id)]["money"] += money
+            message = f"{beginning_message} {user_url} ({make_pretty(processed_role.role)}) - {money}{MONEY_SYM}"
+            time_of_day = (
+                "🌃Ночь" if at_night else "🌟Голосования дня"
+            )
+            game_data["players"][str(player_id)][
+                "achievements"
+            ].append(
+                f'{time_of_day} {game_data["number_of_night"]}.\n{message}'
+            )
 
     def earn_money_for_voting(
         self,

@@ -1,5 +1,5 @@
 from cache.cache_types import ExtraCache, GameCache
-from services.roles.base.roles import Groupings
+from services.roles.base.roles import Groupings, Role
 from services.roles.base import ActiveRoleAtNight
 from services.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
@@ -40,7 +40,7 @@ class Forger(ProcedureAfterNight, ActiveRoleAtNight):
         self,
         *,
         game_data: GameCache,
-        all_roles: dict[str, "Role"],
+        all_roles: dict[str, Role],
     ):
         from .policeman import Policeman
 

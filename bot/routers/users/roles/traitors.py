@@ -3,9 +3,7 @@ import asyncio
 from aiogram import Dispatcher, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-from cache.cache_types import GameCache, UserCache
 from constants.output import NUMBER_OF_NIGHT
-from general.collection_of_roles import Roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
@@ -16,7 +14,7 @@ from services.actions_at_night import (
 )
 from services.roles import Mafia, Traitor
 from states.states import UserFsm
-from utils.utils import get_state_and_assign, make_pretty
+from utils.utils import make_pretty
 
 router = Router(name=__name__)
 

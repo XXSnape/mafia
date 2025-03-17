@@ -5,7 +5,6 @@ from services.roles.base.mixins import (
     ProcedureAfterNight,
 )
 from states.states import UserFsm
-from utils.utils import record_accrual
 from utils.validators import get_processed_role_and_user_if_exists
 
 

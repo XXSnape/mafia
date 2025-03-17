@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
-from functools import total_ordering
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
-from cache.cache_types import GameCache
-from constants.output import MONEY_SYM
+from cache.cache_types import GameCache, UserIdStr
+from services.roles.base.roles import Groupings
 
 if TYPE_CHECKING:
     from services.roles.base import Role
@@ -49,6 +48,26 @@ class BossIsDeadMixin:
             )
 
 
+class SuicideRoleMixin:
+    def __init__(self):
+        self._winners = []
+
+    def get_money_for_victory_and_nights(
+        self,
+        game_data: GameCache,
+        nights_lived: int,
+        winning_group: Groupings,
+        user_id: UserIdStr,
+    ):
+        if user_id in self._winners:
+            payment = 30 * (len(game_data["players"]) // 4)
+            payment -= 5 * (nights_lived - 1)
+            if payment < 5:
+                payment = 5
+            return payment, 0
+        return 0, 0
+
+
 class ProcedureAfterNight(ABC):
     number_in_order: int = 1
 
@@ -65,27 +84,6 @@ class ProcedureAfterNight(ABC):
         **kwargs,
     ):
         pass
-
-    def add_money_to_all_allies(
-        self,
-        game_data: GameCache,
-        money: int,
-        custom_message: str | None = None,
-        beginning_message: str | None = None,
-        user_url: str | None = None,
-        processed_role: Optional["Role"] = None,
-    ):
-        for player_id in game_data[self.roles_key]:
-            game_data["players"][str(player_id)]["money"] += money
-            if custom_message:
-                message = custom_message
-            else:
-                message = f"{beginning_message} {user_url} ({make_pretty(processed_role.role)}) - {money}{MONEY_SYM}"
-            game_data["players"][str(player_id)][
-                "achievements"
-            ].append(
-                f'🌃Ночь {game_data["number_of_night"]}.\n{message}'
-            )
 
 
 class MurderAfterNight(ProcedureAfterNight):

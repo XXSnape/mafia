@@ -3,9 +3,7 @@ import asyncio
 from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-from cache.cache_types import GameCache, UserCache
 from constants.output import NUMBER_OF_NIGHT
-from general.collection_of_roles import Roles
 from keyboards.inline.cb.cb_text import (
     WEREWOLF_TO_DOCTOR_CB,
     WEREWOLF_TO_MAFIA_CB,
@@ -24,7 +22,6 @@ from services.roles import (
 from states.states import UserFsm
 from utils.utils import (
     get_profiles,
-    get_state_and_assign,
     make_pretty,
 )
 from utils.validators import remind_commissioner_about_inspections

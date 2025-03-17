@@ -1,14 +1,11 @@
 from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-from cache.cache_types import GameCache, UserCache
 from constants.output import NUMBER_OF_NIGHT
-from general.collection_of_roles import Roles
 from keyboards.inline.cb.cb_text import DRAW_CB
 from services.actions_at_night import get_game_state_and_data
 from services.roles import Analyst
 from states.states import UserFsm
-from utils.utils import get_state_and_assign
 
 router = Router(name=__name__)
 

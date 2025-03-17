@@ -1,9 +1,10 @@
 from cache.cache_types import GameCache
+from services.roles.base.mixins import SuicideRoleMixin
 from services.roles.base.roles import Groupings
 from services.roles.base import Role
 
 
-class SuicideBomber(Role):
+class SuicideBomber(SuicideRoleMixin, Role):
     role = "Ночной смертник"
     photo = (
         "https://sun6-22.userapi.com/impg/zAaADEA19s"
@@ -20,7 +21,7 @@ class SuicideBomber(Role):
             await self.bot.send_message(
                 chat_id=user_id, text=message
             )
-            game_data["winners"].append(user_id)
+            self._winners.append(user_id)
             return
         await super().report_death(
             game_data=game_data, is_night=is_night, user_id=user_id

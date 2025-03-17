@@ -2,7 +2,6 @@ from cache.cache_types import ExtraCache, GameCache
 from services.roles.base import ActiveRoleAtNight, Role
 from services.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
-from utils.utils import make_build
 from utils.validators import (
     get_processed_user_id_if_exists,
     get_processed_role_and_user_if_exists,
