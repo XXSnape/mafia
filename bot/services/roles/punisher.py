@@ -12,6 +12,7 @@ class Punisher(ProcedureAfterNight, Role):
     number_in_order_after_night = 4
     payment_for_treatment = 0
     payment_for_murder = 0
+    payment_for_night_spent = 8
 
     async def procedure_after_night(
         self,
@@ -27,7 +28,6 @@ class Punisher(ProcedureAfterNight, Role):
             return
         punisher_id = punishers[0]
         killed_py_punisher = set()
-
         if punisher_id not in set(murdered) - set(recovered):
             return
         for role in all_roles:
@@ -49,13 +49,16 @@ class Punisher(ProcedureAfterNight, Role):
                     killed_py_punisher.add(
                         game_data[Bodyguard.roles_key][0]
                     )
+                else:
+                    killed_py_punisher.add(killer_id)
+
         game_data["messages_after_night"].append(
             [
                 punisher_id,
                 "Все нарушители твоего покоя будут наказаны!",
             ]
         )
-        victims |= killed_py_punisher
+        murdered.extend(list(killed_py_punisher))
 
     async def accrual_of_overnight_rewards(
         self,
@@ -64,7 +67,10 @@ class Punisher(ProcedureAfterNight, Role):
         victims: set[int],
         **kwargs
     ):
-        punisher_id = game_data[self.roles_key][0]
+        punishers = game_data[self.roles_key]
+        if not punishers:
+            return
+        punisher_id = punishers[0]
         if punisher_id not in victims:
             return
         for role in all_roles:
@@ -77,7 +83,7 @@ class Punisher(ProcedureAfterNight, Role):
             killer_id = game_data[current_role.roles_key][0]
             if killer_id in victims:
                 if current_role.grouping != Groupings.civilians:
-                    money = 26
+                    money = current_role.payment_for_murder * 2
                 else:
                     money = 0
                 self.add_money_to_all_allies(
