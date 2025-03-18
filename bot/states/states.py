@@ -23,6 +23,8 @@ class UserFsm(StatesGroup):
     JOURNALIST_TAKES_INTERVIEW = State()
     AGENT_WATCHES = State()
     CLOFFELINE_GIRL_PUTS_TO_SLEEP = State()
+    POISONER_CHOOSES_ACTION = State()
+    POISONER_CHOSE_TO_KILL = State()
     KILLER_ATTACKS = State()
     DON_ATTACKS = State()
     FORGER_FAKES = State()

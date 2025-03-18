@@ -36,6 +36,7 @@ def get_data_with_roles(
         "suicide_bomber": roles.SuicideBomber(),
         "instigator": roles.Instigator(),
         "prime_minister": roles.PrimeMinister(),
+        "poisoner": roles.Poisoner(),
         "bodyguard": roles.Bodyguard(),
         "masochist": roles.Masochist(),
         "lawyer": roles.Lawyer(),
@@ -55,7 +56,10 @@ def get_data_with_roles(
 class Roles(enum.Enum):
     don = roles.Mafia()
     doctor = roles.Doctor()
+    poisoner = roles.Poisoner()
+    punisher = roles.Punisher()
     policeman = roles.Policeman()
+
     werewolf = roles.Werewolf()
     forger = roles.Forger()
     # nurse = roles.DoctorAlias()

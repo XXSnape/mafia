@@ -512,6 +512,7 @@ RolesLiteral = Literal[
 
 Money: TypeAlias = int
 Achievements: TypeAlias = list[str]
+Poisoned: TypeAlias = list[list[int] | int]
 
 
 class UserGameCache(TypedDict, total=False):

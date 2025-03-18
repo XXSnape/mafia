@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
 
+from cache.cache_types import Poisoned
 
 if TYPE_CHECKING:
     from services.roles import UsersInGame, GameCache
@@ -19,6 +20,7 @@ from keyboards.inline.cb.cb_text import (
     WEREWOLF_TO_DOCTOR_CB,
     WEREWOLF_TO_MAFIA_CB,
     WEREWOLF_TO_POLICEMAN_CB,
+    POISONER_POISONS_CB,
 )
 
 
@@ -61,6 +63,21 @@ def send_selection_to_players_kb(
         if player_id not in exclude
     ]
     buttons += extra_buttons
+    return generate_inline_kb(data_with_buttons=buttons)
+
+
+def kill_or_poison_kb(poisoned: Poisoned):
+    buttons = [
+        InlineKeyboardButton(
+            text="Отравить💀", callback_data=POISONER_POISONS_CB
+        ),
+    ]
+    if poisoned:
+        buttons.append(
+            InlineKeyboardButton(
+                text="Убить☠️", callback_data=POLICEMAN_KILLS_CB
+            )
+        )
     return generate_inline_kb(data_with_buttons=buttons)
 
 

@@ -20,6 +20,7 @@ from .policeman import router as policeman_router
 # from .prosecutors import router as prosecutors_router
 from .traitors import router as traitors_router
 from .werewolves import router as werewolves_router
+from .poisoners import router as poisoners_router
 
 # from .journalists import router as journalists_router
 
@@ -27,6 +28,7 @@ from .werewolves import router as werewolves_router
 router = Router(name=__name__)
 router.include_routers(
     base_roles_router,
+    poisoners_router,
     # bodyguards_router,
     # doctors_router,
     # mafias_router,

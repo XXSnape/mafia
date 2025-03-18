@@ -14,6 +14,9 @@ class Punisher(ProcedureAfterNight, Role):
     payment_for_murder = 0
     payment_for_night_spent = 8
 
+    def __init__(self):
+        self.killed = []
+
     async def procedure_after_night(
         self,
         game_data: GameCache,
@@ -38,19 +41,30 @@ class Punisher(ProcedureAfterNight, Role):
             if not killed_id:
                 continue
             killer_id = game_data[current_role.roles_key][0]
-            if killed_id == punisher_id:
-                treated_by_bodyguard = (
-                    Bodyguard().get_processed_user_id(game_data)
+            if isinstance(killed_id, list):
+                if punisher_id not in killed_id:
+                    continue
+            elif killed_id != punisher_id:
+                continue
+            treated_by_bodyguard = Bodyguard().get_processed_user_id(
+                game_data
+            )
+            if (
+                treated_by_bodyguard == killer_id
+                and recovered.count(killer_id) == 1
+            ):
+                killed_py_punisher.add(
+                    game_data[Bodyguard.roles_key][0]
                 )
-                if (
-                    treated_by_bodyguard == killer_id
-                    and recovered.count(killer_id) == 1
-                ):
-                    killed_py_punisher.add(
-                        game_data[Bodyguard.roles_key][0]
-                    )
-                else:
-                    killed_py_punisher.add(killer_id)
+                self.killed.append(
+                    [
+                        game_data[Bodyguard.roles_key][0],
+                        current_role,
+                    ]
+                )
+            else:
+                killed_py_punisher.add(killer_id)
+                self.killed.append([killer_id, current_role])
 
         game_data["messages_after_night"].append(
             [
@@ -61,26 +75,11 @@ class Punisher(ProcedureAfterNight, Role):
         murdered.extend(list(killed_py_punisher))
 
     async def accrual_of_overnight_rewards(
-        self,
-        game_data: GameCache,
-        all_roles: dict[str, "Role"],
-        victims: set[int],
-        **kwargs
+        self, game_data: GameCache, victims: set[int], **kwargs
     ):
-        punishers = game_data[self.roles_key]
-        if not punishers:
+        if not self.killed:
             return
-        punisher_id = punishers[0]
-        if punisher_id not in victims:
-            return
-        for role in all_roles:
-            current_role = all_roles[role]
-            if current_role.can_kill_at_night is False:
-                continue
-            killed_id = current_role.get_processed_user_id(game_data)
-            if killed_id != punisher_id:
-                continue
-            killer_id = game_data[current_role.roles_key][0]
+        for killer_id, current_role in self.killed:
             if killer_id in victims:
                 if current_role.grouping != Groupings.civilians:
                     money = current_role.payment_for_murder * 2
@@ -95,3 +94,37 @@ class Punisher(ProcedureAfterNight, Role):
                     processed_role=current_role,
                     beginning_message="Убийство",
                 )
+        self.killed.clear()
+        #
+        # punishers = game_data[self.roles_key]
+        # if not punishers:
+        #     return
+        # punisher_id = punishers[0]
+        # if punisher_id not in victims:
+        #     return
+        # for role in all_roles:
+        #     current_role = all_roles[role]
+        #     if current_role.can_kill_at_night is False:
+        #         continue
+        #     killed_id = current_role.get_processed_user_id(game_data)
+        #     if isinstance(killed_id, list):
+        #         if punisher_id not in killed_id:
+        #             continue
+        #     else:
+        #         if killed_id != punisher_id:
+        #             continue
+        #     killer_id = game_data[current_role.roles_key][0]
+        #     if killer_id in victims:
+        #         if current_role.grouping != Groupings.civilians:
+        #             money = current_role.payment_for_murder * 2
+        #         else:
+        #             money = 0
+        #         self.add_money_to_all_allies(
+        #             game_data=game_data,
+        #             money=money,
+        #             user_url=game_data["players"][str(killer_id)][
+        #                 "url"
+        #             ],
+        #             processed_role=current_role,
+        #             beginning_message="Убийство",
+        #         )
