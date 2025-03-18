@@ -117,7 +117,7 @@ class Game:
         )
 
         await self.mailer.mailing()
-        await asyncio.sleep(20)
+        await asyncio.sleep(12)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
@@ -132,7 +132,7 @@ class Game:
         )
         await asyncio.sleep(1)
         await self.mailer.suggest_vote()
-        await asyncio.sleep(8)
+        await asyncio.sleep(5)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )

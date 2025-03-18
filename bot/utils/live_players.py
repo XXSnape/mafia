@@ -26,6 +26,7 @@ def get_live_roles(game_data: GameCache, all_roles: dict[str, Role]):
     gropings: dict[Groupings, list[tuple[str, int]]] = {
         Groupings.civilians: [],
         Groupings.criminals: [],
+        Groupings.killer: [],
         Groupings.other: [],
     }
     for role in all_roles:

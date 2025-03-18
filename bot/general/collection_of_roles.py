@@ -56,8 +56,7 @@ class Roles(enum.Enum):
     don = roles.Mafia()
     doctor = roles.Doctor()
     policeman = roles.Policeman()
-    traitor = roles.Traitor()
-    # killer = roles.Killer()
+    killer = roles.Killer()
     # werewolf = roles.Werewolf()
     # forger = roles.Forger()
     # hacker = roles.Hacker()
@@ -80,3 +79,4 @@ class Roles(enum.Enum):
     # general = roles.PolicemanAlias()
 
     # civilian = roles.Civilian()
+    # traitor = roles.Traitor()
