@@ -63,8 +63,6 @@ class Role(ABC):
     payment_for_murder = 5
     payment_for_night_spent = 2
 
-    alias: Optional["AliasRole"] = None
-
     is_alias: bool = False
 
     def __call__(
@@ -73,6 +71,14 @@ class Role(ABC):
         self.dispatcher = dispatcher
         self.bot = bot
         self.state = state
+
+    @classmethod
+    @property
+    def alias(cls):
+        subclasses = cls.__subclasses__()
+        if not subclasses:
+            return None
+        return subclasses[0]()
 
     @classmethod
     @property
@@ -251,7 +257,7 @@ class Role(ABC):
             )
 
 
-class AliasRole(Role):
+class AliasRole(ABC):
     is_alias = True
     is_mass_mailing_list: bool = False
 
@@ -271,6 +277,24 @@ class AliasRole(Role):
                 text=f"Погиб {role} {url}.\n\n"
                 f"Текущие союзники:\n{profiles}",
             )
+
+    @classmethod
+    @property
+    def roles_key(cls):
+        super_classes = cls.__bases__
+        return super_classes[1].roles_key
+
+    @classmethod
+    @property
+    def processed_users_key(cls):
+        super_classes = cls.__bases__
+        return super_classes[1].processed_users_key
+
+    @classmethod
+    @property
+    def last_interactive_key(cls):
+        super_classes = cls.__bases__
+        return super_classes[1].last_interactive_key
 
 
 class ActiveRoleAtNight(Role):

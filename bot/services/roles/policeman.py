@@ -20,33 +20,6 @@ from utils.validators import (
 )
 
 
-class PolicemanAlias(AliasRole):
-    role = "Генерал"
-    photo = "https://img.clipart-library.com/2/clip-monsters-vs-aliens/clip-monsters-vs-aliens-21.gif"
-    payment_for_treatment = 11
-    payment_for_murder = 14
-
-    purpose = "Ты правая рука маршала. В случае его смерти вступишь в должность."
-
-    def __init__(self):
-        self.state_for_waiting_for_action = UserFsm.POLICEMAN_CHECKS
-
-    @classmethod
-    @property
-    def roles_key(cls):
-        return Policeman.roles_key
-
-    @classmethod
-    @property
-    def processed_users_key(cls):
-        return Policeman.processed_users_key
-
-    @classmethod
-    @property
-    def last_interactive_key(cls):
-        return Policeman.last_interactive_key
-
-
 class Policeman(
     ProcedureAfterNight, BossIsDeadMixin, ActiveRoleAtNight
 ):
@@ -60,7 +33,6 @@ class Policeman(
     message_to_user_after_action = "Ты выбрал убить {url}"
     mail_message = "Какие меры примешь для ликвидации мафии?"
     can_kill_at_night = True
-    alias = PolicemanAlias()
     extra_data = [
         ExtraCache(key="disclosed_roles"),
         ExtraCache(
@@ -179,3 +151,11 @@ class Policeman(
                 ),
             )
         await super().mailing(game_data=game_data)
+
+
+class PolicemanAlias(AliasRole, Policeman):
+    role = "Генерал"
+    photo = "https://img.clipart-library.com/2/clip-monsters-vs-aliens/clip-monsters-vs-aliens-21.gif"
+    payment_for_treatment = 11
+    payment_for_murder = 14
+    purpose = "Ты правая рука маршала. В случае его смерти вступишь в должность."

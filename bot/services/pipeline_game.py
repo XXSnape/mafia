@@ -1,4 +1,5 @@
 import asyncio
+from pprint import pprint
 from random import shuffle
 
 from aiogram import Dispatcher
@@ -115,7 +116,7 @@ class Game:
         )
 
         await self.mailer.mailing()
-        await asyncio.sleep(20)
+        await asyncio.sleep(27)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )
@@ -269,4 +270,5 @@ class Game:
             }
             game_data["players"][str(user_id)].update(user_data)
             roles.append(user_id)
+        pprint(game_data)
         await self.state.set_data(game_data)

@@ -134,6 +134,7 @@ class Executor:
             self.all_roles[role]
             for role in self.all_roles
             if isinstance(self.all_roles[role], VictimsOfVote)
+            and self.all_roles[role].is_alias is False
         ]
 
     @check_end_of_game
@@ -210,6 +211,7 @@ class Executor:
             self.all_roles[role]
             for role in self.all_roles
             if isinstance(self.all_roles[role], ProcedureAfterNight)
+            and self.all_roles[role].is_alias is False
         ]
         roles.sort(key=attrgetter("number_in_order_after_night"))
         victims = set()
@@ -315,7 +317,7 @@ class Executor:
                 new_state=UserFsm.WAIT_FOR_LATEST_LETTER,
             )
         user_role = game_data["players"][str(user_id)]["enum_name"]
-        role = self.all_roles[user_role]
+        role: Role = self.all_roles[user_role]
         await role.report_death(
             game_data=game_data, is_night=is_night, user_id=user_id
         )
@@ -324,7 +326,10 @@ class Executor:
             "number_died_at_night"
         ] = (game_data["number_of_night"] - 1)
         game_data[role.roles_key].remove(user_id)
-        if isinstance(role, BossIsDeadMixin):
+        if (
+            isinstance(role, BossIsDeadMixin)
+            and role.is_alias is False
+        ):
             await role.boss_is_dead(current_id=user_id)
         if isinstance(role, AliasRole):
             await role.alias_is_dead(

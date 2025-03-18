@@ -47,7 +47,10 @@ class MailerToPlayers:
         game_data: GameCache = await self.state.get_data()
         for role in self.all_roles:
             current_role: Role = self.all_roles[role]
-            if isinstance(current_role, ActiveRoleAtNight) is False:
+            if (
+                isinstance(current_role, ActiveRoleAtNight) is False
+                or current_role.is_alias
+            ):
                 continue
             await current_role.mailing(game_data=game_data)
 

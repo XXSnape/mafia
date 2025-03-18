@@ -13,33 +13,6 @@ from utils.validators import (
 )
 
 
-class DoctorAlias(AliasRole):
-    role = "Медсестра"
-    photo = "https://cdn.culture.ru/images/e2464a8d-222e-54b1-9016-86f63e902959"
-
-    purpose = "Тебе нужно во всем помогать главврачу. В случае его смерти вступишь в должность."
-    payment_for_treatment = 13
-    payment_for_murder = 12
-
-    def __init__(self):
-        self.state_for_waiting_for_action = UserFsm.DOCTOR_TREATS
-
-    @classmethod
-    @property
-    def roles_key(cls):
-        return Doctor.roles_key
-
-    @classmethod
-    @property
-    def processed_users_key(cls):
-        return Doctor.processed_users_key
-
-    @classmethod
-    @property
-    def last_interactive_key(cls):
-        return Doctor.last_interactive_key
-
-
 class Doctor(
     ProcedureAfterNight, BossIsDeadMixin, ActiveRoleAtNight
 ):
@@ -54,7 +27,6 @@ class Doctor(
         "Доктор спешит кому-то на помощь!"
     )
     message_to_user_after_action = "Ты выбрал вылечить {url}"
-    alias = DoctorAlias()
     payment_for_treatment = 15
     payment_for_murder = 18
 
@@ -94,3 +66,12 @@ class Doctor(
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.DOCTOR_TREATS
+
+
+class DoctorAlias(AliasRole, Doctor):
+    role = "Медсестра"
+    photo = "https://cdn.culture.ru/images/e2464a8d-222e-54b1-9016-86f63e902959"
+
+    purpose = "Тебе нужно во всем помогать главврачу. В случае его смерти вступишь в должность."
+    payment_for_treatment = 13
+    payment_for_murder = 12

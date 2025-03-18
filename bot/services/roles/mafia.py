@@ -12,40 +12,6 @@ from states.states import UserFsm
 from utils.validators import get_processed_role_and_user_if_exists
 
 
-class MafiaAlias(AliasRole):
-    role = "Мафия"
-    photo = "https://i.pinimg.com/736x/a1/10/db/a110db3eaba78bf6423bcea68f330a64.jpg"
-    purpose = (
-        "Тебе нужно уничтожить всех горожан и подчиняться дону."
-    )
-    is_mass_mailing_list = True
-    message_to_user_after_action = (
-        "Ты выбрал убить {url}. Но Дон может принять другое решение."
-    )
-    grouping = Groupings.criminals
-    notification_message = None
-    payment_for_treatment = 0
-    payment_for_murder = 13
-
-    def __init__(self):
-        self.state_for_waiting_for_action = UserFsm.MAFIA_ATTACKS
-
-    @classmethod
-    @property
-    def roles_key(cls):
-        return Mafia.roles_key
-
-    @classmethod
-    @property
-    def processed_users_key(cls):
-        return Mafia.processed_users_key
-
-    @classmethod
-    @property
-    def last_interactive_key(cls):
-        return Mafia.last_interactive_key
-
-
 class Mafia(MurderAfterNight, BossIsDeadMixin, ActiveRoleAtNight):
     role = "Дон. Высшее звание в преступных группировках"
     photo = (
@@ -62,8 +28,6 @@ class Mafia(MurderAfterNight, BossIsDeadMixin, ActiveRoleAtNight):
     notification_message = None
     payment_for_treatment = 0
     payment_for_murder = 20
-
-    alias = MafiaAlias()
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.MAFIA_ATTACKS
@@ -92,3 +56,17 @@ class Mafia(MurderAfterNight, BossIsDeadMixin, ActiveRoleAtNight):
             processed_role=processed_role,
             beginning_message="Убийство",
         )
+
+
+class MafiaAlias(AliasRole, Mafia):
+    role = "Мафия"
+    photo = "https://i.pinimg.com/736x/a1/10/db/a110db3eaba78bf6423bcea68f330a64.jpg"
+    purpose = (
+        "Тебе нужно уничтожить всех горожан и подчиняться дону."
+    )
+    is_mass_mailing_list = True
+    message_to_user_after_action = (
+        "Ты выбрал убить {url}. Но Дон может принять другое решение."
+    )
+    payment_for_treatment = 0
+    payment_for_murder = 13

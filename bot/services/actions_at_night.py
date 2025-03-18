@@ -1,4 +1,5 @@
 import asyncio
+from pprint import pprint
 
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
@@ -127,7 +128,11 @@ async def inform_players_and_trace_actions(
     trace_all_actions(
         callback=callback, game_data=game_data, user_id=user_id
     )
-    if current_role.message_to_group_after_action:
+    if (
+        current_role.message_to_group_after_action
+        and not game_data[current_role.processed_users_key]
+    ):
+
         await callback.bot.send_message(
             chat_id=game_data["game_chat"],
             text=current_role.message_to_group_after_action,
@@ -173,7 +178,10 @@ async def take_action_and_register_user(
         user_id=user_id,
         current_role=current_role,
     )
-
+    print(
+        "cur", current_role, "l", current_role.last_interactive_key
+    )
+    pprint(game_data)
     if current_role.last_interactive_key:
         current_night = game_data["number_of_night"]
         nights = game_data[
