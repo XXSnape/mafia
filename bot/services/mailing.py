@@ -114,7 +114,7 @@ class MailerToPlayers:
                         chat_id=chat_id,
                         text=number_of_night
                         + "\n\n".join(
-                            f"{number}) {message[1]}"
+                            f"{number}) {message}"
                             for number, message in enumerate(
                                 messages, start=1
                             )

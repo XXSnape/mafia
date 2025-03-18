@@ -1,10 +1,63 @@
+import asyncio
 from collections.abc import Callable
 from functools import partial, wraps
 from typing import TYPE_CHECKING
 
+from aiogram import Bot
+
+from constants.output import NUMBER_OF_NIGHT
+from utils.utils import make_pretty, get_profiles
+
 if TYPE_CHECKING:
     from services.roles import GameCache, PlayersIds
     from services.roles.base import Role
+
+
+def change_role(
+    game_data: "GameCache",
+    previous_role: "Role",
+    new_role: "Role",
+    role_key: str,
+    user_id: int,
+):
+    game_data[previous_role.roles_key].remove(user_id)
+    game_data[new_role.roles_key].append(user_id)
+    game_data["players"][str(user_id)]["role"] = new_role.role
+    game_data["players"][str(user_id)]["pretty_role"] = make_pretty(
+        new_role.role
+    )
+    game_data["players"][str(user_id)]["enum_name"] = role_key
+    game_data["players"][str(user_id)][
+        "roles_key"
+    ] = new_role.roles_key
+
+
+async def notify_aliases_about_transformation(
+    game_data: "GameCache",
+    bot: Bot,
+    new_role: "Role",
+    user_id: int,
+):
+    url = game_data["players"][str(user_id)]["url"]
+    initial_role = game_data["players"][str(user_id)]["initial_role"]
+    profiles = get_profiles(
+        players_ids=game_data[new_role.roles_key],
+        players=game_data["players"],
+        role=True,
+    )
+    await asyncio.gather(
+        *(
+            bot.send_message(
+                chat_id=player_id,
+                text=NUMBER_OF_NIGHT.format(
+                    game_data["number_of_night"]
+                )
+                + f"{initial_role} {url} превратился в {make_pretty(new_role.role)}\n"
+                f"Текущие союзники:\n{profiles}",
+            )
+            for player_id in game_data[new_role.roles_key]
+        )
+    )
 
 
 def get_user_role_and_url(
@@ -38,7 +91,7 @@ def get_processed_role_and_user_if_exists(async_func: Callable):
             **kwargs,
             processed_role=processed_role,
             processed_user_id=processed_user_id,
-            user_url=user_url
+            user_url=user_url,
         )
 
     return wrapper

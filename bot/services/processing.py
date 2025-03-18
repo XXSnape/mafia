@@ -23,7 +23,6 @@ from states.states import GameFsm, UserFsm
 from utils.utils import (
     get_state_and_assign,
     get_the_most_frequently_encountered_id,
-    dependency_injection,
     get_results_of_goal_identification,
     get_results_of_voting,
     make_build,

@@ -1,3 +1,6 @@
+from pprint import pprint
+
+from aiogram.loggers import dispatcher
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from cache.cache_types import GameCache
 from keyboards.inline.keypads.mailing import send_transformation_kb
@@ -34,9 +37,15 @@ class Werewolf(ProcedureAfterNight, ActiveRoleAtNight):
         ):
             for player_data in game_data["players"].values():
                 if player_data["enum_name"] not in all_roles:
-                    all_roles[player_data["enum_name"]] = (
-                        get_data_with_roles(player_data["enum_name"])
+                    new_role = get_data_with_roles(
+                        player_data["enum_name"]
                     )
+                    new_role(
+                        dispatcher=self.dispatcher,
+                        bot=self.bot,
+                        state=self.state,
+                    )
+                    all_roles[player_data["enum_name"]] = new_role
 
     def __init__(self):
         self.state_for_waiting_for_action = (
