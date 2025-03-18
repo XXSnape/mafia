@@ -62,7 +62,7 @@ def check_end_of_game(async_func: Callable):
                     game_data[current_role.roles_key]
                 )
         if (
-            criminals_count >= players_count - criminals_count
+            criminals_count > players_count - criminals_count
         ):  # TODO >=
             raise GameIsOver(winner=Groupings.criminals)
         return result
@@ -226,6 +226,8 @@ class Executor:
         for role in roles:
             await role.procedure_after_night(**kwargs)
         victims |= set(murdered) - set(recovered)
+        for role in roles:
+            await role.accrual_of_overnight_rewards(**kwargs)
 
         text_about_dead = ""
         for victim_id in victims:
@@ -244,8 +246,6 @@ class Executor:
         await self.bot.send_message(
             chat_id=self.group_chat_id, text=text_about_dead
         )
-        for role in roles:
-            await role.accrual_of_overnight_rewards(**kwargs)
         await self.mailer.send_messages_after_night(
             game_data=game_data
         )

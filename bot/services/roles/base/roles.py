@@ -183,8 +183,12 @@ class Role(ABC):
         user_url: str | None = None,
         processed_role: Optional["Role"] = None,
         at_night: bool = True,
+        additional_players: str | None = None,
     ):
-        for player_id in game_data[self.roles_key]:
+        players = game_data[self.roles_key]
+        if additional_players:
+            players += game_data[additional_players]
+        for player_id in players:
             game_data["players"][str(player_id)]["money"] += money
             message = f"{beginning_message} {user_url} ({make_pretty(processed_role.role)}) - {money}{MONEY_SYM}"
             time_of_day = (

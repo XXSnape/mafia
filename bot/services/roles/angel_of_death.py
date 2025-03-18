@@ -19,7 +19,7 @@ class AngelOfDeath(
     need_to_monitor_interaction = False
     photo = "https://avatars.mds.yandex.net/get-entity_search/10844899/935958285/S600xU_2x"
     purpose = "Если ты умрешь на голосовании, сможешь ночью забрать кого-нибудь с собой"
-    grouping = Groupings.other
+    grouping = Groupings.civilians
     extra_data = [ExtraCache("angels_died", False)]
     message_to_user_after_action = "Ты выбрал отомстить {url}"
     can_kill_at_night = True
@@ -42,22 +42,23 @@ class AngelOfDeath(
         processed_user_id: int,
         **kwargs
     ):
+
         if processed_user_id not in victims:
+            game_data["angels_died"].clear()
             return
-        money = processed_role.payment_for_murder * 2
+        if processed_role.grouping == Groupings.civilians:
+            money = 0
+        else:
+            money = processed_role.payment_for_murder * 2
         self.add_money_to_all_allies(
             game_data=game_data,
             money=money,
             beginning_message="Отомщённое убийство",
             user_url=user_url,
             processed_role=processed_role,
+            additional_players="angels_died",
         )
-
-    def get_processed_user_id(self, game_data: GameCache):
-        result = super().get_processed_user_id(game_data=game_data)
-        if result:
-            game_data["angels_died"].clear()
-        return result
+        game_data["angels_died"].clear()
 
     async def report_death(
         self, game_data: GameCache, is_night: bool, user_id: int
@@ -83,7 +84,7 @@ class AngelOfDeath(
                 - game_data["players"][str(angel_id)][
                     "number_died_at_night"
                 ]
-            ) == 1:
+            ) == 2:
                 angels.append(angel_id)
 
         for angel_id in angels:

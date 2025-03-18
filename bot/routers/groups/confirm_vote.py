@@ -23,12 +23,18 @@ async def confirm_vote(
     callback_data: AimedUserCbData,
     state: FSMContext,
 ):
+    game_data: GameCache = await state.get_data()
+    if callback.from_user.id not in game_data["players_ids"]:
+        await callback.answer(
+            "Мертвые не могут голосовать!", show_alert=True
+        )
+        return
+
     if callback_data.user_id == callback.from_user.id:
         await callback.answer(
             "Теперь твой судья - демократия!", show_alert=True
         )
         return
-    game_data: GameCache = await state.get_data()
     if callback.from_user.id == Prosecutor().get_processed_user_id(
         game_data
     ):
