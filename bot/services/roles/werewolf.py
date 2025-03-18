@@ -1,11 +1,12 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from cache.cache_types import GameCache
 from keyboards.inline.keypads.mailing import send_transformation_kb
-from services.roles.base import ActiveRoleAtNight
+from services.roles.base import ActiveRoleAtNight, Role
+from services.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
 
 
-class Werewolf(ActiveRoleAtNight):
+class Werewolf(ProcedureAfterNight, ActiveRoleAtNight):
     role = "Оборотень"
     need_to_monitor_interaction = False
     photo = (
@@ -17,11 +18,36 @@ class Werewolf(ActiveRoleAtNight):
     mail_message = "Реши, в кого сегодня превратишься!"
     payment_for_treatment = 11
     payment_for_murder = 12
+    number_of_night_for_transformation = 2
+
+    async def procedure_after_night(
+        self,
+        all_roles: dict[str, Role],
+        game_data: GameCache,
+        **kwargs,
+    ):
+        from general.collection_of_roles import get_data_with_roles
+
+        if (
+            game_data["number_of_night"]
+            == self.number_of_night_for_transformation
+        ):
+            for player_data in game_data["players"].values():
+                if player_data["enum_name"] not in all_roles:
+                    all_roles[player_data["enum_name"]] = (
+                        get_data_with_roles(player_data["enum_name"])
+                    )
 
     def __init__(self):
         self.state_for_waiting_for_action = (
             UserFsm.WEREWOLF_TURNS_INTO
         )
+
+    async def accrual_of_overnight_rewards(
+        self,
+        **kwargs,
+    ):
+        pass
 
     def generate_markup(
         self,
@@ -36,7 +62,10 @@ class Werewolf(ActiveRoleAtNight):
         game_data: GameCache,
         own_markup: InlineKeyboardMarkup | None = None,
     ):
-        if game_data["number_of_night"] == 2:  # TODO 4
+        if (
+            game_data["number_of_night"]
+            == self.number_of_night_for_transformation
+        ):  # TODO 4
             await super().mailing(
                 game_data=game_data,
             )

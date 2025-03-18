@@ -58,9 +58,7 @@ class Game:
         all_roles = get_data_with_roles()
         existing = set(
             player_data["enum_name"]
-            for player_id, player_data in game_data[
-                "players"
-            ].items()
+            for player_data in game_data["players"].values()
         )
         not_existing = set(
             role for role in all_roles if role not in existing
@@ -117,7 +115,7 @@ class Game:
         )
 
         await self.mailer.mailing()
-        await asyncio.sleep(36)
+        await asyncio.sleep(12)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )

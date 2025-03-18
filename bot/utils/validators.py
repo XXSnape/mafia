@@ -7,6 +7,20 @@ if TYPE_CHECKING:
     from services.roles.base import Role
 
 
+def get_user_role_and_url(
+    game_data: "GameCache",
+    processed_user_id: int,
+    all_roles: dict[str, "Role"],
+):
+    enum_name = game_data["players"][str(processed_user_id)][
+        "enum_name"
+    ]
+    return (
+        all_roles[enum_name],
+        game_data["players"][str(processed_user_id)]["url"],
+    )
+
+
 def get_processed_role_and_user_if_exists(async_func: Callable):
     @wraps(async_func)
     async def wrapper(role: "Role", **kwargs):
@@ -14,14 +28,11 @@ def get_processed_role_and_user_if_exists(async_func: Callable):
         processed_user_id = role.get_processed_user_id(game_data)
         if processed_user_id is None:
             return
-        enum_name = game_data["players"][str(processed_user_id)][
-            "enum_name"
-        ]
-        all_roles: dict[str, Role] = kwargs["all_roles"]
-        processed_role: Role = all_roles[enum_name]
-        user_url = game_data["players"][str(processed_user_id)][
-            "url"
-        ]
+        processed_role, user_url = get_user_role_and_url(
+            game_data=game_data,
+            processed_user_id=processed_user_id,
+            all_roles=kwargs["all_roles"],
+        )
         return await async_func(
             role,
             **kwargs,

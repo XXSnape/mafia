@@ -1,6 +1,5 @@
 import asyncio
-from itertools import groupby
-from operator import itemgetter
+from collections import defaultdict
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
@@ -99,15 +98,20 @@ class MailerToPlayers:
 
     async def send_messages_after_night(self, game_data: GameCache):
         messages = game_data["messages_after_night"]
-        if messages:
-            group_iter = groupby(messages, key=itemgetter(0))
-            number_of_night = make_build(
-                f"События ночи {game_data['number_of_night']}:\n\n"
-            )
-            await asyncio.gather(
-                *(
+        if not messages:
+            return
+        number_of_night = make_build(
+            f"Важнейшие события ночи {game_data['number_of_night']}:\n\n"
+        )
+        chats_and_messages = defaultdict(list)
+        for chat_id, message in messages:
+            chats_and_messages[chat_id].append(message)
+        tasks = []
+        for chat_id, messages in chats_and_messages.items():
+            if chat_id != self.group_chat_id:
+                tasks.append(
                     self.bot.send_message(
-                        chat_id=user_id,
+                        chat_id=chat_id,
                         text=number_of_night
                         + "\n\n".join(
                             f"{number}) {message[1]}"
@@ -116,9 +120,15 @@ class MailerToPlayers:
                             )
                         ),
                     )
-                    for user_id, messages in group_iter
                 )
-            )
+            else:
+                for message in messages:
+                    tasks.append(
+                        self.bot.send_message(
+                            chat_id=chat_id, text=message
+                        )
+                    )
+        await asyncio.gather(*tasks)
 
     async def familiarize_players(self, game_data: GameCache):
         for user_id, player_data in game_data["players"].items():

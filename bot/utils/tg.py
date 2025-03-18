@@ -5,5 +5,5 @@ from aiogram.types import Message
 
 
 async def delete_message(message: Message):
-    with suppress(TelegramBadRequest):
+    with suppress(TelegramBadRequest, AttributeError):
         await message.delete()

@@ -16,6 +16,7 @@ from states.states import UserFsm
 from utils.validators import (
     remind_commissioner_about_inspections,
     get_processed_role_and_user_if_exists,
+    get_user_role_and_url,
 )
 
 
@@ -76,19 +77,42 @@ class Policeman(
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.POLICEMAN_CHECKS
 
-    @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(
         self,
-        *,
+        all_roles: dict[str, Role],
         game_data: GameCache,
         victims: set[int],
-        processed_role: Role,
-        user_url: str,
-        processed_user_id: int,
         **kwargs,
     ):
-        if processed_user_id not in victims:
+        disclosed_roles = game_data["disclosed_roles"]
+        if (
+            disclosed_roles
+            and disclosed_roles != game_data["forged_roles"]
+        ):
+            processed_role, user_url = get_user_role_and_url(
+                game_data=game_data,
+                processed_user_id=disclosed_roles[0][0],
+                all_roles=all_roles,
+            )
+            self.add_money_to_all_allies(
+                game_data=game_data,
+                money=9,
+                user_url=user_url,
+                processed_role=processed_role,
+                beginning_message="Проверка",
+            )
             return
+        processed_user_id = self.get_processed_user_id(game_data)
+        if (
+            processed_user_id is None
+            or processed_user_id not in victims
+        ):
+            return
+        processed_role, user_url = get_user_role_and_url(
+            game_data=game_data,
+            processed_user_id=processed_user_id,
+            all_roles=all_roles,
+        )
         money = (
             0
             if processed_role.grouping == Groupings.civilians
