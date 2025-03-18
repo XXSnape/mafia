@@ -81,11 +81,11 @@ class Policeman(
         self,
         *,
         game_data: GameCache,
-        all_roles: dict[str, Role],
         victims: set[int],
         processed_role: Role,
         user_url: str,
         processed_user_id: int,
+        **kwargs,
     ):
         if processed_user_id not in victims:
             return
@@ -103,7 +103,7 @@ class Policeman(
         )
 
     async def procedure_after_night(
-        self, game_data: GameCache, murdered: list[int]
+        self, game_data: GameCache, murdered: list[int], **kwargs
     ):
         if game_data["disclosed_roles"]:
             user_id, role = game_data["disclosed_roles"][0]
@@ -130,24 +130,6 @@ class Policeman(
         return super().cancel_actions(
             game_data=game_data, user_id=user_id
         )
-
-    # async def send_delayed_messages_after_night(
-    #     self, game_data: GameCache
-    # ):
-    #     if game_data["disclosed_roles"]:
-    #         user_id, role = game_data["disclosed_roles"][0]
-    #         if game_data.get("forged_roles"):
-    #             faked_id, faked_role = game_data["forged_roles"][0]
-    #             if faked_id == user_id:
-    #                 role = faked_role
-    #         url = game_data["players"][str(user_id)]["url"]
-    #         text = f"{url} - {role}!"
-    #         for policeman_id in game_data[self.roles_key]:
-    #             await self.bot.send_message(
-    #                 chat_id=policeman_id, text=text
-    #             )
-    #         game_data["text_about_checks"] += text + "\n"
-    #         await self.state.set_data(game_data)
 
     def generate_markup(
         self,

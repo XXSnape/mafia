@@ -20,6 +20,7 @@ class Punisher(ProcedureAfterNight, Role):
         victims: set[int],
         recovered: list[int],
         murdered: list[int],
+        **kwargs
     ):
         punishers = game_data.get(self.roles_key)
         if not punishers:
@@ -58,10 +59,10 @@ class Punisher(ProcedureAfterNight, Role):
 
     async def accrual_of_overnight_rewards(
         self,
-        *,
         game_data: GameCache,
         all_roles: dict[str, "Role"],
         victims: set[int],
+        **kwargs
     ):
         punisher_id = game_data[self.roles_key][0]
         if punisher_id not in victims:

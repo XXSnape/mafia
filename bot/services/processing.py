@@ -61,7 +61,9 @@ def check_end_of_game(async_func: Callable):
                 criminals_count += len(
                     game_data[current_role.roles_key]
                 )
-        if criminals_count >= players_count - criminals_count:
+        if (
+            criminals_count > players_count - criminals_count
+        ):  # TODO >=
             raise GameIsOver(winner=Groupings.criminals)
         return result
 
@@ -214,7 +216,7 @@ class Executor:
         victims = set()
         recovered = []
         murdered = []
-        args = {
+        kwargs = {
             "recovered": recovered,
             "murdered": murdered,
             "victims": victims,
@@ -222,11 +224,7 @@ class Executor:
             "all_roles": self.all_roles,
         }
         for role in roles:
-            await role.procedure_after_night(
-                **dependency_injection(
-                    func=role.procedure_after_night, data=args
-                )
-            )
+            await role.procedure_after_night(**kwargs)
         victims |= set(murdered) - set(recovered)
 
         text_about_dead = ""
@@ -247,12 +245,7 @@ class Executor:
             chat_id=self.group_chat_id, text=text_about_dead
         )
         for role in roles:
-            await role.accrual_of_overnight_rewards(
-                **dependency_injection(
-                    func=role.accrual_of_overnight_rewards,
-                    data=args,
-                )
-            )
+            await role.accrual_of_overnight_rewards(**kwargs)
         await self.mailer.send_messages_after_night(
             game_data=game_data
         )

@@ -29,7 +29,7 @@ class Journalist(ProcedureAfterNight, ActiveRoleAtNight):
 
     @get_processed_user_id_if_exists
     async def procedure_after_night(
-        self, game_data: GameCache, processed_user_id: int
+        self, game_data: GameCache, processed_user_id: int, **kwargs
     ):
         visitors = ", ".join(
             game_data["players"][str(user_id)]["url"]
@@ -53,12 +53,11 @@ class Journalist(ProcedureAfterNight, ActiveRoleAtNight):
     @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(
         self,
-        *,
         game_data: GameCache,
-        all_roles: dict[str, Role],
         user_url: str,
         processed_user_id: int,
         processed_role: Role,
+        **kwargs,
     ):
         visitors = (
             len(

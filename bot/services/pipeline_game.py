@@ -117,7 +117,7 @@ class Game:
         )
 
         await self.mailer.mailing()
-        await asyncio.sleep(15)
+        await asyncio.sleep(20)
         await self.executor.delete_messages_from_to_delete(
             to_delete=game_data["to_delete"]
         )

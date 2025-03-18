@@ -91,9 +91,9 @@ class MurderAfterNight(ProcedureAfterNight):
     @get_processed_user_id_if_exists
     async def procedure_after_night(
         self,
-        game_data: GameCache,
         murdered: list[int],
         processed_user_id: int,
+        **kwargs,
     ):
         murdered.append(processed_user_id)
 

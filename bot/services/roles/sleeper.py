@@ -38,6 +38,7 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
         all_roles: dict[str, Role],
         game_data: GameCache,
         processed_user_id: int,
+        **kwargs
     ):
         user_role = game_data["players"][str(processed_user_id)][
             "enum_name"
@@ -57,12 +58,11 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
     @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(
         self,
-        *,
         game_data: GameCache,
-        all_roles: dict[str, "Role"],
         processed_role: Role,
         user_url: str,
         processed_user_id: int,
+        **kwargs
     ):
         if (
             isinstance(processed_role, ActiveRoleAtNight) is False

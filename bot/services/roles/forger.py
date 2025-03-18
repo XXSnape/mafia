@@ -27,7 +27,9 @@ class Forger(ProcedureAfterNight, ActiveRoleAtNight):
     payment_for_treatment = 0
     payment_for_murder = 11
 
-    async def procedure_after_night(self, game_data: GameCache):
+    async def procedure_after_night(
+        self, game_data: GameCache, **kwargs
+    ):
         if (
             game_data["disclosed_roles"]
             and game_data["forged_roles"]
@@ -37,10 +39,7 @@ class Forger(ProcedureAfterNight, ActiveRoleAtNight):
             ]
 
     async def accrual_of_overnight_rewards(
-        self,
-        *,
-        game_data: GameCache,
-        all_roles: dict[str, Role],
+        self, game_data: GameCache, **kwargs
     ):
         from .policeman import Policeman
 

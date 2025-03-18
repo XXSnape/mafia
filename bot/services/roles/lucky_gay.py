@@ -21,6 +21,7 @@ class LuckyGay(ProcedureAfterNight, Role):
         game_data: GameCache,
         recovered: list[int],
         murdered: list[int],
+        **kwargs,
     ):
         send_to_group = False
 
@@ -39,9 +40,6 @@ class LuckyGay(ProcedureAfterNight, Role):
 
     async def accrual_of_overnight_rewards(
         self,
-        *,
-        game_data: GameCache,
-        all_roles: dict[str, "Role"],
         **kwargs,
     ):
         return

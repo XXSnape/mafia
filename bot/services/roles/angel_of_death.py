@@ -35,13 +35,12 @@ class AngelOfDeath(
     @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(
         self,
-        *,
         game_data: GameCache,
-        all_roles: dict[str, Role],
         victims: set[int],
         processed_role: Role,
         user_url: str,
         processed_user_id: int,
+        **kwargs
     ):
         if processed_user_id not in victims:
             return

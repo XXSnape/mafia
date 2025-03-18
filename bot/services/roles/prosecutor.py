@@ -37,7 +37,7 @@ class Prosecutor(
 
     @get_processed_user_id_if_exists
     async def procedure_after_night(
-        self, game_data: GameCache, processed_user_id: int
+        self, game_data: GameCache, processed_user_id: int, **kwargs
     ):
         with suppress(TelegramBadRequest):
             await self.bot.restrict_chat_member(
@@ -49,12 +49,11 @@ class Prosecutor(
     @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(
         self,
-        *,
         game_data: GameCache,
-        all_roles: dict[str, Role],
         processed_role: Role,
         user_url: str,
         processed_user_id: int,
+        **kwargs,
     ):
         money = (
             0

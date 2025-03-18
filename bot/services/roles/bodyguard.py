@@ -37,6 +37,7 @@ class Bodyguard(ProcedureAfterNight, ActiveRoleAtNight):
         game_data: GameCache,
         recovered: list[int],
         murdered: list[int],
+        **kwargs,
     ):
         recovered_id = self.get_processed_user_id(game_data)
         if not recovered_id:
@@ -52,14 +53,13 @@ class Bodyguard(ProcedureAfterNight, ActiveRoleAtNight):
     @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(
         self,
-        *,
         game_data: GameCache,
-        all_roles: dict[str, Role],
         recovered: list[int],
         murdered: list[int],
         processed_role: Role,
         user_url: str,
         processed_user_id: int,
+        **kwargs,
     ):
         if (processed_user_id not in murdered) or (
             processed_user_id in murdered
