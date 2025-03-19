@@ -9,7 +9,7 @@ from general import settings
 from general.log import configure_logging
 from routers.game.users import router as game_users_router
 from routers.game.groups import router as game_groups_router
-from routers.common import router as common_router
+from routers.common import ban_router, order_of_roles_router
 
 
 async def main() -> None:
@@ -25,7 +25,10 @@ async def main() -> None:
         fsm_strategy=FSMStrategy.CHAT, scheduler=scheduler
     )
     dp.include_routers(
-        game_groups_router, game_users_router, common_router
+        game_groups_router,
+        game_users_router,
+        ban_router,
+        order_of_roles_router,
     )
     commands = [
         BotCommand(

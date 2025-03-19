@@ -50,6 +50,7 @@ class Role(ABC):
     need_to_process: bool = False
     photo: str
     grouping: Groupings = Groupings.civilians
+    there_may_be_several: bool = False
     purpose: str | Callable | None
     message_to_user_after_action: str | None = None
     message_to_group_after_action: str | None = None
@@ -260,6 +261,7 @@ class Role(ABC):
 class AliasRole(ABC):
     is_alias = True
     is_mass_mailing_list: bool = False
+    there_may_be_several: bool = True
 
     async def alias_is_dead(
         self, current_id: int, game_data: GameCache

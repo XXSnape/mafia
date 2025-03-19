@@ -27,10 +27,11 @@ class ProhibitedRolesDAO(BaseDAO[ProhibitedRoleModel]):
         result = await self.find_all(
             ProhibitedRoleSchema(user_tg_id=user_id)
         )
-        if result:
-            return (
-                "Забаненные роли:\n"
-                + "\n".join(record.role for record in result),
-                True,
-            )
-        return "Все роли могут участвовать в игре!", False
+        return [record.role for record in result]
+        # if result:
+        #     return (
+        #         "Забаненные роли:\n"
+        #         + "\n".join(record.role for record in result),
+        #         True,
+        #     )
+        # return "Все роли могут участвовать в игре!", False

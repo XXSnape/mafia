@@ -61,12 +61,18 @@ async def view_banned_roles(
     callback: CallbackQuery, session_without_commit: AsyncSession
 ):
     dao = ProhibitedRolesDAO(session=session_without_commit)
-    banned_roles, are_there_roles = await dao.get_banned_roles(
+    banned_roles = await dao.get_banned_roles(
         user_id=callback.from_user.id,
     )
+    if banned_roles:
+        message = "Забаненные роли:\n\n" + "\n".join(banned_roles)
+    else:
+        message = "Все роли могут участвовать в игре!"
     await callback.message.edit_text(
-        text=banned_roles,
-        reply_markup=edit_banned_roles_kb(are_there_roles),
+        text=message,
+        reply_markup=edit_banned_roles_kb(
+            are_there_roles=bool(message)
+        ),
     )
 
 
