@@ -4,3 +4,4 @@ from .users import UserModel
 from .games import GameModel
 from .results import ResultModel
 from .prohibited_roles import ProhibitedRoleModel
+from .orders import OrderModel

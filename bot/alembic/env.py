@@ -15,6 +15,7 @@ from database.models import (
     GameModel,
     ResultModel,
     ProhibitedRoleModel,
+    OrderModel,
 )
 from general import settings
 
