@@ -13,6 +13,7 @@ from database.models import (
     GroupingModel,
     UserModel,
     GameModel,
+    ResultModel,
 )
 from general import settings
 

@@ -1,4 +1,5 @@
 from .groupings import GroupingModel
 from .roles import RoleModel
 from .users import UserModel
-from .game import GameModel
+from .games import GameModel
+from .results import ResultModel
