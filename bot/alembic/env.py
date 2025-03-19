@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-from database.base import BaseModel
-from database import GroupingModel, RoleModel
+from database.common.base import BaseModel
+from database.models import RoleModel, GroupingModel, UserModel
 from general import settings
 
 # this is the Alembic Config object, which provides
