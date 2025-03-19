@@ -270,5 +270,4 @@ class Game:
             }
             game_data["players"][str(user_id)].update(user_data)
             roles.append(user_id)
-        pprint(game_data)
         await self.state.set_data(game_data)

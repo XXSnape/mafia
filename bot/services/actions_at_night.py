@@ -178,10 +178,7 @@ async def take_action_and_register_user(
         user_id=user_id,
         current_role=current_role,
     )
-    print(
-        "cur", current_role, "l", current_role.last_interactive_key
-    )
-    pprint(game_data)
+
     if current_role.last_interactive_key:
         current_night = game_data["number_of_night"]
         nights = game_data[
