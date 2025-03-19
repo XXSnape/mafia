@@ -1,4 +1,9 @@
-from sqlalchemy.orm import declared_attr, DeclarativeBase
+from sqlalchemy.orm import (
+    declared_attr,
+    DeclarativeBase,
+    Mapped,
+    mapped_column,
+)
 
 
 class BaseModel(DeclarativeBase):
@@ -28,3 +33,7 @@ class BaseModel(DeclarativeBase):
         ]
 
         return f"<{self.__class__.__name__} {', '.join(cols)}>"
+
+
+class IdMixin:
+    id: Mapped[int] = mapped_column(primary_key=True)
