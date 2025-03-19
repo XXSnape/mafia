@@ -7,7 +7,7 @@ from services.roles.base import Role, ActiveRoleAtNight
 
 
 @overload
-def get_data_with_roles(role_name: None) -> dict[str, Role]: ...
+def get_data_with_roles() -> dict[str, Role]: ...
 
 
 @overload
@@ -23,6 +23,8 @@ def get_data_with_roles(
         "don": roles.Mafia(),
         "doctor": roles.Doctor(),
         "policeman": roles.Policeman(),
+        "civilian": roles.Civilian(),
+        "mafia": roles.MafiaAlias(),
         "traitor": roles.Traitor(),
         "killer": roles.Killer(),
         "werewolf": roles.Werewolf(),
@@ -42,9 +44,7 @@ def get_data_with_roles(
         "lawyer": roles.Lawyer(),
         "angel_of_death": roles.AngelOfDeath(),
         "prosecutor": roles.Prosecutor(),
-        "civilian": roles.Civilian(),
         "lucky_gay": roles.LuckyGay(),
-        "mafia": roles.MafiaAlias(),
         "nurse": roles.DoctorAlias(),
         "general": roles.PolicemanAlias(),
     }

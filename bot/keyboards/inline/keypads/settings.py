@@ -1,0 +1,75 @@
+from aiogram.types import InlineKeyboardButton
+
+from keyboards.inline.builder import generate_inline_kb
+from keyboards.inline.cb.cb_text import (
+    VIEW_BANNED_ROLES_CB,
+    COMPLETE_TO_BAN_CB,
+    CANCEL_CB,
+    EDIT_BANNED_ROLES_CB,
+    CLEAR_BANNED_ROLES_CB,
+)
+
+
+def select_setting_kb():
+    buttons = [
+        InlineKeyboardButton(
+            text="Забаненные роли🚫",
+            callback_data=VIEW_BANNED_ROLES_CB,
+        )
+    ]
+    return generate_inline_kb(data_with_buttons=buttons)
+
+
+def edit_banned_roles_kb(are_there_roles: bool):
+    buttons = [
+        InlineKeyboardButton(
+            text="Редактировать", callback_data=EDIT_BANNED_ROLES_CB
+        )
+    ]
+    if are_there_roles:
+        buttons.append(
+            InlineKeyboardButton(
+                text="Очистить все",
+                callback_data=CLEAR_BANNED_ROLES_CB,
+            )
+        )
+
+    buttons.append(
+        InlineKeyboardButton(
+            text="Отменить", callback_data=CANCEL_CB
+        )
+    )
+
+    return generate_inline_kb(data_with_buttons=buttons)
+
+
+def go_to_following_roles_kb(
+    current_number: int, max_number: int, are_there_roles: bool
+):
+    buttons = []
+    if current_number != 0:
+        buttons.append(
+            InlineKeyboardButton(
+                text="⏪",
+                callback_data=str(current_number - 1),
+            )
+        )
+    if current_number != max_number:
+        buttons.append(
+            InlineKeyboardButton(
+                text="⏩",
+                callback_data=str(current_number + 1),
+            )
+        )
+    if are_there_roles:
+        buttons.append(
+            InlineKeyboardButton(
+                text="Завершить", callback_data=COMPLETE_TO_BAN_CB
+            )
+        )
+    buttons.append(
+        InlineKeyboardButton(
+            text="Отменить", callback_data=CANCEL_CB
+        )
+    )
+    return generate_inline_kb(data_with_buttons=buttons)

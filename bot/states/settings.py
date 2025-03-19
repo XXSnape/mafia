@@ -1,5 +1,4 @@
-from aiogram.fsm.state import State
-from telebot.states import StatesGroup
+from aiogram.fsm.state import State, StatesGroup
 
 
 class SettingsFsm(StatesGroup):
