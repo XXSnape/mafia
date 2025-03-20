@@ -6,21 +6,22 @@ from aiogram.fsm.state import default_state
 from aiogram.types import Message, CallbackQuery, PollAnswer
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.dao.repositories.prohibited_roles import (
+from database.dao.prohibited_roles import (
     ProhibitedRolesDAO,
 )
+from database.schemas.roles import UserTgId
 
 from keyboards.inline.cb.cb_text import (
     VIEW_BANNED_ROLES_CB,
     CANCEL_CB,
-    COMPLETE_TO_BAN_CB,
-    EDIT_BANNED_ROLES_CB,
-    CLEAR_BANNED_ROLES_CB,
+    SAVE_CB,
+    EDIT_SETTINGS_CB,
+    CLEAR_SETTINGS_CB,
 )
 from keyboards.inline.keypads.settings import (
     select_setting_kb,
     go_to_following_roles_kb,
-    edit_banned_roles_kb,
+    edit_roles_kb,
 )
 from middlewares.db import (
     DatabaseMiddlewareWithCommit,
@@ -58,7 +59,9 @@ async def handle_settings(
 
 @router.callback_query(F.data == VIEW_BANNED_ROLES_CB)
 async def view_banned_roles(
-    callback: CallbackQuery, session_without_commit: AsyncSession
+    callback: CallbackQuery,
+    state: FSMContext,
+    session_without_commit: AsyncSession,
 ):
     dao = ProhibitedRolesDAO(session=session_without_commit)
     banned_roles = await dao.get_banned_roles(
@@ -68,23 +71,23 @@ async def view_banned_roles(
         message = "Забаненные роли:\n\n" + "\n".join(banned_roles)
     else:
         message = "Все роли могут участвовать в игре!"
+    await state.set_state(SettingsFsm.BAN_ROLES)
     await callback.message.edit_text(
         text=message,
-        reply_markup=edit_banned_roles_kb(
-            are_there_roles=bool(message)
+        reply_markup=edit_roles_kb(
+            are_there_roles=bool(banned_roles)
         ),
     )
 
 
-@router.callback_query(F.data == CLEAR_BANNED_ROLES_CB)
+@router.callback_query(
+    SettingsFsm.BAN_ROLES, F.data == CLEAR_SETTINGS_CB
+)
 async def clear_banned_roles(
     callback: CallbackQuery, session_with_commit: AsyncSession
 ):
     dao = ProhibitedRolesDAO(session=session_with_commit)
-    await dao.save_new_prohibited_roles(
-        user_id=callback.from_user.id,
-        roles=None,
-    )
+    await dao.delete(UserTgId(user_tg_id=callback.from_user.id))
     await callback.answer("Теперь для игры доступны все роли!")
     await callback.message.edit_text(
         "Выбери, что конкретно хочешь настроить",
@@ -92,12 +95,13 @@ async def clear_banned_roles(
     )
 
 
-@router.callback_query(F.data == EDIT_BANNED_ROLES_CB)
+@router.callback_query(
+    SettingsFsm.BAN_ROLES, F.data == EDIT_SETTINGS_CB
+)
 async def suggest_roles_to_ban(
     callback: CallbackQuery,
     state: FSMContext,
 ):
-    await state.set_state(SettingsFsm.BAN_ROLES)
     current_number = 0
     available_roles, max_number = get_roles_without_bases(
         number=current_number
@@ -209,9 +213,7 @@ async def switch_pool(
     )
 
 
-@router.callback_query(
-    SettingsFsm.BAN_ROLES, F.data == COMPLETE_TO_BAN_CB
-)
+@router.callback_query(SettingsFsm.BAN_ROLES, F.data == SAVE_CB)
 async def save_prohibited_roles(
     callback: CallbackQuery,
     state: FSMContext,

@@ -57,7 +57,9 @@ class BaseDAO(Generic[T]):
             raise
 
     async def find_all(
-        self, filters: BaseModel | None = None
+        self,
+        filters: BaseModel | None = None,
+        sort_fields: list[str] | None = None,
     ) -> list[T]:
         filter_dict = (
             filters.model_dump(exclude_unset=True) if filters else {}
@@ -67,6 +69,13 @@ class BaseDAO(Generic[T]):
         )
         try:
             query = select(self.model).filter_by(**filter_dict)
+            if sort_fields:
+                query = query.order_by(
+                    *(
+                        getattr(self.model, field)
+                        for field in sort_fields
+                    )
+                )
             result = await self._session.execute(query)
             records = result.scalars().all()
             logger.info(f"Найдено {len(records)} записей.")

@@ -25,13 +25,12 @@ from utils.utils import (
     get_the_most_frequently_encountered_id,
     get_results_of_goal_identification,
     get_results_of_voting,
-    make_build,
 )
 
 from .protocols.protocols import (
     VictimsOfVote,
 )
-from .roles import Lawyer, Mafia, Killer
+from .roles import Mafia, Killer
 from .roles.base import AliasRole, BossIsDeadMixin, Role
 from .roles.base.mixins import ProcedureAfterNight
 
