@@ -14,12 +14,18 @@ async def fill_database_with_roles():
         ]
         session.add_all(groupings)
         await session.flush()
-        all_roles = get_data_with_roles().values()
+        all_roles = get_data_with_roles()
         roles = [
             RoleModel(
-                name=role.role, grouping=role.grouping.value.name
+                name=role.role,
+                key=key,
+                grouping=role.grouping.value.name,
             )
-            for role in all_roles
+            for key, role in all_roles.items()
         ]
         session.add_all(roles)
         await session.commit()
+
+
+if __name__ == "__main__":
+    asyncio.run(fill_database_with_roles())
