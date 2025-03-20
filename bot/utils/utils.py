@@ -12,11 +12,10 @@ from cache.cache_types import GameCache, UserIdInt
 from constants.output import MONEY_SYM
 
 if TYPE_CHECKING:
-    from services.roles.base import Role
-    from services.roles import (
+    from services.game.roles.base import Role
+    from services.game.roles import (
         LivePlayersIds,
         PlayersIds,
-        UserGameCache,
         UsersInGame,
     )
 

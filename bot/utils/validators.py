@@ -9,8 +9,8 @@ from constants.output import NUMBER_OF_NIGHT
 from utils.utils import make_pretty, get_profiles
 
 if TYPE_CHECKING:
-    from services.roles import GameCache, PlayersIds
-    from services.roles.base import Role
+    from services.game.roles import GameCache, PlayersIds
+    from services.game.roles.base import Role
 
 
 def change_role(

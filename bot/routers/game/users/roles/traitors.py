@@ -7,15 +7,11 @@ from constants.output import NUMBER_OF_NIGHT
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
-from services.actions_at_night import (
-    get_game_state_data_and_user_id,
-    trace_all_actions,
-    save_notification_message,
+from services.game.actions_at_night import (
     take_action_and_register_user,
 )
-from services.roles import Mafia, Traitor
+from services.game.roles import Mafia, Traitor
 from states.states import UserFsm
-from utils.tg import delete_message
 from utils.utils import make_pretty
 
 router = Router(name=__name__)

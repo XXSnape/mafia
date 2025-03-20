@@ -3,7 +3,7 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from cache.cache_types import GameCache
-from services.roles import Prosecutor
+from services.game.roles import Prosecutor
 from states.states import GameFsm
 
 router = Router(name=__name__)

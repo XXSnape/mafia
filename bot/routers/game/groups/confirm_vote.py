@@ -10,7 +10,7 @@ from keyboards.inline.callback_factory.recognize_user import (
     ProsAndCons,
 )
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
-from services.roles import PrimeMinister, Prosecutor
+from services.game.roles import PrimeMinister, Prosecutor
 from states.states import GameFsm
 from utils.utils import add_voice
 

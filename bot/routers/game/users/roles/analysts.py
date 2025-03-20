@@ -3,8 +3,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from constants.output import NUMBER_OF_NIGHT
 from keyboards.inline.cb.cb_text import DRAW_CB
-from services.actions_at_night import get_game_state_and_data
-from services.roles import Analyst
+from services.game.actions_at_night import get_game_state_and_data
+from services.game.roles import Analyst
 from states.states import UserFsm
 from utils.tg import delete_message
 

@@ -1,6 +1,6 @@
 from cache.cache_types import GameCache
-from services.roles.base import Role
-from services.roles.base.roles import Groupings
+from general.groupings import Groupings
+from services.game.roles.base import Role
 from utils.utils import get_profiles, make_build
 
 

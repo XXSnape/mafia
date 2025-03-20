@@ -8,13 +8,13 @@ from keyboards.inline.callback_factory.recognize_user import (
 )
 from keyboards.inline.cb.cb_text import PLAYER_BACKS_CB
 from keyboards.inline.keypads.mailing import choose_fake_role_kb
-from services.actions_at_night import (
+from services.game.actions_at_night import (
     get_game_state_data_and_user_id,
     get_game_state_and_data,
     trace_all_actions,
     save_notification_message,
 )
-from services.roles import Forger, Policeman, PolicemanAlias
+from services.game.roles import Forger, Policeman, PolicemanAlias
 from states.states import UserFsm
 from utils.tg import delete_message
 from utils.utils import make_pretty

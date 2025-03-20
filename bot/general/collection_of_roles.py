@@ -2,8 +2,8 @@ import enum
 from typing import overload
 
 from cache.cache_types import RolesLiteral
-from services import roles
-from services.roles.base import Role, ActiveRoleAtNight
+from services.game import roles
+from services.game.roles.base import Role, ActiveRoleAtNight
 
 
 @overload

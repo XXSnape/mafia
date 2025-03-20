@@ -7,7 +7,6 @@ from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from keyboards.inline.cb.cb_text import (
-    DRAW_CB,
     POLICEMAN_KILLS_CB,
     POISONER_POISONS_CB,
     PLAYER_BACKS_CB,
@@ -17,12 +16,11 @@ from keyboards.inline.keypads.mailing import (
     BACK_BTN,
     kill_or_poison_kb,
 )
-from services.actions_at_night import (
+from services.game.actions_at_night import (
     get_game_state_and_data,
     take_action_and_register_user,
 )
-from services.roles import Analyst
-from services.roles.poisoner import Poisoner
+from services.game.roles.poisoner import Poisoner
 from states.states import UserFsm
 from utils.tg import delete_message
 

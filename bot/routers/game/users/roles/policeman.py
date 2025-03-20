@@ -21,14 +21,14 @@ from keyboards.inline.keypads.mailing import (
     kill_or_check_on_policeman,
     send_selection_to_players_kb,
 )
-from services.actions_at_night import (
+from services.game.actions_at_night import (
     take_action_and_register_user,
     get_game_state_and_data,
     get_game_state_data_and_user_id,
     trace_all_actions,
     save_notification_message,
 )
-from services.roles import Policeman
+from services.game.roles import Policeman
 from states.states import UserFsm
 from utils.tg import delete_message
 

@@ -6,8 +6,8 @@ from keyboards.inline.cb.cb_text import (
     WEREWOLF_TO_MAFIA_CB,
     WEREWOLF_TO_POLICEMAN_CB,
 )
-from services.actions_at_night import get_game_state_and_data
-from services.roles import (
+from services.game.actions_at_night import get_game_state_and_data
+from services.game.roles import (
     Werewolf,
     Mafia,
     MafiaAlias,

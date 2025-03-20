@@ -11,6 +11,7 @@ from database.dao.prohibited_roles import (
 )
 from database.schemas.roles import UserTgId
 from general.collection_of_roles import get_data_with_roles
+from general.groupings import Groupings
 from keyboards.inline.cb.cb_text import (
     VIEW_ORDER_OF_ROLES_CB,
     EDIT_SETTINGS_CB,
@@ -24,8 +25,8 @@ from middlewares.db import (
     DatabaseMiddlewareWithCommit,
     DatabaseMiddlewareWithoutCommit,
 )
-from services.roles.base.roles import Groupings
-from services import roles
+
+from services.game import roles
 from states.settings import SettingsFsm
 
 router = Router(name=__name__)

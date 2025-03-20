@@ -1,7 +1,4 @@
-from contextlib import suppress
-
 from aiogram import Dispatcher, Router
-from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from keyboards.inline.callback_factory.recognize_user import (
@@ -11,10 +8,11 @@ from keyboards.inline.callback_factory.recognize_user import (
 from keyboards.inline.keypads.to_bot import (
     participate_in_social_life,
 )
-from services.actions_at_night import get_game_state_data_and_user_id
-from services.roles import Instigator
+from services.game.actions_at_night import (
+    get_game_state_data_and_user_id,
+)
+from services.game.roles import Instigator
 from utils.tg import delete_message
-from utils.utils import get_state_and_assign
 
 router = Router(name=__name__)
 
