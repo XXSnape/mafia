@@ -2,7 +2,6 @@ from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.schemas.roles import UserTgId, ProhibitedRoleSchema
 from keyboards.inline.keypads.settings import (
     edit_roles_kb,
-    select_setting_kb,
     go_to_following_roles_kb,
 )
 from services.settings.base import RouterHelper
@@ -71,6 +70,8 @@ class RoleAttendant(RouterHelper):
     async def view_banned_roles(
         self,
     ):
+        pool_data = await self.state.get_data()
+        await self._delete_last_message(pool_data)
         banned_roles = await self._get_banned_roles()
         if banned_roles:
             message = self._get_banned_roles_text(banned_roles)
@@ -78,6 +79,7 @@ class RoleAttendant(RouterHelper):
             message = make_build(
                 "✅Все роли могут участвовать в игре!"
             )
+        await self.state.clear()
         await self.state.set_state(SettingsFsm.BAN_ROLES)
         await self.callback.message.delete()
         await self.callback.message.answer(
@@ -134,10 +136,7 @@ class RoleAttendant(RouterHelper):
         text = self._get_banned_roles_text(banned_roles)
         msg = await self.poll_answer.bot.send_message(
             chat_id=self.poll_answer.user.id,
-            text=make_build(
-                "❗️Чтобы сохранить изменения, нажмите «Сохранить💾»\n\n"
-            )
-            + text,
+            text=self.REQUIRE_TO_SAVE + text,
         )
         await self.state.update_data({"last_msg_id": msg.message_id})
         current_number += 1

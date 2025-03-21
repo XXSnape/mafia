@@ -1,5 +1,6 @@
 from aiogram import F, Router
 from aiogram.enums import ChatType
+from aiogram.filters import or_f, and_f
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,6 +10,8 @@ from keyboards.inline.cb.cb_text import (
     VIEW_ORDER_OF_ROLES_CB,
     EDIT_SETTINGS_CB,
     SAVE_CB,
+    CLEAR_SETTINGS_CB,
+    CANCEL_CB,
 )
 from middlewares.db import (
     DatabaseMiddlewareWithCommit,
@@ -26,7 +29,12 @@ router.callback_query.middleware(DatabaseMiddlewareWithCommit())
 router.callback_query.middleware(DatabaseMiddlewareWithoutCommit())
 
 
-@router.callback_query(F.data == VIEW_ORDER_OF_ROLES_CB)
+@router.callback_query(
+    or_f(
+        F.data == VIEW_ORDER_OF_ROLES_CB,
+        and_f(SettingsFsm.ORDER_OF_ROLES, F.data == CANCEL_CB),
+    )
+)
 async def view_order_of_roles(
     callback: CallbackQuery,
     state: FSMContext,
@@ -38,6 +46,20 @@ async def view_order_of_roles(
         session=session_without_commit,
     )
     await manager.view_order_of_roles()
+
+
+@router.callback_query(
+    SettingsFsm.ORDER_OF_ROLES, F.data == CLEAR_SETTINGS_CB
+)
+async def clear_order_of_roles(
+    callback: CallbackQuery,
+    state: FSMContext,
+    session_with_commit: AsyncSession,
+):
+    manager = RoleManager(
+        callback=callback, state=state, session=session_with_commit
+    )
+    await manager.clear_order_of_roles()
 
 
 @router.callback_query(

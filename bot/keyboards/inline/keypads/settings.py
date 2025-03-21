@@ -92,7 +92,9 @@ def get_next_role_kb(order_data: OrderOfRolesCache):
                 text=current_role.role, callback_data=role_key
             )
         )
-    buttons.extend([SAVE_BTN, CANCEL_BTN])
+    if len(order_data["selected"]) > 4:
+        buttons.append(SAVE_BTN)
+    buttons.append(CANCEL_BTN)
     return generate_inline_kb(data_with_buttons=buttons)
 
 

@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.schemas.roles import UserTgId
+from utils.utils import make_build
 
 
 @dataclass
@@ -14,6 +15,9 @@ class RouterHelper:
     state: FSMContext | None = None
     session: AsyncSession | None = None
     poll_answer: PollAnswer | None = None
+    REQUIRE_TO_SAVE: str = make_build(
+        "❗️Чтобы сохранить изменения, нажмите «Сохранить💾»\n\n"
+    )
 
     def _get_user_id(self):
         return (

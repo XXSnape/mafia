@@ -1,6 +1,6 @@
 from cache.cache_types import OrderOfRolesCache
 from database.dao.order import OrderOfRolesDAO
-from database.schemas.roles import UserTgId
+from database.schemas.roles import UserTgId, OrderOfRolesSchema
 from general.collection_of_roles import get_data_with_roles
 from general.groupings import Groupings
 from keyboards.inline.keypads.settings import (
@@ -8,16 +8,47 @@ from keyboards.inline.keypads.settings import (
     get_next_role_kb,
 )
 
-from services.game import roles
 from services.settings.base import RouterHelper
 from states.settings import SettingsFsm
+from utils.utils import make_build
 
 
 class RoleManager(RouterHelper):
-    @staticmethod
-    def _get_current_order(selected_roles: list[str]):
+    CURRENT_ORDER_OF_ROLES = make_build(
+        "ℹ️Текущий порядок ролей:\n\n"
+    )
+    BASES_ROLES = [
+        "don",
+        "doctor",
+        "policeman",
+        "civilian",
+    ]
+
+    async def _delete_old_order_of_roles_and_add_new(
+        self, roles: list[str]
+    ):
+        await self.state.set_data({})
+        dao = OrderOfRolesDAO(session=self.session)
+        await dao.delete(
+            UserTgId(user_tg_id=self.callback.from_user.id)
+        )
         all_roles = get_data_with_roles()
-        result = "Текущий порядок ролей:\n\n"
+        order_of_roles = [
+            OrderOfRolesSchema(
+                user_tg_id=self.callback.from_user.id,
+                role=all_roles[role].role,
+                number=number,
+            )
+            for number, role in enumerate(roles, 1)
+        ]
+        await dao.add_many(order_of_roles)
+
+    @classmethod
+    def _get_current_order_text(cls, selected_roles: list[str]):
+        all_roles = get_data_with_roles()
+        result = cls.CURRENT_ORDER_OF_ROLES
+        if len(selected_roles) > 4:
+            result = cls.REQUIRE_TO_SAVE + result
         for index, role in enumerate(selected_roles, 1):
             result += f"{index}) {all_roles[role].role}\n"
         return result
@@ -28,19 +59,14 @@ class RoleManager(RouterHelper):
             UserTgId(user_tg_id=self.callback.from_user.id),
             sort_fields=["number"],
         )
-        text = "Текущий порядок ролей:\n\n"
+        text = self.CURRENT_ORDER_OF_ROLES
         if not order_of_roles:
-            bases = [
-                roles.Mafia(),
-                roles.Doctor(),
-                roles.Policeman(),
-                roles.Civilian(),
-            ]
-            for num, role in enumerate(bases, 1):
-                text += f"{num}) {role.role}\n"
+
+            text = self._get_current_order_text(self.BASES_ROLES)
         else:
             for record in order_of_roles:
                 text += f"{record.number}) {record.role}\n"
+        await self.state.clear()
         await self.state.set_state(SettingsFsm.ORDER_OF_ROLES)
         await self.callback.message.edit_text(
             text=text,
@@ -62,12 +88,7 @@ class RoleManager(RouterHelper):
                     other.append(key)
                 else:
                     attacking.append(key)
-        selected = [
-            "don",
-            "doctor",
-            "policeman",
-            "civilian",
-        ]
+        selected = self.BASES_ROLES.copy()
         order_data: OrderOfRolesCache = {
             "attacking": attacking,
             "other": other,
@@ -77,7 +98,7 @@ class RoleManager(RouterHelper):
         await self.state.set_data(order_data)
         markup = get_next_role_kb(order_data=order_data)
         await self.callback.message.edit_text(
-            text=self._get_current_order(selected),
+            text=self._get_current_order_text(selected),
             reply_markup=markup,
         )
 
@@ -97,35 +118,37 @@ class RoleManager(RouterHelper):
                 "Пока можно выбрать только 30 ролей!",
                 show_alert=True,
             )
-            dao = OrderOfRolesDAO(session=self.session)
-            await dao.save_order_of_roles(
-                user_id=self.callback.from_user.id,
-                roles=order_data["selected"],
+            await self._delete_old_order_of_roles_and_add_new(
+                roles=order_data["selected"]
             )
-            await self.callback.message.edit_text(
-                text=self._get_current_order(order_data["selected"])
-            ),
-            await self.state.clear()
+            await self.view_order_of_roles()
             return
         markup = get_next_role_kb(order_data=order_data)
         await self.state.set_data(order_data)
         await self.callback.message.edit_text(
-            text=self._get_current_order(order_data["selected"]),
+            text=self._get_current_order_text(
+                order_data["selected"]
+            ),
             reply_markup=markup,
         )
 
     async def save_order_of_roles(self):
         order_data: OrderOfRolesCache = await self.state.get_data()
         selected = order_data["selected"]
-        text = self._get_current_order(selected)
-        dao = OrderOfRolesDAO(session=self.session)
-        await dao.save_order_of_roles(
-            user_id=self.callback.from_user.id,
-            roles=order_data["selected"],
+        await self._delete_old_order_of_roles_and_add_new(
+            roles=selected
         )
-        await self.state.clear()
         await self.callback.answer(
-            "Порядок ролей успешно сохранён!", show_alert=True
+            "✅Порядок ролей успешно сохранён!", show_alert=True
         )
-        await self.callback.message.edit_text(text=text)
-        await self.callback.message.answer("/settings - настройки")
+        await self.view_order_of_roles()
+
+    async def clear_order_of_roles(self):
+        dao = OrderOfRolesDAO(session=self.session)
+        await dao.delete(
+            UserTgId(user_tg_id=self.callback.from_user.id)
+        )
+        await self.callback.answer(
+            "✅Порядок ролей сброшен!", show_alert=True
+        )
+        await self.view_order_of_roles()
