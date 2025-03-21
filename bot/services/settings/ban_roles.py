@@ -8,23 +8,17 @@ from keyboards.inline.keypads.settings import (
 from services.settings.base import RouterHelper
 from states.settings import SettingsFsm
 from utils.roles import get_roles_without_bases
+from utils.utils import make_build
 
 
 class RoleAttendant(RouterHelper):
 
-    def _get_user_id(self):
-        return (
-            self.poll_answer.user.id
-            if self.poll_answer
-            else self.callback.from_user.id
-        )
-
-    def _get_bot(self):
-        return (
-            self.poll_answer.bot
-            if self.poll_answer
-            else self.callback.bot
-        )
+    @staticmethod
+    def _get_banned_roles_text(roles: list[str]):
+        result = make_build("🚫Забаненные роли:\n\n")
+        for num, role in enumerate(roles, 1):
+            result += f"{num}) {role}\n"
+        return result
 
     async def _save_new_prohibited_roles(self, roles: list[str]):
         user_id = self._get_user_id()
@@ -49,9 +43,14 @@ class RoleAttendant(RouterHelper):
             else self.callback.bot
         )
         user_id = self._get_user_id()
+        question = make_build("Какие роли хочешь забанить? ")
+        if banned_roles:
+            question += make_build(
+                "Уже выбранные в сообщении выше⏫"
+            )
         poll = await bot.send_poll(
             chat_id=user_id,
-            question="Какие роли хочешь забанить?",
+            question=question,
             options=available_roles,
             allows_multiple_answers=True,
             reply_markup=go_to_following_roles_kb(
@@ -74,13 +73,14 @@ class RoleAttendant(RouterHelper):
     ):
         banned_roles = await self._get_banned_roles()
         if banned_roles:
-            message = "Забаненные роли:\n\n" + "\n".join(
-                banned_roles
-            )
+            message = self._get_banned_roles_text(banned_roles)
         else:
-            message = "Все роли могут участвовать в игре!"
+            message = make_build(
+                "✅Все роли могут участвовать в игре!"
+            )
         await self.state.set_state(SettingsFsm.BAN_ROLES)
-        await self.callback.message.edit_text(
+        await self.callback.message.delete()
+        await self.callback.message.answer(
             text=message,
             reply_markup=edit_roles_kb(
                 are_there_roles=bool(banned_roles)
@@ -93,12 +93,9 @@ class RoleAttendant(RouterHelper):
             UserTgId(user_tg_id=self.callback.from_user.id)
         )
         await self.callback.answer(
-            "Теперь для игры доступны все роли!"
+            "✅Теперь для игры доступны все роли!", show_alert=True
         )
-        await self.callback.message.edit_text(
-            "Выбери, что конкретно хочешь настроить",
-            reply_markup=select_setting_kb(),
-        )
+        await self.view_banned_roles()
 
     async def suggest_roles_to_ban(self):
         current_number = 0
@@ -131,13 +128,16 @@ class RoleAttendant(RouterHelper):
             message_id=pool_data["poll_id"],
         )
         if current_number + 1 > max_number:
-            await self._report_roles_ban(
-                banned_roles=banned_roles,
-            )
+            await self._save_new_prohibited_roles(roles=banned_roles)
+            await self.view_banned_roles()
             return
+        text = self._get_banned_roles_text(banned_roles)
         msg = await self.poll_answer.bot.send_message(
             chat_id=self.poll_answer.user.id,
-            text="Забаненные роли:\n\n" + "\n".join(banned_roles),
+            text=make_build(
+                "❗️Чтобы сохранить изменения, нажмите «Сохранить💾»\n\n"
+            )
+            + text,
         )
         await self.state.update_data({"last_msg_id": msg.message_id})
         current_number += 1
@@ -180,27 +180,8 @@ class RoleAttendant(RouterHelper):
         pool_data = await self.state.get_data()
         await self._delete_last_message(pool_data)
         banned_roles = pool_data["banned_roles"]
-        await self._report_roles_ban(
-            banned_roles=banned_roles,
-        )
+        await self._save_new_prohibited_roles(roles=banned_roles)
         await self.callback.answer(
             "✅Вы успешно забанили роли!", show_alert=True
         )
-        await self.callback.message.delete()
-
-    async def _report_roles_ban(self, banned_roles: list):
-        bot = self._get_bot()
-        user_id = self._get_user_id()
-        await self._save_new_prohibited_roles(
-            roles=banned_roles,
-        )
-        await bot.send_message(
-            chat_id=user_id,
-            text="✅Успешно забаненные роли:\n\n"
-            + "\n".join(banned_roles),
-        )
-        await bot.send_message(
-            chat_id=user_id,
-            text="/settings - настройки",
-        )
-        await self.state.clear()
+        await self.view_banned_roles()

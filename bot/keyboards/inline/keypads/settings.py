@@ -10,6 +10,8 @@ from keyboards.inline.cb.cb_text import (
     EDIT_SETTINGS_CB,
     CLEAR_SETTINGS_CB,
     VIEW_ORDER_OF_ROLES_CB,
+    MENU_CB,
+    ACTIONS_FOR_ROLES_CB,
 )
 
 
@@ -23,6 +25,9 @@ def select_setting_kb():
             text="Забаненные роли🚫",
             callback_data=VIEW_BANNED_ROLES_CB,
         ),
+        InlineKeyboardButton(
+            text="Главное меню✨", callback_data=MENU_CB
+        ),
     ]
     return generate_inline_kb(data_with_buttons=buttons)
 
@@ -30,18 +35,18 @@ def select_setting_kb():
 def edit_roles_kb(are_there_roles: bool):
     buttons = [
         InlineKeyboardButton(
-            text="Редактировать", callback_data=EDIT_SETTINGS_CB
+            text="Редактировать✏️", callback_data=EDIT_SETTINGS_CB
         )
     ]
     if are_there_roles:
         buttons.append(
             InlineKeyboardButton(
-                text="Очистить все",
+                text="Очистить все🗑️",
                 callback_data=CLEAR_SETTINGS_CB,
             )
         )
 
-    buttons.append(CANCEL_BTN)
+    buttons.append(BACK_TO_SELECTING_ACTIONS_FOR_ROLES)
 
     return generate_inline_kb(data_with_buttons=buttons)
 
@@ -91,6 +96,9 @@ def get_next_role_kb(order_data: OrderOfRolesCache):
     return generate_inline_kb(data_with_buttons=buttons)
 
 
+BACK_TO_SELECTING_ACTIONS_FOR_ROLES = InlineKeyboardButton(
+    text="Назад⏪", callback_data=ACTIONS_FOR_ROLES_CB
+)
 CANCEL_BTN = InlineKeyboardButton(
     text="Отменить❌", callback_data=CANCEL_CB
 )

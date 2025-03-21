@@ -1,20 +1,16 @@
 from aiogram import F, Router
 from aiogram.enums import ChatType
-from aiogram.filters import Command, StateFilter
+from aiogram.filters import or_f, and_f
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import default_state
-from aiogram.types import Message, CallbackQuery, PollAnswer
+from aiogram.types import CallbackQuery, PollAnswer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from keyboards.inline.cb.cb_text import (
     VIEW_BANNED_ROLES_CB,
-    CANCEL_CB,
     SAVE_CB,
     EDIT_SETTINGS_CB,
     CLEAR_SETTINGS_CB,
-)
-from keyboards.inline.keypads.settings import (
-    select_setting_kb,
+    CANCEL_CB,
 )
 from middlewares.db import (
     DatabaseMiddlewareWithCommit,
@@ -32,25 +28,12 @@ router.callback_query.middleware(DatabaseMiddlewareWithoutCommit())
 router.poll_answer.middleware(DatabaseMiddlewareWithCommit())
 
 
-@router.callback_query(F.data == CANCEL_CB)
-async def cancel_state(callback: CallbackQuery, state: FSMContext):
-    await state.clear()
-    await callback.message.delete()
-    await callback.message.answer("/settings - настройки")
-
-
-@router.message(Command("settings"), StateFilter(default_state))
-async def handle_settings(
-    message: Message,
-):
-    await message.delete()
-    await message.answer(
-        "Выбери, что конкретно хочешь настроить",
-        reply_markup=select_setting_kb(),
+@router.callback_query(
+    or_f(
+        F.data == VIEW_BANNED_ROLES_CB,
+        and_f(SettingsFsm.BAN_ROLES, F.data == CANCEL_CB),
     )
-
-
-@router.callback_query(F.data == VIEW_BANNED_ROLES_CB)
+)
 async def view_banned_roles(
     callback: CallbackQuery,
     state: FSMContext,
@@ -68,10 +51,12 @@ async def view_banned_roles(
     SettingsFsm.BAN_ROLES, F.data == CLEAR_SETTINGS_CB
 )
 async def clear_banned_roles(
-    callback: CallbackQuery, session_with_commit: AsyncSession
+    callback: CallbackQuery,
+    state: FSMContext,
+    session_with_commit: AsyncSession,
 ):
     attendant = RoleAttendant(
-        callback=callback, session=session_with_commit
+        callback=callback, state=state, session=session_with_commit
     )
     await attendant.clear_banned_roles()
 

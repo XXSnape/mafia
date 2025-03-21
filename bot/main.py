@@ -9,7 +9,11 @@ from general import settings
 from general.log import configure_logging
 from routers.game.users import router as game_users_router
 from routers.game.groups import router as game_groups_router
-from routers.common import ban_router, order_of_roles_router
+from routers.settings import (
+    ban_router,
+    order_of_roles_router,
+    common_router,
+)
 
 
 async def main() -> None:
@@ -29,6 +33,7 @@ async def main() -> None:
         game_users_router,
         ban_router,
         order_of_roles_router,
+        common_router,
     )
     commands = [
         BotCommand(

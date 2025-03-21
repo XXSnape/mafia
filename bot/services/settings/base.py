@@ -15,9 +15,22 @@ class RouterHelper:
     session: AsyncSession | None = None
     poll_answer: PollAnswer | None = None
 
-    async def _get_banned_roles(self):
-        dao = ProhibitedRolesDAO(session=self.session)
-        result = await dao.find_all(
-            UserTgId(user_tg_id=self.callback.from_user.id)
+    def _get_user_id(self):
+        return (
+            self.poll_answer.user.id
+            if self.poll_answer
+            else self.callback.from_user.id
         )
+
+    def _get_bot(self):
+        return (
+            self.poll_answer.bot
+            if self.poll_answer
+            else self.callback.bot
+        )
+
+    async def _get_banned_roles(self):
+        user_id = self._get_user_id()
+        dao = ProhibitedRolesDAO(session=self.session)
+        result = await dao.find_all(UserTgId(user_tg_id=user_id))
         return [record.role for record in result]
