@@ -16,7 +16,7 @@ from keyboards.inline.cb.cb_text import (
 def select_setting_kb():
     buttons = [
         InlineKeyboardButton(
-            text="Порядок ролей",
+            text="Порядок ролей📋",
             callback_data=VIEW_ORDER_OF_ROLES_CB,
         ),
         InlineKeyboardButton(
@@ -92,8 +92,8 @@ def get_next_role_kb(order_data: OrderOfRolesCache):
 
 
 CANCEL_BTN = InlineKeyboardButton(
-    text="Отменить", callback_data=CANCEL_CB
+    text="Отменить❌", callback_data=CANCEL_CB
 )
 SAVE_BTN = InlineKeyboardButton(
-    text="Сохранить", callback_data=SAVE_CB
+    text="Сохранить💾", callback_data=SAVE_CB
 )

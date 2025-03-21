@@ -26,13 +26,6 @@ class RoleAttendant(RouterHelper):
             else self.callback.bot
         )
 
-    async def _get_banned_roles(self):
-        dao = ProhibitedRolesDAO(session=self.session)
-        result = await dao.find_all(
-            UserTgId(user_tg_id=self.callback.from_user.id)
-        )
-        return [record.role for record in result]
-
     async def _save_new_prohibited_roles(self, roles: list[str]):
         user_id = self._get_user_id()
         dao = ProhibitedRolesDAO(session=self.session)
@@ -96,7 +89,9 @@ class RoleAttendant(RouterHelper):
 
     async def clear_banned_roles(self):
         dao = ProhibitedRolesDAO(session=self.session)
-        await dao.delete(UserTgId(user_tg_id=self.callback))
+        await dao.delete(
+            UserTgId(user_tg_id=self.callback.from_user.id)
+        )
         await self.callback.answer(
             "Теперь для игры доступны все роли!"
         )
