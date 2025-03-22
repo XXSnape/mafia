@@ -5,7 +5,6 @@ from aiogram.filters import CommandObject
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from aiogram.utils.payload import decode_payload
-from mypy.state import state
 
 from cache.cache_types import (
     GameCache,
@@ -15,7 +14,9 @@ from cache.cache_types import (
     UsersInGame,
     OwnerCache,
     RolesLiteral,
+    RolesAndUsersMoney,
 )
+from constants.output import MONEY_SYM
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.dao.users import UsersDao
@@ -118,9 +119,6 @@ class Registration(RouterHelper):
         full_name = self.message.from_user.full_name
         game_data: GameCache = await game_state.get_data()
         balance = await self._get_user_balance()
-        user_data: UserCache = {"game_chat": game_chat}
-        await self.state.set_data(user_data)
-        await self.state.set_state(GameFsm.WAIT_FOR_STARTING_GAME)
         user_game_data: UserGameCache = {
             "full_name": full_name,
             "url": get_profile_link(
@@ -138,6 +136,12 @@ class Registration(RouterHelper):
         sent_message = await self._offer_bet(
             game_data=game_data, balance=balance
         )
+        user_data: UserCache = {
+            "game_chat": game_chat,
+            "message_with_offer_id": sent_message.message_id,
+        }
+        await self.state.set_data(user_data)
+        await self.state.set_state(GameFsm.WAIT_FOR_STARTING_GAME)
         game_data["to_delete"].append(
             [user_id, sent_message.message_id]
         )
@@ -175,25 +179,64 @@ class Registration(RouterHelper):
         balance = await self._get_user_balance()
         role_key: RolesLiteral = self.callback.data
         coveted_role = get_data_with_roles(role_key)
+        user_data: UserCache = {"coveted_role": role_key}
+        await self.state.update_data(user_data)
         await self.callback.message.edit_text(
             text=f"Ты выбрал поставить на {coveted_role.role}. Твой баланс: {balance}."
             f"Введи сумму денег или отмени",
             reply_markup=cancel_bet(),
         )
-        user_data: UserCache = {"coveted_role": role_key}
-        await self.state.update_data(user_data)
 
     async def cancel_bet(self):
         user_data: UserCache = await self.state.get_data()
-        _, game_data = await get_game_state_and_data(
+        game_state, game_data = await get_game_state_and_data(
             callback=self.callback,
             state=self.state,
             dispatcher=self.dispatcher,
         )
+        index = None
+        covered_roles = game_data["bids"].get(
+            user_data["coveted_role"], []
+        )
+        for cur_index, (user_id, _) in enumerate(covered_roles):
+            if user_id == self.callback.from_user.id:
+                index = cur_index
+                break
+        del user_data["coveted_role"]
+        if index:
+            covered_roles.pop(index)
+        await self.state.set_data(user_data)
         balance = await self._get_user_balance()
         await self._offer_bet(balance=balance, game_data=game_data)
-        del user_data["coveted_role"]
-        await self.state.set_data(user_data)
+
+    async def set_bet(self):
+        await self.message.delete()
+        rate = int(self.message.text)
+        balance = await self._get_user_balance()
+        if rate > balance:
+            return
+        user_data: UserCache = await self.state.get_data()
+        bot = self._get_bot()
+        user_id = self._get_user_id()
+        game_state = await get_state_and_assign(
+            dispatcher=self.dispatcher,
+            chat_id=user_data["game_chat"],
+            bot_id=bot.id,
+        )
+        game_data: GameCache = await game_state.get_data()
+        bids: RolesAndUsersMoney = game_data["bids"]
+        bids.setdefault(user_data["coveted_role"], []).append(
+            [user_id, rate]
+        )
+        role = get_data_with_roles(user_data["coveted_role"])
+        await bot.edit_message_text(
+            chat_id=user_id,
+            text=make_build(
+                f"Ты успешно поставил {self.message.text}{MONEY_SYM} на роль {role.role}!"
+            ),
+            reply_markup=cancel_bet(),
+            message_id=user_data["message_with_offer_id"],
+        )
 
     async def _init_game(self, message_id: int):
         owner_id = self._get_user_id()
@@ -223,6 +266,7 @@ class Registration(RouterHelper):
             "vote_for": [],
             "tracking": {},
             "text_about_checks": "",
+            "bids": {},
             # 'wait_for': [],
             "number_of_night": 0,
         }

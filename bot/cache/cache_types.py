@@ -105,13 +105,21 @@ class OwnerCache(TypedDict):
     banned_roles: list[RolesLiteral]
 
 
+UserAndMoney = list[int]
+UsersMoney = list[UserAndMoney]
+
+RolesAndUsersMoney = dict[RolesLiteral, UsersMoney]
+
+
 class UserCache(TypedDict, total=False):
     game_chat: int
+    message_with_offer_id: int
     coveted_role: RolesLiteral
 
 
 class GameCache(TypedDict, total=False):
     owner: OwnerCache
+    bids: RolesAndUsersMoney
     game_chat: int
     start_message_id: int
     messages_after_night: MessagesAfterNight

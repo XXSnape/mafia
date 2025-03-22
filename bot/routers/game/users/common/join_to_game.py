@@ -14,6 +14,7 @@ from states.states import GameFsm
 
 router = Router(name=__name__)
 router.message.middleware(DatabaseMiddlewareWithCommit())
+router.message.middleware(DatabaseMiddlewareWithoutCommit())
 router.callback_query.middleware(DatabaseMiddlewareWithoutCommit())
 
 
@@ -64,3 +65,24 @@ async def request_money(
         session=session_without_commit,
     )
     await registration.request_money()
+
+
+@router.message(F.text.regexp(r"[1-9]\d*"))
+async def set_bet(
+    message: Message,
+    state: FSMContext,
+    dispatcher: Dispatcher,
+    session_without_commit: AsyncSession,
+):
+    registration = Registration(
+        message=message,
+        state=state,
+        dispatcher=dispatcher,
+        session=session_without_commit,
+    )
+    await registration.set_bet()
+
+
+@router.message(GameFsm.WAIT_FOR_STARTING_GAME)
+async def delete_erroneous_message(message: Message):
+    await message.delete()
