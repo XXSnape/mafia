@@ -5,7 +5,7 @@ def get_roles_without_bases(number: int):
     all_roles = get_data_with_roles()
     for role in ("don", "doctor", "policeman", "civilian", "mafia"):
         all_roles.pop(role)
-    roles = [role.role for role in all_roles.values()]
+    roles = sorted(role.role for role in all_roles.values())
     len_roles = len(roles)
     delimiter = 10
     for divider in range(10, 0, -1):

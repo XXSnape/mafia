@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from aiogram.types import InlineKeyboardButton
 
 from cache.cache_types import OrderOfRolesCache
@@ -95,6 +97,7 @@ def get_next_role_kb(
                 text=current_role.role, callback_data=role_key
             )
         )
+    buttons.sort(key=attrgetter("text"))
     if len(order_data["selected"]) > 4:
         buttons.extend(
             [
