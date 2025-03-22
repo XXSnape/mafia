@@ -2,6 +2,7 @@ from contextlib import suppress
 
 from aiogram.exceptions import TelegramBadRequest
 
+from cache.cache_types import PollBannedRolesCache
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.schemas.roles import UserTgId, ProhibitedRoleSchema
@@ -12,6 +13,7 @@ from keyboards.inline.keypads.settings import (
 from services.settings.base import RouterHelper
 from states.settings import SettingsFsm
 from utils.roles import get_roles_without_bases
+from utils.tg import delete_message
 from utils.utils import make_build
 
 
@@ -83,19 +85,18 @@ class RoleAttendant(RouterHelper):
             ),
             is_anonymous=False,
         )
-        await self.state.update_data(
-            {
-                "number": current_number,
-                "banned_roles": banned_roles,
-                "poll_id": poll.message_id,
-            }
-        )
+        poll_data: PollBannedRolesCache = {
+            "number": current_number,
+            "banned_roles": banned_roles,
+            "poll_id": poll.message_id,
+        }
+        await self.state.update_data(poll_data)
 
     async def view_banned_roles(
         self,
     ):
-        pool_data = await self.state.get_data()
-        await self._delete_last_message(pool_data)
+        poll_data: PollBannedRolesCache = await self.state.get_data()
+        await self._delete_last_message(poll_data)
         banned_roles = await self._get_banned_roles()
         if banned_roles:
             message = self._get_banned_roles_text(banned_roles)
@@ -105,8 +106,12 @@ class RoleAttendant(RouterHelper):
             )
         await self.state.clear()
         await self.state.set_state(SettingsFsm.BAN_ROLES)
-        await self.callback.message.delete()
-        await self.callback.message.answer(
+        if self.callback:
+            await delete_message(message=self.callback.message)
+        bot = self._get_bot()
+        user_id = self._get_user_id()
+        await bot.send_message(
+            chat_id=user_id,
             text=message,
             reply_markup=edit_roles_kb(
                 are_there_roles=bool(banned_roles)
@@ -137,13 +142,13 @@ class RoleAttendant(RouterHelper):
         )
 
     async def process_banned_roles(self):
-        pool_data = await self.state.get_data()
-        await self._delete_last_message(pool_data)
-        current_number = pool_data["number"]
+        poll_data: PollBannedRolesCache = await self.state.get_data()
+        await self._delete_last_message(poll_data)
+        current_number = poll_data["number"]
         available_roles, max_number = get_roles_without_bases(
             number=current_number
         )
-        banned_roles = pool_data["banned_roles"]
+        banned_roles = poll_data["banned_roles"]
         ids = self.poll_answer.option_ids
         for role_id in ids:
             role_name = available_roles[role_id]
@@ -151,7 +156,7 @@ class RoleAttendant(RouterHelper):
                 banned_roles.append(role_name)
         await self.poll_answer.bot.delete_message(
             chat_id=self.poll_answer.user.id,
-            message_id=pool_data["poll_id"],
+            message_id=poll_data["poll_id"],
         )
         if current_number + 1 > max_number:
             await self._save_new_prohibited_roles(roles=banned_roles)
@@ -175,7 +180,7 @@ class RoleAttendant(RouterHelper):
         )
 
     async def switch_poll(self):
-        poll_data = await self.state.get_data()
+        poll_data: PollBannedRolesCache = await self.state.get_data()
         banned_roles = poll_data["banned_roles"]
         current_number = int(self.callback.data)
         available_roles, max_number = get_roles_without_bases(
@@ -189,8 +194,10 @@ class RoleAttendant(RouterHelper):
             banned_roles=banned_roles,
         )
 
-    async def _delete_last_message(self, pool_data):
-        last_msg_id = pool_data.get("last_msg_id")
+    async def _delete_last_message(
+        self, poll_data: PollBannedRolesCache
+    ):
+        last_msg_id = poll_data.get("last_msg_id")
         if last_msg_id:
             bot = self._get_bot()
             user_id = self._get_user_id()
@@ -201,9 +208,9 @@ class RoleAttendant(RouterHelper):
                 )
 
     async def save_prohibited_roles(self):
-        pool_data = await self.state.get_data()
-        await self._delete_last_message(pool_data)
-        banned_roles = pool_data["banned_roles"]
+        poll_data: PollBannedRolesCache = await self.state.get_data()
+        await self._delete_last_message(poll_data)
+        banned_roles = poll_data["banned_roles"]
         await self._save_new_prohibited_roles(roles=banned_roles)
         await self.callback.answer(
             "✅Вы успешно забанили роли!", show_alert=True

@@ -8,9 +8,11 @@ BASE_DIR = Path(__file__).parent.parent
 
 
 class DBSettings(BaseSettings):
+    echo: bool = True
+
     @property
     def url(self):
-        return "sqlite+aiosqlite:///./db.sqlite3"
+        return r"sqlite+aiosqlite:///D:\Users\КЕКС\PycharmProjects\mafia\db.sqlite3"
 
 
 class Settings(BaseSettings):

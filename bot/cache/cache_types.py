@@ -55,6 +55,15 @@ class OrderOfRolesCache(TypedDict, total=True):
     selected: list[RolesLiteral]
 
 
+class PollBannedRolesCache(TypedDict, total=False):
+    available_roles: list[str]
+    number: int
+    max_number: int
+    banned_roles: list[str]
+    poll_id: int
+    last_msg_id: int
+
+
 class UserGameCache(TypedDict, total=False):
     full_name: str
     url: Url
