@@ -17,10 +17,10 @@ from keyboards.inline.cb.cb_text import (
     POLICEMAN_KILLS_CB,
 )
 from keyboards.inline.keypads.mailing import (
-    BACK_BTN,
     kill_or_check_on_policeman,
     send_selection_to_players_kb,
 )
+from keyboards.inline.buttons.common import BACK_BTN
 from services.game.actions_at_night import (
     take_action_and_register_user,
     get_game_state_and_data,

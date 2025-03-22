@@ -13,9 +13,9 @@ from keyboards.inline.cb.cb_text import (
 )
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
-    BACK_BTN,
     kill_or_poison_kb,
 )
+from keyboards.inline.buttons.common import BACK_BTN
 from services.game.actions_at_night import (
     get_game_state_and_data,
     take_action_and_register_user,

@@ -5,6 +5,7 @@ class GameFsm(StatesGroup):
     REGISTRATION = State()
     STARTED = State()
     VOTE = State()
+    WAIT_FOR_STARTING_GAME = State()
 
 
 class UserFsm(StatesGroup):

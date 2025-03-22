@@ -44,10 +44,14 @@ class RoleManager(RouterHelper):
         await dao.add_many(order_of_roles)
 
     @classmethod
-    def _get_current_order_text(cls, selected_roles: list[str]):
+    def get_current_order_text(
+        cls, selected_roles: list[str], to_save: bool = True
+    ):
         all_roles = get_data_with_roles()
         result = cls.CURRENT_ORDER_OF_ROLES
-        if len(selected_roles) > 4:
+        if not selected_roles:
+            selected_roles = cls.BASES_ROLES
+        if to_save and len(selected_roles) > 4:
             result = cls.REQUIRE_TO_SAVE + result
         for index, role in enumerate(selected_roles, 1):
             result += f"{index}) {all_roles[role].role}\n"
@@ -61,8 +65,7 @@ class RoleManager(RouterHelper):
         )
         text = self.CURRENT_ORDER_OF_ROLES
         if not order_of_roles:
-
-            text = self._get_current_order_text(self.BASES_ROLES)
+            text = self.get_current_order_text(self.BASES_ROLES)
         else:
             for record in order_of_roles:
                 text += f"{record.number}) {record.role}\n"
@@ -98,7 +101,7 @@ class RoleManager(RouterHelper):
         await self.state.set_data(order_data)
         markup = get_next_role_kb(order_data=order_data)
         await self.callback.message.edit_text(
-            text=self._get_current_order_text(selected),
+            text=self.get_current_order_text(selected),
             reply_markup=markup,
         )
 
@@ -126,9 +129,7 @@ class RoleManager(RouterHelper):
         markup = get_next_role_kb(order_data=order_data)
         await self.state.set_data(order_data)
         await self.callback.message.edit_text(
-            text=self._get_current_order_text(
-                order_data["selected"]
-            ),
+            text=self.get_current_order_text(order_data["selected"]),
             reply_markup=markup,
         )
 
@@ -149,9 +150,7 @@ class RoleManager(RouterHelper):
         )
         await self.state.set_data(order_data)
         await self.callback.message.edit_text(
-            text=self._get_current_order_text(
-                order_data["selected"]
-            ),
+            text=self.get_current_order_text(order_data["selected"]),
             reply_markup=markup,
         )
 

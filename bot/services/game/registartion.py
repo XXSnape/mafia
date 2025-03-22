@@ -5,6 +5,7 @@ from aiogram.filters import CommandObject
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from aiogram.utils.payload import decode_payload
+from mypy.state import state
 
 from cache.cache_types import (
     GameCache,
@@ -13,31 +14,42 @@ from cache.cache_types import (
     UserGameCache,
     UsersInGame,
     OwnerCache,
+    RolesLiteral,
 )
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.dao.users import UsersDao
 from database.schemas.roles import UserId, UserTgId
-from keyboards.inline.keypads.join import get_join_kb
+from general.collection_of_roles import get_data_with_roles
+from keyboards.inline.keypads.join import (
+    get_join_kb,
+    offer_to_place_bet,
+    cancel_bet,
+)
 from services.base import RouterHelper
+from services.game.actions_at_night import get_game_state_and_data
 from services.game.pipeline_game import Game
+from services.settings.order_of_roles import RoleManager
 from states.states import GameFsm
 from utils.utils import (
     get_profile_link,
     get_state_and_assign,
     get_profiles_during_registration,
+    make_build,
 )
 
 
 class Registration(RouterHelper):
-    async def _check_user_for_existence(self):
+    async def _get_user_balance(self):
         user_id = self._get_user_id()
         users_dao = UsersDao(session=self.session)
         user = await users_dao.find_one_or_none(
             UserId(tg_id=user_id)
         )
         if user is None:
-            await users_dao.add(UserId(tg_id=user_id))
+            new_user = await users_dao.add(UserId(tg_id=user_id))
+            return new_user.balance
+        return user.balance
 
     async def start_registration(self):
         await self.message.delete()
@@ -54,6 +66,26 @@ class Registration(RouterHelper):
         )
         await self._init_game(message_id=sent_message.message_id)
         await sent_message.pin()
+
+    async def _offer_bet(self, game_data: GameCache, balance: int):
+        to_user_markup = await offer_to_place_bet(
+            banned_roles=game_data["owner"]["banned_roles"]
+        )
+        text = make_build(
+            f"Ты в игре! Удачи! Твой баланс: {balance}. Если хочешь, можешь сделать ставку на разрешенную роль:\n\n"
+        ) + RoleManager.get_current_order_text(
+            selected_roles=game_data["owner"]["order_of_roles"]
+        )
+
+        if self.message:
+            return await self.message.answer(
+                text=text,
+                reply_markup=to_user_markup,
+            )
+        await self.callback.message.edit_text(
+            text=text,
+            reply_markup=to_user_markup,
+        )
 
     async def join_to_game(self, command: CommandObject):
         await self.message.delete()
@@ -85,9 +117,10 @@ class Registration(RouterHelper):
         user_id = self._get_user_id()
         full_name = self.message.from_user.full_name
         game_data: GameCache = await game_state.get_data()
-        await self._check_user_for_existence()
+        balance = await self._get_user_balance()
         user_data: UserCache = {"game_chat": game_chat}
         await self.state.set_data(user_data)
+        await self.state.set_state(GameFsm.WAIT_FOR_STARTING_GAME)
         user_game_data: UserGameCache = {
             "full_name": full_name,
             "url": get_profile_link(
@@ -102,9 +135,14 @@ class Registration(RouterHelper):
         text = get_profiles_during_registration(
             game_data["players_ids"], game_data["players"]
         )
+        sent_message = await self._offer_bet(
+            game_data=game_data, balance=balance
+        )
+        game_data["to_delete"].append(
+            [user_id, sent_message.message_id]
+        )
         await game_state.set_data(game_data)
-        await self.message.answer("Ты в игре! Удачи!")
-        markup = await get_join_kb(
+        to_group_markup = await get_join_kb(
             bot=bot,
             game_chat=game_chat,
             players_ids=game_data["players_ids"],
@@ -113,7 +151,7 @@ class Registration(RouterHelper):
             chat_id=game_chat,
             text=text,
             message_id=game_data["start_message_id"],
-            reply_markup=markup,
+            reply_markup=to_group_markup,
         )
 
     async def finish_registration(self):
@@ -132,6 +170,30 @@ class Registration(RouterHelper):
             dispatcher=self.dispatcher,
         )
         await game.start_game()
+
+    async def request_money(self):
+        balance = await self._get_user_balance()
+        role_key: RolesLiteral = self.callback.data
+        coveted_role = get_data_with_roles(role_key)
+        await self.callback.message.edit_text(
+            text=f"Ты выбрал поставить на {coveted_role.role}. Твой баланс: {balance}."
+            f"Введи сумму денег или отмени",
+            reply_markup=cancel_bet(),
+        )
+        user_data: UserCache = {"coveted_role": role_key}
+        await self.state.update_data(user_data)
+
+    async def cancel_bet(self):
+        user_data: UserCache = await self.state.get_data()
+        _, game_data = await get_game_state_and_data(
+            callback=self.callback,
+            state=self.state,
+            dispatcher=self.dispatcher,
+        )
+        balance = await self._get_user_balance()
+        await self._offer_bet(balance=balance, game_data=game_data)
+        del user_data["coveted_role"]
+        await self.state.set_data(user_data)
 
     async def _init_game(self, message_id: int):
         owner_id = self._get_user_id()

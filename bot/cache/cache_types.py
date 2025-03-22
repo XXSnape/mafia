@@ -105,8 +105,9 @@ class OwnerCache(TypedDict):
     banned_roles: list[RolesLiteral]
 
 
-class UserCache(TypedDict):
+class UserCache(TypedDict, total=False):
     game_chat: int
+    coveted_role: RolesLiteral
 
 
 class GameCache(TypedDict, total=False):

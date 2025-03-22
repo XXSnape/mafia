@@ -5,6 +5,7 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
 
 from cache.cache_types import Poisoned
+from keyboards.inline.buttons.common import BACK_BTN
 
 if TYPE_CHECKING:
     from services.game.roles import UsersInGame, GameCache
@@ -14,7 +15,6 @@ from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from keyboards.inline.cb.cb_text import (
-    PLAYER_BACKS_CB,
     POLICEMAN_CHECKS_CB,
     POLICEMAN_KILLS_CB,
     WEREWOLF_TO_DOCTOR_CB,
@@ -102,8 +102,3 @@ def choose_fake_role_kb(roles: list[tuple[str, str]]):
     ]
     buttons.append(BACK_BTN)
     return generate_inline_kb(data_with_buttons=buttons)
-
-
-BACK_BTN = InlineKeyboardButton(
-    text="Назад⬅️", callback_data=PLAYER_BACKS_CB
-)
