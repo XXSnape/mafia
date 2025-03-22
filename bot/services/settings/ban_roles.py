@@ -1,3 +1,8 @@
+from contextlib import suppress
+
+from aiogram.exceptions import TelegramBadRequest
+
+from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.schemas.roles import UserTgId, ProhibitedRoleSchema
 from keyboards.inline.keypads.settings import (
@@ -21,13 +26,32 @@ class RoleAttendant(RouterHelper):
 
     async def _save_new_prohibited_roles(self, roles: list[str]):
         user_id = self._get_user_id()
-        dao = ProhibitedRolesDAO(session=self.session)
-        await dao.delete(UserTgId(user_tg_id=user_id))
+        bot = self._get_bot()
+        prohibited_dao = ProhibitedRolesDAO(session=self.session)
+        await prohibited_dao.delete(UserTgId(user_tg_id=user_id))
         prohibited_roles = [
             ProhibitedRoleSchema(user_tg_id=user_id, role=role)
             for role in roles
         ]
-        await dao.add_many(prohibited_roles)
+        await prohibited_dao.add_many(prohibited_roles)
+        order_of_roles_dao = OrderOfRolesDAO(session=self.session)
+        used_roles = set(
+            record.role
+            for record in await order_of_roles_dao.find_all(
+                UserTgId(user_tg_id=user_id)
+            )
+        )
+        if used_roles - set(roles) != used_roles:
+            await order_of_roles_dao.delete(
+                UserTgId(user_tg_id=user_id)
+            )
+            await bot.send_message(
+                chat_id=user_id,
+                text=make_build(
+                    "❗️❗️❗️ВНИМАНИЕ! ЗАБАНЕННЫЕ РОЛИ ЕСТЬ В СПИСКЕ С ПОРЯДКОМ РОЛЕЙ. "
+                    "Порядок ролей очищен, исправь это при необходимости"
+                ),
+            )
 
     async def _send_poll_and_save_data(
         self,
@@ -170,10 +194,11 @@ class RoleAttendant(RouterHelper):
         if last_msg_id:
             bot = self._get_bot()
             user_id = self._get_user_id()
-            await bot.delete_message(
-                chat_id=user_id,
-                message_id=last_msg_id,
-            )
+            with suppress(TelegramBadRequest):
+                await bot.delete_message(
+                    chat_id=user_id,
+                    message_id=last_msg_id,
+                )
 
     async def save_prohibited_roles(self):
         pool_data = await self.state.get_data()
