@@ -74,14 +74,12 @@ class Executor:
         message: Message,
         state: FSMContext,
         dispatcher: Dispatcher,
-        scheduler: AsyncIOScheduler,
         mailer: MailerToPlayers,
     ):
 
         self.message = message
         self.state = state
         self.dispatcher = dispatcher
-        self.scheduler = scheduler
         self.bot = message.bot
         self.group_chat_id = self.message.chat.id
         self.mailer = mailer

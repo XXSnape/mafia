@@ -10,6 +10,8 @@ from sqlalchemy import (
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.common.base import BaseModel as Base
+from database.models import RoleModel
+from database.schemas.roles import UserTgId
 
 T = TypeVar("T", bound=Base)
 
@@ -23,6 +25,9 @@ class BaseDAO(Generic[T]):
             raise ValueError(
                 "Модель должна быть указана в дочернем классе"
             )
+
+    def _get_sorting_attrs(self, sort_fields: list[str]):
+        return (getattr(self.model, field) for field in sort_fields)
 
     async def find_one_or_none_by_id(self, data_id: int) -> T | None:
         try:
@@ -71,10 +76,7 @@ class BaseDAO(Generic[T]):
             query = select(self.model).filter_by(**filter_dict)
             if sort_fields:
                 query = query.order_by(
-                    *(
-                        getattr(self.model, field)
-                        for field in sort_fields
-                    )
+                    *self._get_sorting_attrs(sort_fields=sort_fields)
                 )
             result = await self._session.execute(query)
             records = result.scalars().all()

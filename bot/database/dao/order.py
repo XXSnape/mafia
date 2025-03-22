@@ -1,23 +1,22 @@
+from sqlalchemy import select
+
 from database.dao.base import BaseDAO
-from database.models import OrderModel
-from database.schemas.roles import UserTgId, OrderOfRolesSchema
-from general.collection_of_roles import get_data_with_roles
+from database.models import OrderModel, RoleModel
+from database.schemas.roles import UserTgId
 
 
 class OrderOfRolesDAO(BaseDAO[OrderModel]):
     model = OrderModel
 
-    async def save_order_of_roles(
-        self, user_id: int, roles: list[str]
+    async def get_key_of_order_of_roles(
+        self,
+        user_filter: UserTgId,
     ):
-        await self.delete(UserTgId(user_tg_id=user_id))
-        all_roles = get_data_with_roles()
-        order_of_roles = [
-            OrderOfRolesSchema(
-                user_tg_id=user_id,
-                role=all_roles[role].role,
-                number=number,
-            )
-            for number, role in enumerate(roles, 1)
-        ]
-        await self.add_many(order_of_roles)
+        query = (
+            select(RoleModel.key)
+            .select_from(self.model)
+            .join(RoleModel)
+            .filter(self.model.user_tg_id == user_filter.user_tg_id)
+            .order_by(self.model.number)
+        )
+        return (await self._session.scalars(query)).all()

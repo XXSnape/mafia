@@ -100,7 +100,7 @@ VotedFor: TypeAlias = list[list[UserIdInt]]
 
 class OwnerCache(TypedDict):
     user_id: int
-    fullname: str
+    full_name: str
     order_of_roles: list[RolesLiteral]
     banned_roles: list[RolesLiteral]
 

@@ -30,13 +30,11 @@ class Game:
         message: Message,
         state: FSMContext,
         dispatcher: Dispatcher,
-        scheduler: AsyncIOScheduler,
     ):
 
         self.message = message
         self.state = state
         self.dispatcher = dispatcher
-        self.scheduler = scheduler
         self.bot = message.bot
         self.group_chat_id = self.message.chat.id
         self.mailer = MailerToPlayers(
@@ -50,7 +48,6 @@ class Game:
             message=message,
             state=state,
             dispatcher=dispatcher,
-            scheduler=scheduler,
             mailer=self.mailer,
         )
 

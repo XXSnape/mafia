@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from aiogram import Dispatcher
 from aiogram.filters import CommandObject
 from aiogram.fsm.context import FSMContext
@@ -10,17 +12,20 @@ from cache.cache_types import (
     UserCache,
     UserGameCache,
     UsersInGame,
+    OwnerCache,
 )
+from database.dao.order import OrderOfRolesDAO
+from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.dao.users import UsersDao
-from database.schemas.roles import UserId
+from database.schemas.roles import UserId, UserTgId
 from keyboards.inline.keypads.join import get_join_kb
 from services.base import RouterHelper
+from services.game.pipeline_game import Game
 from states.states import GameFsm
 from utils.utils import (
     get_profile_link,
     get_state_and_assign,
     get_profiles_during_registration,
-    make_build,
 )
 
 
@@ -111,19 +116,47 @@ class Registration(RouterHelper):
             reply_markup=markup,
         )
 
+    async def finish_registration(self):
+        game_data: GameCache = await self.state.get_data()
+        user_id = self._get_user_id()
+        if game_data["owner"]["user_id"] != user_id:
+            full_name = game_data["owner"]["full_name"]
+            await self.callback.answer(
+                f"Пожалуйста, попроси {full_name} начать игру!",
+                show_alert=True,
+            )
+            return
+        game = Game(
+            message=self.callback.message,
+            state=self.state,
+            dispatcher=self.dispatcher,
+        )
+        await game.start_game()
+
     async def _init_game(self, message_id: int):
+        owner_id = self._get_user_id()
+        banned_roles = await ProhibitedRolesDAO(
+            session=self.session
+        ).get_key_of_banned_roles(UserTgId(user_tg_id=owner_id))
+        order_of_roles = await OrderOfRolesDAO(
+            session=self.session
+        ).get_key_of_order_of_roles(UserTgId(user_tg_id=owner_id))
+        owner_data: OwnerCache = {
+            "user_id": owner_id,
+            "full_name": self.message.from_user.full_name,
+            "order_of_roles": order_of_roles,
+            "banned_roles": banned_roles,
+        }
+        pprint(owner_data)
         game_data: GameCache = {
             "game_chat": self.message.chat.id,
-            # "owner": self.message.from_user.id,
+            "owner": owner_data,
             "pros": [],
             "cons": [],
             "start_message_id": message_id,
             "players_ids": [],
             "players": {},
             "messages_after_night": [],
-            "forged_roles": [],
-            "winners": [],
-            "losers": [],
             "to_delete": [],
             "vote_for": [],
             "tracking": {},
@@ -133,35 +166,3 @@ class Registration(RouterHelper):
         }
         await self.state.set_data(game_data)
         await self.state.set_state(GameFsm.REGISTRATION)
-
-
-async def add_user_to_game(
-    dispatcher: Dispatcher,
-    tg_obj: CallbackQuery | Message,
-    state: FSMContext,
-) -> tuple[LivePlayersIds, UsersInGame]:
-    if isinstance(tg_obj, CallbackQuery):
-        chat_id = tg_obj.message.chat.id
-    else:
-        chat_id = tg_obj.chat.id
-    user_state: FSMContext = await get_state_and_assign(
-        dispatcher=dispatcher,
-        chat_id=tg_obj.from_user.id,
-        bot_id=tg_obj.bot.id,
-    )
-    user_data: UserCache = {"game_chat": chat_id}
-    await user_state.update_data(user_data)
-    game_data: GameCache = await state.get_data()
-    user_game_data: UserGameCache = {
-        "full_name": tg_obj.from_user.full_name,
-        "url": get_profile_link(
-            user_id=tg_obj.from_user.id,
-            full_name=tg_obj.from_user.full_name,
-        ),
-        "money": 0,
-        "achievements": [],
-    }
-    game_data["players_ids"].append(tg_obj.from_user.id)
-    game_data["players"][str(tg_obj.from_user.id)] = user_game_data
-    await state.set_data(game_data)
-    return game_data["players_ids"], game_data["players"]
