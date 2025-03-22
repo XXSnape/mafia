@@ -12,6 +12,7 @@ from keyboards.inline.cb.cb_text import (
     SAVE_CB,
     CLEAR_SETTINGS_CB,
     CANCEL_CB,
+    DELETE_LATEST_ROLE_IN_ORDER_CB,
 )
 from middlewares.db import (
     DatabaseMiddlewareWithCommit,
@@ -91,6 +92,18 @@ async def add_new_role_to_queue(
         callback=callback, state=state, session=session_with_commit
     )
     await manager.add_new_role_to_queue()
+
+
+@router.callback_query(
+    SettingsFsm.ORDER_OF_ROLES,
+    F.data == DELETE_LATEST_ROLE_IN_ORDER_CB,
+)
+async def pop_latest_role_in_order(
+    callback: CallbackQuery,
+    state: FSMContext,
+):
+    manager = RoleManager(callback=callback, state=state)
+    await manager.pop_latest_role_in_order()
 
 
 @router.callback_query(SettingsFsm.ORDER_OF_ROLES, F.data == SAVE_CB)

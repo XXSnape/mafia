@@ -132,6 +132,29 @@ class RoleManager(RouterHelper):
             reply_markup=markup,
         )
 
+    async def pop_latest_role_in_order(self):
+        order_data: OrderOfRolesCache = await self.state.get_data()
+        selected = order_data["selected"]
+        latest_role_key = selected.pop()
+        role = get_data_with_roles(latest_role_key)
+        key = (
+            "attacking"
+            if role.grouping == Groupings.criminals
+            else "other"
+        )
+        if latest_role_key not in order_data[key]:
+            order_data[key].append(latest_role_key)
+        markup = get_next_role_kb(
+            order_data=order_data, automatic_attacking=False
+        )
+        await self.state.set_data(order_data)
+        await self.callback.message.edit_text(
+            text=self._get_current_order_text(
+                order_data["selected"]
+            ),
+            reply_markup=markup,
+        )
+
     async def save_order_of_roles(self):
         order_data: OrderOfRolesCache = await self.state.get_data()
         selected = order_data["selected"]

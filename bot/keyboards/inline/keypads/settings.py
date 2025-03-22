@@ -12,6 +12,7 @@ from keyboards.inline.cb.cb_text import (
     VIEW_ORDER_OF_ROLES_CB,
     MENU_CB,
     ACTIONS_FOR_ROLES_CB,
+    DELETE_LATEST_ROLE_IN_ORDER_CB,
 )
 
 
@@ -75,11 +76,13 @@ def go_to_following_roles_kb(
     return generate_inline_kb(data_with_buttons=buttons)
 
 
-def get_next_role_kb(order_data: OrderOfRolesCache):
+def get_next_role_kb(
+    order_data: OrderOfRolesCache, automatic_attacking: bool = True
+):
     all_roles = get_data_with_roles()
     buttons = []
     if (len(order_data["selected"]) + 1) % 4 == 0:
-        if len(order_data["attacking"]) == 1:
+        if automatic_attacking and len(order_data["attacking"]) == 1:
             order_data["selected"].append("mafia")
             return get_next_role_kb(order_data)
         key = "attacking"
@@ -93,7 +96,15 @@ def get_next_role_kb(order_data: OrderOfRolesCache):
             )
         )
     if len(order_data["selected"]) > 4:
-        buttons.append(SAVE_BTN)
+        buttons.extend(
+            [
+                InlineKeyboardButton(
+                    text="Убрать последний🗑️",
+                    callback_data=DELETE_LATEST_ROLE_IN_ORDER_CB,
+                ),
+                SAVE_BTN,
+            ]
+        )
     buttons.append(CANCEL_BTN)
     return generate_inline_kb(data_with_buttons=buttons)
 
