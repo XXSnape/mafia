@@ -40,6 +40,8 @@ def get_profiles(
     money_need: bool = False,
 ) -> str:
     result = ""
+    if not players_ids:
+        return "Пока нет участников!"
 
     for (
         index,

@@ -3,8 +3,7 @@ import asyncio
 from database.common.sessions import async_session_maker
 from database.models import GroupingModel, RoleModel
 from general.collection_of_roles import get_data_with_roles
-
-Groupings
+from general.groupings import Groupings
 
 
 async def fill_database_with_roles():

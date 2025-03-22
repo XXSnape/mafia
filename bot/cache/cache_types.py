@@ -98,13 +98,21 @@ DisclosedRoles = list[list[UserIdStr, RoleName]]
 VotedFor: TypeAlias = list[list[UserIdInt]]
 
 
+class OwnerCache(TypedDict):
+    user_id: int
+    fullname: str
+    order_of_roles: list[RolesLiteral]
+    banned_roles: list[RolesLiteral]
+
+
 class UserCache(TypedDict):
     game_chat: int
 
 
 class GameCache(TypedDict, total=False):
-    owner: int
+    owner: OwnerCache
     game_chat: int
+    start_message_id: int
     messages_after_night: MessagesAfterNight
     disclosed_roles: DisclosedRoles
     pros: PlayersIds

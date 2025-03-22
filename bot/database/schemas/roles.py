@@ -1,6 +1,10 @@
 from pydantic import BaseModel
 
 
+class UserId(BaseModel):
+    tg_id: int
+
+
 class UserTgId(BaseModel):
     user_tg_id: int
 

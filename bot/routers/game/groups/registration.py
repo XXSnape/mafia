@@ -11,7 +11,10 @@ from keyboards.inline.cb.cb_text import (
 )
 from keyboards.inline.keypads.join import get_join_kb
 from services.game.pipeline_game import Game
-from services.game.registartion import add_user_to_game, init_game
+from services.game.registartion import (
+    add_user_to_game,
+    Registration,
+)
 from states.states import GameFsm
 from utils.utils import get_profiles_during_registration
 
@@ -25,16 +28,21 @@ async def start_registration(
     scheduler: AsyncIOScheduler,
     dispatcher: Dispatcher,
 ):
-    await message.delete()
-    await init_game(state=state, message=message)
-    live_players, players = await add_user_to_game(
-        dispatcher=dispatcher, tg_obj=message, state=state
+    registration = Registration(
+        message=message,
+        state=state,
     )
-    sent_message = await message.answer(
-        get_profiles_during_registration(live_players, players),
-        reply_markup=get_join_kb(),
-    )
-    await sent_message.pin()
+    await registration.start_registration()
+    # await message.delete()
+    # await init_game(state=state, message=message)
+    # live_players, players = await add_user_to_game(
+    #     dispatcher=dispatcher, tg_obj=message, state=state
+    # )
+    # sent_message = await message.answer(
+    #     get_profiles_during_registration(live_players, players),
+    #     reply_markup=get_join_kb(),
+    # )
+    # await sent_message.pin()
     # scheduler.add_job(
     #     start_game_by_timer,
     #     "date",
@@ -48,27 +56,27 @@ async def start_registration(
     # )
 
 
-@router.callback_query(GameFsm.REGISTRATION, F.data == JOIN_CB)
-async def join_new_member(
-    callback: CallbackQuery,
-    state: FSMContext,
-    dispatcher: Dispatcher,
-):
-    game_cache: GameCache = await state.get_data()
-    ids: list[int] = game_cache["players_ids"]
-    if callback.from_user.id in ids:
-        await callback.answer(
-            "Ты уже успешно зарегистрировался!", show_alert=True
-        )
-        return
-    live_players, players = await add_user_to_game(
-        dispatcher=dispatcher, tg_obj=callback, state=state
-    )
-    await callback.answer("Ты в игре! Удачи!", show_alert=True)
-    await callback.message.edit_text(
-        text=get_profiles_during_registration(live_players, players),
-        reply_markup=get_join_kb(),
-    )
+# @router.callback_query(GameFsm.REGISTRATION, F.data == JOIN_CB)
+# async def join_new_member(
+#     callback: CallbackQuery,
+#     state: FSMContext,
+#     dispatcher: Dispatcher,
+# ):
+#     game_cache: GameCache = await state.get_data()
+#     ids: list[int] = game_cache["players_ids"]
+#     if callback.from_user.id in ids:
+#         await callback.answer(
+#             "Ты уже успешно зарегистрировался!", show_alert=True
+#         )
+#         return
+#     live_players, players = await add_user_to_game(
+#         dispatcher=dispatcher, tg_obj=callback, state=state
+#     )
+#     await callback.answer("Ты в игре! Удачи!", show_alert=True)
+#     await callback.message.edit_text(
+#         text=get_profiles_during_registration(live_players, players),
+#         reply_markup=get_join_kb(),
+#     )
 
 
 @router.callback_query(

@@ -8,7 +8,7 @@ from keyboards.inline.keypads.settings import (
     get_next_role_kb,
 )
 
-from services.settings.base import RouterHelper
+from services.base import RouterHelper
 from states.settings import SettingsFsm
 from utils.utils import make_build
 

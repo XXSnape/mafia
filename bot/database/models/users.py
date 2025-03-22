@@ -11,7 +11,9 @@ class UserModel(BaseModel):
     tg_id: Mapped[int] = mapped_column(
         primary_key=True, autoincrement=False
     )
-    balance: Mapped[int]
+    balance: Mapped[int] = mapped_column(
+        default=0, server_default="0"
+    )
     registration_date: Mapped[datetime] = mapped_column(
         server_default=func.now()
     )
