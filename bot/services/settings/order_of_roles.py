@@ -1,7 +1,10 @@
 from cache.cache_types import OrderOfRolesCache
 from database.dao.order import OrderOfRolesDAO
 from database.schemas.roles import UserTgId, OrderOfRolesSchema
-from general.collection_of_roles import get_data_with_roles
+from general.collection_of_roles import (
+    get_data_with_roles,
+    BASES_ROLES,
+)
 from general.groupings import Groupings
 from keyboards.inline.keypads.settings import (
     edit_roles_kb,
@@ -17,12 +20,6 @@ class RoleManager(RouterHelper):
     CURRENT_ORDER_OF_ROLES = make_build(
         "ℹ️Текущий порядок ролей:\n\n"
     )
-    BASES_ROLES = [
-        "don",
-        "doctor",
-        "policeman",
-        "civilian",
-    ]
 
     async def _delete_old_order_of_roles_and_add_new(
         self, roles: list[str]
@@ -50,7 +47,7 @@ class RoleManager(RouterHelper):
         all_roles = get_data_with_roles()
         result = cls.CURRENT_ORDER_OF_ROLES
         if not selected_roles:
-            selected_roles = cls.BASES_ROLES
+            selected_roles = BASES_ROLES
         if to_save and len(selected_roles) > 4:
             result = cls.REQUIRE_TO_SAVE + result
         for index, role in enumerate(selected_roles, 1):
@@ -65,7 +62,7 @@ class RoleManager(RouterHelper):
         )
         text = self.CURRENT_ORDER_OF_ROLES
         if not order_of_roles:
-            text = self.get_current_order_text(self.BASES_ROLES)
+            text = self.get_current_order_text(BASES_ROLES)
         else:
             for record in order_of_roles:
                 text += f"{record.number}) {record.role}\n"
@@ -91,7 +88,7 @@ class RoleManager(RouterHelper):
                     other.append(key)
                 else:
                     attacking.append(key)
-        selected = self.BASES_ROLES.copy()
+        selected = BASES_ROLES.copy()
         order_data: OrderOfRolesCache = {
             "attacking": attacking,
             "other": other,

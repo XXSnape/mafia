@@ -53,6 +53,14 @@ def get_data_with_roles(
     return all_roles
 
 
+BASES_ROLES = [
+    "don",
+    "doctor",
+    "policeman",
+    "civilian",
+]
+
+
 class Roles(enum.Enum):
     don = roles.Mafia()
     forger = roles.Forger()

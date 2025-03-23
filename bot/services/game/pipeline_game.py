@@ -1,14 +1,23 @@
 import asyncio
-from random import shuffle
+from operator import itemgetter
+from pprint import pprint
+from random import shuffle, choice
 
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from cache.cache_types import GameCache, UserGameCache
+from cache.cache_types import (
+    GameCache,
+    UserGameCache,
+    RolesLiteral,
+    UserIdInt,
+    UserAndMoney,
+)
 from constants.output import MONEY_SYM
 from general.collection_of_roles import Roles, get_data_with_roles
 from general.exceptions import GameIsOver
+from general.groupings import Groupings
 
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
 from services.game.mailing import MailerToPlayers
@@ -142,8 +151,8 @@ class Game:
         await self.executor.clear_data_after_all_actions()
 
     async def give_out_rewards(self, e: GameIsOver):
-        def sorting_winners_by_money(user_id: str):
-            return game_data["players"][user_id]["money"]
+        # def sorting_winners_by_money(user_id: str):
+        #     return game_data["players"][user_id]["money"]
 
         game_data: GameCache = await self.state.get_data()
         result = make_build(
@@ -163,7 +172,9 @@ class Game:
                 winners.append(user_id)
             else:
                 losers.append(user_id)
-        winners.sort(key=sorting_winners_by_money, reverse=True)
+        winners.sort(
+            key=itemgetter("players", user_id, "money"), reverse=True
+        )
         winners = make_build("🔥Победители:\n") + get_profiles(
             players_ids=winners,
             players=game_data["players"],
@@ -229,9 +240,8 @@ class Game:
         )
         await state.clear()
 
-    def initialization_by_role(
-        self, game_data: GameCache, role: Role
-    ):
+    @staticmethod
+    def initialization_by_role(game_data: GameCache, role: Role):
         if (
             role.is_alias is False
             and role.roles_key not in game_data
@@ -247,23 +257,114 @@ class Game:
                 for extra in role.extra_data:
                     game_data[extra.key] = extra.data_type()
 
+    @staticmethod
+    def check_bids(game_data: GameCache):
+        role_and_winner_with_money: dict[
+            RolesLiteral, UserAndMoney
+        ] = {}
+        bids = game_data["bids"]
+        losers: list[UserIdInt] = []
+        for role, rates in bids.items():
+            rates.sort(key=itemgetter(1), reverse=True)
+            if len(rates) == 1:
+                role_and_winner_with_money[role] = [
+                    rates[0][0],
+                    rates[0][1],
+                ]
+            elif rates[0][1] == rates[1][1]:
+                for user_id, _ in rates:
+                    losers.append(user_id)
+            else:
+                role_and_winner_with_money[role] = [
+                    rates[0][0],
+                    rates[0][1],
+                ]
+                for user_id, _ in rates[1:]:
+                    losers.append(user_id)
+        sorted_role_and_winner = {}
+        for role, winner in sorted(
+            role_and_winner_with_money.items(),
+            key=itemgetter(1, 1),
+            reverse=True,
+        ):
+            sorted_role_and_winner[role] = winner
+        return sorted_role_and_winner, losers
+
     async def select_roles(self):
         game_data: GameCache = await self.state.get_data()
-        ids = game_data["players_ids"][:]
-        shuffle(ids)
-        roles_tpl = tuple(Roles)
-        for user_id, role in zip(ids, roles_tpl):
-            current_role: Role = role.value
+        banned_roles = game_data["owner"]["banned_roles"]
+        order_of_roles = game_data["owner"]["order_of_roles"]
+        all_roles = get_data_with_roles()
+        criminals: list[RolesLiteral] = []
+        other: list[RolesLiteral] = []
+        players_ids = game_data["players_ids"]
+        number_of_players = len(players_ids)
+        for key, role in all_roles.items():
+            if key in banned_roles:
+                continue
+            if role.grouping == Groupings.criminals:
+                role_type = criminals
+            else:
+                role_type = other
+            if role not in order_of_roles:
+                role_type.append(role)
+            elif get_data_with_roles(role).there_may_be_several:
+                role_type.append(role)
+        role_and_winner, not_winners = self.check_bids(game_data)
+        winning_roles = list(
+            role
+            for role in role_and_winner.keys()
+            if role not in order_of_roles
+        )
+        while len(order_of_roles) != number_of_players:
+            if len(order_of_roles) % 4 == 0:
+                role_type = criminals
+            else:
+                role_type = other
+            role = None
+            for winning_role in winning_roles:
+                if winning_role in role_type:
+                    role = winning_role
+            if role:
+                winning_roles.remove(role)
+            else:
+                role = choice(role_type)
+            order_of_roles.append(role)
+            if (
+                get_data_with_roles(role).there_may_be_several
+                is False
+            ):
+                role_type.remove(role)
+        winners = set()
+        for role, winner in role_and_winner.items():
+            if role not in order_of_roles:
+                not_winners.append(winner[0])
+            else:
+                winners.add(winner[0])
+        print(f"{players_ids=}")
+        print(f"{not_winners=}")
+        print(f"{winners}")
+        not_winners.extend(
+            set(players_ids) - (set(not_winners) | winners)
+        )
+        for role_key in order_of_roles[:number_of_players]:
+            winner = role_and_winner.get(role_key)
+            if winner is None:
+                winner_id = choice(not_winners)
+                not_winners.remove(winner_id)
+            else:
+                winner_id = winner[0]
+            current_role = get_data_with_roles(role_key)
             self.initialization_by_role(game_data, role=current_role)
             roles = game_data[current_role.roles_key]
             user_data: UserGameCache = {
                 "role": current_role.role,
                 "pretty_role": make_pretty(current_role.role),
                 "initial_role": make_pretty(current_role.role),
-                "enum_name": role.name,
+                "enum_name": role_key,
                 "roles_key": current_role.roles_key,
-                "user_id": user_id,
+                "user_id": winner_id,
             }
-            game_data["players"][str(user_id)].update(user_data)
-            roles.append(user_id)
+            game_data["players"][str(winner_id)].update(user_data)
+            roles.append(winner_id)
         await self.state.set_data(game_data)

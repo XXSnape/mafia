@@ -27,7 +27,7 @@ async def get_join_kb(
             ),
         )
     )
-    if len(players_ids) >= 4:
+    if len(players_ids) >= 1:  # TODO 4
         builder.add(
             types.InlineKeyboardButton(
                 text="Начать игру",

@@ -1,5 +1,7 @@
 import asyncio
 from collections import defaultdict
+from pprint import pprint
+from traceback import print_tb
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
@@ -9,7 +11,7 @@ from cache.cache_types import (
     UserGameCache,
     UsersInGame,
 )
-from general.collection_of_roles import Roles
+from general.collection_of_roles import Roles, get_data_with_roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserVoteIndexCbData,
 )
@@ -136,28 +138,30 @@ class MailerToPlayers:
     async def familiarize_players(self, game_data: GameCache):
         for user_id, player_data in game_data["players"].items():
             player_data: UserGameCache
-            current_role = Roles[player_data["enum_name"]].value
+            current_role = get_data_with_roles(
+                player_data["enum_name"]
+            )
             if current_role.is_alias:
                 continue
-            roles = game_data[current_role.roles_key]
+            persons = game_data[current_role.roles_key]
             await self.bot.send_photo(
-                chat_id=roles[0],
+                chat_id=persons[0],
                 photo=current_role.photo,
                 caption=f"Твоя роль - "
                 f"{make_pretty(current_role.role)}! "
                 f"{current_role.purpose}",
             )
-            if current_role.alias and len(roles) > 1:
+            if current_role.alias and len(persons) > 1:
                 profiles = get_profiles(
-                    players_ids=roles,
+                    players_ids=persons,
                     players=game_data["players"],
                     role=True,
                 )
                 await self.bot.send_message(
-                    chat_id=roles[0],
+                    chat_id=persons[0],
                     text="Твои союзники!\n\n" + profiles,
                 )
-                for user_id in roles[1:]:
+                for user_id in persons[1:]:
                     await self.bot.send_photo(
                         chat_id=user_id,
                         photo=current_role.alias.photo,
@@ -169,12 +173,11 @@ class MailerToPlayers:
                         chat_id=user_id,
                         text="Твои союзники!\n\n" + profiles,
                     )
-                    if (
-                        current_role.alias.state_for_waiting_for_action
-                    ):
-                        await get_state_and_assign(
-                            dispatcher=self.dispatcher,
-                            chat_id=user_id,
-                            bot_id=self.bot.id,
-                            new_state=current_role.alias.state_for_waiting_for_action,
-                        )
+            if current_role.state_for_waiting_for_action:
+                for person_id in persons:
+                    await get_state_and_assign(
+                        dispatcher=self.dispatcher,
+                        chat_id=person_id,
+                        bot_id=self.bot.id,
+                        new_state=current_role.state_for_waiting_for_action,
+                    )

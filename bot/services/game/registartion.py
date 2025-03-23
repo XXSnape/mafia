@@ -21,7 +21,10 @@ from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.dao.users import UsersDao
 from database.schemas.roles import UserId, UserTgId
-from general.collection_of_roles import get_data_with_roles
+from general.collection_of_roles import (
+    get_data_with_roles,
+    BASES_ROLES,
+)
 from keyboards.inline.keypads.join import (
     get_join_kb,
     offer_to_place_bet,
@@ -229,6 +232,7 @@ class Registration(RouterHelper):
             [user_id, rate]
         )
         role = get_data_with_roles(user_data["coveted_role"])
+        await self.state.set_data(game_data)
         await bot.edit_message_text(
             chat_id=user_id,
             text=make_build(
@@ -249,7 +253,7 @@ class Registration(RouterHelper):
         owner_data: OwnerCache = {
             "user_id": owner_id,
             "full_name": self.message.from_user.full_name,
-            "order_of_roles": order_of_roles,
+            "order_of_roles": order_of_roles or BASES_ROLES,
             "banned_roles": banned_roles,
         }
         pprint(owner_data)
