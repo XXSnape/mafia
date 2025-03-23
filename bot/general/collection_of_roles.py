@@ -59,6 +59,7 @@ BASES_ROLES = [
     "policeman",
     "civilian",
 ]
+REQUIRED_ROLES = BASES_ROLES + ["mafia"]
 
 
 class Roles(enum.Enum):

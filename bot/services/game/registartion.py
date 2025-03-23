@@ -246,7 +246,7 @@ class Registration(RouterHelper):
         owner_id = self._get_user_id()
         banned_roles = await ProhibitedRolesDAO(
             session=self.session
-        ).get_key_of_banned_roles(UserTgId(user_tg_id=owner_id))
+        ).get_keys_of_banned_roles(UserTgId(user_tg_id=owner_id))
         order_of_roles = await OrderOfRolesDAO(
             session=self.session
         ).get_key_of_order_of_roles(UserTgId(user_tg_id=owner_id))

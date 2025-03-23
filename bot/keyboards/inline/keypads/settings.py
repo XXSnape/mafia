@@ -2,8 +2,12 @@ from operator import attrgetter
 
 from aiogram.types import InlineKeyboardButton
 
-from cache.cache_types import OrderOfRolesCache
-from general.collection_of_roles import get_data_with_roles
+from cache.cache_types import OrderOfRolesCache, RolesLiteral
+from general.collection_of_roles import (
+    get_data_with_roles,
+    BASES_ROLES,
+    REQUIRED_ROLES,
+)
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import (
     BACK_TO_SELECTING_ACTIONS_FOR_ROLES,
@@ -17,7 +21,9 @@ from keyboards.inline.cb.cb_text import (
     VIEW_ORDER_OF_ROLES_CB,
     MENU_CB,
     DELETE_LATEST_ROLE_IN_ORDER_CB,
+    BAN_EVERYTHING_CB,
 )
+from utils.sorting import sort_roles_by_name
 
 
 def select_setting_kb():
@@ -37,7 +43,7 @@ def select_setting_kb():
     return generate_inline_kb(data_with_buttons=buttons)
 
 
-def edit_roles_kb(are_there_roles: bool):
+def edit_roles_kb(are_there_roles: bool, to_ban: bool = False):
     buttons = [
         InlineKeyboardButton(
             text="Редактировать✏️", callback_data=EDIT_SETTINGS_CB
@@ -50,33 +56,39 @@ def edit_roles_kb(are_there_roles: bool):
                 callback_data=CLEAR_SETTINGS_CB,
             )
         )
+    if to_ban:
+        buttons.append(
+            InlineKeyboardButton(
+                text="Забанить все🚫",
+                callback_data=BAN_EVERYTHING_CB,
+            )
+        )
 
     buttons.append(BACK_TO_SELECTING_ACTIONS_FOR_ROLES)
 
     return generate_inline_kb(data_with_buttons=buttons)
 
 
-def go_to_following_roles_kb(
-    current_number: int, max_number: int, are_there_roles: bool
+def suggest_banning_roles_kb(
+    banned_roles_keys: list[RolesLiteral],
 ):
     buttons = []
-    if current_number != 0:
+    all_roles = get_data_with_roles()
+    sort_keys = sorted(all_roles.keys(), key=sort_roles_by_name)
+    for key in sort_keys:
+        if key in REQUIRED_ROLES:
+            continue
+        if key in banned_roles_keys:
+            sym = "🚫"
+        else:
+            sym = "✅"
         buttons.append(
             InlineKeyboardButton(
-                text="⏪",
-                callback_data=str(current_number - 1),
+                text=sym + all_roles[key].role, callback_data=key
             )
         )
-    if current_number != max_number:
-        buttons.append(
-            InlineKeyboardButton(
-                text="⏩",
-                callback_data=str(current_number + 1),
-            )
-        )
-    if are_there_roles:
-        buttons.append(SAVE_BTN)
-    buttons.append(CANCEL_BTN)
+
+    buttons.extend([SAVE_BTN, CANCEL_BTN])
     return generate_inline_kb(data_with_buttons=buttons)
 
 
