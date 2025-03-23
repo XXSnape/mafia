@@ -5,9 +5,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 def generate_inline_kb(
-    data_with_url=(),
     data_with_buttons=(),
-    data_with_cb=(),
     sizes: Iterable[int] = (1,),
 ) -> InlineKeyboardMarkup:
     """
@@ -22,10 +20,5 @@ def generate_inline_kb(
     for data in data_with_buttons:
         if data:
             builder.add(data)
-    for data in data_with_url:
-        builder.button(text=data[0], url=data[1])
-
-    for data in data_with_cb:
-        builder.button(text=data[0], callback_data=data[1])
     builder.adjust(*sizes)
     return builder.as_markup()

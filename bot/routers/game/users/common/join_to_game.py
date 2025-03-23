@@ -2,6 +2,7 @@ from aiogram import Router, Dispatcher, F
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import CommandStart, CommandObject
 from aiogram.types import Message, CallbackQuery
+from click import command
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from keyboards.inline.cb.cb_text import CANCEL_CB
@@ -18,7 +19,24 @@ router.message.middleware(DatabaseMiddlewareWithoutCommit())
 router.callback_query.middleware(DatabaseMiddlewareWithoutCommit())
 
 
-@router.message(CommandStart(deep_link=True))
+@router.message(
+    GameFsm.WAIT_FOR_STARTING_GAME, CommandStart(deep_link=True)
+)
+async def leave_game(
+    message: Message,
+    command: CommandObject,
+    state: FSMContext,
+    dispatcher: Dispatcher,
+):
+    registration = Registration(
+        message=message, state=state, dispatcher=dispatcher
+    )
+    await registration.leave_game(command=command)
+
+
+@router.message(
+    CommandStart(deep_link=True),
+)
 async def join_to_game(
     message: Message,
     command: CommandObject,

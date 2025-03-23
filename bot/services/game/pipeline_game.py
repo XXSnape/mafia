@@ -263,6 +263,8 @@ class Game:
         losers: list[UserIdInt] = []
         for role, rates in bids.items():
             rates.sort(key=itemgetter(1), reverse=True)
+            if len(rates) == 0:
+                continue
             if len(rates) == 1:
                 role_and_winner_with_money[role] = [
                     rates[0][0],

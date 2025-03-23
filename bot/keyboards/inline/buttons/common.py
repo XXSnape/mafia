@@ -20,3 +20,6 @@ CANCEL_BTN = InlineKeyboardButton(
 SAVE_BTN = InlineKeyboardButton(
     text="Сохранить💾", callback_data=SAVE_CB
 )
+TO_BOT = InlineKeyboardButton(
+    text="Сделать ставку!", url="t.me/Drivenicebot"
+)

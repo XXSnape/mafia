@@ -91,6 +91,25 @@ class Registration(RouterHelper):
             reply_markup=to_user_markup,
         )
 
+    async def _change_message_in_group(
+        self, game_data: GameCache, game_chat: int
+    ):
+        bot = self._get_bot()
+        text = get_profiles_during_registration(
+            game_data["players_ids"], game_data["players"]
+        )
+        to_group_markup = await get_join_kb(
+            bot=bot,
+            game_chat=game_chat,
+            players_ids=game_data["players_ids"],
+        )
+        await bot.edit_message_text(
+            chat_id=game_chat,
+            text=text,
+            message_id=game_data["start_message_id"],
+            reply_markup=to_group_markup,
+        )
+
     async def join_to_game(self, command: CommandObject):
         await self.message.delete()
         current_data: UserCache = await self.state.get_data()
@@ -100,10 +119,6 @@ class Registration(RouterHelper):
             if current_data["game_chat"] != game_chat:
                 await self.message.answer(
                     "Сначала заверши предыдущую игру"
-                )
-            else:
-                await self.message.answer(
-                    "Ты уже успешно зарегистрировался!"
                 )
             return
         bot = self._get_bot()
@@ -133,9 +148,9 @@ class Registration(RouterHelper):
         }
         game_data["players_ids"].append(user_id)
         game_data["players"][str(user_id)] = user_game_data
-        text = get_profiles_during_registration(
-            game_data["players_ids"], game_data["players"]
-        )
+        # text = get_profiles_during_registration(
+        #     game_data["players_ids"], game_data["players"]
+        # )
         sent_message = await self._offer_bet(
             game_data=game_data, balance=balance
         )
@@ -149,17 +164,20 @@ class Registration(RouterHelper):
             [user_id, sent_message.message_id]
         )
         await game_state.set_data(game_data)
-        to_group_markup = await get_join_kb(
-            bot=bot,
-            game_chat=game_chat,
-            players_ids=game_data["players_ids"],
+        await self._change_message_in_group(
+            game_data=game_data, game_chat=game_chat
         )
-        await bot.edit_message_text(
-            chat_id=game_chat,
-            text=text,
-            message_id=game_data["start_message_id"],
-            reply_markup=to_group_markup,
-        )
+        # to_group_markup = await get_join_kb(
+        #     bot=bot,
+        #     game_chat=game_chat,
+        #     players_ids=game_data["players_ids"],
+        # )
+        # await bot.edit_message_text(
+        #     chat_id=game_chat,
+        #     text=text,
+        #     message_id=game_data["start_message_id"],
+        #     reply_markup=to_group_markup,
+        # )
 
     async def finish_registration(self):
         game_data: GameCache = await self.state.get_data()
@@ -190,6 +208,23 @@ class Registration(RouterHelper):
             reply_markup=cancel_bet(),
         )
 
+    def _delete_bet(
+        self, user_data: UserCache, game_data: GameCache
+    ):
+        index = None
+        covered_roles = game_data["bids"].get(
+            user_data.get("coveted_role"), []
+        )
+        if not covered_roles:
+            return
+        current_user_id = self._get_user_id()
+        for cur_index, (user_id, _) in enumerate(covered_roles):
+            if user_id == current_user_id:
+                index = cur_index
+                break
+        if index is not None:
+            covered_roles.pop(index)
+
     async def cancel_bet(self):
         user_data: UserCache = await self.state.get_data()
         game_state, game_data = await get_game_state_and_data(
@@ -197,20 +232,43 @@ class Registration(RouterHelper):
             state=self.state,
             dispatcher=self.dispatcher,
         )
-        index = None
-        covered_roles = game_data["bids"].get(
-            user_data["coveted_role"], []
-        )
-        for cur_index, (user_id, _) in enumerate(covered_roles):
-            if user_id == self.callback.from_user.id:
-                index = cur_index
-                break
+        self._delete_bet(user_data=user_data, game_data=game_data)
         del user_data["coveted_role"]
-        if index:
-            covered_roles.pop(index)
         await self.state.set_data(user_data)
+        await game_state.set_data(game_data)
         balance = await self._get_user_balance()
         await self._offer_bet(balance=balance, game_data=game_data)
+
+    async def leave_game(self, command: CommandObject):
+        await self.message.delete()
+        user_data: UserCache = await self.state.get_data()
+        args = command.args
+        game_chat = int(decode_payload(args))
+        if user_data["game_chat"] != game_chat:
+            return
+        user_id = self._get_user_id()
+        bot = self._get_bot()
+        game_state = await get_state_and_assign(
+            dispatcher=self.dispatcher,
+            chat_id=user_data["game_chat"],
+            bot_id=self.message.bot.id,
+        )
+        game_data: GameCache = await game_state.get_data()
+        game_data["players_ids"].remove(user_id)
+        del game_data["players"][str(user_id)]
+        self._delete_bet(user_data=user_data, game_data=game_data)
+        await game_state.set_data(game_data)
+        await self._change_message_in_group(
+            game_data=game_data, game_chat=user_data["game_chat"]
+        )
+        await bot.delete_message(
+            chat_id=user_id,
+            message_id=user_data["message_with_offer_id"],
+        )
+        await self.state.clear()
+        await self.message.answer(
+            make_build("Ты успешно вышел из игры!")
+        )
 
     async def set_bet(self):
         await self.message.delete()
@@ -232,7 +290,8 @@ class Registration(RouterHelper):
             [user_id, rate]
         )
         role = get_data_with_roles(user_data["coveted_role"])
-        await self.state.set_data(game_data)
+        await self.state.set_data(user_data)
+        await game_state.set_data(game_data)
         await bot.edit_message_text(
             chat_id=user_id,
             text=make_build(
@@ -256,7 +315,6 @@ class Registration(RouterHelper):
             "order_of_roles": order_of_roles or BASES_ROLES,
             "banned_roles": banned_roles,
         }
-        pprint(owner_data)
         game_data: GameCache = {
             "game_chat": self.message.chat.id,
             "owner": owner_data,
