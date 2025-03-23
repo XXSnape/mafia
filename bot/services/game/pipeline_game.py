@@ -1,12 +1,12 @@
 import asyncio
 from operator import itemgetter
-from pprint import pprint
-from random import shuffle, choice
+from random import choice
 
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
+
 from aiogram.types import Message
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 from cache.cache_types import (
     GameCache,
     UserGameCache,
@@ -24,6 +24,7 @@ from services.game.mailing import MailerToPlayers
 from services.game.processing import Executor
 from services.game.roles.base import Role
 from states.states import GameFsm
+from utils.sorting import sorting_by_rate, sorting_by_money
 from utils.utils import (
     get_state_and_assign,
     make_pretty,
@@ -151,9 +152,6 @@ class Game:
         await self.executor.clear_data_after_all_actions()
 
     async def give_out_rewards(self, e: GameIsOver):
-        # def sorting_winners_by_money(user_id: str):
-        #     return game_data["players"][user_id]["money"]
-
         game_data: GameCache = await self.state.get_data()
         result = make_build(
             f"🚩Игра завершена! Победившая группировка: {e.winner.value.name}\n\n"
@@ -172,9 +170,8 @@ class Game:
                 winners.append(user_id)
             else:
                 losers.append(user_id)
-        winners.sort(
-            key=itemgetter("players", user_id, "money"), reverse=True
-        )
+        sorting_func = sorting_by_money(game_data=game_data)
+        winners.sort(key=sorting_func, reverse=True)
         winners = make_build("🔥Победители:\n") + get_profiles(
             players_ids=winners,
             players=game_data["players"],
@@ -281,23 +278,23 @@ class Game:
                 ]
                 for user_id, _ in rates[1:]:
                     losers.append(user_id)
-        sorted_role_and_winner = {}
+        sorted_roles_and_winner = {}
         for role, winner in sorted(
             role_and_winner_with_money.items(),
-            key=itemgetter(1, 1),
+            key=sorting_by_rate,
             reverse=True,
         ):
-            sorted_role_and_winner[role] = winner
-        return sorted_role_and_winner, losers
+            sorted_roles_and_winner[role] = winner
+        return sorted_roles_and_winner, losers
 
     async def select_roles(self):
         game_data: GameCache = await self.state.get_data()
         banned_roles = game_data["owner"]["banned_roles"]
         order_of_roles = game_data["owner"]["order_of_roles"]
+        players_ids = game_data["players_ids"]
         all_roles = get_data_with_roles()
         criminals: list[RolesLiteral] = []
         other: list[RolesLiteral] = []
-        players_ids = game_data["players_ids"]
         number_of_players = len(players_ids)
         for key, role in all_roles.items():
             if key in banned_roles:
@@ -307,17 +304,20 @@ class Game:
             else:
                 role_type = other
             if role not in order_of_roles:
-                role_type.append(role)
+                role_type.append(key)
             elif get_data_with_roles(role).there_may_be_several:
-                role_type.append(role)
+                role_type.append(key)
         role_and_winner, not_winners = self.check_bids(game_data)
         winning_roles = list(
             role
             for role in role_and_winner.keys()
             if role not in order_of_roles
         )
-        while len(order_of_roles) != number_of_players:
-            if len(order_of_roles) % 4 == 0:
+        while len(order_of_roles) < number_of_players:
+            if (
+                len(order_of_roles) % 4 == 0
+                and len(order_of_roles) != 4
+            ):
                 role_type = criminals
             else:
                 role_type = other
@@ -325,6 +325,7 @@ class Game:
             for winning_role in winning_roles:
                 if winning_role in role_type:
                     role = winning_role
+                    break
             if role:
                 winning_roles.remove(role)
             else:
@@ -341,9 +342,6 @@ class Game:
                 not_winners.append(winner[0])
             else:
                 winners.add(winner[0])
-        print(f"{players_ids=}")
-        print(f"{not_winners=}")
-        print(f"{winners}")
         not_winners.extend(
             set(players_ids) - (set(not_winners) | winners)
         )
