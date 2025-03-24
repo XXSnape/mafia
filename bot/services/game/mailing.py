@@ -1,7 +1,5 @@
 import asyncio
 from collections import defaultdict
-from pprint import pprint
-from traceback import print_tb
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext

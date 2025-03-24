@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, PollAnswer, Message
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.dao.prohibited_roles import ProhibitedRolesDAO
@@ -18,6 +19,7 @@ class RouterHelper:
     poll_answer: PollAnswer | None = None
     message: Message | None = None
     dispatcher: Dispatcher | None = None
+    scheduler: AsyncIOScheduler | None = None
     REQUIRE_TO_SAVE: str = make_build(
         "❗️Чтобы сохранить изменения, нажмите «Сохранить💾»\n\n"
     )

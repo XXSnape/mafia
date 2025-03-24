@@ -282,27 +282,6 @@ class Executor:
         )
         return True
 
-    async def delete_message_by_chat(
-        self, chat_id: int, message_id: int
-    ):
-        with suppress(TelegramBadRequest):
-            await self.bot.delete_message(
-                chat_id=chat_id, message_id=message_id
-            )
-
-    async def delete_messages_from_to_delete(
-        self, to_delete: ChatsAndMessagesIds
-    ):
-        await asyncio.gather(
-            *(
-                self.delete_message_by_chat(
-                    chat_id=chat_id,
-                    message_id=message_id,
-                )
-                for chat_id, message_id in to_delete
-            )
-        )
-
     async def remove_user_from_game(
         self, game_data: GameCache, user_id: int, is_night: bool
     ):

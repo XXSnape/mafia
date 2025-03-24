@@ -1,11 +1,13 @@
 import asyncio
 from operator import itemgetter
+from pprint import pprint
 from random import choice
 
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 
 from aiogram.types import Message
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from cache.cache_types import (
     GameCache,
@@ -25,6 +27,7 @@ from services.game.processing import Executor
 from services.game.roles.base import Role
 from states.states import GameFsm
 from utils.sorting import sorting_by_rate, sorting_by_money
+from utils.tg import delete_messages_from_to_delete, reset_user_state
 from utils.utils import (
     get_state_and_assign,
     make_pretty,
@@ -40,8 +43,9 @@ class Game:
         message: Message,
         state: FSMContext,
         dispatcher: Dispatcher,
+        scheduler: AsyncIOScheduler,
     ):
-
+        self.scheduler = scheduler
         self.message = message
         self.state = state
         self.dispatcher = dispatcher
@@ -85,11 +89,14 @@ class Game:
     async def start_game(
         self,
     ):
-
+        to_delete = (await self.state.get_data())["to_delete"]
+        await delete_messages_from_to_delete(
+            bot=self.bot, state=self.state, to_delete=to_delete
+        )
         await self.message.delete()
         await self.state.set_state(GameFsm.STARTED)
         await self.select_roles()
-        game_data: GameCache = await self.state.get_data()
+        game_data = await self.state.get_data()
         await self.mailer.familiarize_players(game_data)
         self.init_existing_roles(game_data)
         await self.message.answer(
@@ -123,8 +130,10 @@ class Game:
 
         await self.mailer.mailing()
         await asyncio.sleep(27)
-        await self.executor.delete_messages_from_to_delete(
-            to_delete=game_data["to_delete"]
+        await delete_messages_from_to_delete(
+            bot=self.bot,
+            to_delete=game_data["to_delete"],
+            state=self.state,
         )
         await self.executor.sum_up_after_night()
         players_after_night = get_live_players(
@@ -138,14 +147,18 @@ class Game:
         await asyncio.sleep(1)
         await self.mailer.suggest_vote()
         await asyncio.sleep(5)
-        await self.executor.delete_messages_from_to_delete(
-            to_delete=game_data["to_delete"]
+        await delete_messages_from_to_delete(
+            bot=self.bot,
+            to_delete=game_data["to_delete"],
+            state=self.state,
         )
         result = await self.executor.confirm_final_aim()
         if result:
             await asyncio.sleep(10)
-        await self.executor.delete_messages_from_to_delete(
-            to_delete=game_data["to_delete"]
+        await delete_messages_from_to_delete(
+            bot=self.bot,
+            to_delete=game_data["to_delete"],
+            state=self.state,
         )
         await self.executor.sum_up_after_voting()
         await asyncio.sleep(2)
@@ -190,8 +203,10 @@ class Game:
             chat_id=self.group_chat_id,
             text=result + winners + losers,
         )
-        await self.executor.delete_messages_from_to_delete(
-            to_delete=game_data["to_delete"]
+        await delete_messages_from_to_delete(
+            bot=self.bot,
+            to_delete=game_data["to_delete"],
+            state=self.state,
         )
         await asyncio.gather(
             *(
@@ -230,12 +245,11 @@ class Game:
             f"\n\nИтого: {player_data['money']}{MONEY_SYM}"
         )
         await self.bot.send_message(chat_id=user_id, text=text)
-        state = await get_state_and_assign(
+        await reset_user_state(
             dispatcher=self.dispatcher,
-            chat_id=user_id,
+            user_id=user_id,
             bot_id=self.bot.id,
         )
-        await state.clear()
 
     @staticmethod
     def initialization_by_role(game_data: GameCache, role: Role):
@@ -367,4 +381,5 @@ class Game:
             }
             game_data["players"][str(winner_id)].update(user_data)
             roles.append(winner_id)
+        pprint(game_data)
         await self.state.set_data(game_data)

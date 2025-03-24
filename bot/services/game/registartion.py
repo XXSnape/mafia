@@ -1,3 +1,6 @@
+import time
+from dataclasses import dataclass
+from datetime import timedelta, datetime, timezone
 from pprint import pprint
 
 from aiogram import Dispatcher
@@ -5,13 +8,14 @@ from aiogram.filters import CommandObject
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from aiogram.utils.payload import decode_payload
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.date import DateTrigger
+from apscheduler.triggers.interval import IntervalTrigger
 
 from cache.cache_types import (
     GameCache,
-    LivePlayersIds,
     UserCache,
     UserGameCache,
-    UsersInGame,
     OwnerCache,
     RolesLiteral,
     RolesAndUsersMoney,
@@ -35,6 +39,11 @@ from services.game.actions_at_night import get_game_state_and_data
 from services.game.pipeline_game import Game
 from services.settings.order_of_roles import RoleManager
 from states.states import GameFsm
+from utils.scheduler import (
+    start_game,
+    remind_of_beginning_of_game,
+    clearing_tasks_on_schedule,
+)
 from utils.utils import (
     get_profile_link,
     get_state_and_assign,
@@ -44,15 +53,19 @@ from utils.utils import (
 
 
 class Registration(RouterHelper):
-    async def _get_user_balance(self):
+
+    async def _get_user_or_create(self):
         user_id = self._get_user_id()
         users_dao = UsersDao(session=self.session)
         user = await users_dao.find_one_or_none(
             UserId(tg_id=user_id)
         )
         if user is None:
-            new_user = await users_dao.add(UserId(tg_id=user_id))
-            return new_user.balance
+            user = await users_dao.add(UserId(tg_id=user_id))
+        return user
+
+    async def _get_user_balance(self):
+        user = await self._get_user_or_create()
         return user.balance
 
     async def start_registration(self):
@@ -68,8 +81,43 @@ class Registration(RouterHelper):
             ),
             reply_markup=markup,
         )
-        await self._init_game(message_id=sent_message.message_id)
+        start_of_registration_dt = datetime.utcnow()
+        end_of_registration = int(
+            (
+                start_of_registration_dt + timedelta(seconds=40)
+            ).timestamp()
+        )
+        start_of_registration = int(
+            start_of_registration_dt.timestamp()
+        )
+        await self._init_game(
+            message_id=sent_message.message_id,
+            start_of_registration=start_of_registration,
+            end_of_registration=end_of_registration,
+        )
         await sent_message.pin()
+        self.scheduler.add_job(
+            func=start_game,
+            trigger=DateTrigger(
+                run_date=datetime.fromtimestamp(end_of_registration),
+                timezone=timezone.utc,
+            ),
+            id=f"start_{self.message.chat.id}",
+            kwargs={
+                "message": sent_message,
+                "state": self.state,
+                "dispatcher": self.dispatcher,
+                "scheduler": self.scheduler,
+            },
+            replace_existing=True,
+        )
+        self.scheduler.add_job(
+            func=remind_of_beginning_of_game,
+            trigger=IntervalTrigger(seconds=7),
+            id=f"remind_{self.message.chat.id}",
+            kwargs={"bot": self.message.bot, "state": self.state},
+            replace_existing=True,
+        )
 
     async def _offer_bet(self, game_data: GameCache, balance: int):
         to_user_markup = await offer_to_place_bet(
@@ -167,17 +215,6 @@ class Registration(RouterHelper):
         await self._change_message_in_group(
             game_data=game_data, game_chat=game_chat
         )
-        # to_group_markup = await get_join_kb(
-        #     bot=bot,
-        #     game_chat=game_chat,
-        #     players_ids=game_data["players_ids"],
-        # )
-        # await bot.edit_message_text(
-        #     chat_id=game_chat,
-        #     text=text,
-        #     message_id=game_data["start_message_id"],
-        #     reply_markup=to_group_markup,
-        # )
 
     async def finish_registration(self):
         game_data: GameCache = await self.state.get_data()
@@ -189,10 +226,16 @@ class Registration(RouterHelper):
                 show_alert=True,
             )
             return
+        clearing_tasks_on_schedule(
+            scheduler=self.scheduler,
+            game_chat=game_data["game_chat"],
+            is_running_on_schedule=False,
+        )
         game = Game(
             message=self.callback.message,
             state=self.state,
             dispatcher=self.dispatcher,
+            scheduler=self.scheduler,
         )
         await game.start_game()
 
@@ -301,7 +344,12 @@ class Registration(RouterHelper):
             message_id=user_data["message_with_offer_id"],
         )
 
-    async def _init_game(self, message_id: int):
+    async def _init_game(
+        self,
+        message_id: int,
+        start_of_registration: int,
+        end_of_registration: int,
+    ):
         owner_id = self._get_user_id()
         banned_roles = await ProhibitedRolesDAO(
             session=self.session
@@ -329,6 +377,8 @@ class Registration(RouterHelper):
             "tracking": {},
             "text_about_checks": "",
             "bids": {},
+            "start_of_registration": start_of_registration,
+            "end_of_registration": end_of_registration,
             # 'wait_for': [],
             "number_of_night": 0,
         }

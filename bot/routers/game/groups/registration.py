@@ -27,9 +27,14 @@ async def start_registration(
     state: FSMContext,
     session_without_commit: AsyncSession,
     scheduler: AsyncIOScheduler,
+    dispatcher: Dispatcher,
 ):
     registration = Registration(
-        message=message, state=state, session=session_without_commit
+        message=message,
+        state=state,
+        session=session_without_commit,
+        dispatcher=dispatcher,
+        scheduler=scheduler,
     )
     await registration.start_registration()
 
@@ -41,8 +46,12 @@ async def finish_registration(
     callback: CallbackQuery,
     state: FSMContext,
     dispatcher: Dispatcher,
+    scheduler: AsyncIOScheduler,
 ):
     registration = Registration(
-        callback=callback, state=state, dispatcher=dispatcher
+        callback=callback,
+        state=state,
+        dispatcher=dispatcher,
+        scheduler=scheduler,
     )
     await registration.finish_registration()

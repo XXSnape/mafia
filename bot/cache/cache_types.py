@@ -136,3 +136,5 @@ class GameCache(TypedDict, total=False):
     winners: PlayersIds
     losers: PlayersIds
     number_of_night: NumberOfNight
+    start_of_registration: int
+    end_of_registration: int
