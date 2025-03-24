@@ -50,7 +50,12 @@ from utils.scheduler import (
     clearing_tasks_on_schedule,
     get_minutes_and_seconds_text,
 )
-from utils.tg import check_user_for_admin_rights
+from utils.tg import (
+    check_user_for_admin_rights,
+    reset_state_to_all_users,
+    delete_messages_from_to_delete,
+    clear_game_data,
+)
 from utils.utils import (
     get_profile_link,
     get_state_and_assign,
@@ -60,6 +65,22 @@ from utils.utils import (
 
 
 class Registration(RouterHelper):
+
+    async def _verification_for_admin_or_creator(self):
+        await self.message.delete()
+        game_data: GameCache = await self.state.get_data()
+        user_id = self._get_user_id()
+        is_admin = await check_user_for_admin_rights(
+            bot=self.message.bot,
+            chat_id=self.message.chat.id,
+            user_id=user_id,
+        )
+        if (
+            is_admin is False
+            and game_data["owner"]["user_id"] != user_id
+        ):
+            return
+        return game_data
 
     async def _get_user_or_create(self):
         user_id = self._get_user_id()
@@ -91,7 +112,7 @@ class Registration(RouterHelper):
         start_of_registration_dt = datetime.utcnow()
         end_of_registration = int(
             (
-                start_of_registration_dt + timedelta(seconds=5)
+                start_of_registration_dt + timedelta(seconds=60 * 2)
             ).timestamp()
         )
         start_of_registration = int(
@@ -103,6 +124,11 @@ class Registration(RouterHelper):
             end_of_registration=end_of_registration,
         )
         await sent_message.pin()
+        time_to_start = get_minutes_and_seconds_text(
+            now=start_of_registration,
+            end_of_registration=end_of_registration,
+        )
+        await self.message.answer(make_build(time_to_start))
         self.scheduler.add_job(
             func=start_game,
             trigger=DateTrigger(
@@ -127,18 +153,10 @@ class Registration(RouterHelper):
         )
 
     async def extend_registration(self):
-        await self.message.delete()
-        game_data: GameCache = await self.state.get_data()
-        user_id = self._get_user_id()
-        is_admin = await check_user_for_admin_rights(
-            bot=self.message.bot,
-            chat_id=self.message.chat.id,
-            user_id=user_id,
+        game_data: GameCache = (
+            await self._verification_for_admin_or_creator()
         )
-        if (
-            is_admin is False
-            and game_data["owner"]["user_id"] != user_id
-        ):
+        if not game_data:
             return
         now = int(datetime.utcnow().timestamp())
         start_of_registration = game_data["start_of_registration"]
@@ -165,6 +183,28 @@ class Registration(RouterHelper):
             make_build(
                 f"Регистрация продлена на 30 секунд\n{time_to_start}"
             )
+        )
+
+    async def cancel_game(self):
+        game_data: GameCache = (
+            await self._verification_for_admin_or_creator()
+        )
+        if not game_data:
+            return
+        await clear_game_data(
+            game_data=game_data,
+            bot=self.message.bot,
+            dispatcher=self.dispatcher,
+            state=self.state,
+            message_id=game_data["start_message_id"],
+        )
+        clearing_tasks_on_schedule(
+            scheduler=self.scheduler,
+            game_chat=game_data["game_chat"],
+            need_to_clean_start=True,
+        )
+        await self.message.answer(
+            make_build("Игра успешно отменена!")
         )
 
     async def _offer_bet(self, game_data: GameCache, balance: int):
@@ -285,7 +325,7 @@ class Registration(RouterHelper):
         clearing_tasks_on_schedule(
             scheduler=self.scheduler,
             game_chat=game_data["game_chat"],
-            is_running_on_schedule=False,
+            need_to_clean_start=True,
         )
         game = Game(
             message=self.callback.message,

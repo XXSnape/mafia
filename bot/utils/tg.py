@@ -10,7 +10,11 @@ from aiogram.types import (
     ChatMemberAdministrator,
 )
 
-from cache.cache_types import ChatsAndMessagesIds
+from cache.cache_types import (
+    ChatsAndMessagesIds,
+    UserIdInt,
+    GameCache,
+)
 from utils.utils import get_state_and_assign
 
 
@@ -37,6 +41,46 @@ async def reset_user_state(
         bot_id=bot_id,
     )
     await state.clear()
+
+
+async def reset_state_to_all_users(
+    dispatcher: Dispatcher, bot_id: int, users_ids: list[UserIdInt]
+):
+    await asyncio.gather(
+        *(
+            [
+                reset_user_state(
+                    dispatcher=dispatcher,
+                    user_id=user_id,
+                    bot_id=bot_id,
+                )
+                for user_id in users_ids
+            ]
+        )
+    )
+
+
+async def clear_game_data(
+    game_data: GameCache,
+    bot: Bot,
+    dispatcher: Dispatcher,
+    state: FSMContext,
+    message_id: int,
+):
+    await bot.delete_message(
+        chat_id=game_data["game_chat"], message_id=message_id
+    )
+    await delete_messages_from_to_delete(
+        bot=bot,
+        to_delete=game_data["to_delete"],
+        state=None,
+    )
+    await reset_state_to_all_users(
+        dispatcher=dispatcher,
+        bot_id=bot.id,
+        users_ids=game_data["players_ids"],
+    )
+    await state.clear(),
 
 
 async def check_user_for_admin_rights(

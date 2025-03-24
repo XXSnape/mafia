@@ -49,6 +49,22 @@ async def extend_registration(
     await registration.extend_registration()
 
 
+@router.message(GameFsm.REGISTRATION, Command("revoke"))
+async def cancel_game(
+    message: Message,
+    state: FSMContext,
+    scheduler: AsyncIOScheduler,
+    dispatcher: Dispatcher,
+):
+    registration = Registration(
+        message=message,
+        state=state,
+        scheduler=scheduler,
+        dispatcher=dispatcher,
+    )
+    await registration.cancel_game()
+
+
 @router.callback_query(
     GameFsm.REGISTRATION, F.data == FINISH_REGISTRATION_CB
 )

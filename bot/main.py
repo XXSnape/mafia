@@ -46,6 +46,9 @@ async def main() -> None:
         BotCommand(
             command="extend", description="Продлить регистрацию"
         ),
+        BotCommand(
+            command="revoke", description="Отменить регистрацию"
+        ),
     ]
     bot = Bot(
         token=settings.token,

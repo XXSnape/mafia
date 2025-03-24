@@ -9,7 +9,12 @@ from telebot.types import BotName
 
 from cache.cache_types import GameCache
 from services.game.pipeline_game import Game
-from utils.tg import delete_messages_from_to_delete, reset_user_state
+from utils.tg import (
+    delete_messages_from_to_delete,
+    reset_user_state,
+    reset_state_to_all_users,
+    clear_game_data,
+)
 from utils.utils import make_build
 
 
@@ -22,34 +27,22 @@ async def start_game(
     clearing_tasks_on_schedule(
         scheduler=scheduler,
         game_chat=message.chat.id,
-        is_running_on_schedule=True,
+        need_to_clean_start=False,
     )
     game_data: GameCache = await state.get_data()
     if len(game_data["players_ids"]) < 4:
-        await message.delete()
-        await delete_messages_from_to_delete(
+        await clear_game_data(
+            game_data=game_data,
             bot=message.bot,
-            to_delete=game_data["to_delete"],
-            state=None,
-        )
-        await asyncio.gather(
-            *(
-                [
-                    reset_user_state(
-                        dispatcher=dispatcher,
-                        user_id=user_id,
-                        bot_id=message.bot.id,
-                    )
-                    for user_id in game_data["players_ids"]
-                ]
-            )
+            dispatcher=dispatcher,
+            state=state,
+            message_id=message.message_id,
         )
         await message.answer(
             text=make_build(
                 "Недостаточно игроков для начала игры! Нужно минимум 4. Игра отменяется."
             )
         ),
-        await state.clear(),
         return
 
     game = Game(
@@ -64,9 +57,9 @@ async def start_game(
 def clearing_tasks_on_schedule(
     scheduler: AsyncIOScheduler,
     game_chat: int,
-    is_running_on_schedule: bool,
+    need_to_clean_start: bool,
 ):
-    if is_running_on_schedule is False:
+    if need_to_clean_start is True:
         scheduler.remove_job(job_id=f"start_{game_chat}")
     scheduler.remove_job(job_id=f"remind_{game_chat}")
 
