@@ -6,7 +6,12 @@ from pprint import pprint
 from aiogram import Dispatcher
 from aiogram.filters import CommandObject
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import (
+    CallbackQuery,
+    Message,
+    ChatMemberOwner,
+    ChatMemberAdministrator,
+)
 from aiogram.utils.payload import decode_payload
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.date import DateTrigger
@@ -43,7 +48,9 @@ from utils.scheduler import (
     start_game,
     remind_of_beginning_of_game,
     clearing_tasks_on_schedule,
+    get_minutes_and_seconds_text,
 )
+from utils.tg import check_user_for_admin_rights
 from utils.utils import (
     get_profile_link,
     get_state_and_assign,
@@ -84,7 +91,7 @@ class Registration(RouterHelper):
         start_of_registration_dt = datetime.utcnow()
         end_of_registration = int(
             (
-                start_of_registration_dt + timedelta(seconds=40)
+                start_of_registration_dt + timedelta(seconds=5)
             ).timestamp()
         )
         start_of_registration = int(
@@ -113,10 +120,51 @@ class Registration(RouterHelper):
         )
         self.scheduler.add_job(
             func=remind_of_beginning_of_game,
-            trigger=IntervalTrigger(seconds=7),
+            trigger=IntervalTrigger(seconds=31),
             id=f"remind_{self.message.chat.id}",
             kwargs={"bot": self.message.bot, "state": self.state},
             replace_existing=True,
+        )
+
+    async def extend_registration(self):
+        await self.message.delete()
+        game_data: GameCache = await self.state.get_data()
+        user_id = self._get_user_id()
+        is_admin = await check_user_for_admin_rights(
+            bot=self.message.bot,
+            chat_id=self.message.chat.id,
+            user_id=user_id,
+        )
+        if (
+            is_admin is False
+            and game_data["owner"]["user_id"] != user_id
+        ):
+            return
+        now = int(datetime.utcnow().timestamp())
+        start_of_registration = game_data["start_of_registration"]
+        if now - start_of_registration > 60:  # TODO 60 * 5
+            await self.message.answer(
+                make_build("Больше нельзя ждать!")
+            )
+            return
+        end_of_registration = game_data["end_of_registration"] + 30
+        await self.state.update_data(
+            {"end_of_registration": end_of_registration}
+        )
+        self.scheduler.reschedule_job(
+            job_id=f"start_{self.message.chat.id}",
+            trigger=DateTrigger(
+                run_date=datetime.fromtimestamp(end_of_registration),
+                timezone=timezone.utc,
+            ),
+        )
+        time_to_start = get_minutes_and_seconds_text(
+            now=now, end_of_registration=end_of_registration
+        )
+        await self.message.answer(
+            make_build(
+                f"Регистрация продлена на 30 секунд\n{time_to_start}"
+            )
         )
 
     async def _offer_bet(self, game_data: GameCache, balance: int):
@@ -219,10 +267,18 @@ class Registration(RouterHelper):
     async def finish_registration(self):
         game_data: GameCache = await self.state.get_data()
         user_id = self._get_user_id()
-        if game_data["owner"]["user_id"] != user_id:
+        is_admin = await check_user_for_admin_rights(
+            bot=self.callback.bot,
+            chat_id=game_data["game_chat"],
+            user_id=user_id,
+        )
+        if (
+            is_admin is False
+            and game_data["owner"]["user_id"] != user_id
+        ):
             full_name = game_data["owner"]["full_name"]
             await self.callback.answer(
-                f"Пожалуйста, попроси {full_name} начать игру!",
+                f"Пожалуйста, попроси {full_name} или администраторов начать игру!",
                 show_alert=True,
             )
             return

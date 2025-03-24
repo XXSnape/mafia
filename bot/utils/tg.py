@@ -4,7 +4,11 @@ from contextlib import suppress
 from aiogram import Bot, Dispatcher
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import (
+    Message,
+    ChatMemberOwner,
+    ChatMemberAdministrator,
+)
 
 from cache.cache_types import ChatsAndMessagesIds
 from utils.utils import get_state_and_assign
@@ -33,6 +37,17 @@ async def reset_user_state(
         bot_id=bot_id,
     )
     await state.clear()
+
+
+async def check_user_for_admin_rights(
+    bot: Bot, chat_id: int, user_id: int
+) -> bool:
+    member = await bot.get_chat_member(
+        chat_id=chat_id, user_id=user_id
+    )
+    return isinstance(
+        member, (ChatMemberOwner, ChatMemberAdministrator)
+    )
 
 
 async def delete_messages_from_to_delete(

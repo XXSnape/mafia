@@ -43,6 +43,9 @@ async def main() -> None:
             command="settings",
             description="Персональные настройки игры",
         ),
+        BotCommand(
+            command="extend", description="Продлить регистрацию"
+        ),
     ]
     bot = Bot(
         token=settings.token,

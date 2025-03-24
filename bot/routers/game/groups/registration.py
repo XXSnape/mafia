@@ -39,6 +39,16 @@ async def start_registration(
     await registration.start_registration()
 
 
+@router.message(GameFsm.REGISTRATION, Command("extend"))
+async def extend_registration(
+    message: Message, state: FSMContext, scheduler: AsyncIOScheduler
+):
+    registration = Registration(
+        message=message, state=state, scheduler=scheduler
+    )
+    await registration.extend_registration()
+
+
 @router.callback_query(
     GameFsm.REGISTRATION, F.data == FINISH_REGISTRATION_CB
 )
