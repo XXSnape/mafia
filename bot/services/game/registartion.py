@@ -133,7 +133,7 @@ class Registration(RouterHelper):
         start_of_registration_dt = datetime.utcnow()
         end_of_registration = int(
             (
-                start_of_registration_dt + timedelta(seconds=15)
+                start_of_registration_dt + timedelta(seconds=60 * 2)
             ).timestamp()
         )
         start_of_registration = int(
@@ -313,7 +313,7 @@ class Registration(RouterHelper):
         await self._change_message_in_group(
             game_data=game_data, game_chat=game_chat
         )
-        if len(game_data["players_ids"]) == 2:  # TODO 30
+        if len(game_data["players_ids"]) == 30:  # TODO 30
             await self._start_game(
                 game_data=game_data, game_state=game_state
             )

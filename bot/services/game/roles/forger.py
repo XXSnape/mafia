@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 from cache.cache_types import ExtraCache, GameCache
 from services.game.roles.base.roles import Role
 from general.groupings import Groupings
@@ -42,32 +44,65 @@ class Forger(
     async def procedure_after_night(
         self, game_data: GameCache, **kwargs
     ):
+        from services.game.roles.warden import Warden
+
+        forged_roles = game_data[self.extra_data[0].key]
+        if not forged_roles:
+            return
+        disclosed_roles = game_data["disclosed_roles"]
         if (
-            game_data["disclosed_roles"]
-            and game_data["forged_roles"]
+            disclosed_roles
+            and disclosed_roles[0][0] == forged_roles[0][0]
+            and disclosed_roles != forged_roles
         ):
-            game_data["disclosed_roles"][:] = game_data[
-                "forged_roles"
-            ]
+            game_data["disclosed_roles"][:] = forged_roles
+            self.has_policeman_been_deceived = True
+            self.all_roles["policeman"].was_deceived = True
+
+        checked = game_data.get(Warden.extra_data[0].key, [])
+        if len(checked) == 2:
+            processed_user_id = forged_roles[0][0]
+            index = None
+            for ind, (user_id, _) in enumerate(checked):
+                if user_id == processed_user_id:
+                    print("yes!", user_id, processed_user_id)
+                    index = ind
+                    break
+            if index is not None:
+                checked_role = checked[index][1]
+                forged_role = forged_roles[0][1]
+                if (
+                    self.all_roles[checked_role].grouping
+                    != self.all_roles[forged_role].grouping
+                ):
+                    self.has_warden_been_deceived = True
+                    self.all_roles["warden"].was_deceived = True
+                    checked[index] = forged_roles[0]
 
     async def accrual_of_overnight_rewards(
         self, game_data: GameCache, victims: set[int], **kwargs
     ):
         from .policeman import Policeman
+        from services.game.roles.warden import Warden
 
-        if (
-            game_data["disclosed_roles"]
-            and game_data["disclosed_roles"]
-            == game_data["forged_roles"]
-        ):
+        deceived_users = []
+        if self.has_policeman_been_deceived:
             policeman = game_data[Policeman.roles_key][0]
             url = game_data["players"][str(policeman)]["url"]
             money = 14
+            deceived_users.append([url, money, Policeman()])
+        if self.has_warden_been_deceived:
+            warden = game_data[Warden.roles_key][0]
+            url = game_data["players"][str(warden)]["url"]
+            money = 10
+            deceived_users.append([url, money, Warden()])
+
+        for url, money, role in deceived_users:
             self.add_money_to_all_allies(
                 game_data=game_data,
                 money=money,
                 user_url=url,
-                processed_role=Policeman(),
+                processed_role=role,
                 beginning_message="Спецоперация по подделке документов прошла успешно. Обманут",
             )
 
@@ -75,7 +110,6 @@ class Forger(
         self,
         game_data: GameCache,
         removed_user: list[int],
-        all_roles: dict[str, Role],
         **kwargs,
     ):
         from .policeman import Policeman
@@ -92,14 +126,15 @@ class Forger(
             and mafias
             and mafias[0] != removed_user[0]
         ):
-            if "mafia" not in all_roles:
+            if "mafia" not in self.all_roles:
                 mafia = MafiaAlias()
                 mafia(
+                    all_roles=self.all_roles,
                     dispatcher=self.dispatcher,
                     bot=self.bot,
                     state=self.state,
                 )
-                all_roles["mafia"] = mafia
+                self.all_roles["mafia"] = mafia
             forger_id = forgers[0]
             await notify_aliases_about_transformation(
                 game_data=game_data,
@@ -128,8 +163,11 @@ class Forger(
     def cancel_actions(self, game_data: GameCache, user_id: int):
         if game_data["forged_roles"]:
             game_data["forged_roles"].clear()
-            return True
-        return False
+        return super().cancel_actions(
+            game_data=game_data, user_id=user_id
+        )
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.FORGER_FAKES
+        self.has_policeman_been_deceived = False
+        self.has_warden_been_deceived = False

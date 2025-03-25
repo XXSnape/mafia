@@ -84,7 +84,7 @@ async def forges_selects_documents(
     )
     current_role = get_data_with_roles(callback.data)
     pretty_role = make_pretty(current_role.role)
-    game_data["forged_roles"][0].append(pretty_role)
+    game_data["forged_roles"][0].append(callback.data)
     user_id = game_data["forged_roles"][0][0]
     trace_all_actions(
         callback=callback, game_data=game_data, user_id=user_id

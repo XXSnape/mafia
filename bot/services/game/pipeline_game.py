@@ -1,12 +1,10 @@
 import asyncio
 from operator import itemgetter
-from pprint import pprint
 from random import choice
 
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.context import FSMContext
 
-from aiogram.types import Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from cache.cache_types import (
@@ -17,7 +15,7 @@ from cache.cache_types import (
     UserAndMoney,
 )
 from constants.output import MONEY_SYM
-from general.collection_of_roles import Roles, get_data_with_roles
+from general.collection_of_roles import get_data_with_roles
 from general.exceptions import GameIsOver
 from general.groupings import Groupings
 
@@ -84,6 +82,7 @@ class Game:
                 dispatcher=self.dispatcher,
                 bot=self.bot,
                 state=self.state,
+                all_roles=self.all_roles,
             )
         self.mailer.all_roles = all_roles
         self.executor.all_roles = all_roles
@@ -95,7 +94,6 @@ class Game:
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
-            to_delete=game_data["to_delete"],
         )
         await self.bot.delete_message(
             chat_id=self.group_chat_id,
@@ -137,10 +135,9 @@ class Game:
         )
 
         await self.mailer.mailing()
-        await asyncio.sleep(27)
+        await asyncio.sleep(30)
         await delete_messages_from_to_delete(
             bot=self.bot,
-            to_delete=game_data["to_delete"],
             state=self.state,
         )
         await self.executor.sum_up_after_night()
@@ -158,7 +155,6 @@ class Game:
         await asyncio.sleep(5)
         await delete_messages_from_to_delete(
             bot=self.bot,
-            to_delete=game_data["to_delete"],
             state=self.state,
         )
         result = await self.executor.confirm_final_aim()
@@ -166,7 +162,6 @@ class Game:
             await asyncio.sleep(10)
         await delete_messages_from_to_delete(
             bot=self.bot,
-            to_delete=game_data["to_delete"],
             state=self.state,
         )
         await self.executor.sum_up_after_voting()
@@ -214,7 +209,6 @@ class Game:
         )
         await delete_messages_from_to_delete(
             bot=self.bot,
-            to_delete=game_data["to_delete"],
             state=self.state,
         )
         await asyncio.gather(
@@ -241,11 +235,11 @@ class Game:
         if money != 0:
             if not achivements:
                 achivements_text = make_build(
-                    "\nУ тебя нет активных действий за игру!"
+                    "\nУ тебя нет полезных действий за игру!"
                 )
             else:
                 achivements_text = make_build(
-                    "\nОтчет об активных действиях, повлиявших на исход:\n\n● "
+                    "\nОтчет об активных и полезных действиях, повлиявших на исход:\n\n● "
                 ) + "\n● ".join(
                     achievement for achievement in achivements
                 )

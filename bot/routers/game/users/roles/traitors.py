@@ -37,24 +37,6 @@ async def traitor_finds_out(
     )
     url = game_data["players"][str(user_id)]["url"]
     role = game_data["players"][str(user_id)]["pretty_role"]
-    # await delete_message(callback.message)
-    # await callback.bot.send_message(
-    #     chat_id=game_data["game_chat"],
-    #     text=Traitor.message_to_group_after_action,
-    # )
-    # await callback.message.answer(
-    #     text=Traitor.message_to_user_after_action.format(url=url)
-    # )
-    # game_data[Traitor.processed_users_key].append(user_id)
-    # trace_all_actions(
-    #     callback=callback, game_data=game_data, user_id=user_id
-    # )
-    # save_notification_message(
-    #     game_data=game_data,
-    #     processed_user_id=user_id,
-    #     message=Traitor.notification_message,
-    #     current_user_id=callback.from_user.id,
-    # )
     await asyncio.gather(
         *(
             callback.bot.send_message(

@@ -102,7 +102,9 @@ class Poisoner(
                 game_data[self.extra_data[0].key][1] = 0
             else:
                 game_data[self.extra_data[0].key][0].pop()
-            return True
+            return super().cancel_actions(
+                game_data=game_data, user_id=user_id
+            )
 
     def generate_markup(self, game_data: GameCache, **kwargs):
         poisoned = game_data[self.extra_data[0].key]

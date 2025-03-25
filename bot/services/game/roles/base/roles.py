@@ -1,4 +1,5 @@
 from abc import ABC
+from contextlib import suppress
 from typing import Callable, Optional, Self
 
 from aiogram import Bot, Dispatcher
@@ -12,6 +13,7 @@ from cache.cache_types import (
     PlayersIds,
     LastInteraction,
     UserGameCache,
+    RolesLiteral,
 )
 from constants.output import MONEY_SYM
 from general.groupings import Groupings
@@ -53,8 +55,13 @@ class Role(ABC):
     is_alias: bool = False
 
     def __call__(
-        self, dispatcher: Dispatcher, bot: Bot, state: FSMContext
+        self,
+        dispatcher: Dispatcher,
+        bot: Bot,
+        state: FSMContext,
+        all_roles: dict[str, "Role"],
     ):
+        self.all_roles = all_roles
         self.dispatcher = dispatcher
         self.bot = bot
         self.state = state
@@ -172,18 +179,22 @@ class Role(ABC):
         self,
         game_data: GameCache,
         money: int,
+        custom_message: str | None = None,
         beginning_message: str | None = None,
         user_url: str | None = None,
         processed_role: Optional["Role"] = None,
         at_night: bool = True,
-        additional_players: str | None = None,
+        additional_players: RolesLiteral | None = None,
     ):
         players = game_data[self.roles_key]
         if additional_players:
             players += game_data[additional_players]
         for player_id in players:
             game_data["players"][str(player_id)]["money"] += money
-            message = f"{beginning_message} {user_url} ({make_pretty(processed_role.role)}) - {money}{MONEY_SYM}"
+            if custom_message:
+                message = custom_message
+            else:
+                message = f"{beginning_message} {user_url} ({make_pretty(processed_role.role)}) - {money}{MONEY_SYM}"
             time_of_day = (
                 "🌃Ночь" if at_night else "🌟Голосования дня"
             )
@@ -319,10 +330,19 @@ class ActiveRoleAtNight(Role):
         if not suffers:
             return False
         for suffer in suffers:
-            game_data[self.processed_users_key].remove(suffer)
+            if (
+                self.processed_users_key
+                and suffer in game_data[self.processed_users_key]
+            ):
+                game_data[self.processed_users_key].remove(suffer)
             self.deleting_notification_messages(
                 game_data=game_data, suffer_id=suffer
             )
+            with suppress(KeyError, ValueError):
+                game_data["tracking"][str(suffer)][
+                    "interacting"
+                ].remove(user_id)
+
         if self.processed_by_boss:
             game_data[self.processed_by_boss].clear()
         if self.last_interactive_key:

@@ -25,7 +25,7 @@ async def get_join_kb(
         ),
         TO_BOT,
     ]
-    if len(players_ids) >= 1:  # TODO 4
+    if len(players_ids) >= 4:  # TODO 4
         buttons.append(
             InlineKeyboardButton(
                 text="Начать игру",

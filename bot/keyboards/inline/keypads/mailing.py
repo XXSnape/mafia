@@ -66,6 +66,27 @@ def send_selection_to_players_kb(
     return generate_inline_kb(data_with_buttons=buttons)
 
 
+def selection_to_warden_kb(game_data: "GameCache", user_id: int):
+    from services.game.roles.warden import Warden
+
+    checked = game_data[Warden.extra_data[0].key]
+    print("ch", checked)
+    buttons = []
+    for player_id in game_data["players_ids"]:
+        if player_id == user_id:
+            continue
+        text = game_data["players"][str(player_id)]["full_name"]
+        if checked and player_id == checked[0][0]:
+            text = "✅" + text
+        buttons.append(
+            InlineKeyboardButton(
+                text=text, callback_data=str(player_id)
+            )
+        )
+    print("but", buttons)
+    return generate_inline_kb(data_with_buttons=buttons)
+
+
 def kill_or_poison_kb(poisoned: Poisoned):
     buttons = [
         InlineKeyboardButton(

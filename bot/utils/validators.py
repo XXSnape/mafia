@@ -111,6 +111,15 @@ def get_processed_user_id_if_exists(async_func: Callable):
     return wrapper
 
 
+def remind_worden_about_inspections(game_data: "GameCache"):
+    if not game_data["text_about_checked_for_the_same_groups"]:
+        return "Нет информации о совместных группах"
+    return (
+        "По результатам прошлых проверок выяснено:\n\n"
+        + game_data["text_about_checked_for_the_same_groups"]
+    )
+
+
 def remind_commissioner_about_inspections(
     game_data: "GameCache",
 ) -> str:

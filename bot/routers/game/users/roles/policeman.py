@@ -4,7 +4,6 @@ from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from constants.output import ROLE_IS_KNOWN, NUMBER_OF_NIGHT
-from general.collection_of_roles import Roles
 from keyboards.inline.callback_factory.recognize_user import (
     CheckOrKill,
     PoliceActionIndexCbData,
@@ -122,9 +121,11 @@ async def policeman_chose_to_check(
             dispatcher=dispatcher,
         )
     )
-    role = game_data["players"][str(checked_user_id)]["pretty_role"]
+    role_key = game_data["players"][str(checked_user_id)][
+        "enum_name"
+    ]
     url = game_data["players"][str(checked_user_id)]["url"]
-    game_data["disclosed_roles"].append([checked_user_id, role])
+    game_data["disclosed_roles"].append([checked_user_id, role_key])
     await delete_message(callback.message)
     await callback.bot.send_message(
         chat_id=game_data["game_chat"],
@@ -152,8 +153,6 @@ async def policeman_chose_to_check(
                 f"{game_data['players'][str(callback.from_user.id)]['url']} "
                 f"решил проверить {url}",
             )
-            for policeman_id in game_data[
-                Roles.policeman.value.roles_key
-            ]
+            for policeman_id in game_data[Policeman.roles_key]
         )
     )

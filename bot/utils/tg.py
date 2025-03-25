@@ -72,8 +72,7 @@ async def clear_game_data(
     )
     await delete_messages_from_to_delete(
         bot=bot,
-        to_delete=game_data["to_delete"],
-        state=None,
+        state=state,
     )
     await reset_state_to_all_users(
         dispatcher=dispatcher,
@@ -96,9 +95,9 @@ async def check_user_for_admin_rights(
 
 async def delete_messages_from_to_delete(
     bot: Bot,
-    to_delete: ChatsAndMessagesIds,
     state: FSMContext | None,
 ):
+    to_delete = (await state.get_data())["to_delete"]
     await asyncio.gather(
         *(
             delete_message_by_chat(
@@ -109,5 +108,4 @@ async def delete_messages_from_to_delete(
             for chat_id, message_id in to_delete
         )
     )
-    if state:
-        await state.update_data({"to_delete": []})
+    await state.update_data({"to_delete": []})

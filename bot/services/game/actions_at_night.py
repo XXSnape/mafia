@@ -87,7 +87,7 @@ async def get_game_state_and_data(
     callback: CallbackQuery,
     state: FSMContext,
     dispatcher: Dispatcher,
-):
+) -> tuple[FSMContext, GameCache]:
     user_data: UserCache = await state.get_data()
     game_state = await get_state_and_assign(
         dispatcher=dispatcher,

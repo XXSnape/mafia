@@ -1,7 +1,7 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardButton
 
 from cache.cache_types import ExtraCache, GameCache
-from services.game.roles.base.roles import Role
+
 from general.groupings import Groupings
 from constants.output import ROLE_IS_KNOWN
 from keyboards.inline.keypads.mailing import (
@@ -14,6 +14,7 @@ from services.game.roles.base import (
 )
 from services.game.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
+from utils.utils import make_pretty
 from utils.validators import (
     remind_commissioner_about_inspections,
     get_user_role_and_url,
@@ -48,32 +49,31 @@ class Policeman(
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.POLICEMAN_CHECKS
+        self.was_deceived: bool = False
 
     async def accrual_of_overnight_rewards(
         self,
-        all_roles: dict[str, Role],
         game_data: GameCache,
         victims: set[int],
         **kwargs,
     ):
         disclosed_roles = game_data["disclosed_roles"]
-        if (
-            disclosed_roles
-            and disclosed_roles != game_data["forged_roles"]
-        ):
-            processed_role, user_url = get_user_role_and_url(
-                game_data=game_data,
-                processed_user_id=disclosed_roles[0][0],
-                all_roles=all_roles,
-            )
-            self.add_money_to_all_allies(
-                game_data=game_data,
-                money=9,
-                user_url=user_url,
-                processed_role=processed_role,
-                beginning_message="Проверка",
-            )
-            return
+        if game_data["disclosed_roles"]:
+            if self.was_deceived is False:
+                processed_role, user_url = get_user_role_and_url(
+                    game_data=game_data,
+                    processed_user_id=disclosed_roles[0][0],
+                    all_roles=self.all_roles,
+                )
+                self.add_money_to_all_allies(
+                    game_data=game_data,
+                    money=9,
+                    user_url=user_url,
+                    processed_role=processed_role,
+                    beginning_message="Проверка",
+                )
+            self.was_deceived = False
+
         processed_user_id = self.get_processed_user_id(game_data)
         if (
             processed_user_id is None
@@ -83,7 +83,7 @@ class Policeman(
         processed_role, user_url = get_user_role_and_url(
             game_data=game_data,
             processed_user_id=processed_user_id,
-            all_roles=all_roles,
+            all_roles=self.all_roles,
         )
         money = (
             0
@@ -101,16 +101,17 @@ class Policeman(
     async def procedure_after_night(
         self, game_data: GameCache, murdered: list[int], **kwargs
     ):
+
         if game_data["disclosed_roles"]:
-            user_id, role = game_data["disclosed_roles"][0]
+            user_id, role_key = game_data["disclosed_roles"][0]
             url = game_data["players"][str(user_id)]["url"]
-            text = f"{url} - {role}!"
+            role = make_pretty(self.all_roles[role_key].role)
+            text = f"🌃Ночь {game_data['number_of_night']}\n{url} - {role}!"
             for policeman_id in game_data[self.roles_key]:
                 await self.bot.send_message(
                     chat_id=policeman_id, text=text
                 )
-            game_data["text_about_checks"] += text + "\n"
-            await self.state.set_data(game_data)
+            game_data["text_about_checks"] += text + "\n\n"
         else:
             processed_user_id = self.get_processed_user_id(game_data)
             if processed_user_id:
@@ -122,7 +123,6 @@ class Policeman(
                 [game_data["disclosed_roles"][0][0], ROLE_IS_KNOWN]
             )
             game_data["disclosed_roles"].clear()
-            return True
         return super().cancel_actions(
             game_data=game_data, user_id=user_id
         )
@@ -138,7 +138,6 @@ class Policeman(
     async def mailing(
         self,
         game_data: GameCache,
-        own_markup: InlineKeyboardMarkup | None = None,
     ):
         policeman = self.get_roles(game_data)
         if not policeman:
