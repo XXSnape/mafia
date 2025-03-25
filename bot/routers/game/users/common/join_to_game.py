@@ -2,6 +2,7 @@ from aiogram import Router, Dispatcher, F
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import CommandStart, CommandObject
 from aiogram.types import Message, CallbackQuery
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from click import command
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -43,12 +44,14 @@ async def join_to_game(
     state: FSMContext,
     dispatcher: Dispatcher,
     session_with_commit: AsyncSession,
+    scheduler: AsyncIOScheduler,
 ):
     registration = Registration(
         message=message,
         state=state,
         dispatcher=dispatcher,
         session=session_with_commit,
+        scheduler=scheduler,
     )
     await registration.join_to_game(command=command)
 

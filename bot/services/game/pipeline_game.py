@@ -3,7 +3,7 @@ from operator import itemgetter
 from pprint import pprint
 from random import choice
 
-from aiogram import Dispatcher
+from aiogram import Dispatcher, Bot
 from aiogram.fsm.context import FSMContext
 
 from aiogram.types import Message
@@ -40,17 +40,18 @@ from utils.live_players import get_live_players
 class Game:
     def __init__(
         self,
-        message: Message,
+        # message: Message,
+        bot: Bot,
+        group_chat_id: int,
         state: FSMContext,
         dispatcher: Dispatcher,
         scheduler: AsyncIOScheduler,
     ):
         self.scheduler = scheduler
-        self.message = message
         self.state = state
         self.dispatcher = dispatcher
-        self.bot = message.bot
-        self.group_chat_id = self.message.chat.id
+        self.bot = bot
+        self.group_chat_id = group_chat_id
         self.mailer = MailerToPlayers(
             state=self.state,
             bot=self.bot,
@@ -59,7 +60,8 @@ class Game:
         )
         self.all_roles = {}
         self.executor = Executor(
-            message=message,
+            bot=self.bot,
+            group_chat_id=self.group_chat_id,
             state=state,
             dispatcher=dispatcher,
             mailer=self.mailer,
@@ -89,18 +91,23 @@ class Game:
     async def start_game(
         self,
     ):
-        to_delete = (await self.state.get_data())["to_delete"]
+        game_data: GameCache = await self.state.get_data()
         await delete_messages_from_to_delete(
-            bot=self.bot, state=self.state, to_delete=to_delete
+            bot=self.bot,
+            state=self.state,
+            to_delete=game_data["to_delete"],
         )
-        await self.message.delete()
+        await self.bot.delete_message(
+            chat_id=self.group_chat_id,
+            message_id=game_data["start_message_id"],
+        )
         await self.state.set_state(GameFsm.STARTED)
-        await self.select_roles()
-        game_data = await self.state.get_data()
+        game_data = await self.select_roles()
         await self.mailer.familiarize_players(game_data)
         self.init_existing_roles(game_data)
-        await self.message.answer(
-            text="Игра начинается!",
+        await self.bot.send_message(
+            chat_id=self.group_chat_id,
+            text=make_build("Игра начинается!"),
             reply_markup=get_to_bot_kb(),
         )
         while True:
@@ -122,7 +129,8 @@ class Game:
         night_starts_text = make_build(
             f"Наступает ночь {game_data['number_of_night']}"
         )
-        await self.message.answer_photo(
+        await self.bot.send_photo(
+            chat_id=self.group_chat_id,
             photo="https://i.pinimg.com/originals/f0/43/ed/f043edcac9690fdec845925508006459.jpg",
             caption=f"{night_starts_text}.\n\n{players}",
             reply_markup=get_to_bot_kb("Действовать!"),
@@ -139,7 +147,8 @@ class Game:
         players_after_night = get_live_players(
             game_data=game_data, all_roles=self.all_roles
         )
-        await self.message.answer_photo(
+        await self.bot.send_photo(
+            chat_id=self.group_chat_id,
             photo="https://i.pinimg.com/originals/b1/80/98/b18098074864e4b1bf5cc8412ced6421.jpg",
             caption=f"{make_build('Пришло время провести следственные мероприятия жителям города!')}\n\n"
             f"{players_after_night}",
@@ -381,5 +390,5 @@ class Game:
             }
             game_data["players"][str(winner_id)].update(user_data)
             roles.append(winner_id)
-        pprint(game_data)
         await self.state.set_data(game_data)
+        return game_data

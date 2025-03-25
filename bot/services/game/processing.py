@@ -4,7 +4,7 @@ from contextlib import suppress
 from operator import attrgetter
 from typing import TYPE_CHECKING
 
-from aiogram import Dispatcher
+from aiogram import Dispatcher, Bot
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
@@ -71,17 +71,17 @@ def check_end_of_game(async_func: Callable):
 class Executor:
     def __init__(
         self,
-        message: Message,
+        bot: Bot,
+        group_chat_id: int,
         state: FSMContext,
         dispatcher: Dispatcher,
         mailer: MailerToPlayers,
     ):
 
-        self.message = message
         self.state = state
         self.dispatcher = dispatcher
-        self.bot = message.bot
-        self.group_chat_id = self.message.chat.id
+        self.bot = bot
+        self.group_chat_id = group_chat_id
         self.mailer = mailer
         self.all_roles = {}
 
@@ -194,7 +194,7 @@ class Executor:
             is_night=False,
         )
         await self.bot.send_message(
-            chat_id=game_data["game_chat"],
+            chat_id=self.group_chat_id,
             text=result_text
             + f"Сегодня народ принял тяжелое решение и повесил "
             f'{user_info["url"]} с ролью {user_info["pretty_role"]}!',
