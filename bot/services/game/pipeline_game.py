@@ -8,6 +8,7 @@ from aiogram.fsm.context import FSMContext
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from cache.cache_types import (
@@ -16,6 +17,8 @@ from cache.cache_types import (
     RolesLiteral,
     UserIdInt,
     UserAndMoney,
+    RolesAndUsersMoney,
+    RoleAndUserMoney,
 )
 from constants.output import MONEY_SYM
 from database.dao.games import GamesDao
@@ -38,6 +41,12 @@ from utils.utils import (
     get_profiles,
 )
 from utils.live_players import get_live_players
+
+
+class BidForRoleSchema(BaseModel):
+    user_tg_id: int
+    role_key: RolesLiteral
+    money: int
 
 
 class Game:
@@ -302,39 +311,63 @@ class Game:
                     game_data[extra.key] = extra.data_type()
 
     @staticmethod
-    def check_bids(game_data: GameCache):
-        role_and_winner_with_money: dict[
-            RolesLiteral, UserAndMoney
-        ] = {}
+    def check_bids(
+        game_data: GameCache,
+    ) -> tuple[RoleAndUserMoney, list[BidForRoleSchema]]:
+        role_and_winner_with_money: RoleAndUserMoney = {}
         bids = game_data["bids"]
-        losers: list[UserIdInt] = []
-        for role, rates in bids.items():
+        losers: list[BidForRoleSchema] = []
+        for role_key, rates in bids.items():
             rates.sort(key=itemgetter(1), reverse=True)
             if len(rates) == 0:
                 continue
             if len(rates) == 1:
-                role_and_winner_with_money[role] = [
+                role_and_winner_with_money[role_key] = [
                     rates[0][0],
                     rates[0][1],
                 ]
             elif rates[0][1] == rates[1][1]:
-                for user_id, _ in rates:
-                    losers.append(user_id)
+                for user_id, money in rates:
+                    loser = BidForRoleSchema(
+                        user_tg_id=user_id,
+                        role_key=role_key,
+                        money=money,
+                    )
+                    losers.append(loser)
             else:
-                role_and_winner_with_money[role] = [
+                role_and_winner_with_money[role_key] = [
                     rates[0][0],
                     rates[0][1],
                 ]
-                for user_id, _ in rates[1:]:
-                    losers.append(user_id)
+                for user_id, money in rates[1:]:
+                    loser = BidForRoleSchema(
+                        user_tg_id=user_id,
+                        role_key=role_key,
+                        money=money,
+                    )
+                    losers.append(loser)
         sorted_roles_and_winner = {}
-        for role, winner in sorted(
+        for role_key, winner in sorted(
             role_and_winner_with_money.items(),
             key=sorting_by_rate,
             reverse=True,
         ):
-            sorted_roles_and_winner[role] = winner
+            sorted_roles_and_winner[role_key] = winner
         return sorted_roles_and_winner, losers
+
+    def record_data_about_betting_results(
+        self,
+        order_of_roles: list[RolesLiteral],
+        winners_bets: list[BidForRoleSchema],
+        losers_bets: list[BidForRoleSchema],
+    ):
+        for winner in winners_bets:
+            ...
+        for loser in losers_bets:
+            if loser.role_key in order_of_roles:
+                ...
+            else:
+                ...
 
     async def select_roles(self):
         game_data: GameCache = await self.state.get_data()
@@ -356,7 +389,10 @@ class Game:
                 role_type.append(key)
             elif get_data_with_roles(role).there_may_be_several:
                 role_type.append(key)
-        role_and_winner, not_winners = self.check_bids(game_data)
+        role_and_winner, losers = self.check_bids(game_data)
+        not_winners = [
+            loser.user_tg_id for loser in losers
+        ]
         winning_roles = list(
             role
             for role in role_and_winner.keys()
@@ -386,22 +422,30 @@ class Game:
             ):
                 role_type.remove(role)
         winners = set()
-        for role, winner in role_and_winner.items():
-            if role not in order_of_roles:
+        for role_key, winner in role_and_winner.items():
+            if role_key not in order_of_roles:
                 not_winners.append(winner[0])
             else:
                 winners.add(winner[0])
         not_winners.extend(
             set(players_ids) - (set(not_winners) | winners)
         )
+        winners_bets: list[BidForRoleSchema] = []
         for role_key in order_of_roles[:number_of_players]:
+            current_role = get_data_with_roles(role_key)
             winner = role_and_winner.get(role_key)
             if winner is None:
                 winner_id = choice(not_winners)
                 not_winners.remove(winner_id)
             else:
                 winner_id = winner[0]
-            current_role = get_data_with_roles(role_key)
+                winners_bets.append(
+                    BidForRoleSchema(
+                        user_tg_id=winner_id,
+                        role_key=role_key,
+                        money=winner[1]
+                    )
+                )
             self.initialization_by_role(game_data, role=current_role)
             roles = game_data[current_role.roles_key]
             user_data: UserGameCache = {
@@ -414,5 +458,10 @@ class Game:
             }
             game_data["players"][str(winner_id)].update(user_data)
             roles.append(winner_id)
+        self.record_data_about_betting_results(
+            order_of_roles=order_of_roles,
+            winners_bets=winners_bets,
+            losers_bets=losers
+        )
         await self.state.set_data(game_data)
         return game_data

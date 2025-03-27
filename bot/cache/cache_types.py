@@ -104,6 +104,7 @@ UserAndMoney = list[int]
 UsersMoney = list[UserAndMoney]
 
 RolesAndUsersMoney = dict[RolesLiteral, UsersMoney]
+RoleAndUserMoney = dict[RolesLiteral, UserAndMoney]
 
 
 class UserCache(TypedDict, total=False):
@@ -112,15 +113,9 @@ class UserCache(TypedDict, total=False):
     coveted_role: RolesLiteral
 
 
-class BettingResultsCache:
-    winners: UserAndMoney
-    loses: UserAndMoney
-
-
 class GameCache(TypedDict, total=False):
     owner: OwnerCache
     bids: RolesAndUsersMoney
-    betting_results: dict[RolesLiteral, BettingResultsCache]
     game_chat: int
     start_message_id: int
     messages_after_night: MessagesAfterNight
