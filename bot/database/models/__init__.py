@@ -5,3 +5,4 @@ from .games import GameModel
 from .results import ResultModel
 from .prohibited_roles import ProhibitedRoleModel
 from .orders import OrderModel
+from .rates import RateModel

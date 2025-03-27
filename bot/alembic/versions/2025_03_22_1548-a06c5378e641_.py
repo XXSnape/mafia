@@ -1,7 +1,7 @@
 """empty message
 
 Revision ID: a06c5378e641
-Revises: 
+Revises:
 Create Date: 2025-03-22 15:48:44.061107
 
 """
@@ -28,8 +28,18 @@ def upgrade() -> None:
     )
     op.create_table(
         "users",
-        sa.Column("tg_id", sa.Integer(), autoincrement=False, nullable=False),
-        sa.Column("balance", sa.Integer(), server_default="0", nullable=False),
+        sa.Column(
+            "tg_id",
+            sa.Integer(),
+            autoincrement=False,
+            nullable=False,
+        ),
+        sa.Column(
+            "balance",
+            sa.Integer(),
+            server_default="0",
+            nullable=False,
+        ),
         sa.Column(
             "registration_date",
             sa.DateTime(),
@@ -52,7 +62,9 @@ def upgrade() -> None:
             ["creator_tg_id"], ["users.tg_id"], ondelete="SET NULL"
         ),
         sa.ForeignKeyConstraint(
-            ["winning_group"], ["groupings.name"], ondelete="SET NULL"
+            ["winning_group"],
+            ["groupings.name"],
+            ondelete="SET NULL",
         ),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -72,7 +84,9 @@ def upgrade() -> None:
         sa.Column("role", sa.String(), nullable=False),
         sa.Column("number", sa.Integer(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(["role"], ["roles.name"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["role"], ["roles.name"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(
             ["user_tg_id"], ["users.tg_id"], ondelete="CASCADE"
         ),
@@ -83,7 +97,9 @@ def upgrade() -> None:
         sa.Column("user_tg_id", sa.Integer(), nullable=False),
         sa.Column("role", sa.String(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(["role"], ["roles.name"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["role"], ["roles.name"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(
             ["user_tg_id"], ["users.tg_id"], ondelete="CASCADE"
         ),
@@ -98,8 +114,12 @@ def upgrade() -> None:
         sa.Column("nights_lived", sa.Integer(), nullable=False),
         sa.Column("money", sa.Integer(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(["game_id"], ["games.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["role"], ["roles.name"], ondelete="SET NULL"),
+        sa.ForeignKeyConstraint(
+            ["game_id"], ["games.id"], ondelete="CASCADE"
+        ),
+        sa.ForeignKeyConstraint(
+            ["role"], ["roles.name"], ondelete="SET NULL"
+        ),
         sa.ForeignKeyConstraint(
             ["user_tg_id"], ["users.tg_id"], ondelete="SET NULL"
         ),

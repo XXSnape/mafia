@@ -100,6 +100,8 @@ class Registration(RouterHelper):
             state=game_state,
             dispatcher=self.dispatcher,
             scheduler=self.scheduler,
+            broker=self.broker,
+            session=self.session,
         )
         await game.start_game()
 
@@ -162,6 +164,8 @@ class Registration(RouterHelper):
                 "state": self.state,
                 "dispatcher": self.dispatcher,
                 "scheduler": self.scheduler,
+                "broker": self.broker,
+                "session": self.session,
             },
             replace_existing=True,
         )

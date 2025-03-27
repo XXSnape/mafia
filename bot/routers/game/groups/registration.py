@@ -4,6 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery, Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from faststream.rabbit import RabbitBroker
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from keyboards.inline.cb.cb_text import (
@@ -11,6 +12,7 @@ from keyboards.inline.cb.cb_text import (
 )
 from middlewares.db import (
     DatabaseMiddlewareWithoutCommit,
+    DatabaseMiddlewareWithCommit,
 )
 from services.game.registartion import (
     Registration,
@@ -18,21 +20,22 @@ from services.game.registartion import (
 from states.states import GameFsm
 
 router = Router(name=__name__)
-router.message.middleware(DatabaseMiddlewareWithoutCommit())
+router.message.middleware(DatabaseMiddlewareWithCommit())
+router.callback_query.middleware(DatabaseMiddlewareWithCommit())
 
 
 @router.message(Command("registration"), StateFilter(default_state))
 async def start_registration(
     message: Message,
     state: FSMContext,
-    session_without_commit: AsyncSession,
+    session_with_commit: AsyncSession,
     scheduler: AsyncIOScheduler,
     dispatcher: Dispatcher,
 ):
     registration = Registration(
         message=message,
         state=state,
-        session=session_without_commit,
+        session=session_with_commit,
         dispatcher=dispatcher,
         scheduler=scheduler,
     )
@@ -73,11 +76,15 @@ async def finish_registration(
     state: FSMContext,
     dispatcher: Dispatcher,
     scheduler: AsyncIOScheduler,
+    broker: RabbitBroker,
+    session_with_commit: AsyncSession,
 ):
     registration = Registration(
         callback=callback,
         state=state,
         dispatcher=dispatcher,
         scheduler=scheduler,
+        broker=broker,
+        session=session_with_commit,
     )
     await registration.finish_registration()

@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 from operator import itemgetter
 from random import choice
 
@@ -6,6 +7,8 @@ from aiogram import Dispatcher, Bot
 from aiogram.fsm.context import FSMContext
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from faststream.rabbit import RabbitBroker
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from cache.cache_types import (
     GameCache,
@@ -15,6 +18,8 @@ from cache.cache_types import (
     UserAndMoney,
 )
 from constants.output import MONEY_SYM
+from database.dao.games import GamesDao
+from database.schemas.games import BeginningOfGameScheme
 from general.collection_of_roles import get_data_with_roles
 from general.exceptions import GameIsOver
 from general.groupings import Groupings
@@ -44,6 +49,8 @@ class Game:
         state: FSMContext,
         dispatcher: Dispatcher,
         scheduler: AsyncIOScheduler,
+        broker: RabbitBroker,
+        session: AsyncSession,
     ):
         self.scheduler = scheduler
         self.state = state
@@ -64,6 +71,10 @@ class Game:
             dispatcher=dispatcher,
             mailer=self.mailer,
         )
+        self.broker = broker
+        self.session = session
+        self.game_id: int | None = None
+        self.beginning_game: int | None = None
 
     def init_existing_roles(self, game_data: GameCache):
         all_roles = get_data_with_roles()
@@ -87,17 +98,36 @@ class Game:
         self.mailer.all_roles = all_roles
         self.executor.all_roles = all_roles
 
+    async def create_game_in_db(self, creator_id: UserIdInt):
+        dao = GamesDao(session=self.session)
+        beginning_dt = datetime.datetime.now(datetime.UTC)
+        self.beginning_game = beginning_dt.timestamp()
+
+        game_instance = await dao.add(
+            BeginningOfGameScheme(
+                chat_id=self.group_chat_id,
+                creator_tg_id=creator_id,
+                start=beginning_dt,
+            )
+        )
+        self.game_id = game_instance.id
+
     async def start_game(
         self,
     ):
         game_data: GameCache = await self.state.get_data()
-        await delete_messages_from_to_delete(
-            bot=self.bot,
-            state=self.state,
+        await asyncio.gather(
+            delete_messages_from_to_delete(
+                bot=self.bot,
+                state=self.state,
+            ),
+            self.bot.delete_message(
+                chat_id=self.group_chat_id,
+                message_id=game_data["start_message_id"],
+            ),
         )
-        await self.bot.delete_message(
-            chat_id=self.group_chat_id,
-            message_id=game_data["start_message_id"],
+        await self.create_game_in_db(
+            creator_id=game_data["owner"]["user_id"]
         )
         await self.state.set_state(GameFsm.STARTED)
         game_data = await self.select_roles()

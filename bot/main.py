@@ -1,11 +1,10 @@
 import asyncio
 
-from aiogram import Bot, Dispatcher
-from aiogram.client.default import DefaultBotProperties
+from aiogram import Dispatcher
 from aiogram.fsm.strategy import FSMStrategy
 from aiogram.types import BotCommand, BotCommandScopeDefault
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from general import settings
+from general.config import bot, broker
 from general.log import configure_logging
 from routers.game.users import router as game_users_router
 from routers.game.groups import router as game_groups_router
@@ -26,7 +25,9 @@ async def main() -> None:
     scheduler = AsyncIOScheduler()
     scheduler.configure(timezone="Europe/Moscow")
     dp = Dispatcher(
-        fsm_strategy=FSMStrategy.CHAT, scheduler=scheduler
+        fsm_strategy=FSMStrategy.CHAT,
+        scheduler=scheduler,
+        broker=broker,
     )
     dp.include_routers(
         game_groups_router,
@@ -50,10 +51,7 @@ async def main() -> None:
             command="revoke", description="Отменить регистрацию"
         ),
     ]
-    bot = Bot(
-        token=settings.token,
-        default=DefaultBotProperties(parse_mode="HTML"),
-    )
+
     await bot.set_my_commands(commands, BotCommandScopeDefault())
     scheduler.start()
     await dp.start_polling(bot)

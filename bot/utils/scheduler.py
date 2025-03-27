@@ -1,11 +1,10 @@
-import asyncio
 from datetime import datetime
 
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from telebot.types import BotName
+from faststream.rabbit import RabbitBroker
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from cache.cache_types import GameCache
 from services.game.pipeline_game import Game
@@ -20,6 +19,8 @@ async def start_game(
     state: FSMContext,
     dispatcher: Dispatcher,
     scheduler: AsyncIOScheduler,
+    session: AsyncSession,
+    broker: RabbitBroker,
 ):
     game_data: GameCache = await state.get_data()
     clearing_tasks_on_schedule(
@@ -49,6 +50,8 @@ async def start_game(
         state=state,
         dispatcher=dispatcher,
         scheduler=scheduler,
+        broker=broker,
+        session=session,
     )
     await game.start_game()
 

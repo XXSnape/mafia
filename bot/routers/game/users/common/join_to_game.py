@@ -4,6 +4,7 @@ from aiogram.filters import CommandStart, CommandObject
 from aiogram.types import Message, CallbackQuery
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from click import command
+from faststream.rabbit import RabbitBroker
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from keyboards.inline.cb.cb_text import CANCEL_CB
@@ -45,6 +46,7 @@ async def join_to_game(
     dispatcher: Dispatcher,
     session_with_commit: AsyncSession,
     scheduler: AsyncIOScheduler,
+    broker: RabbitBroker,
 ):
     registration = Registration(
         message=message,
@@ -52,6 +54,7 @@ async def join_to_game(
         dispatcher=dispatcher,
         session=session_with_commit,
         scheduler=scheduler,
+        broker=broker,
     )
     await registration.join_to_game(command=command)
 
