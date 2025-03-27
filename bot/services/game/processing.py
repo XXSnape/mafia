@@ -60,7 +60,7 @@ def check_end_of_game(async_func: Callable):
                     game_data[current_role.roles_key]
                 )
         if (
-            criminals_count > players_count - criminals_count
+            criminals_count >= players_count - criminals_count
         ):  # TODO >=
             raise GameIsOver(winner=Groupings.criminals)
         return result

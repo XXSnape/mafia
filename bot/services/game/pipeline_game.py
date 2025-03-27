@@ -168,7 +168,7 @@ class Game:
         )
 
         await self.mailer.mailing()
-        await asyncio.sleep(30)
+        await asyncio.sleep(5)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -356,6 +356,7 @@ class Game:
         losers_bets: list[BidForRoleSchema],
     ):
         rates = []
+        roles_are_not_in_game = []
         for winner in winners_bets:
             rates.append(
                 ResultBidForRoleSchema(
@@ -365,6 +366,7 @@ class Game:
                 )
             )
         for loser in losers_bets:
+            print("or", order_of_roles, loser.role_key)
             if loser.role_key in order_of_roles:
                 rates.append(
                     ResultBidForRoleSchema(
@@ -374,10 +376,13 @@ class Game:
                     )
                 )
             else:
-                ...
-        pprint(rates)
+                roles_are_not_in_game.append(loser)
+        print(roles_are_not_in_game)
         await self.broker.publish(
             message=rates, queue="betting_results"
+        )
+        await self.broker.publish(
+            message=roles_are_not_in_game, queue="role_outside_game"
         )
 
     async def select_roles(self):
@@ -431,11 +436,19 @@ class Game:
             ):
                 role_type.remove(role)
         winners = set()
-        for role_key, winner in role_and_winner.items():
+        order_of_roles[:] = order_of_roles[:number_of_players]
+        for role_key, (winner_id, money) in role_and_winner.items():
             if role_key not in order_of_roles:
-                not_winners.append(winner[0])
+                not_winners.append(winner_id)
+                losers.append(
+                    BidForRoleSchema(
+                        user_tg_id=winner_id,
+                        role_key=role_key,
+                        money=money,
+                    )
+                )
             else:
-                winners.add(winner[0])
+                winners.add(winner_id)
         not_winners.extend(
             set(players_ids) - (set(not_winners) | winners)
         )
