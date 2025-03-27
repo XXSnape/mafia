@@ -17,11 +17,31 @@ class RabbitSettings(BaseSettings):
 
 
 class DBSettings(BaseSettings):
-    echo: bool = True
+    """
+    db_host: хост базы
+    db_port: порт базы
+    postgres_user: логин пользователя
+    postgres_password: пароль пользователя
+    postgres_db: название базы
+    echo: bool = True, если нужно, чтобы запросы выводились в консоль, иначе False
+    """
+
+    db_host: str
+    db_port: int
+    postgres_user: str
+    postgres_password: str
+    postgres_db: str
+    echo: bool = False
 
     @property
-    def url(self):
-        return r"sqlite+aiosqlite:////home/nachi/PycharmProjects/mafia/db.sqlite3"
+    def url(self) -> str:
+        """
+        Возвращает строку для подключения к базе данных.
+        """
+        return (
+            f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}"
+            f"@{self.db_host}:{self.db_port}/{self.postgres_db}"
+        )
 
 
 class Settings(BaseSettings):

@@ -1,0 +1,15 @@
+services:
+#  redis:
+#    image: redis:7.4-alpine
+#    ports:
+#      - "6379:6379"
+  postgres:
+    container_name: postgres
+    image: postgres:14.8-alpine3.18
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./db/:/var/lib/postgresql/data
+    env_file:
+      - .env
+#    restart: on-failure

@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 from operator import itemgetter
+from pprint import pprint
 from random import choice
 
 from aiogram import Dispatcher, Bot
@@ -8,7 +9,6 @@ from aiogram.fsm.context import FSMContext
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
-from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from cache.cache_types import (
@@ -16,12 +16,14 @@ from cache.cache_types import (
     UserGameCache,
     RolesLiteral,
     UserIdInt,
-    UserAndMoney,
-    RolesAndUsersMoney,
     RoleAndUserMoney,
 )
 from constants.output import MONEY_SYM
 from database.dao.games import GamesDao
+from database.schemas.bids import (
+    BidForRoleSchema,
+    ResultBidForRoleSchema,
+)
 from database.schemas.games import BeginningOfGameScheme
 from general.collection_of_roles import get_data_with_roles
 from general.exceptions import GameIsOver
@@ -35,7 +37,6 @@ from states.states import GameFsm
 from utils.sorting import sorting_by_rate, sorting_by_money
 from utils.tg import delete_messages_from_to_delete, reset_user_state
 from utils.utils import (
-    get_state_and_assign,
     make_pretty,
     make_build,
     get_profiles,
@@ -43,16 +44,9 @@ from utils.utils import (
 from utils.live_players import get_live_players
 
 
-class BidForRoleSchema(BaseModel):
-    user_tg_id: int
-    role_key: RolesLiteral
-    money: int
-
-
 class Game:
     def __init__(
         self,
-        # message: Message,
         bot: Bot,
         group_chat_id: int,
         state: FSMContext,
@@ -109,9 +103,8 @@ class Game:
 
     async def create_game_in_db(self, creator_id: UserIdInt):
         dao = GamesDao(session=self.session)
-        beginning_dt = datetime.datetime.now(datetime.UTC)
+        beginning_dt = datetime.datetime.now()
         self.beginning_game = beginning_dt.timestamp()
-
         game_instance = await dao.add(
             BeginningOfGameScheme(
                 chat_id=self.group_chat_id,
@@ -120,6 +113,7 @@ class Game:
             )
         )
         self.game_id = game_instance.id
+        await self.session.commit()
 
     async def start_game(
         self,
@@ -355,19 +349,36 @@ class Game:
             sorted_roles_and_winner[role_key] = winner
         return sorted_roles_and_winner, losers
 
-    def record_data_about_betting_results(
+    async def record_data_about_betting_results(
         self,
         order_of_roles: list[RolesLiteral],
         winners_bets: list[BidForRoleSchema],
         losers_bets: list[BidForRoleSchema],
     ):
+        rates = []
         for winner in winners_bets:
-            ...
+            rates.append(
+                ResultBidForRoleSchema(
+                    **winner.model_dump(),
+                    game_id=self.game_id,
+                    is_winner=True,
+                )
+            )
         for loser in losers_bets:
             if loser.role_key in order_of_roles:
-                ...
+                rates.append(
+                    ResultBidForRoleSchema(
+                        **loser.model_dump(),
+                        game_id=self.game_id,
+                        is_winner=False,
+                    )
+                )
             else:
                 ...
+        pprint(rates)
+        await self.broker.publish(
+            message=rates, queue="betting_results"
+        )
 
     async def select_roles(self):
         game_data: GameCache = await self.state.get_data()
@@ -390,9 +401,7 @@ class Game:
             elif get_data_with_roles(role).there_may_be_several:
                 role_type.append(key)
         role_and_winner, losers = self.check_bids(game_data)
-        not_winners = [
-            loser.user_tg_id for loser in losers
-        ]
+        not_winners = [loser.user_tg_id for loser in losers]
         winning_roles = list(
             role
             for role in role_and_winner.keys()
@@ -443,7 +452,7 @@ class Game:
                     BidForRoleSchema(
                         user_tg_id=winner_id,
                         role_key=role_key,
-                        money=winner[1]
+                        money=winner[1],
                     )
                 )
             self.initialization_by_role(game_data, role=current_role)
@@ -458,10 +467,10 @@ class Game:
             }
             game_data["players"][str(winner_id)].update(user_data)
             roles.append(winner_id)
-        self.record_data_about_betting_results(
+        await self.record_data_about_betting_results(
             order_of_roles=order_of_roles,
             winners_bets=winners_bets,
-            losers_bets=losers
+            losers_bets=losers,
         )
         await self.state.set_data(game_data)
         return game_data

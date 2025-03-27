@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import func
+from sqlalchemy import func, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column
 
 
@@ -9,7 +9,7 @@ from database.common.base import BaseModel
 
 class UserModel(BaseModel):
     tg_id: Mapped[int] = mapped_column(
-        primary_key=True, autoincrement=False
+        BigInteger, primary_key=True, autoincrement=False
     )
     balance: Mapped[int] = mapped_column(
         default=0, server_default="0"

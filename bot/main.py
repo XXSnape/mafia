@@ -54,6 +54,7 @@ async def main() -> None:
 
     await bot.set_my_commands(commands, BotCommandScopeDefault())
     scheduler.start()
+    await broker.connect()
     await dp.start_polling(bot)
 
 
