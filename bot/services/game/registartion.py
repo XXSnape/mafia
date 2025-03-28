@@ -381,7 +381,7 @@ class Registration(RouterHelper):
     async def cancel_bet(self):
         user_data: UserCache = await self.state.get_data()
         game_state, game_data = await get_game_state_and_data(
-            callback=self.callback,
+            tg_obj=self.callback,
             state=self.state,
             dispatcher=self.dispatcher,
         )

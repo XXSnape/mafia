@@ -38,7 +38,7 @@ async def supervisor_collects_information(
     dispatcher: Dispatcher,
 ):
     game_state, game_data = await get_game_state_and_data(
-        callback=callback, state=state, dispatcher=dispatcher
+        tg_obj=callback, state=state, dispatcher=dispatcher
     )
     checked = game_data[Warden.extra_data[0].key]
     processed_user_id = int(callback.data)

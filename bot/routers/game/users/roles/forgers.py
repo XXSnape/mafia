@@ -15,6 +15,7 @@ from services.game.actions_at_night import (
     save_notification_message,
 )
 from services.game.roles import Forger, Policeman, PolicemanAlias
+from services.game.saving_role_selection import ForgerSaver
 from states.states import UserFsm
 from utils.tg import delete_message
 from utils.utils import make_pretty
@@ -31,25 +32,29 @@ async def forger_fakes(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    _, game_data, user_id = await get_game_state_data_and_user_id(
-        callback=callback,
-        callback_data=callback_data,
-        state=state,
-        dispatcher=dispatcher,
+    saver = ForgerSaver(
+        callback=callback, state=state, dispatcher=dispatcher
     )
-
-    url = game_data["players"][str(user_id)]["url"]
-    game_data["forged_roles"].append([user_id])
-    all_roles = get_data_with_roles()
-    current_roles = [
-        (all_roles[data["enum_name"]].role, data["enum_name"])
-        for _, data in game_data["players"].items()
-        if data["role"] not in (Policeman.role, PolicemanAlias.role)
-    ]
-    markup = choose_fake_role_kb(current_roles)
-    await callback.message.edit_text(
-        text=f"Выбери для {url} новую роль", reply_markup=markup
-    )
+    await saver.forger_fakes(callback_data=callback_data)
+    # _, game_data, user_id = await get_game_state_data_and_user_id(
+    #     callback=callback,
+    #     callback_data=callback_data,
+    #     state=state,
+    #     dispatcher=dispatcher,
+    # )
+    #
+    # url = game_data["players"][str(user_id)]["url"]
+    # game_data["forged_roles"].append([user_id])
+    # all_roles = get_data_with_roles()
+    # current_roles = [
+    #     (all_roles[data["enum_name"]].role, data["enum_name"])
+    #     for _, data in game_data["players"].items()
+    #     if data["role"] not in (Policeman.role, PolicemanAlias.role)
+    # ]
+    # markup = choose_fake_role_kb(current_roles)
+    # await callback.message.edit_text(
+    #     text=f"Выбери для {url} новую роль", reply_markup=markup
+    # )
 
 
 @router.callback_query(
@@ -60,17 +65,21 @@ async def forges_cancels_selection(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    _, game_data = await get_game_state_and_data(
+    saver = ForgerSaver(
         callback=callback, state=state, dispatcher=dispatcher
     )
-    game_data["forged_roles"].clear()
-    markup = Forger().generate_markup(
-        player_id=callback.from_user.id, game_data=game_data
-    )
-    await callback.message.edit_text(
-        text=Forger.mail_message,
-        reply_markup=markup,
-    )
+    await saver.forges_cancels_selection()
+    # _, game_data = await get_game_state_and_data(
+    #     tg_obj=callback, state=state, dispatcher=dispatcher
+    # )
+    # game_data["forged_roles"].clear()
+    # markup = Forger().generate_markup(
+    #     player_id=callback.from_user.id, game_data=game_data
+    # )
+    # await callback.message.edit_text(
+    #     text=Forger.mail_message,
+    #     reply_markup=markup,
+    # )
 
 
 @router.callback_query(UserFsm.FORGER_FAKES, F.data)
@@ -79,29 +88,33 @@ async def forges_selects_documents(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    _, game_data = await get_game_state_and_data(
+    saver = ForgerSaver(
         callback=callback, state=state, dispatcher=dispatcher
     )
-    current_role = get_data_with_roles(callback.data)
-    pretty_role = make_pretty(current_role.role)
-    game_data["forged_roles"][0].append(callback.data)
-    user_id = game_data["forged_roles"][0][0]
-    trace_all_actions(
-        callback=callback, game_data=game_data, user_id=user_id
-    )
-    save_notification_message(
-        game_data=game_data,
-        processed_user_id=user_id,
-        message=Forger.notification_message,
-        current_user_id=callback.from_user.id,
-    )
-    url = game_data["players"][str(user_id)]["url"]
-    await delete_message(callback.message)
-    await callback.bot.send_message(
-        chat_id=game_data["game_chat"],
-        text=Forger.message_to_group_after_action,
-    )
-    await callback.message.answer(
-        text=NUMBER_OF_NIGHT.format(game_data["number_of_night"])
-        + f"Ты выбрал подменить документы {url} на {pretty_role}"
-    )
+    await saver.forges_selects_documents()
+    # _, game_data = await get_game_state_and_data(
+    #     tg_obj=callback, state=state, dispatcher=dispatcher
+    # )
+    # current_role = get_data_with_roles(callback.data)
+    # pretty_role = make_pretty(current_role.role)
+    # game_data["forged_roles"][0].append(callback.data)
+    # user_id = game_data["forged_roles"][0][0]
+    # trace_all_actions(
+    #     callback=callback, game_data=game_data, user_id=user_id
+    # )
+    # save_notification_message(
+    #     game_data=game_data,
+    #     processed_user_id=user_id,
+    #     message=Forger.notification_message,
+    #     current_user_id=callback.from_user.id,
+    # )
+    # url = game_data["players"][str(user_id)]["url"]
+    # await delete_message(callback.message)
+    # await callback.bot.send_message(
+    #     chat_id=game_data["game_chat"],
+    #     text=Forger.message_to_group_after_action,
+    # )
+    # await callback.message.answer(
+    #     text=NUMBER_OF_NIGHT.format(game_data["number_of_night"])
+    #     + f"Ты выбрал подменить документы {url} на {pretty_role}"
+    # )

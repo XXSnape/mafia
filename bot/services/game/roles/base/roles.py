@@ -39,6 +39,7 @@ class Role(ABC):
     role: str
     need_to_process: bool = False
     photo: str
+    clearing_state_after_death: bool = True
     grouping: Groupings = Groupings.civilians
     there_may_be_several: bool = False
     purpose: str | Callable | None

@@ -15,6 +15,7 @@ from services.game.actions_at_night import (
     take_action_and_register_user,
 )
 from services.game.roles import Instigator
+from services.game.saving_role_selection import InstigatorSaver
 from states.states import UserFsm
 from utils.tg import delete_message
 
@@ -31,27 +32,33 @@ async def instigator_chooses_subject(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    game_state, game_data, user_id = (
-        await get_game_state_data_and_user_id(
-            callback=callback,
-            callback_data=callback_data,
-            state=state,
-            dispatcher=dispatcher,
-        )
+    saver = InstigatorSaver(
+        callback=callback, state=state, dispatcher=dispatcher
     )
-    url = game_data["players"][str(user_id)]["url"]
-    game_data[Instigator.extra_data[0].key].append([user_id])
-    markup = send_selection_to_players_kb(
-        players_ids=game_data["players_ids"],
-        players=game_data["players"],
-        extra_buttons=(BACK_BTN,),
-        exclude=user_id,
+    await saver.instigator_chooses_subject(
+        callback_data=callback_data
     )
-    await state.set_state(UserFsm.INSTIGATOR_CHOOSES_OBJECT)
-    await callback.message.edit_text(
-        text=f"За кого должен проголосовать {url}?",
-        reply_markup=markup,
-    )
+    # game_state, game_data, user_id = (
+    #     await get_game_state_data_and_user_id(
+    #         callback=callback,
+    #         callback_data=callback_data,
+    #         state=state,
+    #         dispatcher=dispatcher,
+    #     )
+    # )
+    # url = game_data["players"][str(user_id)]["url"]
+    # game_data[Instigator.extra_data[0].key].append([user_id])
+    # markup = send_selection_to_players_kb(
+    #     players_ids=game_data["players_ids"],
+    #     players=game_data["players"],
+    #     extra_buttons=(BACK_BTN,),
+    #     exclude=user_id,
+    # )
+    # await state.set_state(UserFsm.INSTIGATOR_CHOOSES_OBJECT)
+    # await callback.message.edit_text(
+    #     text=f"За кого должен проголосовать {url}?",
+    #     reply_markup=markup,
+    # )
 
 
 @router.callback_query(
@@ -62,22 +69,26 @@ async def instigator_cancels_selection(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    game_state, game_data = await get_game_state_and_data(
-        callback=callback,
-        state=state,
-        dispatcher=dispatcher,
+    saver = InstigatorSaver(
+        callback=callback, state=state, dispatcher=dispatcher
     )
-    await state.set_state(UserFsm.INSTIGATOR_CHOOSES_SUBJECT)
-    instigator = Instigator()
-    game_data[Instigator.extra_data[0].key].clear()
-    await game_state.set_data(game_data)
-    await callback.message.edit_text(
-        text=instigator.mail_message,
-        reply_markup=instigator.generate_markup(
-            player_id=callback.from_user.id,
-            game_data=game_data,
-        ),
-    )
+    await saver.instigator_cancels_selection()
+    # game_state, game_data = await get_game_state_and_data(
+    #     tg_obj=callback,
+    #     state=state,
+    #     dispatcher=dispatcher,
+    # )
+    # await state.set_state(UserFsm.INSTIGATOR_CHOOSES_SUBJECT)
+    # instigator = Instigator()
+    # game_data[Instigator.extra_data[0].key].clear()
+    # await game_state.set_data(game_data)
+    # await callback.message.edit_text(
+    #     text=instigator.mail_message,
+    #     reply_markup=instigator.generate_markup(
+    #         player_id=callback.from_user.id,
+    #         game_data=game_data,
+    #     ),
+    # )
 
 
 @router.callback_query(
@@ -89,19 +100,25 @@ async def instigator_chooses_object(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    game_state, game_data, user_id = (
-        await take_action_and_register_user(
-            callback=callback,
-            callback_data=callback_data,
-            state=state,
-            dispatcher=dispatcher,
-        )
+    saver = InstigatorSaver(
+        callback=callback, state=state, dispatcher=dispatcher
     )
-    deceived_user = game_data[Instigator.extra_data[0].key][0]
-    deceived_user.append(user_id)
-    subject_url = game_data["players"][str(deceived_user[0])]["url"]
-    object_id = game_data["players"][str(deceived_user[1])]["url"]
-    await delete_message(callback.message)
-    await callback.message.answer(
-        text=f"Днём {subject_url} проголосует за {object_id}, если попытается голосовать"
+    await saver.instigator_chooses_object(
+        callback_data=callback_data
     )
+    # game_state, game_data, user_id = (
+    #     await take_action_and_register_user(
+    #         callback=callback,
+    #         callback_data=callback_data,
+    #         state=state,
+    #         dispatcher=dispatcher,
+    #     )
+    # )
+    # deceived_user = game_data[Instigator.extra_data[0].key][0]
+    # deceived_user.append(user_id)
+    # subject_url = game_data["players"][str(deceived_user[0])]["url"]
+    # object_id = game_data["players"][str(deceived_user[1])]["url"]
+    # await delete_message(callback.message)
+    # await callback.message.answer(
+    #     text=f"Днём {subject_url} проголосует за {object_id}, если попытается голосовать"
+    # )

@@ -60,7 +60,7 @@ async def werewolf_turns_into(
         ],
     }
     game_state, game_data = await get_game_state_and_data(
-        callback=callback, state=state, dispatcher=dispatcher
+        tg_obj=callback, state=state, dispatcher=dispatcher
     )
 
     user_id = callback.from_user.id

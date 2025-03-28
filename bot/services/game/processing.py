@@ -191,7 +191,7 @@ class Executor:
         await self.remove_user_from_game(
             game_data=game_data,
             user_id=removed_user_id,
-            is_night=False,
+            at_night=False,
         )
         await self.bot.send_message(
             chat_id=self.group_chat_id,
@@ -230,7 +230,7 @@ class Executor:
         text_about_dead = ""
         for victim_id in victims:
             await self.remove_user_from_game(
-                game_data=game_data, user_id=victim_id, is_night=True
+                game_data=game_data, user_id=victim_id, at_night=True
             )
             url = game_data["players"][str(victim_id)]["url"]
             role = game_data["players"][str(victim_id)][
@@ -283,19 +283,26 @@ class Executor:
         return True
 
     async def remove_user_from_game(
-        self, game_data: GameCache, user_id: int, is_night: bool
+        self, game_data: GameCache, user_id: int, at_night: bool
     ):
-        if is_night:
+        user_role = game_data["players"][str(user_id)]["enum_name"]
+        role: Role = self.all_roles[user_role]
+        if at_night:
             await get_state_and_assign(
                 dispatcher=self.dispatcher,
                 chat_id=user_id,
                 bot_id=self.bot.id,
                 new_state=UserFsm.WAIT_FOR_LATEST_LETTER,
             )
-        user_role = game_data["players"][str(user_id)]["enum_name"]
-        role: Role = self.all_roles[user_role]
+        elif role.clearing_state_after_death:
+            user_state = await get_state_and_assign(
+                dispatcher=self.dispatcher,
+                chat_id=user_id,
+                bot_id=self.bot.id,
+            )
+            await user_state.clear()
         await role.report_death(
-            game_data=game_data, is_night=is_night, user_id=user_id
+            game_data=game_data, is_night=at_night, user_id=user_id
         )
         game_data["players_ids"].remove(user_id)
         game_data["players"][str(user_id)][

@@ -7,6 +7,7 @@ from services.game.roles.base.mixins import (
     ProcedureAfterVoting,
 )
 from states.states import UserFsm
+from utils.utils import get_state_and_assign
 from utils.validators import get_processed_role_and_user_if_exists
 
 
@@ -25,6 +26,7 @@ class AngelOfDeath(
     message_to_user_after_action = "Ты выбрал отомстить {url}"
     can_kill_at_night = True
     payment_for_night_spent = 5
+    clearing_state_after_death = False
 
     async def take_action_after_voting(
         self, game_data: GameCache, removed_user: list[int], **kwargs
@@ -43,7 +45,13 @@ class AngelOfDeath(
         processed_user_id: int,
         **kwargs
     ):
-
+        for angel_id in game_data[self.roles_key]:
+            angel_state = await get_state_and_assign(
+                dispatcher=self.dispatcher,
+                chat_id=angel_id,
+                bot_id=self.bot.id,
+            )
+            await angel_state.clear()
         if processed_user_id not in victims:
             game_data["angels_died"].clear()
             return

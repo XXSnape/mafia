@@ -2,7 +2,7 @@ import asyncio
 
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Message
 from cache.cache_types import GameCache, UserCache, UserIdInt
 from constants.output import NUMBER_OF_NIGHT
 from general.collection_of_roles import get_data_with_roles
@@ -84,7 +84,7 @@ async def inform_aliases(
 
 
 async def get_game_state_and_data(
-    callback: CallbackQuery,
+    tg_obj: CallbackQuery | Message,
     state: FSMContext,
     dispatcher: Dispatcher,
 ) -> tuple[FSMContext, GameCache]:
@@ -92,7 +92,7 @@ async def get_game_state_and_data(
     game_state = await get_state_and_assign(
         dispatcher=dispatcher,
         chat_id=user_data["game_chat"],
-        bot_id=callback.bot.id,
+        bot_id=tg_obj.bot.id,
     )
     game_data: GameCache = await game_state.get_data()
     return game_state, game_data
@@ -105,7 +105,7 @@ async def get_game_state_data_and_user_id(
     dispatcher: Dispatcher,
 ) -> tuple[FSMContext, GameCache, UserIdInt]:
     game_state, game_data = await get_game_state_and_data(
-        callback=callback, state=state, dispatcher=dispatcher
+        tg_obj=callback, state=state, dispatcher=dispatcher
     )
     user_id = game_data["players_ids"][callback_data.user_index]
     return game_state, game_data, user_id
