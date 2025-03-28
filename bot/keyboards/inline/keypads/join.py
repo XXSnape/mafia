@@ -45,7 +45,7 @@ async def offer_to_place_bet(banned_roles: list[RolesLiteral]):
                 )
             )
     buttons.sort(key=attrgetter("text"))
-    return generate_inline_kb(data_with_buttons=buttons)
+    return generate_inline_kb(data_with_buttons=buttons, sizes=[2])
 
 
 def cancel_bet():

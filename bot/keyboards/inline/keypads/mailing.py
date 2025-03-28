@@ -70,7 +70,6 @@ def selection_to_warden_kb(game_data: "GameCache", user_id: int):
     from services.game.roles.warden import Warden
 
     checked = game_data[Warden.extra_data[0].key]
-    print("ch", checked)
     buttons = []
     for player_id in game_data["players_ids"]:
         if player_id == user_id:
@@ -83,7 +82,6 @@ def selection_to_warden_kb(game_data: "GameCache", user_id: int):
                 text=text, callback_data=str(player_id)
             )
         )
-    print("but", buttons)
     return generate_inline_kb(data_with_buttons=buttons)
 
 

@@ -229,7 +229,9 @@ class Registration(RouterHelper):
             banned_roles=game_data["owner"]["banned_roles"]
         )
         text = make_build(
-            f"Ты в игре! Удачи! Твой баланс: {balance}. Если хочешь, можешь сделать ставку на разрешенную роль:\n\n"
+            f"Ты в игре! Удачи!\n"
+            f"Твой баланс: {balance}{MONEY_SYM}.\n"
+            f"Если хочешь, можешь сделать ставку на разрешенную роль:\n\n"
         ) + RoleManager.get_current_order_text(
             selected_roles=game_data["owner"]["order_of_roles"]
         )
@@ -351,8 +353,11 @@ class Registration(RouterHelper):
         user_data: UserCache = {"coveted_role": role_key}
         await self.state.update_data(user_data)
         await self.callback.message.edit_text(
-            text=f"Ты выбрал поставить на {coveted_role.role}. Твой баланс: {balance}."
-            f"Введи сумму денег или отмени",
+            text=make_build(
+                f"Ты выбрал поставить на {coveted_role.role}.\n"
+                f"Твой баланс: {balance}{MONEY_SYM}.\n"
+                f"Введи сумму денег или отмени"
+            ),
             reply_markup=cancel_bet(),
         )
 
@@ -443,7 +448,8 @@ class Registration(RouterHelper):
         await bot.edit_message_text(
             chat_id=user_id,
             text=make_build(
-                f"Ты успешно поставил {self.message.text}{MONEY_SYM} на роль {role.role}!"
+                f"Ты успешно поставил {self.message.text}{MONEY_SYM} на роль {role.role}!\n"
+                f"Твой текущий баланс: {balance}{MONEY_SYM}"
             ),
             reply_markup=cancel_bet(),
             message_id=user_data["message_with_offer_id"],
