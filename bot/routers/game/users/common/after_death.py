@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from cache.cache_types import GameCache, UserCache
 from states.states import UserFsm
-from utils.utils import get_state_and_assign
+from utils.utils import get_state_and_assign, make_build
 
 router = Router(name=__name__)
 
@@ -27,5 +27,5 @@ async def send_latest_message(
         chat_id=user_data["game_chat"],
         text=f"По слухам {role} {url} перед смертью проглаголил такие слова:\n\n{message.text}",
     )
-    await message.answer("Сообщение успешно отправлено!")
+    await message.answer(make_build("Сообщение успешно отправлено!"))
     await state.set_state(state=None)

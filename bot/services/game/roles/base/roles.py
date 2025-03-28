@@ -127,9 +127,8 @@ class Role(ABC):
         nights_lived = user_data.get(
             "number_died_at_night", count_of_nights
         )
-        nights_lived_text = make_build(
-            f"Дней и ночей прожито: {nights_lived} из {count_of_nights}"
-        )
+        nights_lived_text = f"Дней и ночей прожито: {nights_lived} из {count_of_nights}"
+
         money_for_victory, money_for_nights = (
             self.get_money_for_victory_and_nights(
                 game_data=game_data,
@@ -142,11 +141,9 @@ class Role(ABC):
             user_data["money"] += (
                 money_for_victory + money_for_nights
             )
-            text = (
-                make_build(
-                    f"🔥🔥🔥Поздравляю! Ты победил в роли {user_data['initial_role']} ({money_for_victory}{MONEY_SYM})!\n\n"
-                )
-                + f"{nights_lived_text} ({money_for_nights}{MONEY_SYM})\n"
+            text = make_build(
+                f"🔥🔥🔥Поздравляю! Ты победил в роли {user_data['initial_role']} ({money_for_victory}{MONEY_SYM})!\n\n"
+                f"{nights_lived_text} ({money_for_nights}{MONEY_SYM})\n"
             )
             return PersonalResultSchema(
                 user_tg_id=int(user_id),
@@ -159,11 +156,9 @@ class Role(ABC):
             )
         else:
             user_data["money"] = 0
-            text = (
-                make_build(
-                    f"🚫К сожалению, ты проиграл в роли {user_data['initial_role']} (0{MONEY_SYM})!\n\n"
-                )
-                + f"{nights_lived_text} (0 {MONEY_SYM})"
+            text = make_build(
+                f"🚫К сожалению, ты проиграл в роли {user_data['initial_role']} (0{MONEY_SYM})!\n\n"
+                f"{nights_lived_text} (0{MONEY_SYM})"
             )
             return PersonalResultSchema(
                 user_tg_id=int(user_id),
@@ -233,8 +228,8 @@ class Role(ABC):
             voted_role=voted_role
         )
         user_data["money"] += earned_money
-        achivements = user_data["achievements"]
-        achivements.append(
+        achievements = user_data["achievements"]
+        achievements.append(
             f"🌟День {number_of_day}.\nПовешение {voted_user['url']} ("
             f"{voted_user['pretty_role']}) - {earned_money}{MONEY_SYM}"
         )
@@ -259,13 +254,15 @@ class Role(ABC):
         self, game_data: GameCache, is_night: bool, user_id: int
     ):
         if is_night:
-            message = "К сожалению, тебя убили! Отправь напоследок все, что думаешь!"
+            message = make_build(
+                "К сожалению, тебя убили! Отправь напоследок все, что думаешь!"
+            )
             await self.bot.send_message(
                 chat_id=user_id,
                 text=message,
             )
         else:
-            message = "Тебя линчевали на голосовании!"
+            message = make_build("Тебя линчевали на голосовании!")
             await self.bot.send_message(
                 chat_id=user_id, text=message
             )

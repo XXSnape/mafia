@@ -13,6 +13,7 @@ from services.game.actions_at_night import (
 )
 from services.game.roles import Instigator
 from utils.tg import delete_message
+from utils.utils import make_build
 
 router = Router(name=__name__)
 
@@ -51,6 +52,8 @@ async def vote_for(
     )
     await callback.bot.send_message(
         chat_id=game_data["game_chat"],
-        text=f"{voting_url} выступает против {voted_url}!",
+        text=make_build(
+            f"{voting_url} выступает против {voted_url}!"
+        ),
         reply_markup=participate_in_social_life(),
     )

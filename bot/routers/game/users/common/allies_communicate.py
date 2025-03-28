@@ -7,7 +7,7 @@ from aiogram.types import Message
 from cache.cache_types import GameCache, UserCache
 from services.game.roles import Hacker, Mafia
 from states.states import UserFsm
-from utils.utils import get_state_and_assign
+from utils.utils import get_state_and_assign, make_build
 
 router = Router(name=__name__)
 
@@ -60,4 +60,6 @@ async def allies_communicate(
                 text=f"{role} ??? передает:\n\n{message.text}",
             )
     if len(game_data[aliases]) > 1:
-        await message.answer("Сообщение успешно отправлено!")
+        await message.answer(
+            make_build("Сообщение успешно отправлено!")
+        )
