@@ -45,9 +45,7 @@ async def policeman_makes_choice(
     dispatcher: Dispatcher,
 ):
     saver = PolicemanSaver(
-        callback=callback,
-        state=state,
-        dispatcher=dispatcher
+        callback=callback, state=state, dispatcher=dispatcher
     )
     await saver.policeman_makes_choice()
     # data = {
@@ -105,9 +103,7 @@ async def policeman_chose_to_kill(
     dispatcher: Dispatcher,
 ):
     saver = PolicemanSaver(
-        callback=callback,
-        state=state,
-        dispatcher=dispatcher
+        callback=callback, state=state, dispatcher=dispatcher
     )
     await saver.policeman_chose_to_kill(callback_data=callback_data)
     # await take_action_and_register_user(
@@ -131,9 +127,7 @@ async def policeman_chose_to_check(
     dispatcher: Dispatcher,
 ):
     saver = PolicemanSaver(
-        callback=callback,
-        state=state,
-        dispatcher=dispatcher
+        callback=callback, state=state, dispatcher=dispatcher
     )
     await saver.policeman_chose_to_check(callback_data=callback_data)
     # _, game_data, checked_user_id = (

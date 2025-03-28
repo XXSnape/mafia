@@ -37,9 +37,7 @@ async def poisoner_chose_to_kill(
     dispatcher: Dispatcher,
 ):
     saver = PoisonerSaver(
-        callback=callback,
-        state=state,
-        dispatcher=dispatcher
+        callback=callback, state=state, dispatcher=dispatcher
     )
     await saver.poisoner_chose_to_kill()
     # game_state, game_data = await get_game_state_and_data(
@@ -66,9 +64,7 @@ async def poisoner_poisons(
     dispatcher: Dispatcher,
 ):
     saver = PoisonerSaver(
-        callback=callback,
-        state=state,
-        dispatcher=dispatcher
+        callback=callback, state=state, dispatcher=dispatcher
     )
     await saver.poisoner_poisons()
     # game_state, game_data = await get_game_state_and_data(
@@ -101,9 +97,7 @@ async def poisoner_cancels_selection(
     dispatcher: Dispatcher,
 ):
     saver = PoisonerSaver(
-        callback=callback,
-        state=state,
-        dispatcher=dispatcher
+        callback=callback, state=state, dispatcher=dispatcher
     )
     await saver.poisoner_cancels_selection()
     # _, game_data = await get_game_state_and_data(
@@ -130,9 +124,7 @@ async def poisoner_chose_victim(
     dispatcher: Dispatcher,
 ):
     saver = PoisonerSaver(
-        callback=callback,
-        state=state,
-        dispatcher=dispatcher
+        callback=callback, state=state, dispatcher=dispatcher
     )
     await saver.poisoner_chose_victim(callback_data=callback_data)
     # game_state, game_data, user_id = (
