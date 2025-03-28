@@ -6,6 +6,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.types import InlineKeyboardButton
+from faststream.rabbit import RabbitBroker
 
 from cache.cache_types import (
     ExtraCache,
@@ -16,6 +17,7 @@ from cache.cache_types import (
     RolesLiteral,
 )
 from constants.output import MONEY_SYM
+from database.schemas.results import PersonalResultSchema
 from general.groupings import Groupings
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
@@ -118,7 +120,8 @@ class Role(ABC):
         winning_group: Groupings,
         game_data: GameCache,
         user_id: str,
-    ) -> bool:
+        game_id: int,
+    ) -> PersonalResultSchema:
         user_data = game_data["players"][user_id]
         count_of_nights = game_data["number_of_night"]
         nights_lived = user_data.get(
@@ -127,7 +130,6 @@ class Role(ABC):
         nights_lived_text = make_build(
             f"Дней и ночей прожито: {nights_lived} из {count_of_nights}"
         )
-        achivements = user_data["achievements"]
         money_for_victory, money_for_nights = (
             self.get_money_for_victory_and_nights(
                 game_data=game_data,
@@ -140,24 +142,38 @@ class Role(ABC):
             user_data["money"] += (
                 money_for_victory + money_for_nights
             )
-            achivements.insert(
-                0,
+            text = (
                 make_build(
                     f"🔥🔥🔥Поздравляю! Ты победил в роли {user_data['initial_role']} ({money_for_victory}{MONEY_SYM})!\n\n"
                 )
-                + f"{nights_lived_text} ({money_for_nights}{MONEY_SYM})\n",
+                + f"{nights_lived_text} ({money_for_nights}{MONEY_SYM})\n"
             )
-            return True
+            return PersonalResultSchema(
+                user_tg_id=int(user_id),
+                game_id=game_id,
+                role=user_data["role"],
+                is_winner=True,
+                nights_lived=nights_lived,
+                money=user_data["money"],
+                text=text,
+            )
         else:
             user_data["money"] = 0
-            achivements.insert(
-                0,
+            text = (
                 make_build(
                     f"🚫К сожалению, ты проиграл в роли {user_data['initial_role']} (0{MONEY_SYM})!\n\n"
                 )
-                + f"{nights_lived_text} (0 {MONEY_SYM})",
+                + f"{nights_lived_text} (0 {MONEY_SYM})"
             )
-            return False
+            return PersonalResultSchema(
+                user_tg_id=int(user_id),
+                game_id=game_id,
+                role=user_data["role"],
+                is_winner=False,
+                nights_lived=nights_lived,
+                money=user_data["money"],
+                text=text,
+            )
 
     def get_money_for_voting(
         self,

@@ -15,6 +15,5 @@ class ResultModel(IdMixin, BaseModel):
         ForeignKey("roles.name", ondelete="SET NULL"),
     )
     is_winner: Mapped[bool]
-
     nights_lived: Mapped[int]
     money: Mapped[int]

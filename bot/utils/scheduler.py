@@ -11,7 +11,7 @@ from services.game.pipeline_game import Game
 from utils.tg import (
     clear_game_data,
 )
-from utils.utils import make_build
+from utils.utils import make_build, get_minutes_and_seconds_text
 
 
 async def start_game(
@@ -66,23 +66,12 @@ def clearing_tasks_on_schedule(
     scheduler.remove_job(job_id=f"remind_{game_chat}")
 
 
-def get_minutes_and_seconds_text(now: int, end_of_registration: int):
-    diff = end_of_registration - now
-    minutes = diff // 60
-    seconds = diff % 60
-    message = "До начала игры осталось примерно "
-    if minutes:
-        message += f"{minutes} м. "
-    message += f"{seconds} с!"
-    return message
-
-
 async def remind_of_beginning_of_game(bot: Bot, state: FSMContext):
     game_data: GameCache = await state.get_data()
     now = int(datetime.utcnow().timestamp())
     end_of_registration = game_data["end_of_registration"]
     message = get_minutes_and_seconds_text(
-        now=now, end_of_registration=end_of_registration
+        start=now, end=end_of_registration
     )
     await bot.send_message(
         chat_id=game_data["game_chat"], text=make_build(message)

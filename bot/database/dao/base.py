@@ -105,9 +105,14 @@ class BaseDAO(Generic[T]):
             logger.error(f"Ошибка при добавлении записи: {e}")
             raise
 
-    async def add_many(self, instances: List[BaseModel]):
+    async def add_many(
+        self,
+        instances: List[BaseModel],
+        exclude: set[str] | None = None,
+    ):
         values_list = [
-            item.model_dump(exclude_unset=True) for item in instances
+            item.model_dump(exclude_unset=True, exclude=exclude)
+            for item in instances
         ]
         logger.info(
             f"Добавление нескольких записей {self.model.__name__}. Количество: {len(values_list)}"

@@ -22,7 +22,6 @@ def change_role(
 ):
     game_data[previous_role.roles_key].remove(user_id)
     game_data[new_role.roles_key].append(user_id)
-    game_data["players"][str(user_id)]["role"] = new_role.role
     game_data["players"][str(user_id)]["pretty_role"] = make_pretty(
         new_role.role
     )

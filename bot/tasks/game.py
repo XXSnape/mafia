@@ -1,9 +1,13 @@
 from faststream import FastStream
-from faststream.rabbit import RabbitBroker
-from pydantic import BaseModel
 import asyncio
 
-from broker.dependencies import SessionWithCommitDep
+from database.dao.games import GamesDao
+from database.dao.results import ResultsDao
+from database.schemas.common import IdSchema
+from database.schemas.games import EndOfGameSchema
+from database.schemas.results import PersonalResultSchema
+from tasks.dependencies import SessionWithCommitDep
+
 from constants.output import MONEY_SYM
 from database.dao.rates import RatesDao
 from database.dao.users import UsersDao
@@ -46,7 +50,9 @@ async def analyze_betting_results(
     await rates_dao.add_many(schemas)
     for bet in bids:
         if bet.is_winner:
-            await users_dao.collect_money_for_bets(user_money=bet)
+            await users_dao.update_balance(
+                user_money=bet, add_money=False
+            )
 
 
 @broker.subscriber("role_outside_game")
@@ -67,6 +73,31 @@ async def report_role_outside_game(bids: list[BidForRoleSchema]):
             for user_id, message in messages
         ]
     )
+
+
+@broker.subscriber("game_results")
+async def save_game_results(
+    game_result: EndOfGameSchema, session: SessionWithCommitDep
+):
+    dao = GamesDao(session=session)
+    await dao.update(
+        filters=IdSchema(id=game_result.id), values=game_result
+    )
+
+
+@broker.subscriber("personal_results")
+async def save_personal_results(
+    personal_results: list[PersonalResultSchema],
+    session: SessionWithCommitDep,
+):
+    result_dao = ResultsDao(session=session)
+    users_dao = UsersDao(session=session)
+    await result_dao.add_many(personal_results, exclude={"text"})
+
+    for result in personal_results:
+        await users_dao.update_balance(
+            user_money=result, add_money=True
+        )
 
 
 async def main():

@@ -190,3 +190,17 @@ def get_the_most_frequently_encountered_id(ids: "PlayersIds"):
     if most_common[0][1] == most_common[1][1]:
         return None
     return most_common[0][0]
+
+
+def get_minutes_and_seconds_text(
+    start: int,
+    end: int,
+    message="До начала игры осталось примерно ",
+):
+    diff = end - start
+    minutes = diff // 60
+    seconds = diff % 60
+    if minutes:
+        message += f"{minutes} м. "
+    message += f"{seconds} с!"
+    return message

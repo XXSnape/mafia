@@ -13,3 +13,9 @@ services:
     env_file:
       - .env
 #    restart: on-failure
+  rabbitmq:
+    image: rabbitmq:alpine
+    ports:
+      - 5672:5672
+    volumes:
+      - ./rabbitmq_data:/data

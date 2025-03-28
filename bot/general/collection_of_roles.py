@@ -58,8 +58,8 @@ BASES_ROLES = [
     "warden",
     "don",
     "policeman",
-    "forger",
-    # "doctor",
+    # "forger",
+    "doctor",
     # "policeman",
     # "civilian",
 ]

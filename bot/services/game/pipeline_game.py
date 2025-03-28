@@ -17,6 +17,7 @@ from cache.cache_types import (
     RolesLiteral,
     UserIdInt,
     RoleAndUserMoney,
+    UserIdStr,
 )
 from constants.output import MONEY_SYM
 from database.dao.games import GamesDao
@@ -24,7 +25,11 @@ from database.schemas.bids import (
     BidForRoleSchema,
     ResultBidForRoleSchema,
 )
-from database.schemas.games import BeginningOfGameScheme
+from database.schemas.games import (
+    BeginningOfGameSchema,
+    EndOfGameSchema,
+)
+from database.schemas.results import PersonalResultSchema
 from general.collection_of_roles import get_data_with_roles
 from general.exceptions import GameIsOver
 from general.groupings import Groupings
@@ -40,6 +45,7 @@ from utils.utils import (
     make_pretty,
     make_build,
     get_profiles,
+    get_minutes_and_seconds_text,
 )
 from utils.live_players import get_live_players
 
@@ -104,9 +110,9 @@ class Game:
     async def create_game_in_db(self, creator_id: UserIdInt):
         dao = GamesDao(session=self.session)
         beginning_dt = datetime.datetime.now()
-        self.beginning_game = beginning_dt.timestamp()
+        self.beginning_game = int(beginning_dt.timestamp())
         game_instance = await dao.add(
-            BeginningOfGameScheme(
+            BeginningOfGameSchema(
                 chat_id=self.group_chat_id,
                 creator_tg_id=creator_id,
                 start=beginning_dt,
@@ -208,47 +214,75 @@ class Game:
         )
         winners = []
         losers = []
+        personal_results: dict[UserIdStr, PersonalResultSchema] = {}
         for user_id, player in game_data["players"].items():
             enum_name = player["enum_name"]
             current_role: Role = self.all_roles[enum_name]
-            is_winner = current_role.earn_money_for_winning(
+            personal_result = current_role.earn_money_for_winning(
                 winning_group=e.winner,
                 game_data=game_data,
                 user_id=user_id,
+                game_id=self.game_id,
             )
-            if is_winner:
+            if personal_result.is_winner:
                 winners.append(user_id)
             else:
                 losers.append(user_id)
+            personal_results[user_id] = personal_result
         sorting_func = sorting_by_money(game_data=game_data)
         winners.sort(key=sorting_func, reverse=True)
-        winners = make_build("🔥Победители:\n") + get_profiles(
+        winners_text = make_build("🔥Победители:\n") + get_profiles(
             players_ids=winners,
             players=game_data["players"],
             initial_role=True,
             money_need=True,
             role=True,
         )
-        losers = make_build("\n\n🚫Проигравшие:\n") + get_profiles(
+        losers_text = make_build(
+            "\n\n🚫Проигравшие:\n"
+        ) + get_profiles(
             players_ids=losers,
             players=game_data["players"],
             initial_role=True,
             money_need=True,
             role=True,
         )
+        end_of_game = datetime.datetime.now()
+        message = get_minutes_and_seconds_text(
+            start=self.beginning_game,
+            end=int(end_of_game.timestamp()),
+            message="⏰ Игра длилась ",
+        )
         await self.bot.send_message(
             chat_id=self.group_chat_id,
-            text=result + winners + losers,
+            text=result
+            + winners_text
+            + losers_text
+            + make_build(f"\n\n{message}"),
         )
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
         )
+        await self.broker.publish(
+            message=EndOfGameSchema(
+                id=self.game_id,
+                number_of_nights=game_data["number_of_night"],
+                end=end_of_game,
+                winning_group=e.winner.value.name,
+            ),
+            queue="game_results",
+        )
+        await self.broker.publish(
+            message=list(personal_results.values()),
+            queue="personal_results",
+        )
         await asyncio.gather(
             *(
-                self.reset_state(
-                    user_id=int(user_id),
+                self.sum_up_personal_results_players(
+                    user_id=user_id,
                     player_data=player_data,
+                    personal_results=personal_results,
                 )
                 for user_id, player_data in game_data[
                     "players"
@@ -257,33 +291,31 @@ class Game:
         )
         await self.state.clear()
 
-    async def reset_state(
+    async def sum_up_personal_results_players(
         self,
-        user_id: int,
+        user_id: UserIdStr,
         player_data: UserGameCache,
+        personal_results: dict[UserIdStr, PersonalResultSchema],
     ):
-        result_of_game, *achivements = player_data["achievements"]
-        money = player_data["money"]
-        text = result_of_game
-        if money != 0:
-            if not achivements:
-                achivements_text = make_build(
-                    "\nУ тебя нет полезных действий за игру!"
-                )
-            else:
-                achivements_text = make_build(
-                    "\nОтчет об активных и полезных действиях, повлиявших на исход:\n\n● "
-                ) + "\n● ".join(
-                    achievement for achievement in achivements
-                )
-            text += achivements_text
-        text += make_build(
-            f"\n\nИтого: {player_data['money']}{MONEY_SYM}"
-        )
-        await self.bot.send_message(chat_id=user_id, text=text)
+        achievements = player_data["achievements"]
+        result = personal_results[user_id]
+        text = result.text
+        if not achievements:
+            achievements_text = make_build(
+                "\nУ тебя нет полезных действий за игру!"
+            )
+        else:
+            achievements_text = make_build(
+                "\nОтчет об активных и полезных действиях, повлиявших на исход:\n\n● "
+            ) + "\n● ".join(
+                achievement for achievement in achievements
+            )
+        text += achievements_text
+        text += make_build(f"\n\nИтого: {result.money}{MONEY_SYM}")
+        await self.bot.send_message(chat_id=int(user_id), text=text)
         await reset_user_state(
             dispatcher=self.dispatcher,
-            user_id=user_id,
+            user_id=int(user_id),
             bot_id=self.bot.id,
         )
 

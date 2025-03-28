@@ -26,7 +26,6 @@ class BossIsDeadMixin:
             return
         new_boss_id = players[0]
         new_boss_url = game_data["players"][str(new_boss_id)]["url"]
-        game_data["players"][str(new_boss_id)]["role"] = self.role
         game_data["players"][str(new_boss_id)]["pretty_role"] = (
             make_pretty(self.role)
         )

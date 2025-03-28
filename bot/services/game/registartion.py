@@ -48,7 +48,6 @@ from utils.scheduler import (
     start_game,
     remind_of_beginning_of_game,
     clearing_tasks_on_schedule,
-    get_minutes_and_seconds_text,
 )
 from utils.tg import (
     check_user_for_admin_rights,
@@ -61,6 +60,7 @@ from utils.utils import (
     get_state_and_assign,
     get_profiles_during_registration,
     make_build,
+    get_minutes_and_seconds_text,
 )
 
 
@@ -148,8 +148,8 @@ class Registration(RouterHelper):
         )
         await sent_message.pin()
         time_to_start = get_minutes_and_seconds_text(
-            now=start_of_registration,
-            end_of_registration=end_of_registration,
+            start=start_of_registration,
+            end=end_of_registration,
         )
         await self.message.answer(make_build(time_to_start))
         self.scheduler.add_job(
@@ -198,7 +198,7 @@ class Registration(RouterHelper):
             ),
         )
         time_to_start = get_minutes_and_seconds_text(
-            now=now, end_of_registration=end_of_registration
+            start=now, end=end_of_registration
         )
         await self.message.answer(
             make_build(
