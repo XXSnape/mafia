@@ -12,7 +12,7 @@ from keyboards.inline.callback_factory.recognize_user import (
 from services.game.roles import Hacker, Mafia
 from services.game.roles.base import Role, ActiveRoleAtNight
 from utils.tg import delete_message
-from utils.utils import get_state_and_assign
+from utils.state import get_state_and_assign
 
 
 def save_notification_message(
@@ -107,7 +107,7 @@ async def get_game_state_data_and_user_id(
     game_state, game_data = await get_game_state_and_data(
         tg_obj=callback, state=state, dispatcher=dispatcher
     )
-    user_id = game_data["players_ids"][callback_data.user_index]
+    user_id = game_data["live_players_ids"][callback_data.user_index]
     return game_state, game_data, user_id
 
 

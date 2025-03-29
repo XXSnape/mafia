@@ -1,21 +1,81 @@
-from general.collection_of_roles import get_data_with_roles
+from collections.abc import Callable
+from functools import wraps
+from typing import TYPE_CHECKING
+
+from cache.cache_types import RolesLiteral
+from utils.pretty_text import make_pretty
+
+if TYPE_CHECKING:
+    from services.game.roles import GameCache, PlayersIds
+    from services.game.roles.base import Role
 
 
-def get_roles_without_bases(number: int):
-    all_roles = get_data_with_roles()
-    for role in ("don", "doctor", "policeman", "civilian", "mafia"):
-        all_roles.pop(role)
-    roles = sorted(role.role for role in all_roles.values())
-    len_roles = len(roles)
-    delimiter = 10
-    for divider in range(10, 0, -1):
-        if len_roles % divider != 1:
-            delimiter = divider
-            break
-    max_number = len(roles) // delimiter + bool(
-        len(roles) % delimiter
+def change_role(
+    game_data: "GameCache",
+    previous_role: "Role",
+    new_role: "Role",
+    role_id: RolesLiteral,
+    user_id: int,
+):
+    game_data[previous_role.roles_key].remove(user_id)
+    game_data[new_role.roles_key].append(user_id)
+    game_data["players"][str(user_id)]["pretty_role"] = make_pretty(
+        new_role.role
     )
+    game_data["players"][str(user_id)]["role_id"] = role_id
+    game_data["players"][str(user_id)][
+        "roles_key"
+    ] = new_role.roles_key
+
+
+def get_user_role_and_url(
+    game_data: "GameCache",
+    processed_user_id: int,
+    all_roles: dict[str, "Role"],
+):
+    role_id = game_data["players"][str(processed_user_id)][
+        "role_id"
+    ]
     return (
-        roles[number * delimiter : (number + 1) * delimiter],
-        max_number - 1,
+        all_roles[role_id],
+        game_data["players"][str(processed_user_id)]["url"],
     )
+
+
+def get_processed_role_and_user_if_exists(async_func: Callable):
+    @wraps(async_func)
+    async def wrapper(role: "Role", **kwargs):
+        game_data: GameCache = kwargs["game_data"]
+        processed_user_id = role.get_processed_user_id(game_data)
+        if processed_user_id is None:
+            return
+        processed_role, user_url = get_user_role_and_url(
+            game_data=game_data,
+            processed_user_id=processed_user_id,
+            all_roles=kwargs["all_roles"],
+        )
+        return await async_func(
+            role,
+            **kwargs,
+            processed_role=processed_role,
+            processed_user_id=processed_user_id,
+            user_url=user_url,
+        )
+
+    return wrapper
+
+
+def get_processed_user_id_if_exists(async_func: Callable):
+    @wraps(async_func)
+    async def wrapper(role: "Role", **kwargs):
+        game_data: GameCache = kwargs["game_data"]
+        processed_user_id = role.get_processed_user_id(game_data)
+        if processed_user_id is None:
+            return
+        return await async_func(
+            role, **kwargs, processed_user_id=processed_user_id
+        )
+
+    return wrapper
+
+

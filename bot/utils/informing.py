@@ -1,35 +1,67 @@
-from collections import Counter
-from contextlib import suppress
-from inspect import get_annotations
-from typing import TYPE_CHECKING
-from collections.abc import Callable
-from aiogram import Dispatcher
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State
-from aiogram.fsm.storage.base import StorageKey
+import asyncio
 from collections import defaultdict
-from cache.cache_types import GameCache, UserIdInt
-from constants.output import MONEY_SYM
 
-if TYPE_CHECKING:
-    from services.game.roles.base import Role
-    from services.game.roles import (
-        LivePlayersIds,
-        PlayersIds,
-        UsersInGame,
+from aiogram import Bot
+
+from cache.cache_types import GameCache, UserIdInt
+from constants.output import MONEY_SYM, NUMBER_OF_NIGHT
+from general.groupings import Groupings
+from services.game.roles.base import Role
+from utils.pretty_text import make_build, make_pretty
+
+
+def get_live_players(
+    game_data: GameCache, all_roles: dict[str, Role]
+):
+    profiles = get_profiles(
+        players_ids=game_data["live_players_ids"],
+        players=game_data["players"],
+    )
+    live_roles = get_live_roles(
+        game_data=game_data, all_roles=all_roles
+    )
+    return (
+        f"{make_build('💗Живые игроки:')}\n"
+        f"{profiles}\n\n"
+        f"{make_build('Состав группировок:')}\n"
+        f"{live_roles}\n\n"
     )
 
 
-def dependency_injection(func: Callable, data: dict):
-    keys = set(get_annotations(func).keys())
-    suitable_keys = keys & set(data.keys())
-    return {
-        key: val for key, val in data.items() if key in suitable_keys
+def get_live_roles(game_data: GameCache, all_roles: dict[str, Role]):
+    gropings: dict[Groupings, list[tuple[str, int]]] = {
+        Groupings.civilians: [],
+        Groupings.criminals: [],
+        Groupings.killer: [],
+        Groupings.other: [],
     }
-
-
-def get_profile_link(user_id: int | str, full_name: str) -> str:
-    return f'<a href="tg://user?id={user_id}">{full_name}</a>'
+    for role in all_roles:
+        current_role = all_roles[role]
+        if not game_data[current_role.roles_key]:
+            continue
+        grouping = gropings[current_role.grouping]
+        text = current_role.role
+        if current_role.alias:
+            count = 1
+        elif current_role.is_alias:
+            count = len(game_data[current_role.roles_key][1:])
+        else:
+            count = len(game_data[current_role.roles_key])
+        if count == 0:
+            continue
+        if count > 1:
+            count_text = f" ({count})"
+            text += make_build(count_text)
+        grouping.append((text, count))
+    result = ""
+    for grouping, roles in gropings.items():
+        if not roles:
+            continue
+        grouping_roles = "\n● ".join(role for role, _ in roles)
+        total = sum(count for _, count in roles)
+        total_text = make_build(f"- {total}:")
+        result += f"\n{grouping.value.name} {total_text}\n● {grouping_roles}\n"
+    return result
 
 
 def get_profiles(
@@ -70,29 +102,6 @@ def get_profiles_during_registration(
 ) -> str:
     profiles = get_profiles(live_players_ids, players)
     return f"Скорее присоединяйся к игре!\nУчастники:\n{profiles}"
-
-
-def add_voice(
-    user_id: int,
-    add_to: "PlayersIds",
-    delete_from: "PlayersIds",
-    prime_ministers: "PlayersIds",
-):
-    repeat = 2 if user_id in prime_ministers else 1
-    for _ in range(repeat):
-        with suppress(ValueError):
-            delete_from.remove(user_id)
-    if user_id not in add_to:
-        for _ in range(repeat):
-            add_to.append(user_id)
-
-
-def make_build(string: str) -> str:
-    return f"<b>{string}</b>"
-
-
-def make_pretty(string: str) -> str:
-    return f"<b><i><u>{string}</u></i></b>"
 
 
 def get_results_of_goal_identification(game_data: GameCache):
@@ -162,45 +171,49 @@ def record_accrual(
         )
 
 
-async def get_state_and_assign(
-    dispatcher: Dispatcher,
-    chat_id: int,
-    bot_id: int,
-    new_state: State | None = None,
+async def notify_aliases_about_transformation(
+    game_data: "GameCache",
+    bot: Bot,
+    new_role: "Role",
+    user_id: int,
 ):
-    chat_state: FSMContext = FSMContext(
-        storage=dispatcher.storage,
-        key=StorageKey(
-            chat_id=chat_id,
-            user_id=chat_id,
-            bot_id=bot_id,
-        ),
+    url = game_data["players"][str(user_id)]["url"]
+    initial_role = game_data["players"][str(user_id)]["initial_role"]
+    profiles = get_profiles(
+        players_ids=game_data[new_role.roles_key],
+        players=game_data["players"],
+        role=True,
     )
-    if new_state:
-        await chat_state.set_state(new_state)
-    return chat_state
+    await asyncio.gather(
+        *(
+            bot.send_message(
+                chat_id=player_id,
+                text=NUMBER_OF_NIGHT.format(
+                    game_data["number_of_night"]
+                )
+                + f"{initial_role} {url} превратился в {make_pretty(new_role.role)}\n"
+                f"Текущие союзники:\n{profiles}",
+            )
+            for player_id in game_data[new_role.roles_key]
+        )
+    )
 
 
-def get_the_most_frequently_encountered_id(ids: "PlayersIds"):
-    if not ids:
-        return None
-    if len(set(ids)) == 1:
-        return ids[0]
-    most_common = Counter(ids).most_common()
-    if most_common[0][1] == most_common[1][1]:
-        return None
-    return most_common[0][0]
+def remind_worden_about_inspections(game_data: "GameCache"):
+    if not game_data["text_about_checked_for_the_same_groups"]:
+        return "Нет информации о совместных группах"
+    return (
+        "По результатам прошлых проверок выяснено:\n\n"
+        + game_data["text_about_checked_for_the_same_groups"]
+    )
 
 
-def get_minutes_and_seconds_text(
-    start: int,
-    end: int,
-    message="До начала игры осталось примерно ",
-):
-    diff = end - start
-    minutes = diff // 60
-    seconds = diff % 60
-    if minutes:
-        message += f"{minutes} м. "
-    message += f"{seconds} с!"
-    return message
+def remind_commissioner_about_inspections(
+    game_data: "GameCache",
+) -> str:
+    if not game_data["text_about_checks"]:
+        return "Роли ещё неизвестны"
+    return (
+        "По результатам прошлых проверок выяснено:\n\n"
+        + game_data["text_about_checks"]
+    )

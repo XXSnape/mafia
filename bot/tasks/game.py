@@ -18,7 +18,7 @@ from database.schemas.bids import (
 )
 from general.collection_of_roles import get_data_with_roles
 from general.config import broker, bot
-from utils.utils import make_build
+from utils.pretty_text import make_build
 
 
 @broker.subscriber("betting_results")

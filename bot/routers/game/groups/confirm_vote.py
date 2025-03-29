@@ -13,7 +13,6 @@ from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from services.game.processing_actions_in_group import GroupManager
 from services.game.roles import PrimeMinister, Prosecutor
 from states.states import GameFsm
-from utils.utils import add_voice
 
 router = Router(name=__name__)
 

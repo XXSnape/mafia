@@ -24,7 +24,7 @@ class InstigatorSaver(RouterHelper):
         url = game_data["players"][str(user_id)]["url"]
         game_data[Instigator.extra_data[0].key].append([user_id])
         markup = send_selection_to_players_kb(
-            players_ids=game_data["players_ids"],
+            players_ids=game_data["live_players_ids"],
             players=game_data["players"],
             extra_buttons=(BACK_BTN,),
             exclude=user_id,

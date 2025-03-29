@@ -3,7 +3,7 @@ from services.game.roles.base.roles import Role
 from services.game.roles.base import ActiveRoleAtNight
 from services.game.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
-from utils.validators import (
+from utils.roles import (
     get_processed_user_id_if_exists,
     get_processed_role_and_user_if_exists,
 )

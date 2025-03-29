@@ -13,7 +13,7 @@ from services.game.actions_at_night import (
 from services.game.roles import Mafia, Traitor
 from services.game.saving_role_selection.traitor import TraitorSaver
 from states.states import UserFsm
-from utils.utils import make_pretty
+from utils.pretty_text import make_pretty
 
 router = Router(name=__name__)
 

@@ -9,9 +9,9 @@ from services.game.roles.base.mixins import (
     ProcedureAfterVoting,
 )
 from states.states import UserFsm
-from utils.utils import make_pretty
-from utils.validators import (
-    notify_aliases_about_transformation,
+from utils.pretty_text import make_pretty
+from utils.informing import notify_aliases_about_transformation
+from utils.roles import (
     change_role,
 )
 

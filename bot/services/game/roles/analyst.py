@@ -5,7 +5,7 @@ from keyboards.inline.cb.cb_text import DRAW_CB
 from services.game.roles.base import ActiveRoleAtNight
 from services.game.roles.base.mixins import ProcedureAfterVoting
 from states.states import UserFsm
-from utils.validators import get_processed_user_id_if_exists
+from utils.roles import get_processed_user_id_if_exists
 
 
 class Analyst(ProcedureAfterVoting, ActiveRoleAtNight):

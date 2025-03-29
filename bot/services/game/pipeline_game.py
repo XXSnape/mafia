@@ -39,14 +39,14 @@ from services.game.controlling_game import Controller
 from services.game.roles.base import Role
 from states.states import GameFsm
 from utils.sorting import sorting_by_rate, sorting_by_money
-from utils.tg import delete_messages_from_to_delete, reset_user_state
-from utils.utils import (
+from utils.tg import delete_messages_from_to_delete
+from utils.state import reset_user_state
+from utils.pretty_text import (
     make_pretty,
     make_build,
-    get_profiles,
     get_minutes_and_seconds_text,
 )
-from utils.live_players import get_live_players
+from utils.informing import get_live_players, get_profiles
 
 
 class Game:
@@ -410,7 +410,7 @@ class Game:
         game_data: GameCache = await self.state.get_data()
         banned_roles = game_data["owner"]["banned_roles"]
         order_of_roles = game_data["owner"]["order_of_roles"]
-        players_ids = game_data["players_ids"]
+        players_ids = game_data["live_players_ids"]
         all_roles = get_data_with_roles()
         criminals: list[RolesLiteral] = []
         other: list[RolesLiteral] = []

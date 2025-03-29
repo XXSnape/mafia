@@ -14,7 +14,7 @@ from services.game.actions_at_night import (
 from services.game.processing_user_actions import UserManager
 from services.game.roles import Instigator
 from utils.tg import delete_message
-from utils.utils import make_build
+from utils.pretty_text import make_build
 
 router = Router(name=__name__)
 

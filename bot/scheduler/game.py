@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from aiogram import Dispatcher, Bot
+from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
@@ -8,10 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from cache.cache_types import GameCache
 from services.game.pipeline_game import Game
-from utils.tg import (
-    clear_game_data,
-)
-from utils.utils import make_build, get_minutes_and_seconds_text
+from utils.state import clear_game_data
+from utils.pretty_text import make_build, get_minutes_and_seconds_text
 
 
 async def start_game(
@@ -28,7 +26,7 @@ async def start_game(
         game_chat=game_data["game_chat"],
         need_to_clean_start=False,
     )
-    if len(game_data["players_ids"]) < 4:
+    if len(game_data["live_players_ids"]) < 4:
         await clear_game_data(
             game_data=game_data,
             bot=bot,

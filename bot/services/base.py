@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.schemas.roles import UserTgId
-from utils.utils import make_build
+from utils.pretty_text import make_build
 
 
 @dataclass

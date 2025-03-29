@@ -39,7 +39,7 @@ class PoisonerSaver(RouterHelper):
         await self.callback.message.edit_text(
             "Кого собираешься отравить?",
             reply_markup=send_selection_to_players_kb(
-                players_ids=game_data["players_ids"],
+                players_ids=game_data["live_players_ids"],
                 players=game_data["players"],
                 extra_buttons=(BACK_BTN,),
                 exclude=exclude,

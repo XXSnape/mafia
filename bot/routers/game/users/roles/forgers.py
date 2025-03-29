@@ -18,7 +18,7 @@ from services.game.roles import Forger, Policeman, PolicemanAlias
 from services.game.saving_role_selection.forger import ForgerSaver
 from states.states import UserFsm
 from utils.tg import delete_message
-from utils.utils import make_pretty
+from utils.pretty_text import make_pretty
 
 router = Router(name=__name__)
 

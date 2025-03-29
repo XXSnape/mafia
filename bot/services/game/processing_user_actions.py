@@ -13,7 +13,7 @@ from services.game.actions_at_night import (
 )
 from services.game.roles import Hacker, Mafia, Instigator
 from utils.tg import delete_message
-from utils.utils import make_build
+from utils.pretty_text import make_build
 
 
 class UserManager(RouterHelper):

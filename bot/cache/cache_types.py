@@ -124,7 +124,7 @@ class GameCache(TypedDict, total=False):
     disclosed_roles: DisclosedRoles
     pros: PlayersIds
     cons: PlayersIds
-    players_ids: LivePlayersIds
+    live_players_ids: LivePlayersIds
     players: UsersInGame
     tracking: TrackingData
     text_about_checks: str

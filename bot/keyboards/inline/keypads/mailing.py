@@ -34,7 +34,7 @@ def send_transformation_kb(game_data: "GameCache"):
         ),
     ]
     if len(game_data["mafias"]) + 1 < (
-        len(game_data["players_ids"])
+        len(game_data["live_players_ids"])
         - (len(game_data["mafias"]) + 1)
     ):
         buttons.append(
@@ -71,7 +71,7 @@ def selection_to_warden_kb(game_data: "GameCache", user_id: int):
 
     checked = game_data[Warden.extra_data[0].key]
     buttons = []
-    for player_id in game_data["players_ids"]:
+    for player_id in game_data["live_players_ids"]:
         if player_id == user_id:
             continue
         text = game_data["players"][str(player_id)]["full_name"]

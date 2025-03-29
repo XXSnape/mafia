@@ -14,9 +14,9 @@ from services.game.roles.base import (
 )
 from services.game.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
-from utils.utils import make_pretty
-from utils.validators import (
-    remind_commissioner_about_inspections,
+from utils.pretty_text import make_pretty
+from utils.informing import remind_commissioner_about_inspections
+from utils.roles import (
     get_user_role_and_url,
 )
 

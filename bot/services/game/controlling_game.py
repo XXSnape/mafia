@@ -24,12 +24,11 @@ from keyboards.inline.keypads.mailing import send_selection_to_players_kb
 from keyboards.inline.keypads.to_bot import participate_in_social_life
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from states.states import GameFsm, UserFsm
-from utils.utils import (
-    get_state_and_assign,
-    get_the_most_frequently_encountered_id,
-    get_results_of_goal_identification,
-    get_results_of_voting, make_build, make_pretty, get_profiles,
-)
+from utils.pretty_text import (
+    make_build, make_pretty, )
+from utils.calculator import get_the_most_frequently_encountered_id
+from utils.informing import get_profiles, get_results_of_goal_identification, get_results_of_voting
+from utils.state import get_state_and_assign
 
 from .protocols.protocols import (
     VictimsOfVote,
@@ -47,7 +46,7 @@ def check_end_of_game(async_func: Callable):
         result = await async_func(self)
         state = self.state
         game_data: GameCache = await state.get_data()
-        players_count = len(game_data["players_ids"])
+        players_count = len(game_data["live_players_ids"])
         if not game_data[Mafia.roles_key]:
             if not game_data.get(Killer.roles_key):
                 raise GameIsOver(winner=Groupings.civilians)
@@ -306,7 +305,7 @@ class Controller:
         await role.report_death(
             game_data=game_data, is_night=at_night, user_id=user_id
         )
-        game_data["players_ids"].remove(user_id)
+        game_data["live_players_ids"].remove(user_id)
         game_data["players"][str(user_id)][
             "number_died_at_night"
         ] = (game_data["number_of_night"] - 1)
@@ -361,7 +360,7 @@ class Controller:
             reply_markup=participate_in_social_life(),
         )
         game_data: GameCache = await self.state.get_data()
-        live_players = game_data["players_ids"]
+        live_players = game_data["live_players_ids"]
         players = game_data["players"]
         banned_user = Prosecutor().get_processed_user_id(game_data)
         await asyncio.gather(

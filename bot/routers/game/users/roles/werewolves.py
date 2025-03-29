@@ -19,13 +19,11 @@ from services.game.roles import (
 from services.game.saving_role_selection.werewolf import WerewolfSaver
 from states.states import UserFsm
 from utils.tg import delete_message
-from utils.utils import (
-    make_pretty,
-)
-from utils.validators import (
-    remind_commissioner_about_inspections,
+from utils.pretty_text import (
+    make_pretty, )
+from utils.informing import notify_aliases_about_transformation, remind_commissioner_about_inspections
+from utils.roles import (
     change_role,
-    notify_aliases_about_transformation,
 )
 
 router = Router(name=__name__)

@@ -44,24 +44,18 @@ from services.game.actions_at_night import get_game_state_and_data
 from services.game.pipeline_game import Game
 from services.settings.order_of_roles import RoleManager
 from states.states import GameFsm
-from utils.scheduler import (
-    start_game,
-    remind_of_beginning_of_game,
-    clearing_tasks_on_schedule,
-)
+from scheduler.game import start_game, clearing_tasks_on_schedule, remind_of_beginning_of_game
 from utils.tg import (
     check_user_for_admin_rights,
-    reset_state_to_all_users,
     delete_messages_from_to_delete,
-    clear_game_data,
 )
-from utils.utils import (
+from utils.pretty_text import (
     get_profile_link,
-    get_state_and_assign,
-    get_profiles_during_registration,
     make_build,
     get_minutes_and_seconds_text,
 )
+from utils.informing import get_profiles_during_registration
+from utils.state import get_state_and_assign, reset_state_to_all_users, clear_game_data
 
 
 def verification_for_admin_or_creator(async_func):
@@ -251,12 +245,12 @@ class Registration(RouterHelper):
     ):
         bot = self._get_bot()
         text = get_profiles_during_registration(
-            game_data["players_ids"], game_data["players"]
+            game_data["live_players_ids"], game_data["players"]
         )
         to_group_markup = await get_join_kb(
             bot=bot,
             game_chat=game_chat,
-            players_ids=game_data["players_ids"],
+            players_ids=game_data["live_players_ids"],
         )
         await bot.edit_message_text(
             chat_id=game_chat,
@@ -301,7 +295,7 @@ class Registration(RouterHelper):
             "money": 0,
             "achievements": [],
         }
-        game_data["players_ids"].append(user_id)
+        game_data["live_players_ids"].append(user_id)
         game_data["players"][str(user_id)] = user_game_data
         sent_message = await self._offer_bet(
             game_data=game_data, balance=balance
@@ -319,7 +313,7 @@ class Registration(RouterHelper):
         await self._change_message_in_group(
             game_data=game_data, game_chat=game_chat
         )
-        if len(game_data["players_ids"]) == 30:  # TODO 30
+        if len(game_data["live_players_ids"]) == 30:  # TODO 30
             await self._start_game(
                 game_data=game_data, game_state=game_state
             )
@@ -407,7 +401,7 @@ class Registration(RouterHelper):
             bot_id=self.message.bot.id,
         )
         game_data: GameCache = await game_state.get_data()
-        game_data["players_ids"].remove(user_id)
+        game_data["live_players_ids"].remove(user_id)
         del game_data["players"][str(user_id)]
         self._delete_bet(user_data=user_data, game_data=game_data)
         await game_state.set_data(game_data)
@@ -480,7 +474,7 @@ class Registration(RouterHelper):
             "pros": [],
             "cons": [],
             "start_message_id": message_id,
-            "players_ids": [],
+            "live_players_ids": [],
             "players": {},
             "messages_after_night": [],
             "to_delete": [],

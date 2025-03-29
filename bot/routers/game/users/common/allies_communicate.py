@@ -8,7 +8,8 @@ from cache.cache_types import GameCache, UserCache
 from services.game.processing_user_actions import UserManager
 from services.game.roles import Hacker, Mafia
 from states.states import UserFsm
-from utils.utils import get_state_and_assign, make_build
+from utils.pretty_text import make_build
+from utils.state import get_state_and_assign
 
 router = Router(name=__name__)
 

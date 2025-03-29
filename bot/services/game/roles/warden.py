@@ -10,7 +10,7 @@ from keyboards.inline.keypads.mailing import selection_to_warden_kb
 from services.game.roles.base import ActiveRoleAtNight
 from services.game.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
-from utils.validators import remind_worden_about_inspections
+from utils.informing import remind_worden_about_inspections
 
 
 class Warden(ProcedureAfterNight, ActiveRoleAtNight):

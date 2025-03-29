@@ -6,8 +6,9 @@ from general.groupings import Groupings
 
 if TYPE_CHECKING:
     from services.game.roles.base import Role
-from utils.utils import get_profiles, make_pretty
-from utils.validators import get_processed_user_id_if_exists
+from utils.pretty_text import make_pretty
+from utils.informing import get_profiles
+from utils.roles import get_processed_user_id_if_exists
 
 
 class BossIsDeadMixin:

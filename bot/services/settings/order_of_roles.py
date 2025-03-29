@@ -13,7 +13,7 @@ from keyboards.inline.keypads.settings import (
 
 from services.base import RouterHelper
 from states.settings import SettingsFsm
-from utils.utils import make_build
+from utils.pretty_text import make_build
 
 
 class RoleManager(RouterHelper):

@@ -7,7 +7,7 @@ from services.game.actions_at_night import get_game_state_data_and_user_id, get_
     save_notification_message
 from services.game.roles import Forger, Policeman, PolicemanAlias
 from utils.tg import delete_message
-from utils.utils import make_pretty
+from utils.pretty_text import make_pretty
 
 
 class ForgerSaver(RouterHelper):

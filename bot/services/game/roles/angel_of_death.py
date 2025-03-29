@@ -7,8 +7,8 @@ from services.game.roles.base.mixins import (
     ProcedureAfterVoting,
 )
 from states.states import UserFsm
-from utils.utils import get_state_and_assign
-from utils.validators import get_processed_role_and_user_if_exists
+from utils.state import get_state_and_assign
+from utils.roles import get_processed_role_and_user_if_exists
 
 
 class AngelOfDeath(

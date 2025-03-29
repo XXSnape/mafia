@@ -32,7 +32,7 @@ class PolicemanSaver(RouterHelper):
         )
         police_action = data[self.callback.data]
         markup = send_selection_to_players_kb(
-            players_ids=game_data["players_ids"],
+            players_ids=game_data["live_players_ids"],
             players=game_data["players"],
             extra_buttons=(BACK_BTN,),
             exclude=self.callback.from_user.id,

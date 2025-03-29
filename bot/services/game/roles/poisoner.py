@@ -7,7 +7,7 @@ from services.game.roles.base.mixins import (
 )
 from general.groupings import Groupings
 from states.states import UserFsm
-from utils.validators import get_user_role_and_url
+from utils.roles import get_user_role_and_url
 
 
 class Poisoner(

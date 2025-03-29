@@ -23,13 +23,13 @@ from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
 
-from utils.utils import (
-    get_profiles,
-    get_state_and_assign,
-    get_the_most_frequently_encountered_id,
+from utils.pretty_text import (
     make_pretty,
     make_build,
 )
+from utils.calculator import get_the_most_frequently_encountered_id
+from utils.informing import get_profiles
+from utils.state import get_state_and_assign
 
 
 class Role(ABC):
@@ -456,10 +456,10 @@ class ActiveRoleAtNight(Role):
             ):
                 exclude.append(int(processed_user_id))
 
-        if game_data["players_ids"] == exclude:
+        if game_data["live_players_ids"] == exclude:
             return
         return send_selection_to_players_kb(
-            players_ids=game_data["players_ids"],
+            players_ids=game_data["live_players_ids"],
             players=game_data["players"],
             exclude=exclude,
             extra_buttons=extra_buttons,

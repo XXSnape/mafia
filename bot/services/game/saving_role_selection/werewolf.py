@@ -3,8 +3,9 @@ from services.base import RouterHelper
 from services.game.actions_at_night import get_game_state_and_data
 from services.game.roles import Mafia, MafiaAlias, Doctor, DoctorAlias, Policeman, PolicemanAlias, Werewolf
 from utils.tg import delete_message
-from utils.utils import make_pretty
-from utils.validators import change_role, notify_aliases_about_transformation, remind_commissioner_about_inspections
+from utils.pretty_text import make_pretty
+from utils.informing import notify_aliases_about_transformation, remind_commissioner_about_inspections
+from utils.roles import change_role
 
 
 class WerewolfSaver(RouterHelper):

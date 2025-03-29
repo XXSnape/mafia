@@ -15,5 +15,4 @@ def sorting_by_rate(
 def sorting_by_money(game_data: GameCache):
     def wrapper(user_id: UserIdStr):
         return game_data["players"][user_id]["money"]
-
     return wrapper
