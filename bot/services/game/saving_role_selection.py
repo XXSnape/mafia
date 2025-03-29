@@ -1,5 +1,9 @@
 import asyncio
 
+from aiogram.fsm.context import FSMContext
+from aiogram.types import CallbackQuery
+
+from cache.cache_types import GameCache
 from constants.output import NUMBER_OF_NIGHT, ROLE_IS_KNOWN
 from general.collection_of_roles import get_data_with_roles
 from keyboards.inline.buttons.common import BACK_BTN
@@ -11,13 +15,13 @@ from keyboards.inline.callback_factory.recognize_user import (
 )
 from keyboards.inline.cb.cb_text import (
     POLICEMAN_KILLS_CB,
-    POLICEMAN_CHECKS_CB,
+    POLICEMAN_CHECKS_CB, WEREWOLF_TO_MAFIA_CB, WEREWOLF_TO_DOCTOR_CB, WEREWOLF_TO_POLICEMAN_CB,
 )
 from keyboards.inline.keypads.mailing import (
     choose_fake_role_kb,
     send_selection_to_players_kb,
     kill_or_poison_kb,
-    kill_or_check_on_policeman,
+    kill_or_check_on_policeman, selection_to_warden_kb,
 )
 from services.base import RouterHelper
 from services.game.actions_at_night import (
@@ -33,11 +37,12 @@ from services.game.roles import (
     PolicemanAlias,
     Forger,
     Instigator,
-    Poisoner,
+    Poisoner, Traitor, Mafia, Warden, Werewolf, MafiaAlias, Doctor, DoctorAlias,
 )
 from states.states import UserFsm
 from utils.tg import delete_message
 from utils.utils import make_pretty
+from utils.validators import notify_aliases_about_transformation, remind_commissioner_about_inspections, change_role
 
 
 class AnalystSaver(RouterHelper):
@@ -374,3 +379,170 @@ class PolicemanSaver(RouterHelper):
                 for policeman_id in game_data[Policeman.roles_key]
             )
         )
+
+
+class TraitorSaver(RouterHelper):
+    async def traitor_finds_out(self, callback_data: UserActionIndexCbData):
+        game_state, game_data, user_id = (
+            await take_action_and_register_user(
+                callback=self.callback,
+                callback_data=callback_data,
+                state=self.state,
+                dispatcher=self.dispatcher,
+            )
+        )
+        url = game_data["players"][str(user_id)]["url"]
+        role = game_data["players"][str(user_id)]["pretty_role"]
+        await asyncio.gather(
+            *(
+                self.callback.bot.send_message(
+                    chat_id=player_id,
+                    text=NUMBER_OF_NIGHT.format(
+                        game_data["number_of_night"]
+                    )
+                         + f"{make_pretty(Traitor.role)} проверил и узнал, что {url} - {role}",
+                )
+                for player_id in game_data[Mafia.roles_key]
+                                 + game_data[Traitor.roles_key]
+            )
+        )
+
+
+class WardenSaver(RouterHelper):
+
+    async def _generate_markup_after_selection(
+            self,
+            game_data: GameCache,
+            game_state: FSMContext
+    ):
+        markup = selection_to_warden_kb(
+            game_data=game_data, user_id=self.callback.from_user.id
+        )
+        await self.callback.message.edit_reply_markup(reply_markup=markup)
+        await game_state.set_data(game_data)
+
+
+    async def supervisor_collects_information(self):
+        game_state, game_data = await get_game_state_and_data(
+            tg_obj=self.callback, state=self.state, dispatcher=self.dispatcher
+        )
+        checked = game_data[Warden.extra_data[0].key]
+        processed_user_id = int(self.callback.data)
+        if len(checked) == 1 and checked[0][0] == processed_user_id:
+            checked.clear()
+            await self._generate_markup_after_selection(
+                game_state=game_state,
+                game_data=game_data,
+            )
+            return
+        elif len(checked) == 0:
+            checked.append(
+                [
+                    processed_user_id,
+                    game_data["players"][str(processed_user_id)][
+                        "enum_name"
+                    ],
+                ]
+            )
+            await self._generate_markup_after_selection(
+                game_state=game_state,
+                game_data=game_data,
+            )
+            return
+
+        checked.append(
+            [
+                processed_user_id,
+                game_data["players"][str(processed_user_id)][
+                    "enum_name"
+                ],
+            ]
+        )
+        user1_id = checked[0][0]
+        user2_id = checked[1][0]
+        for user_id in [user1_id, user2_id]:
+            trace_all_actions(
+                callback=self.callback, game_data=game_data, user_id=user_id
+            )
+            save_notification_message(
+                game_data=game_data,
+                processed_user_id=user_id,
+                message=ROLE_IS_KNOWN,
+                current_user_id=self.callback.from_user.id,
+            )
+        user1_url = game_data["players"][str(user1_id)]["url"]
+        user2_url = game_data["players"][str(user2_id)]["url"]
+        await delete_message(self.callback.message)
+        await game_state.set_data(game_data)
+        await self.callback.bot.send_message(
+            chat_id=game_data["game_chat"],
+            text=Warden.message_to_group_after_action,
+        )
+        await self.callback.message.answer(
+            NUMBER_OF_NIGHT.format(game_data["number_of_night"])
+            + f"Ты решил проверить на принадлежность одной группировки {user1_url} и {user2_url}"
+        )
+
+
+class WerewolfSaver(RouterHelper):
+    async def werewolf_turns_into(self):
+        data = {
+            WEREWOLF_TO_MAFIA_CB: [
+                [Mafia(), "don"],
+                [MafiaAlias(), "mafia"],
+            ],
+            WEREWOLF_TO_DOCTOR_CB: [
+                [Doctor(), "doctor"],
+                [DoctorAlias(), "nurse"],
+            ],
+            WEREWOLF_TO_POLICEMAN_CB: [
+                [Policeman(), "policeman"],
+                [PolicemanAlias(), "general"],
+            ],
+        }
+        game_state, game_data = await get_game_state_and_data(
+            tg_obj=self.callback, state=self.state, dispatcher=self.dispatcher
+        )
+
+        user_id = self.callback.from_user.id
+        current_roles = data[self.callback.data]
+        roles_key = current_roles[0][0].roles_key
+        await delete_message(self.callback.message)
+        are_there_many_senders = False
+        if len(game_data[roles_key]) == 0:
+            enum_name = current_roles[0][1]
+            new_role = current_roles[0][0]
+        else:
+            enum_name = current_roles[1][1]
+            new_role = current_roles[1][0]
+            are_there_many_senders = True
+        change_role(
+            game_data=game_data,
+            previous_role=Werewolf(),
+            new_role=new_role,
+            role_key=enum_name,
+            user_id=user_id,
+        )
+        await game_state.set_data(game_data)
+        await self.state.set_state(new_role.state_for_waiting_for_action)
+        await self.callback.message.answer_photo(
+            photo=new_role.photo,
+            caption=f"Твоя новая роль - {make_pretty(new_role.role)}!",
+        )
+        await self.callback.bot.send_photo(
+            chat_id=game_data["game_chat"],
+            photo=new_role.photo,
+            caption=f"{make_pretty(Werewolf.role)} принял решение превратиться в {make_pretty(new_role.role)}. "
+                    f"Уже со следующего дня изменения в миропорядке вступят в силу.",
+        )
+        if are_there_many_senders:
+            await notify_aliases_about_transformation(
+                game_data=game_data,
+                bot=self.callback.bot,
+                new_role=new_role,
+                user_id=user_id,
+            )
+        if self.callback.data == WEREWOLF_TO_POLICEMAN_CB:
+            await self.callback.message.answer(
+                text=remind_commissioner_about_inspections(game_data)
+            )

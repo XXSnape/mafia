@@ -6,7 +6,6 @@ from keyboards.inline.cb.cb_text import DRAW_CB
 from services.game.actions_at_night import get_game_state_and_data
 from services.game.roles import Analyst
 from services.game.saving_role_selection import (
-    RoleSelectionSaver,
     AnalystSaver,
 )
 from states.states import UserFsm

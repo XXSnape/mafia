@@ -35,8 +35,7 @@ from general.exceptions import GameIsOver
 from general.groupings import Groupings
 
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
-from services.game.mailing import MailerToPlayers
-from services.game.processing import Executor
+from services.game.controlling_game import Controller
 from services.game.roles.base import Role
 from states.states import GameFsm
 from utils.sorting import sorting_by_rate, sorting_by_money
@@ -66,19 +65,12 @@ class Game:
         self.dispatcher = dispatcher
         self.bot = bot
         self.group_chat_id = group_chat_id
-        self.mailer = MailerToPlayers(
-            state=self.state,
-            bot=self.bot,
-            dispatcher=self.dispatcher,
-            group_chat_id=self.group_chat_id,
-        )
         self.all_roles = {}
-        self.executor = Executor(
+        self.controller = Controller(
             bot=self.bot,
             group_chat_id=self.group_chat_id,
             state=state,
             dispatcher=dispatcher,
-            mailer=self.mailer,
         )
         self.broker = broker
         self.session = session
@@ -104,8 +96,7 @@ class Game:
                 state=self.state,
                 all_roles=self.all_roles,
             )
-        self.mailer.all_roles = all_roles
-        self.executor.all_roles = all_roles
+        self.controller.all_roles = all_roles
 
     async def create_game_in_db(self, creator_id: UserIdInt):
         dao = GamesDao(session=self.session)
@@ -140,7 +131,7 @@ class Game:
         )
         await self.state.set_state(GameFsm.STARTED)
         game_data = await self.select_roles()
-        await self.mailer.familiarize_players(game_data)
+        await self.controller.familiarize_players(game_data)
         self.init_existing_roles(game_data)
         await self.bot.send_message(
             chat_id=self.group_chat_id,
@@ -173,13 +164,13 @@ class Game:
             reply_markup=get_to_bot_kb("Действовать!"),
         )
 
-        await self.mailer.mailing()
+        await self.controller.mailing()
         await asyncio.sleep(5)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
         )
-        await self.executor.sum_up_after_night()
+        await self.controller.sum_up_after_night()
         players_after_night = get_live_players(
             game_data=game_data, all_roles=self.all_roles
         )
@@ -190,22 +181,22 @@ class Game:
             f"{players_after_night}",
         )
         await asyncio.sleep(1)
-        await self.mailer.suggest_vote()
+        await self.controller.suggest_vote()
         await asyncio.sleep(5)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
         )
-        result = await self.executor.confirm_final_aim()
+        result = await self.controller.confirm_final_aim()
         if result:
             await asyncio.sleep(10)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
         )
-        await self.executor.sum_up_after_voting()
+        await self.controller.sum_up_after_voting()
         await asyncio.sleep(2)
-        await self.executor.clear_data_after_all_actions()
+        await self.controller.clear_data_after_all_actions()
 
     async def give_out_rewards(self, e: GameIsOver):
         game_data: GameCache = await self.state.get_data()
@@ -398,7 +389,6 @@ class Game:
                 )
             )
         for loser in losers_bets:
-            print("or", order_of_roles, loser.role_key)
             if loser.role_key in order_of_roles:
                 rates.append(
                     ResultBidForRoleSchema(
@@ -409,7 +399,6 @@ class Game:
                 )
             else:
                 roles_are_not_in_game.append(loser)
-        print(roles_are_not_in_game)
         await self.broker.publish(
             message=rates, queue="betting_results"
         )
