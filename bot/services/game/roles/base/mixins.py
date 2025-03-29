@@ -19,9 +19,7 @@ class BossIsDeadMixin:
         game_data: GameCache = await self.state.get_data()
         url = game_data["players"][str(current_id)]["url"]
         role = game_data["players"][str(current_id)]["pretty_role"]
-        role_id = game_data["players"][str(current_id)][
-            "role_id"
-        ]
+        role_id = game_data["players"][str(current_id)]["role_id"]
         players = game_data[self.roles_key]
         if not players:
             return
@@ -30,9 +28,7 @@ class BossIsDeadMixin:
         game_data["players"][str(new_boss_id)]["pretty_role"] = (
             make_pretty(self.role)
         )
-        game_data["players"][str(new_boss_id)][
-            "role_id"
-        ] = role_id
+        game_data["players"][str(new_boss_id)]["role_id"] = role_id
         await self.state.set_data(game_data)
         profiles = get_profiles(
             players_ids=game_data[self.roles_key],

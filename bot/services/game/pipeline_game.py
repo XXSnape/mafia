@@ -1,7 +1,6 @@
 import asyncio
 import datetime
 from operator import itemgetter
-from pprint import pprint
 from random import choice
 
 from aiogram import Dispatcher, Bot
@@ -496,7 +495,7 @@ class Game:
                 "pretty_role": make_pretty(current_role.role),
                 "initial_role": make_pretty(current_role.role),
                 "role_id": role_id,
-                'initial_role_id': role_id,
+                "initial_role_id": role_id,
                 "roles_key": current_role.roles_key,
                 "user_id": winner_id,
             }

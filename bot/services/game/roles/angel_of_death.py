@@ -7,7 +7,7 @@ from services.game.roles.base.mixins import (
     ProcedureAfterVoting,
 )
 from states.states import UserFsm
-from utils.state import get_state_and_assign
+from utils.state import reset_user_state
 from utils.roles import get_processed_role_and_user_if_exists
 
 
@@ -46,12 +46,11 @@ class AngelOfDeath(
         **kwargs
     ):
         for angel_id in game_data[self.roles_key]:
-            angel_state = await get_state_and_assign(
+            await reset_user_state(
                 dispatcher=self.dispatcher,
-                chat_id=angel_id,
+                user_id=angel_id,
                 bot_id=self.bot.id,
             )
-            await angel_state.clear()
         if processed_user_id not in victims:
             game_data["angels_died"].clear()
             return

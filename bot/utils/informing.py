@@ -1,17 +1,33 @@
 import asyncio
 from collections import defaultdict
+from typing import TYPE_CHECKING
 
 from aiogram import Bot
 
-from cache.cache_types import GameCache, UserIdInt
+from cache.cache_types import (
+    GameCache,
+    UserIdInt,
+    PlayersIds,
+    UsersInGame,
+    LivePlayersIds,
+)
 from constants.output import MONEY_SYM, NUMBER_OF_NIGHT
 from general.groupings import Groupings
-from services.game.roles.base import Role
+from keyboards.inline.callback_factory.recognize_user import (
+    UserVoteIndexCbData,
+)
+from keyboards.inline.keypads.mailing import (
+    send_selection_to_players_kb,
+)
+
 from utils.pretty_text import make_build, make_pretty
+
+if TYPE_CHECKING:
+    from services.game.roles.base import Role
 
 
 def get_live_players(
-    game_data: GameCache, all_roles: dict[str, Role]
+    game_data: GameCache, all_roles: dict[str, "Role"]
 ):
     profiles = get_profiles(
         players_ids=game_data["live_players_ids"],
@@ -28,7 +44,9 @@ def get_live_players(
     )
 
 
-def get_live_roles(game_data: GameCache, all_roles: dict[str, Role]):
+def get_live_roles(
+    game_data: GameCache, all_roles: dict[str, "Role"]
+):
     gropings: dict[Groupings, list[tuple[str, int]]] = {
         Groupings.civilians: [],
         Groupings.criminals: [],
@@ -65,8 +83,8 @@ def get_live_roles(game_data: GameCache, all_roles: dict[str, Role]):
 
 
 def get_profiles(
-    players_ids: "LivePlayersIds",
-    players: "UsersInGame",
+    players_ids: PlayersIds,
+    players: UsersInGame,
     role: bool = False,
     initial_role: bool = False,
     money_need: bool = False,
@@ -98,7 +116,7 @@ def get_profiles(
 
 
 def get_profiles_during_registration(
-    live_players_ids: "LivePlayersIds", players: "UsersInGame"
+    live_players_ids: LivePlayersIds, players: UsersInGame
 ) -> str:
     profiles = get_profiles(live_players_ids, players)
     return f"Скорее присоединяйся к игре!\nУчастники:\n{profiles}"
@@ -154,25 +172,8 @@ def get_results_of_voting(
     )
 
 
-def record_accrual(
-    game_data: GameCache,
-    roles_key: str,
-    processed_role: "Role",
-    user_url: str,
-    action: str,
-):
-    for player_id in game_data[roles_key]:
-        game_data["players"][str(player_id)][
-            "money"
-        ] += processed_role.payment_for_treatment
-        game_data["players"][str(player_id)]["achievements"].append(
-            f'Ночь {game_data["number_of_night"]}. '
-            f"{action} {user_url} ({processed_role.role}) - {processed_role.payment_for_treatment}💵"
-        )
-
-
 async def notify_aliases_about_transformation(
-    game_data: "GameCache",
+    game_data: GameCache,
     bot: Bot,
     new_role: "Role",
     user_id: int,
@@ -199,7 +200,62 @@ async def notify_aliases_about_transformation(
     )
 
 
-def remind_worden_about_inspections(game_data: "GameCache"):
+async def send_messages_after_night(
+    game_data: GameCache, bot: Bot, group_chat_id: int
+):
+    messages = game_data["messages_after_night"]
+    if not messages:
+        return
+    number_of_night = make_build(
+        f"Важнейшие события ночи {game_data['number_of_night']}:\n\n"
+    )
+    chats_and_messages = defaultdict(list)
+    for chat_id, message in messages:
+        chats_and_messages[chat_id].append(message)
+    tasks = []
+    for chat_id, messages in chats_and_messages.items():
+        if chat_id != group_chat_id:
+            tasks.append(
+                bot.send_message(
+                    chat_id=chat_id,
+                    text=number_of_night
+                    + "\n\n".join(
+                        f"{number}) {message}"
+                        for number, message in enumerate(
+                            messages, start=1
+                        )
+                    ),
+                )
+            )
+        else:
+            for message in messages:
+                tasks.append(
+                    bot.send_message(chat_id=chat_id, text=message)
+                )
+    await asyncio.gather(*tasks)
+
+
+async def send_request_to_vote(
+    bot: Bot,
+    game_data: GameCache,
+    user_id: int,
+    players_ids: LivePlayersIds,
+    players: UsersInGame,
+):
+    sent_message = await bot.send_message(
+        chat_id=user_id,
+        text="Проголосуй за того, кто не нравится!",
+        reply_markup=send_selection_to_players_kb(
+            players_ids=players_ids,
+            players=players,
+            exclude=user_id,
+            user_index_cb=UserVoteIndexCbData,
+        ),
+    )
+    game_data["to_delete"].append([user_id, sent_message.message_id])
+
+
+def remind_worden_about_inspections(game_data: GameCache):
     if not game_data["text_about_checked_for_the_same_groups"]:
         return "Нет информации о совместных группах"
     return (
@@ -209,7 +265,7 @@ def remind_worden_about_inspections(game_data: "GameCache"):
 
 
 def remind_commissioner_about_inspections(
-    game_data: "GameCache",
+    game_data: GameCache,
 ) -> str:
     if not game_data["text_about_checks"]:
         return "Роли ещё неизвестны"

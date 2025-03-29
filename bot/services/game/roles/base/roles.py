@@ -6,7 +6,6 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.types import InlineKeyboardButton
-from faststream.rabbit import RabbitBroker
 
 from cache.cache_types import (
     ExtraCache,

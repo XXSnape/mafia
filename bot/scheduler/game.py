@@ -9,7 +9,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from cache.cache_types import GameCache
 from services.game.pipeline_game import Game
 from utils.state import clear_game_data
-from utils.pretty_text import make_build, get_minutes_and_seconds_text
+from utils.pretty_text import (
+    make_build,
+    get_minutes_and_seconds_text,
+)
 
 
 async def start_game(

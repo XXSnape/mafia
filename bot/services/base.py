@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, PollAnswer, Message
+from aiogram.types import CallbackQuery, Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
 from sqlalchemy.ext.asyncio import AsyncSession

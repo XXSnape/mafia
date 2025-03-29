@@ -14,7 +14,7 @@ def get_minutes_and_seconds_text(
     start: int,
     end: int,
     message="До начала игры осталось примерно ",
-):
+) -> str:
     diff = end - start
     minutes = diff // 60
     seconds = diff % 60
@@ -22,5 +22,3 @@ def get_minutes_and_seconds_text(
         message += f"{minutes} м. "
     message += f"{seconds} с!"
     return message
-
-

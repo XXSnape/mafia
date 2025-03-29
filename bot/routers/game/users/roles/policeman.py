@@ -28,7 +28,9 @@ from services.game.actions_at_night import (
     save_notification_message,
 )
 from services.game.roles import Policeman
-from services.game.saving_role_selection.policeman import PolicemanSaver
+from services.game.saving_role_selection.policeman import (
+    PolicemanSaver,
+)
 from states.states import UserFsm
 from utils.tg import delete_message
 

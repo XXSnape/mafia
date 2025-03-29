@@ -1,10 +1,16 @@
 from constants.output import NUMBER_OF_NIGHT
 from general.collection_of_roles import get_data_with_roles
-from keyboards.inline.callback_factory.recognize_user import UserActionIndexCbData
+from keyboards.inline.callback_factory.recognize_user import (
+    UserActionIndexCbData,
+)
 from keyboards.inline.keypads.mailing import choose_fake_role_kb
 from services.base import RouterHelper
-from services.game.actions_at_night import get_game_state_data_and_user_id, get_game_state_and_data, trace_all_actions, \
-    save_notification_message
+from services.game.actions_at_night import (
+    get_game_state_data_and_user_id,
+    get_game_state_and_data,
+    trace_all_actions,
+    save_notification_message,
+)
 from services.game.roles import Forger, Policeman, PolicemanAlias
 from utils.tg import delete_message
 from utils.pretty_text import make_pretty

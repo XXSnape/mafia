@@ -4,7 +4,11 @@ from cache.cache_types import GameCache
 from constants.output import ROLE_IS_KNOWN, NUMBER_OF_NIGHT
 from keyboards.inline.keypads.mailing import selection_to_warden_kb
 from services.base import RouterHelper
-from services.game.actions_at_night import get_game_state_and_data, trace_all_actions, save_notification_message
+from services.game.actions_at_night import (
+    get_game_state_and_data,
+    trace_all_actions,
+    save_notification_message,
+)
 from services.game.roles import Warden
 from utils.tg import delete_message
 
@@ -12,20 +16,21 @@ from utils.tg import delete_message
 class WardenSaver(RouterHelper):
 
     async def _generate_markup_after_selection(
-            self,
-            game_data: GameCache,
-            game_state: FSMContext
+        self, game_data: GameCache, game_state: FSMContext
     ):
         markup = selection_to_warden_kb(
             game_data=game_data, user_id=self.callback.from_user.id
         )
-        await self.callback.message.edit_reply_markup(reply_markup=markup)
+        await self.callback.message.edit_reply_markup(
+            reply_markup=markup
+        )
         await game_state.set_data(game_data)
-
 
     async def supervisor_collects_information(self):
         game_state, game_data = await get_game_state_and_data(
-            tg_obj=self.callback, state=self.state, dispatcher=self.dispatcher
+            tg_obj=self.callback,
+            state=self.state,
+            dispatcher=self.dispatcher,
         )
         checked = game_data[Warden.extra_data[0].key]
         processed_user_id = int(self.callback.data)
@@ -63,7 +68,9 @@ class WardenSaver(RouterHelper):
         user2_id = checked[1][0]
         for user_id in [user1_id, user2_id]:
             trace_all_actions(
-                callback=self.callback, game_data=game_data, user_id=user_id
+                callback=self.callback,
+                game_data=game_data,
+                user_id=user_id,
             )
             save_notification_message(
                 game_data=game_data,

@@ -41,7 +41,7 @@ class Werewolf(ProcedureAfterNight, ActiveRoleAtNight):
                         dispatcher=self.dispatcher,
                         bot=self.bot,
                         state=self.state,
-                        all_roles=self.all_roles
+                        all_roles=self.all_roles,
                     )
                     all_roles[player_data["role_id"]] = new_role
 

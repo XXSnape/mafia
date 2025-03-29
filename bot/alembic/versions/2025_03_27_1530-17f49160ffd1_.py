@@ -29,8 +29,12 @@ def upgrade() -> None:
         sa.Column("user_tg_id", sa.Integer(), nullable=False),
         sa.Column("role", sa.String(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(["game_id"], ["games.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["role"], ["roles.name"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["game_id"], ["games.id"], ondelete="CASCADE"
+        ),
+        sa.ForeignKeyConstraint(
+            ["role"], ["roles.name"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(
             ["user_tg_id"], ["users.tg_id"], ondelete="CASCADE"
         ),

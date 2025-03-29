@@ -10,7 +10,7 @@ class ExtraCache:
 
 
 Url: TypeAlias = str
-PlayersIds: TypeAlias = list[int]
+PlayersIds: TypeAlias = list[int | str]
 UserIdStr: TypeAlias = str
 RoleName: TypeAlias = str
 UserIdInt: TypeAlias = int

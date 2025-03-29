@@ -1,19 +1,9 @@
-import time
-from dataclasses import dataclass
 from datetime import timedelta, datetime, timezone
-from pprint import pprint
 
-from aiogram import Dispatcher
 from aiogram.filters import CommandObject
 from aiogram.fsm.context import FSMContext
-from aiogram.types import (
-    CallbackQuery,
-    Message,
-    ChatMemberOwner,
-    ChatMemberAdministrator,
-)
+
 from aiogram.utils.payload import decode_payload
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 
@@ -44,10 +34,13 @@ from services.game.actions_at_night import get_game_state_and_data
 from services.game.pipeline_game import Game
 from services.settings.order_of_roles import RoleManager
 from states.states import GameFsm
-from scheduler.game import start_game, clearing_tasks_on_schedule, remind_of_beginning_of_game
+from scheduler.game import (
+    start_game,
+    clearing_tasks_on_schedule,
+    remind_of_beginning_of_game,
+)
 from utils.tg import (
     check_user_for_admin_rights,
-    delete_messages_from_to_delete,
 )
 from utils.pretty_text import (
     get_profile_link,
@@ -55,7 +48,10 @@ from utils.pretty_text import (
     get_minutes_and_seconds_text,
 )
 from utils.informing import get_profiles_during_registration
-from utils.state import get_state_and_assign, reset_state_to_all_users, clear_game_data
+from utils.state import (
+    get_state_and_assign,
+    clear_game_data,
+)
 
 
 def verification_for_admin_or_creator(async_func):

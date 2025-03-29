@@ -2,7 +2,6 @@ from collections.abc import AsyncGenerator
 from typing import Annotated, TypeAlias
 
 from fast_depends import Depends
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.common.sessions import async_session_maker

@@ -16,12 +16,18 @@ from services.game.roles import (
     Policeman,
     PolicemanAlias,
 )
-from services.game.saving_role_selection.werewolf import WerewolfSaver
+from services.game.saving_role_selection.werewolf import (
+    WerewolfSaver,
+)
 from states.states import UserFsm
 from utils.tg import delete_message
 from utils.pretty_text import (
-    make_pretty, )
-from utils.informing import notify_aliases_about_transformation, remind_commissioner_about_inspections
+    make_pretty,
+)
+from utils.informing import (
+    notify_aliases_about_transformation,
+    remind_commissioner_about_inspections,
+)
 from utils.roles import (
     change_role,
 )
@@ -45,9 +51,7 @@ async def werewolf_turns_into(
     dispatcher: Dispatcher,
 ):
     saver = WerewolfSaver(
-        callback=callback,
-        state=state,
-        dispatcher=dispatcher
+        callback=callback, state=state, dispatcher=dispatcher
     )
     await saver.werewolf_turns_into()
     # data = {

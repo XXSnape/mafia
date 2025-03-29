@@ -1,9 +1,17 @@
 from constants.output import NUMBER_OF_NIGHT
 from keyboards.inline.buttons.common import BACK_BTN
-from keyboards.inline.callback_factory.recognize_user import UserActionIndexCbData
-from keyboards.inline.keypads.mailing import send_selection_to_players_kb, kill_or_poison_kb
+from keyboards.inline.callback_factory.recognize_user import (
+    UserActionIndexCbData,
+)
+from keyboards.inline.keypads.mailing import (
+    send_selection_to_players_kb,
+    kill_or_poison_kb,
+)
 from services.base import RouterHelper
-from services.game.actions_at_night import get_game_state_and_data, take_action_and_save_data
+from services.game.actions_at_night import (
+    get_game_state_and_data,
+    take_action_and_save_data,
+)
 from services.game.roles import Poisoner
 from states.states import UserFsm
 from utils.tg import delete_message

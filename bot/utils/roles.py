@@ -2,16 +2,15 @@ from collections.abc import Callable
 from functools import wraps
 from typing import TYPE_CHECKING
 
-from cache.cache_types import RolesLiteral
+from cache.cache_types import RolesLiteral, GameCache
 from utils.pretty_text import make_pretty
 
 if TYPE_CHECKING:
-    from services.game.roles import GameCache, PlayersIds
     from services.game.roles.base import Role
 
 
 def change_role(
-    game_data: "GameCache",
+    game_data: GameCache,
     previous_role: "Role",
     new_role: "Role",
     role_id: RolesLiteral,
@@ -29,13 +28,11 @@ def change_role(
 
 
 def get_user_role_and_url(
-    game_data: "GameCache",
+    game_data: GameCache,
     processed_user_id: int,
     all_roles: dict[str, "Role"],
 ):
-    role_id = game_data["players"][str(processed_user_id)][
-        "role_id"
-    ]
+    role_id = game_data["players"][str(processed_user_id)]["role_id"]
     return (
         all_roles[role_id],
         game_data["players"][str(processed_user_id)]["url"],
@@ -77,5 +74,3 @@ def get_processed_user_id_if_exists(async_func: Callable):
         )
 
     return wrapper
-
-

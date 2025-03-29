@@ -1,10 +1,25 @@
-from keyboards.inline.cb.cb_text import WEREWOLF_TO_MAFIA_CB, WEREWOLF_TO_DOCTOR_CB, WEREWOLF_TO_POLICEMAN_CB
+from keyboards.inline.cb.cb_text import (
+    WEREWOLF_TO_MAFIA_CB,
+    WEREWOLF_TO_DOCTOR_CB,
+    WEREWOLF_TO_POLICEMAN_CB,
+)
 from services.base import RouterHelper
 from services.game.actions_at_night import get_game_state_and_data
-from services.game.roles import Mafia, MafiaAlias, Doctor, DoctorAlias, Policeman, PolicemanAlias, Werewolf
+from services.game.roles import (
+    Mafia,
+    MafiaAlias,
+    Doctor,
+    DoctorAlias,
+    Policeman,
+    PolicemanAlias,
+    Werewolf,
+)
 from utils.tg import delete_message
 from utils.pretty_text import make_pretty
-from utils.informing import notify_aliases_about_transformation, remind_commissioner_about_inspections
+from utils.informing import (
+    notify_aliases_about_transformation,
+    remind_commissioner_about_inspections,
+)
 from utils.roles import change_role
 
 
@@ -25,7 +40,9 @@ class WerewolfSaver(RouterHelper):
             ],
         }
         game_state, game_data = await get_game_state_and_data(
-            tg_obj=self.callback, state=self.state, dispatcher=self.dispatcher
+            tg_obj=self.callback,
+            state=self.state,
+            dispatcher=self.dispatcher,
         )
 
         user_id = self.callback.from_user.id
@@ -48,7 +65,9 @@ class WerewolfSaver(RouterHelper):
             user_id=user_id,
         )
         await game_state.set_data(game_data)
-        await self.state.set_state(new_role.state_for_waiting_for_action)
+        await self.state.set_state(
+            new_role.state_for_waiting_for_action
+        )
         await self.callback.message.answer_photo(
             photo=new_role.photo,
             caption=f"Твоя новая роль - {make_pretty(new_role.role)}!",
@@ -57,7 +76,7 @@ class WerewolfSaver(RouterHelper):
             chat_id=game_data["game_chat"],
             photo=new_role.photo,
             caption=f"{make_pretty(Werewolf.role)} принял решение превратиться в {make_pretty(new_role.role)}. "
-                    f"Уже со следующего дня изменения в миропорядке вступят в силу.",
+            f"Уже со следующего дня изменения в миропорядке вступят в силу.",
         )
         if are_there_many_senders:
             await notify_aliases_about_transformation(

@@ -39,9 +39,7 @@ async def supervisor_collects_information(
     dispatcher: Dispatcher,
 ):
     saver = WardenSaver(
-        callback=callback,
-        state=state,
-        dispatcher=dispatcher
+        callback=callback, state=state, dispatcher=dispatcher
     )
     await saver.supervisor_collects_information()
     # game_state, game_data = await get_game_state_and_data(

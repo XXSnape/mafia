@@ -1,3 +1,6 @@
+from collections.abc import MutableSequence
+
+
 from cache.cache_types import RolesLiteral, UserIdStr, GameCache
 from general.collection_of_roles import get_data_with_roles
 
@@ -15,4 +18,9 @@ def sorting_by_rate(
 def sorting_by_money(game_data: GameCache):
     def wrapper(user_id: UserIdStr):
         return game_data["players"][user_id]["money"]
+
     return wrapper
+
+
+def sorting_by_voting(voting_data: MutableSequence[str, list[str]]):
+    return len(voting_data[1])

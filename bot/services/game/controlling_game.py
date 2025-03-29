@@ -1,40 +1,48 @@
 import asyncio
-from collections import defaultdict
 from collections.abc import Callable
-from contextlib import suppress
 from operator import attrgetter
 from typing import TYPE_CHECKING
 
 from aiogram import Dispatcher, Bot
-from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 from cache.cache_types import (
-    ChatsAndMessagesIds,
     GameCache,
     UserGameCache,
-    LastInteraction, LivePlayersIds, UsersInGame,
+    LastInteraction,
 )
 from general.collection_of_roles import get_data_with_roles
 from general.exceptions import GameIsOver
 from general.groupings import Groupings
-from keyboards.inline.callback_factory.recognize_user import UserVoteIndexCbData
-from keyboards.inline.keypads.mailing import send_selection_to_players_kb
-from keyboards.inline.keypads.to_bot import participate_in_social_life
+
+from keyboards.inline.keypads.to_bot import (
+    participate_in_social_life,
+)
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from states.states import GameFsm, UserFsm
 from utils.pretty_text import (
-    make_build, make_pretty, )
+    make_pretty,
+)
 from utils.calculator import get_the_most_frequently_encountered_id
-from utils.informing import get_profiles, get_results_of_goal_identification, get_results_of_voting
-from utils.state import get_state_and_assign
+from utils.informing import (
+    get_profiles,
+    get_results_of_goal_identification,
+    get_results_of_voting,
+    send_messages_after_night,
+    send_request_to_vote,
+)
+from utils.state import get_state_and_assign, reset_user_state
 
 from .protocols.protocols import (
     VictimsOfVote,
 )
 from .roles import Mafia, Killer, Prosecutor
-from .roles.base import AliasRole, BossIsDeadMixin, Role, ActiveRoleAtNight
+from .roles.base import (
+    AliasRole,
+    BossIsDeadMixin,
+    Role,
+    ActiveRoleAtNight,
+)
 from .roles.base.mixins import ProcedureAfterNight
 
 if TYPE_CHECKING:
@@ -245,8 +253,10 @@ class Controller:
         await self.bot.send_message(
             chat_id=self.group_chat_id, text=text_about_dead
         )
-        await self.mailer.send_messages_after_night(
-            game_data=game_data
+        await send_messages_after_night(
+            game_data=game_data,
+            bot=self.bot,
+            group_chat_id=self.group_chat_id,
         )
         await self.state.set_data(game_data)
 
@@ -296,12 +306,11 @@ class Controller:
                 new_state=UserFsm.WAIT_FOR_LATEST_LETTER,
             )
         elif role.clearing_state_after_death:
-            user_state = await get_state_and_assign(
+            await reset_user_state(
                 dispatcher=self.dispatcher,
-                chat_id=user_id,
+                user_id=user_id,
                 bot_id=self.bot.id,
             )
-            await user_state.clear()
         await role.report_death(
             game_data=game_data, is_night=at_night, user_id=user_id
         )
@@ -331,27 +340,6 @@ class Controller:
                 continue
             await current_role.mailing(game_data=game_data)
 
-    async def send_request_to_vote(
-        self,
-        game_data: GameCache,
-        user_id: int,
-        players_ids: LivePlayersIds,
-        players: UsersInGame,
-    ):
-        sent_message = await self.bot.send_message(
-            chat_id=user_id,
-            text="Проголосуй за того, кто не нравится!",
-            reply_markup=send_selection_to_players_kb(
-                players_ids=players_ids,
-                players=players,
-                exclude=user_id,
-                user_index_cb=UserVoteIndexCbData,
-            ),
-        )
-        game_data["to_delete"].append(
-            [user_id, sent_message.message_id]
-        )
-
     async def suggest_vote(self):
         await self.bot.send_photo(
             chat_id=self.group_chat_id,
@@ -365,50 +353,17 @@ class Controller:
         banned_user = Prosecutor().get_processed_user_id(game_data)
         await asyncio.gather(
             *(
-                self.send_request_to_vote(
+                send_request_to_vote(
                     game_data=game_data,
                     user_id=user_id,
                     players_ids=live_players,
                     players=players,
+                    bot=self.bot,
                 )
                 for user_id in live_players
                 if user_id != banned_user
             )
         )
-
-    async def send_messages_after_night(self, game_data: GameCache):
-        messages = game_data["messages_after_night"]
-        if not messages:
-            return
-        number_of_night = make_build(
-            f"Важнейшие события ночи {game_data['number_of_night']}:\n\n"
-        )
-        chats_and_messages = defaultdict(list)
-        for chat_id, message in messages:
-            chats_and_messages[chat_id].append(message)
-        tasks = []
-        for chat_id, messages in chats_and_messages.items():
-            if chat_id != self.group_chat_id:
-                tasks.append(
-                    self.bot.send_message(
-                        chat_id=chat_id,
-                        text=number_of_night
-                        + "\n\n".join(
-                            f"{number}) {message}"
-                            for number, message in enumerate(
-                                messages, start=1
-                            )
-                        ),
-                    )
-                )
-            else:
-                for message in messages:
-                    tasks.append(
-                        self.bot.send_message(
-                            chat_id=chat_id, text=message
-                        )
-                    )
-        await asyncio.gather(*tasks)
 
     async def familiarize_players(self, game_data: GameCache):
         for user_id, player_data in game_data["players"].items():
@@ -456,4 +411,3 @@ class Controller:
                         bot_id=self.bot.id,
                         new_state=current_role.state_for_waiting_for_action,
                     )
-

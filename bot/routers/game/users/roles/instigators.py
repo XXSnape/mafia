@@ -15,7 +15,9 @@ from services.game.actions_at_night import (
     take_action_and_save_data,
 )
 from services.game.roles import Instigator
-from services.game.saving_role_selection.instigator import InstigatorSaver
+from services.game.saving_role_selection.instigator import (
+    InstigatorSaver,
+)
 from states.states import UserFsm
 from utils.tg import delete_message
 

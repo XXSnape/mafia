@@ -29,9 +29,7 @@ async def traitor_finds_out(
     dispatcher: Dispatcher,
 ):
     saver = TraitorSaver(
-        callback=callback,
-        state=state,
-        dispatcher=dispatcher
+        callback=callback, state=state, dispatcher=dispatcher
     )
     await saver.traitor_finds_out(callback_data=callback_data)
     # game_state, game_data, user_id = (

@@ -1,7 +1,4 @@
-from contextlib import suppress
-
 from cache.cache_types import ExtraCache, GameCache
-from services.game.roles.base.roles import Role
 from general.groupings import Groupings
 from services.game.roles.base import ActiveRoleAtNight
 from services.game.roles.base.mixins import (

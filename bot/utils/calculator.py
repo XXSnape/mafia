@@ -1,7 +1,9 @@
 from collections import Counter
 
+from cache.cache_types import PlayersIds
 
-def get_the_most_frequently_encountered_id(ids: "PlayersIds"):
+
+def get_the_most_frequently_encountered_id(ids: PlayersIds):
     if not ids:
         return None
     if len(set(ids)) == 1:

@@ -2,7 +2,7 @@ from contextlib import suppress
 
 from aiogram.exceptions import TelegramBadRequest
 
-from cache.cache_types import GameCache
+from cache.cache_types import GameCache, PlayersIds
 from keyboards.inline.callback_factory.recognize_user import (
     AimedUserCbData,
     ProsAndCons,
@@ -11,16 +11,17 @@ from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from services.base import RouterHelper
 from services.game.roles import Prosecutor, PrimeMinister
 from utils.tg import delete_message
+
 # from utils.utils import add_voice
 
 
 class GroupManager(RouterHelper):
     @staticmethod
     def _add_voice(
-            user_id: int,
-            add_to: "PlayersIds",
-            delete_from: "PlayersIds",
-            prime_ministers: "PlayersIds",
+        user_id: int,
+        add_to: PlayersIds,
+        delete_from: PlayersIds,
+        prime_ministers: PlayersIds,
     ):
         repeat = 2 if user_id in prime_ministers else 1
         for _ in range(repeat):
@@ -30,11 +31,11 @@ class GroupManager(RouterHelper):
             for _ in range(repeat):
                 add_to.append(user_id)
 
-
     async def delete_message_from_non_players(self):
         game_data: GameCache = await self.state.get_data()
         if (
-            self.message.from_user.id not in game_data["live_players_ids"]
+            self.message.from_user.id
+            not in game_data["live_players_ids"]
         ) or self.message.from_user.id == Prosecutor().get_processed_user_id(
             game_data
         ):

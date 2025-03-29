@@ -21,7 +21,9 @@ from services.game.actions_at_night import (
     take_action_and_save_data,
 )
 from services.game.roles.poisoner import Poisoner
-from services.game.saving_role_selection.poisoner import PoisonerSaver
+from services.game.saving_role_selection.poisoner import (
+    PoisonerSaver,
+)
 from states.states import UserFsm
 from utils.tg import delete_message
 
