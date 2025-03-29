@@ -4,7 +4,6 @@ from general.groupings import Groupings
 from services.game.roles.base import (
     ActiveRoleAtNight,
     AliasRole,
-    BossIsDeadMixin,
 )
 from services.game.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
@@ -14,9 +13,7 @@ from utils.roles import (
 )
 
 
-class Doctor(
-    ProcedureAfterNight, BossIsDeadMixin, ActiveRoleAtNight
-):
+class Doctor(ProcedureAfterNight, ActiveRoleAtNight):
     role = "Главный врач"
     mail_message = "Кого вылечить этой ночью?"
     is_self_selecting = True

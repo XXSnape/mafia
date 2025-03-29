@@ -63,7 +63,6 @@ class Poisoner(
     async def accrual_of_overnight_rewards(
         self,
         game_data: GameCache,
-        all_roles: dict[str, Role],
         victims: set[int],
         **kwargs,
     ):
@@ -77,7 +76,7 @@ class Poisoner(
             user_role, user_url = get_user_role_and_url(
                 game_data=game_data,
                 processed_user_id=victim_id,
-                all_roles=all_roles,
+                all_roles=self.all_roles,
             )
             money = user_role.payment_for_murder
             self.add_money_to_all_allies(

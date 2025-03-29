@@ -6,42 +6,7 @@ from general.groupings import Groupings
 
 if TYPE_CHECKING:
     from services.game.roles.base import Role
-from utils.pretty_text import make_pretty
-from utils.informing import get_profiles
 from utils.roles import get_processed_user_id_if_exists
-
-
-class BossIsDeadMixin:
-    async def boss_is_dead(
-        self,
-        current_id: int,
-    ):
-        game_data: GameCache = await self.state.get_data()
-        url = game_data["players"][str(current_id)]["url"]
-        role = game_data["players"][str(current_id)]["pretty_role"]
-        role_id = game_data["players"][str(current_id)]["role_id"]
-        players = game_data[self.roles_key]
-        if not players:
-            return
-        new_boss_id = players[0]
-        new_boss_url = game_data["players"][str(new_boss_id)]["url"]
-        game_data["players"][str(new_boss_id)]["pretty_role"] = (
-            make_pretty(self.role)
-        )
-        game_data["players"][str(new_boss_id)]["role_id"] = role_id
-        await self.state.set_data(game_data)
-        profiles = get_profiles(
-            players_ids=game_data[self.roles_key],
-            players=game_data["players"],
-            role=True,
-        )
-        for player_id in players:
-            await self.bot.send_message(
-                chat_id=player_id,
-                text=f"Погиб {role} {url}.\n\n"
-                f"Новый {role} {new_boss_url}\n\n"
-                f"Текущие союзники:\n{profiles}",
-            )
 
 
 class SuicideRoleMixin:
@@ -75,7 +40,6 @@ class ProcedureAfterNight(ABC):
     async def accrual_of_overnight_rewards(
         self,
         game_data: GameCache,
-        all_roles: dict[str, "Role"],
         **kwargs,
     ):
         pass

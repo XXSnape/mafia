@@ -34,16 +34,12 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
 
     @get_processed_user_id_if_exists
     async def procedure_after_night(
-        self,
-        all_roles: dict[str, Role],
-        game_data: GameCache,
-        processed_user_id: int,
-        **kwargs
+        self, game_data: GameCache, processed_user_id: int, **kwargs
     ):
         user_role = game_data["players"][str(processed_user_id)][
             "role_id"
         ]
-        role: Role = all_roles[user_role]
+        role: Role = self.all_roles[user_role]
         if isinstance(role, ActiveRoleAtNight) is False:
             return
         send_message = role.cancel_actions(

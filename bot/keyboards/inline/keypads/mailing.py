@@ -1,14 +1,10 @@
 from collections.abc import Iterable
-from typing import TYPE_CHECKING
 
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
 
-from cache.cache_types import Poisoned
+from cache.cache_types import Poisoned, GameCache, UsersInGame
 from keyboards.inline.buttons.common import BACK_BTN
-
-if TYPE_CHECKING:
-    from services.game.roles import UsersInGame, GameCache
 
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.callback_factory.recognize_user import (
@@ -24,22 +20,31 @@ from keyboards.inline.cb.cb_text import (
 )
 
 
-def send_transformation_kb(game_data: "GameCache"):
+def send_transformation_kb(game_data: GameCache):
+    from services.game.roles import (
+        Mafia,
+        MafiaAlias,
+        Policeman,
+        Doctor,
+    )
+
     buttons = [
         InlineKeyboardButton(
-            text="Маршал", callback_data=WEREWOLF_TO_POLICEMAN_CB
+            text=Policeman.role,
+            callback_data=WEREWOLF_TO_POLICEMAN_CB,
         ),
         InlineKeyboardButton(
-            text="Доктор", callback_data=WEREWOLF_TO_DOCTOR_CB
+            text=Doctor.role, callback_data=WEREWOLF_TO_DOCTOR_CB
         ),
     ]
-    if len(game_data["mafias"]) + 1 < (
+    if len(game_data[Mafia.roles_key]) + 1 < (
         len(game_data["live_players_ids"])
-        - (len(game_data["mafias"]) + 1)
+        - (len(game_data[Mafia.roles_key]) + 1)
     ):
         buttons.append(
             InlineKeyboardButton(
-                text="Мафия", callback_data=WEREWOLF_TO_MAFIA_CB
+                text=MafiaAlias.role,
+                callback_data=WEREWOLF_TO_MAFIA_CB,
             )
         )
     return generate_inline_kb(data_with_buttons=buttons)
@@ -47,7 +52,7 @@ def send_transformation_kb(game_data: "GameCache"):
 
 def send_selection_to_players_kb(
     players_ids: list[int],
-    players: "UsersInGame",
+    players: UsersInGame,
     extra_buttons: tuple[InlineKeyboardButton, ...] = (),
     exclude: Iterable[int] | int = (),
     user_index_cb: type[CallbackData] = UserActionIndexCbData,
@@ -66,7 +71,7 @@ def send_selection_to_players_kb(
     return generate_inline_kb(data_with_buttons=buttons)
 
 
-def selection_to_warden_kb(game_data: "GameCache", user_id: int):
+def selection_to_warden_kb(game_data: GameCache, user_id: int):
     from services.game.roles.warden import Warden
 
     checked = game_data[Warden.extra_data[0].key]

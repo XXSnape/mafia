@@ -1,4 +1,3 @@
-import enum
 from typing import overload
 
 from cache.cache_types import RolesLiteral
@@ -56,12 +55,22 @@ def get_data_with_roles(
 
 BASES_ROLES = [
     "don",
+    "policeman",
+    "general",
+    "general",
+    "general",
+    # "doctor",
+    "policeman",
     "warden",
     # "don",
     "policeman",
     # "forger",
-    "doctor",
+    # "doctor",
     # "policeman",
     # "civilian",
 ]
 REQUIRED_ROLES = BASES_ROLES + ["mafia"]
+
+# TESTED
+# "nurse"
+# "doctor"

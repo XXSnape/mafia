@@ -26,7 +26,6 @@ class Instigator(ProcedureAfterVoting, ActiveRoleAtNight):
     async def take_action_after_voting(
         self,
         game_data: GameCache,
-        all_roles: dict[str, Role],
         **kwargs,
     ):
         vote_for = game_data["vote_for"]
@@ -37,7 +36,9 @@ class Instigator(ProcedureAfterVoting, ActiveRoleAtNight):
         if not [victim, aim] in vote_for:
             return
         aim_data = game_data["players"][str(aim)]
-        role = all_roles[game_data["players"][str(aim)]["role_id"]]
+        role = self.all_roles[
+            game_data["players"][str(aim)]["role_id"]
+        ]
         if role.grouping != Groupings.civilians:
             money = role.payment_for_murder * 2
         else:

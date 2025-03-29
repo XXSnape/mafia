@@ -5,6 +5,7 @@ from cache.cache_types import (
     GameCache,
     UserIdInt,
     RolesLiteral,
+    CheckedForTheSameGroups,
 )
 from keyboards.inline.keypads.mailing import selection_to_warden_kb
 from services.game.roles.base import ActiveRoleAtNight
@@ -21,6 +22,7 @@ class Warden(ProcedureAfterNight, ActiveRoleAtNight):
         "width=2094&height=2094&fmt=webp"
     )
     need_to_monitor_interaction = False
+    need_to_process = False
     purpose = "Ты можешь проверить двух любых игроков на принадлежность одной группировки."
     message_to_group_after_action = "Осуществляется плановая проверка документов отдельных социальных структур!"
     mail_message = "Выбери 2х игроков для проверки"
@@ -47,7 +49,7 @@ class Warden(ProcedureAfterNight, ActiveRoleAtNight):
     def _get_user_roles_and_url(
         self,
         game_data: GameCache,
-        checked_users: list[list[UserIdInt, RolesLiteral]],
+        checked_users: CheckedForTheSameGroups,
     ):
         user1_data, user2_data = checked_users
         user1_id, user1_role_key = user1_data
@@ -117,15 +119,8 @@ class Warden(ProcedureAfterNight, ActiveRoleAtNight):
             game_data=game_data, user_id=player_id
         )
 
-    async def mailing(self, game_data: GameCache):
-        wardens = self.get_roles(game_data)
-        if not wardens:
-            return
-        for warden_id in wardens:
-            await self.bot.send_message(
-                chat_id=warden_id,
-                text=remind_worden_about_inspections(
-                    game_data=game_data
-                ),
-            )
-        await super().mailing(game_data=game_data)
+    @staticmethod
+    def get_general_text_before_sending(
+        game_data: GameCache,
+    ) -> str | None:
+        return remind_worden_about_inspections(game_data=game_data)

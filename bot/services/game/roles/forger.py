@@ -62,7 +62,6 @@ class Forger(
             index = None
             for ind, (user_id, _) in enumerate(checked):
                 if user_id == processed_user_id:
-                    print("yes!", user_id, processed_user_id)
                     index = ind
                     break
             if index is not None:
@@ -158,8 +157,8 @@ class Forger(
             )
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
-        if game_data["forged_roles"]:
-            game_data["forged_roles"].clear()
+        if game_data[self.extra_data[0].key]:
+            game_data[self.extra_data[0].key].clear()
         return super().cancel_actions(
             game_data=game_data, user_id=user_id
         )

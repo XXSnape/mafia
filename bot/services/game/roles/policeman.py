@@ -10,7 +10,6 @@ from keyboards.inline.keypads.mailing import (
 from services.game.roles.base import (
     ActiveRoleAtNight,
     AliasRole,
-    BossIsDeadMixin,
 )
 from services.game.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
@@ -21,9 +20,7 @@ from utils.roles import (
 )
 
 
-class Policeman(
-    ProcedureAfterNight, BossIsDeadMixin, ActiveRoleAtNight
-):
+class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
     role = "Маршал. Верховный главнокомандующий армии"
     photo = "https://avatars.mds.yandex.net/get-kinopoisk-image/1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x"
     need_to_monitor_interaction = False
@@ -135,21 +132,11 @@ class Policeman(
     ):
         return kill_or_check_on_policeman()
 
-    async def mailing(
-        self,
-        game_data: GameCache,
-    ):
-        policeman = self.get_roles(game_data)
-        if not policeman:
-            return
-        for policeman_id in policeman:
-            await self.bot.send_message(
-                chat_id=policeman_id,
-                text=remind_commissioner_about_inspections(
-                    game_data=game_data
-                ),
-            )
-        await super().mailing(game_data=game_data)
+    @staticmethod
+    def get_general_text_before_sending(game_data: GameCache):
+        return remind_commissioner_about_inspections(
+            game_data=game_data
+        )
 
 
 class PolicemanAlias(AliasRole, Policeman):

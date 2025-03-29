@@ -119,7 +119,9 @@ def get_profiles_during_registration(
     live_players_ids: LivePlayersIds, players: UsersInGame
 ) -> str:
     profiles = get_profiles(live_players_ids, players)
-    return f"Скорее присоединяйся к игре!\nУчастники:\n{profiles}"
+    return make_build(
+        f"Скорее присоединяйся к игре!\nУчастники:\n{profiles}"
+    )
 
 
 def get_results_of_goal_identification(game_data: GameCache):

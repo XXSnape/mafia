@@ -46,7 +46,7 @@ RolesLiteral = Literal[
 ]
 
 Money: TypeAlias = int
-Achievements: TypeAlias = list[str]
+Achievements: TypeAlias = list[list[str | int]]
 Poisoned: TypeAlias = list[list[int] | int]
 
 
@@ -91,7 +91,7 @@ TrackingData: TypeAlias = dict[UserIdStr, InteractionData]
 NumberOfNight: TypeAlias = int
 
 LastInteraction: TypeAlias = dict[UserIdStr, list[NumberOfNight]]
-DisclosedRoles = list[list[UserIdStr, RoleName]]
+DisclosedRoles = list[list[UserIdStr, RolesLiteral]]
 VotedFor: TypeAlias = list[list[UserIdInt]]
 
 
@@ -107,6 +107,9 @@ UsersMoney = list[UserAndMoney]
 
 RolesAndUsersMoney = dict[RolesLiteral, UsersMoney]
 RoleAndUserMoney = dict[RolesLiteral, UserAndMoney]
+CheckedForTheSameGroups: TypeAlias = list[
+    list[UserIdInt, RolesLiteral]
+]
 
 
 class UserCache(TypedDict, total=False):
@@ -122,12 +125,17 @@ class GameCache(TypedDict, total=False):
     start_message_id: int
     messages_after_night: MessagesAfterNight
     disclosed_roles: DisclosedRoles
+    forged_roles: DisclosedRoles
+    checked_for_the_same_groups: CheckedForTheSameGroups
+    deceived: PlayersIds
+    poisoned: list[list[UserIdInt] | int]
     pros: PlayersIds
     cons: PlayersIds
     live_players_ids: LivePlayersIds
     players: UsersInGame
     tracking: TrackingData
     text_about_checks: str
+    text_about_checked_for_the_same_groups: str
     to_delete: ChatsAndMessagesIds
     vote_for: VotedFor
     winners: PlayersIds
@@ -135,3 +143,4 @@ class GameCache(TypedDict, total=False):
     number_of_night: NumberOfNight
     start_of_registration: int
     end_of_registration: int
+    angels_died: PlayersIds

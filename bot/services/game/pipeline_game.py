@@ -156,15 +156,15 @@ class Game:
         night_starts_text = make_build(
             f"Наступает ночь {game_data['number_of_night']}"
         )
-        await self.bot.send_photo(
+        message = await self.bot.send_photo(
             chat_id=self.group_chat_id,
             photo="https://i.pinimg.com/originals/f0/43/ed/f043edcac9690fdec845925508006459.jpg",
             caption=f"{night_starts_text}.\n\n{players}",
             reply_markup=get_to_bot_kb("Действовать!"),
         )
-
+        await message.pin()
         await self.controller.mailing()
-        await asyncio.sleep(5)
+        await asyncio.sleep(25)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -179,9 +179,9 @@ class Game:
             caption=f"{make_build('Пришло время провести следственные мероприятия жителям города!')}\n\n"
             f"{players_after_night}",
         )
-        await asyncio.sleep(1)
+        await asyncio.sleep(4)
         await self.controller.suggest_vote()
-        await asyncio.sleep(5)
+        await asyncio.sleep(10)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -296,9 +296,12 @@ class Game:
             )
         else:
             achievements_text = make_build(
-                "\nОтчет об активных и полезных действиях, повлиявших на исход:\n\n● "
-            ) + "\n● ".join(
-                achievement for achievement in achievements
+                "\nОтчет о действиях, повлиявших на исход:\n\n● "
+            ) + "\n\n● ".join(
+                achievement.format(
+                    money=money if result.money != 0 else 0
+                )
+                for achievement, money in achievements
             )
         text += achievements_text
         text += make_build(f"\n\nИтого: {result.money}{MONEY_SYM}")

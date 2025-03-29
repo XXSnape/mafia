@@ -95,6 +95,8 @@ async def save_personal_results(
     await result_dao.add_many(personal_results, exclude={"text"})
 
     for result in personal_results:
+        if result.money == 0:
+            continue
         await users_dao.update_balance(
             user_money=result, add_money=True
         )

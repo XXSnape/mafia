@@ -22,7 +22,6 @@ class Werewolf(ProcedureAfterNight, ActiveRoleAtNight):
 
     async def procedure_after_night(
         self,
-        all_roles: dict[str, Role],
         game_data: GameCache,
         **kwargs,
     ):
@@ -33,7 +32,7 @@ class Werewolf(ProcedureAfterNight, ActiveRoleAtNight):
             == self.number_of_night_for_transformation
         ):
             for player_data in game_data["players"].values():
-                if player_data["role_id"] not in all_roles:
+                if player_data["role_id"] not in self.all_roles:
                     new_role = get_data_with_roles(
                         player_data["role_id"]
                     )
@@ -43,7 +42,7 @@ class Werewolf(ProcedureAfterNight, ActiveRoleAtNight):
                         state=self.state,
                         all_roles=self.all_roles,
                     )
-                    all_roles[player_data["role_id"]] = new_role
+                    self.all_roles[player_data["role_id"]] = new_role
 
     def __init__(self):
         self.state_for_waiting_for_action = (

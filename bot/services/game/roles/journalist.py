@@ -31,13 +31,15 @@ class Journalist(ProcedureAfterNight, ActiveRoleAtNight):
     async def procedure_after_night(
         self, game_data: GameCache, processed_user_id: int, **kwargs
     ):
-        visitors = ", ".join(
+        interacting = [
             game_data["players"][str(user_id)]["url"]
             for user_id in game_data["tracking"]
             .get(str(processed_user_id), {})
             .get("interacting", [])
             if user_id != game_data[self.roles_key][0]
-        )
+        ]
+        self.number_of_visitors = len(interacting) - 1
+        visitors = ", ".join(interacting)
         user_url = game_data["players"][str(processed_user_id)][
             "url"
         ]
@@ -59,17 +61,10 @@ class Journalist(ProcedureAfterNight, ActiveRoleAtNight):
         processed_role: Role,
         **kwargs,
     ):
-        visitors = (
-            len(
-                game_data["tracking"]
-                .get(str(processed_user_id), {})
-                .get("interacting", [])
-            )
-            - 1
-        )
-        if not visitors:
+        if self.number_of_visitors == 0:
             return
-        money = 3 * visitors
+
+        money = 3 * self.number_of_visitors
         self.add_money_to_all_allies(
             game_data=game_data,
             money=money,
@@ -77,8 +72,10 @@ class Journalist(ProcedureAfterNight, ActiveRoleAtNight):
             processed_role=processed_role,
             beginning_message="Интервью с",
         )
+        self.number_of_visitors = 0
 
     def __init__(self):
         self.state_for_waiting_for_action = (
             UserFsm.JOURNALIST_TAKES_INTERVIEW
         )
+        self.number_of_visitors = 0

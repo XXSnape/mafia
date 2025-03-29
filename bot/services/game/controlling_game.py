@@ -22,6 +22,7 @@ from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from states.states import GameFsm, UserFsm
 from utils.pretty_text import (
     make_pretty,
+    make_build,
 )
 from utils.calculator import get_the_most_frequently_encountered_id
 from utils.informing import (
@@ -39,7 +40,6 @@ from .protocols.protocols import (
 from .roles import Mafia, Killer, Prosecutor
 from .roles.base import (
     AliasRole,
-    BossIsDeadMixin,
     Role,
     ActiveRoleAtNight,
 )
@@ -161,7 +161,6 @@ class Controller:
             key=attrgetter("number_in_order_after_voting")
         )
         kwargs = {
-            "all_roles": self.all_roles,
             "game_data": game_data,
         }
         is_not_there_removed = len(pros) == len(cons) or len(
@@ -228,7 +227,6 @@ class Controller:
             "murdered": murdered,
             "victims": victims,
             "game_data": game_data,
-            "all_roles": self.all_roles,
         }
         for role in roles:
             await role.procedure_after_night(**kwargs)
@@ -245,13 +243,14 @@ class Controller:
             role = game_data["players"][str(victim_id)][
                 "pretty_role"
             ]
-            text_about_dead += f"Убит {role} - {url}!\n\n"
+            text_about_dead += f"🌹Убит {role} - {url}!\n\n"
 
         text_about_dead = (
-            text_about_dead or "Сегодня ночью все выжили!"
+            text_about_dead or "💕Сегодня ночью все выжили!"
         )
         await self.bot.send_message(
-            chat_id=self.group_chat_id, text=text_about_dead
+            chat_id=self.group_chat_id,
+            text=make_build(text_about_dead),
         )
         await send_messages_after_night(
             game_data=game_data,
@@ -281,13 +280,14 @@ class Controller:
         await self.state.set_state(GameFsm.VOTE)
         sent_survey = await self.bot.send_message(
             chat_id=self.group_chat_id,
-            text=f"На кону судьба {url}!",
+            text=make_build(f"На кону судьба {url}!"),
             reply_markup=get_vote_for_aim_kb(
                 user_id=aim_id,
                 pros=game_data["pros"],
                 cons=game_data["cons"],
             ),
         )
+        await sent_survey.pin()
         game_data["to_delete"].append(
             [self.group_chat_id, sent_survey.message_id]
         )
@@ -312,17 +312,18 @@ class Controller:
                 bot_id=self.bot.id,
             )
         await role.report_death(
-            game_data=game_data, is_night=at_night, user_id=user_id
+            game_data=game_data, at_night=at_night, user_id=user_id
         )
         game_data["live_players_ids"].remove(user_id)
         game_data["players"][str(user_id)][
             "number_died_at_night"
         ] = (game_data["number_of_night"] - 1)
         game_data[role.roles_key].remove(user_id)
-        if (
-            isinstance(role, BossIsDeadMixin)
-            and role.is_alias is False
-        ):
+        if role.alias:
+            # if (
+            #     isinstance(role, BossIsDeadMixin)
+            #     and role.is_alias is False
+            # ):
             await role.boss_is_dead(current_id=user_id)
         if isinstance(role, AliasRole):
             await role.alias_is_dead(
@@ -341,12 +342,13 @@ class Controller:
             await current_role.mailing(game_data=game_data)
 
     async def suggest_vote(self):
-        await self.bot.send_photo(
+        message = await self.bot.send_photo(
             chat_id=self.group_chat_id,
             photo="https://studychinese.ru/content/dictionary/pictures/25/12774.jpg",
             caption="Кого обвиним во всем и повесим?",
             reply_markup=participate_in_social_life(),
         )
+        await message.pin()
         game_data: GameCache = await self.state.get_data()
         live_players = game_data["live_players_ids"]
         players = game_data["players"]

@@ -19,7 +19,7 @@ from utils.pretty_text import make_build
 class UserManager(RouterHelper):
     async def send_latest_message(self):
         game_state, game_data = await get_game_state_and_data(
-            tg_obj=self.callback,
+            tg_obj=self.message,
             state=self.state,
             dispatcher=self.dispatcher,
         )

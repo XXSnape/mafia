@@ -31,6 +31,7 @@ async def start_registration(
     session_with_commit: AsyncSession,
     scheduler: AsyncIOScheduler,
     dispatcher: Dispatcher,
+    broker: RabbitBroker,
 ):
     registration = Registration(
         message=message,
@@ -38,6 +39,7 @@ async def start_registration(
         session=session_with_commit,
         dispatcher=dispatcher,
         scheduler=scheduler,
+        broker=broker,
     )
     await registration.start_registration()
 

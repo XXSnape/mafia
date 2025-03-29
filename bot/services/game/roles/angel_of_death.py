@@ -33,7 +33,7 @@ class AngelOfDeath(
     ):
         removed_user_id = removed_user[0]
         if removed_user_id in game_data.get(self.roles_key, []):
-            game_data["angels_died"].append(removed_user_id)
+            game_data[self.extra_data[0].key].append(removed_user_id)
 
     @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(
@@ -52,7 +52,7 @@ class AngelOfDeath(
                 bot_id=self.bot.id,
             )
         if processed_user_id not in victims:
-            game_data["angels_died"].clear()
+            game_data[self.extra_data[0].key].clear()
             return
         if processed_role.grouping == Groupings.civilians:
             money = 0
@@ -64,29 +64,29 @@ class AngelOfDeath(
             beginning_message="Отомщённое убийство",
             user_url=user_url,
             processed_role=processed_role,
-            additional_players="angels_died",
+            additional_players=self.extra_data[0].key,
         )
-        game_data["angels_died"].clear()
+        game_data[self.extra_data[0].key].clear()
 
     async def report_death(
-        self, game_data: GameCache, is_night: bool, user_id: int
+        self, game_data: GameCache, at_night: bool, user_id: int
     ):
-        if is_night is False:
+        if at_night is False:
             await self.bot.send_message(
                 chat_id=user_id,
                 text="Тебя линчевали на голосовании, не забудь отомстить обидчикам!",
             )
             return
         await super().report_death(
-            game_data=game_data, is_night=is_night, user_id=user_id
+            game_data=game_data, at_night=at_night, user_id=user_id
         )
 
     async def mailing(self, game_data: GameCache):
-        if "angels_died" not in game_data:
+        if self.extra_data[0].key not in game_data:
             return
         current_number = game_data["number_of_night"]
         angels = []
-        for angel_id in game_data["angels_died"]:
+        for angel_id in game_data[self.extra_data[0].key]:
             if (
                 current_number
                 - game_data["players"][str(angel_id)][

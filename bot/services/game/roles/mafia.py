@@ -4,7 +4,6 @@ from general.groupings import Groupings
 from services.game.roles.base import (
     ActiveRoleAtNight,
     AliasRole,
-    BossIsDeadMixin,
 )
 from services.game.roles.base.mixins import (
     MurderAfterNight,
@@ -13,7 +12,7 @@ from states.states import UserFsm
 from utils.roles import get_processed_role_and_user_if_exists
 
 
-class Mafia(MurderAfterNight, BossIsDeadMixin, ActiveRoleAtNight):
+class Mafia(MurderAfterNight, ActiveRoleAtNight):
     role = "Дон. Высшее звание в преступных группировках"
     photo = (
         "https://avatars.mds.yandex.net/i?id="

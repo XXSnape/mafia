@@ -11,6 +11,7 @@ from keyboards.inline.callback_factory.recognize_user import (
 )
 from services.game.roles import Hacker, Mafia
 from services.game.roles.base import Role, ActiveRoleAtNight
+from utils.pretty_text import make_build
 from utils.tg import delete_message
 from utils.state import get_state_and_assign
 
@@ -56,7 +57,7 @@ async def inform_aliases(
         pretty_role = game_data["players"][
             str(callback.from_user.id)
         ]["pretty_role"]
-        message = (
+        message = make_build(
             NUMBER_OF_NIGHT.format(game_data["number_of_night"])
             + f"{pretty_role} {current_url} выбрал {url}"
         )
@@ -134,21 +135,25 @@ async def inform_players_and_trace_actions(
 
         await callback.bot.send_message(
             chat_id=game_data["game_chat"],
-            text=current_role.message_to_group_after_action,
+            text=make_build(
+                current_role.message_to_group_after_action
+            ),
         )
     if current_role.message_to_user_after_action:
         await delete_message(callback.message)
         await callback.message.answer(
-            NUMBER_OF_NIGHT.format(game_data["number_of_night"])
-            + current_role.message_to_user_after_action.format(
-                url=url
+            make_build(
+                NUMBER_OF_NIGHT.format(game_data["number_of_night"])
+                + current_role.message_to_user_after_action.format(
+                    url=url
+                )
             )
         )
     if current_role.notification_message:
         save_notification_message(
             game_data=game_data,
             processed_user_id=user_id,
-            message=current_role.notification_message,
+            message=make_build(current_role.notification_message),
             current_user_id=callback.from_user.id,
         )
 
@@ -171,12 +176,6 @@ async def take_action_and_save_data(
         "role_id"
     ]
     current_role: ActiveRoleAtNight = get_data_with_roles(role_id)
-    await inform_players_and_trace_actions(
-        callback=callback,
-        game_data=game_data,
-        user_id=user_id,
-        current_role=current_role,
-    )
 
     if current_role.last_interactive_key:
         current_night = game_data["number_of_night"]
@@ -195,4 +194,10 @@ async def take_action_and_save_data(
     ):
         game_data[current_role.processed_by_boss].append(user_id)
     await state.set_data(game_data)
+    await inform_players_and_trace_actions(
+        callback=callback,
+        game_data=game_data,
+        user_id=user_id,
+        current_role=current_role,
+    )
     return game_state, game_data, user_id

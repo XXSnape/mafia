@@ -20,7 +20,6 @@ class Punisher(ProcedureAfterNight, Role):
     async def procedure_after_night(
         self,
         game_data: GameCache,
-        all_roles: dict[str, Role],  # TODO all roles
         victims: set[int],
         recovered: list[int],
         murdered: list[int],
@@ -33,8 +32,8 @@ class Punisher(ProcedureAfterNight, Role):
         killed_py_punisher = set()
         if punisher_id not in set(murdered) - set(recovered):
             return
-        for role in all_roles:
-            current_role = all_roles[role]
+        for role in self.all_roles:
+            current_role = self.all_roles[role]
             if current_role.can_kill_at_night is False:
                 continue
             killed_id = current_role.get_processed_user_id(game_data)
@@ -95,36 +94,3 @@ class Punisher(ProcedureAfterNight, Role):
                     beginning_message="Убийство",
                 )
         self.killed.clear()
-        #
-        # punishers = game_data[self.roles_key]
-        # if not punishers:
-        #     return
-        # punisher_id = punishers[0]
-        # if punisher_id not in victims:
-        #     return
-        # for role in all_roles:
-        #     current_role = all_roles[role]
-        #     if current_role.can_kill_at_night is False:
-        #         continue
-        #     killed_id = current_role.get_processed_user_id(game_data)
-        #     if isinstance(killed_id, list):
-        #         if punisher_id not in killed_id:
-        #             continue
-        #     else:
-        #         if killed_id != punisher_id:
-        #             continue
-        #     killer_id = game_data[current_role.roles_key][0]
-        #     if killer_id in victims:
-        #         if current_role.grouping != Groupings.civilians:
-        #             money = current_role.payment_for_murder * 2
-        #         else:
-        #             money = 0
-        #         self.add_money_to_all_allies(
-        #             game_data=game_data,
-        #             money=money,
-        #             user_url=game_data["players"][str(killer_id)][
-        #                 "url"
-        #             ],
-        #             processed_role=current_role,
-        #             beginning_message="Убийство",
-        #         )

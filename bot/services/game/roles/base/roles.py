@@ -1,5 +1,6 @@
 from abc import ABC
 from contextlib import suppress
+from random import shuffle
 from typing import Callable, Optional, Self
 
 from aiogram import Bot, Dispatcher
@@ -67,6 +68,39 @@ class Role(ABC):
         self.dispatcher = dispatcher
         self.bot = bot
         self.state = state
+
+    async def boss_is_dead(
+        self,
+        current_id: int,
+    ):
+        game_data: GameCache = await self.state.get_data()
+        url = game_data["players"][str(current_id)]["url"]
+        role = game_data["players"][str(current_id)]["pretty_role"]
+        role_id = game_data["players"][str(current_id)]["role_id"]
+        players = game_data[self.roles_key]
+        if not players:
+            return
+        shuffle(players)
+        new_boss_id = players[0]
+        new_boss_url = game_data["players"][str(new_boss_id)]["url"]
+        game_data["players"][str(new_boss_id)]["pretty_role"] = (
+            make_pretty(self.role)
+        )
+        game_data["players"][str(new_boss_id)]["role_id"] = role_id
+        print("self", self.role, "game", game_data)
+        await self.state.set_data(game_data)
+        profiles = get_profiles(
+            players_ids=game_data[self.roles_key],
+            players=game_data["players"],
+            role=True,
+        )
+        for player_id in players:
+            await self.bot.send_message(
+                chat_id=player_id,
+                text=f"Погиб {role} {url}.\n\n"
+                f"Новый {role} - {new_boss_url}\n\n"
+                f"Текущие союзники:\n{profiles}",
+            )
 
     @classmethod
     @property
@@ -195,7 +229,7 @@ class Role(ABC):
         user_url: str | None = None,
         processed_role: Optional["Role"] = None,
         at_night: bool = True,
-        additional_players: RolesLiteral | None = None,
+        additional_players: str | None = None,
     ):
         players = game_data[self.roles_key]
         if additional_players:
@@ -205,14 +239,19 @@ class Role(ABC):
             if custom_message:
                 message = custom_message
             else:
-                message = f"{beginning_message} {user_url} ({make_pretty(processed_role.role)}) - {money}{MONEY_SYM}"
+                message = f"{beginning_message} {user_url} ({make_pretty(processed_role.role)})"
+            message += " - {money}" + MONEY_SYM
+
             time_of_day = (
                 "🌃Ночь" if at_night else "🌟Голосования дня"
             )
             game_data["players"][str(player_id)][
                 "achievements"
             ].append(
-                f'{time_of_day} {game_data["number_of_night"]}.\n{message}'
+                [
+                    f'{time_of_day} {game_data["number_of_night"]}.\n{message}',
+                    money,
+                ]
             )
 
     def earn_money_for_voting(
@@ -229,10 +268,15 @@ class Role(ABC):
         )
         user_data["money"] += earned_money
         achievements = user_data["achievements"]
-        achievements.append(
-            f"🌟День {number_of_day}.\nПовешение {voted_user['url']} ("
-            f"{voted_user['pretty_role']}) - {earned_money}{MONEY_SYM}"
+        message = (
+            (
+                f"🌟День {number_of_day}.\nПовешение {voted_user['url']} "
+                f"({voted_user['pretty_role']}) - "
+            )
+            + "{money}"
+            + MONEY_SYM
         )
+        achievements.append([message, earned_money])
 
     def get_processed_user_id(self, game_data: GameCache):
         if self.processed_by_boss:
@@ -251,9 +295,9 @@ class Role(ABC):
         return None
 
     async def report_death(
-        self, game_data: GameCache, is_night: bool, user_id: int
+        self, game_data: GameCache, at_night: bool, user_id: int
     ):
-        if is_night:
+        if at_night:
             message = make_build(
                 "К сожалению, тебя убили! Отправь напоследок все, что думаешь!"
             )
@@ -334,7 +378,6 @@ class ActiveRoleAtNight(Role):
             )
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
-
         suffers = (
             game_data["tracking"]
             .get(str(user_id), {})
@@ -362,21 +405,10 @@ class ActiveRoleAtNight(Role):
             data: LastInteraction = game_data[
                 self.last_interactive_key
             ]
-            if self.is_alias is False and (
-                self.alias is None
-                or self.alias.is_mass_mailing_list is False
-            ):
+            if self.is_alias is False:
                 for suffer in suffers:
                     suffer_interaction = data[str(suffer)]
                     suffer_interaction.pop()
-            else:
-                processed_user_id = self.get_processed_user_id(
-                    game_data
-                )
-                for suffer in suffers:
-                    if suffer != processed_user_id:
-                        suffer_interaction = data[str(suffer)]
-                        suffer_interaction.pop()
         return True
 
     async def send_survey(
@@ -465,17 +497,30 @@ class ActiveRoleAtNight(Role):
         )
 
     def get_roles(self, game_data: GameCache):
-        if self.processed_users_key not in game_data:
-            return
         roles = game_data[self.roles_key]
         if not roles:
             return
         return roles
 
+    @staticmethod
+    def get_general_text_before_sending(
+        game_data: GameCache,
+    ) -> str | None:
+        return None
+
     async def mailing(self, game_data: GameCache):
         roles = self.get_roles(game_data)
         if not roles:
             return
+        general_text = self.get_general_text_before_sending(
+            game_data
+        )
+        if general_text is not None:
+            for user_id in roles:
+                await self.bot.send_message(
+                    chat_id=user_id,
+                    text=general_text,
+                )
         await self.send_survey(
             player_id=roles[0],
             game_data=game_data,

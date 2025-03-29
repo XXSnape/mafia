@@ -49,7 +49,7 @@ def get_processed_role_and_user_if_exists(async_func: Callable):
         processed_role, user_url = get_user_role_and_url(
             game_data=game_data,
             processed_user_id=processed_user_id,
-            all_roles=kwargs["all_roles"],
+            all_roles=role.all_roles,
         )
         return await async_func(
             role,

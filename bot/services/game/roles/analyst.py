@@ -54,7 +54,6 @@ class Analyst(ProcedureAfterVoting, ActiveRoleAtNight):
         processed_user_id: int,
         **kwargs,
     ):
-        number_of_day = game_data["number_of_night"]
         removed_user = removed_user[0]
         url = (
             None
@@ -72,26 +71,25 @@ class Analyst(ProcedureAfterVoting, ActiveRoleAtNight):
             money = 22
             to_group = "Все, кто читал прогнозы на день, были готовы к дневным событиям!"
             achievement = (
-                f"Удача! Действительно никого не повесили - {money}{MONEY_SYM}"
+                f"Удача! Действительно никого не повесили"
                 if url is None
-                else f"Удачный прогноз! Был повешен {url} ({role}) - {money}{MONEY_SYM}"
+                else f"Удачный прогноз! Был повешен {url} ({role})"
             )
         else:
             money = 0
             to_group = "Обман или чёрный лебедь? Аналитические прогнозы не сбылись!"
             achievement = (
-                f"Неудача! Никого не повесили - {money}{MONEY_SYM}"
+                f"Неудача! Никого не повесили"
                 if url is None
-                else f"Неудачный прогноз! Был повешен {url} ({role}) - {money}{MONEY_SYM}"
+                else f"Неудачный прогноз! Был повешен {url} ({role})"
             )
         await self.bot.send_message(
             chat_id=game_data["game_chat"],
             text=to_group,
         )
-        for player_id in game_data[self.roles_key]:
-            game_data["players"][str(player_id)][
-                "achievements"
-            ].append(
-                f"🌟Голосование дня {number_of_day}.\n{achievement}"
-            )
-            game_data["players"][str(player_id)]["money"] += money
+        self.add_money_to_all_allies(
+            game_data=game_data,
+            money=money,
+            custom_message=achievement,
+            at_night=False,
+        )

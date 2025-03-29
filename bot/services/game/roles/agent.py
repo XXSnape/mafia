@@ -26,12 +26,14 @@ class Agent(ProcedureAfterNight, ActiveRoleAtNight):
         processed_user_id: int,
         **kwargs,
     ):
-        visitors = ", ".join(
+        sufferers = [
             game_data["players"][str(user_id)]["url"]
             for user_id in game_data["tracking"]
             .get(str(processed_user_id), {})
             .get("sufferers", [])
-        )
+        ]
+        visitors = ", ".join(sufferers)
+        self.number_of_visitors = len(sufferers)
         user_url = game_data["players"][str(processed_user_id)][
             "url"
         ]
@@ -40,6 +42,7 @@ class Agent(ProcedureAfterNight, ActiveRoleAtNight):
             if not visitors
             else f"{user_url} навещал: {visitors}"
         )
+
         await self.bot.send_message(
             chat_id=game_data[self.roles_key][0], text=message
         )
@@ -53,14 +56,9 @@ class Agent(ProcedureAfterNight, ActiveRoleAtNight):
         processed_user_id: int,
         **kwargs,
     ):
-        visitors = len(
-            game_data["tracking"]
-            .get(str(processed_user_id), {})
-            .get("sufferers", [])
-        )
-        if not visitors:
+        if self.number_of_visitors == 0:
             return
-        money = 6 * visitors
+        money = 6 * self.number_of_visitors
         self.add_money_to_all_allies(
             game_data=game_data,
             money=money,
@@ -68,6 +66,8 @@ class Agent(ProcedureAfterNight, ActiveRoleAtNight):
             user_url=user_url,
             processed_role=processed_role,
         )
+        self.number_of_visitors = 0
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.AGENT_WATCHES
+        self.number_of_visitors = 0
