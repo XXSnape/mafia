@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from aiogram import Bot
 
+from cache.cache_types import RolesLiteral
 from constants.output import NUMBER_OF_NIGHT
 from utils.utils import make_pretty, get_profiles
 
@@ -17,7 +18,7 @@ def change_role(
     game_data: "GameCache",
     previous_role: "Role",
     new_role: "Role",
-    role_key: str,
+    role_id: RolesLiteral,
     user_id: int,
 ):
     game_data[previous_role.roles_key].remove(user_id)
@@ -25,7 +26,7 @@ def change_role(
     game_data["players"][str(user_id)]["pretty_role"] = make_pretty(
         new_role.role
     )
-    game_data["players"][str(user_id)]["enum_name"] = role_key
+    game_data["players"][str(user_id)]["role_id"] = role_id
     game_data["players"][str(user_id)][
         "roles_key"
     ] = new_role.roles_key
@@ -64,11 +65,11 @@ def get_user_role_and_url(
     processed_user_id: int,
     all_roles: dict[str, "Role"],
 ):
-    enum_name = game_data["players"][str(processed_user_id)][
-        "enum_name"
+    role_id = game_data["players"][str(processed_user_id)][
+        "role_id"
     ]
     return (
-        all_roles[enum_name],
+        all_roles[role_id],
         game_data["players"][str(processed_user_id)]["url"],
     )
 

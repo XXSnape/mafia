@@ -146,7 +146,7 @@ class Forger(
                 game_data=game_data,
                 previous_role=self,
                 new_role=MafiaAlias(),
-                role_key="mafia",
+                role_id="mafia",
                 user_id=forger_id,
             )
             await notify_aliases_about_transformation(

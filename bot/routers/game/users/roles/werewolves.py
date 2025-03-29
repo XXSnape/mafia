@@ -16,7 +16,7 @@ from services.game.roles import (
     Policeman,
     PolicemanAlias,
 )
-from services.game.saving_role_selection import WerewolfSaver
+from services.game.saving_role_selection.werewolf import WerewolfSaver
 from states.states import UserFsm
 from utils.tg import delete_message
 from utils.utils import (

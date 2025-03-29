@@ -80,7 +80,7 @@ class Game:
     def init_existing_roles(self, game_data: GameCache):
         all_roles = get_data_with_roles()
         existing = set(
-            player_data["enum_name"]
+            player_data["role_id"]
             for player_data in game_data["players"].values()
         )
         not_existing = set(
@@ -207,8 +207,8 @@ class Game:
         losers = []
         personal_results: dict[UserIdStr, PersonalResultSchema] = {}
         for user_id, player in game_data["players"].items():
-            enum_name = player["enum_name"]
-            current_role: Role = self.all_roles[enum_name]
+            role_id = player["role_id"]
+            current_role: Role = self.all_roles[role_id]
             personal_result = current_role.earn_money_for_winning(
                 winning_group=e.winner,
                 game_data=game_data,
@@ -458,13 +458,13 @@ class Game:
                 role_type.remove(role)
         winners = set()
         order_of_roles[:] = order_of_roles[:number_of_players]
-        for role_key, (winner_id, money) in role_and_winner.items():
-            if role_key not in order_of_roles:
+        for role_id, (winner_id, money) in role_and_winner.items():
+            if role_id not in order_of_roles:
                 not_winners.append(winner_id)
                 losers.append(
                     BidForRoleSchema(
                         user_tg_id=winner_id,
-                        role_key=role_key,
+                        role_key=role_id,
                         money=money,
                     )
                 )
@@ -474,9 +474,9 @@ class Game:
             set(players_ids) - (set(not_winners) | winners)
         )
         winners_bets: list[BidForRoleSchema] = []
-        for role_key in order_of_roles[:number_of_players]:
-            current_role = get_data_with_roles(role_key)
-            winner = role_and_winner.get(role_key)
+        for role_id in order_of_roles[:number_of_players]:
+            current_role = get_data_with_roles(role_id)
+            winner = role_and_winner.get(role_id)
             if winner is None:
                 winner_id = choice(not_winners)
                 not_winners.remove(winner_id)
@@ -485,7 +485,7 @@ class Game:
                 winners_bets.append(
                     BidForRoleSchema(
                         user_tg_id=winner_id,
-                        role_key=role_key,
+                        role_key=role_id,
                         money=winner[1],
                     )
                 )
@@ -495,7 +495,8 @@ class Game:
                 "role": current_role.role,
                 "pretty_role": make_pretty(current_role.role),
                 "initial_role": make_pretty(current_role.role),
-                "enum_name": role_key,
+                "role_id": role_id,
+                'initial_role_id': role_id,
                 "roles_key": current_role.roles_key,
                 "user_id": winner_id,
             }

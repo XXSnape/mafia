@@ -33,16 +33,17 @@ class Werewolf(ProcedureAfterNight, ActiveRoleAtNight):
             == self.number_of_night_for_transformation
         ):
             for player_data in game_data["players"].values():
-                if player_data["enum_name"] not in all_roles:
+                if player_data["role_id"] not in all_roles:
                     new_role = get_data_with_roles(
-                        player_data["enum_name"]
+                        player_data["role_id"]
                     )
                     new_role(
                         dispatcher=self.dispatcher,
                         bot=self.bot,
                         state=self.state,
+                        all_roles=self.all_roles
                     )
-                    all_roles[player_data["enum_name"]] = new_role
+                    all_roles[player_data["role_id"]] = new_role
 
     def __init__(self):
         self.state_for_waiting_for_action = (

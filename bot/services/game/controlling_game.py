@@ -182,10 +182,10 @@ class Controller:
         ]
         for user_id in set(pros):
             current_role = self.all_roles[
-                game_data["players"][str(user_id)]["enum_name"]
+                game_data["players"][str(user_id)]["role_id"]
             ]
             current_role.earn_money_for_voting(
-                voted_role=self.all_roles[user_info["enum_name"]],
+                voted_role=self.all_roles[user_info["role_id"]],
                 voted_user=user_info,
                 game_data=game_data,
                 user_id=user_id,
@@ -287,7 +287,7 @@ class Controller:
     async def remove_user_from_game(
         self, game_data: GameCache, user_id: int, at_night: bool
     ):
-        user_role = game_data["players"][str(user_id)]["enum_name"]
+        user_role = game_data["players"][str(user_id)]["role_id"]
         role: Role = self.all_roles[user_role]
         if at_night:
             await get_state_and_assign(
@@ -415,7 +415,7 @@ class Controller:
         for user_id, player_data in game_data["players"].items():
             player_data: UserGameCache
             current_role = get_data_with_roles(
-                player_data["enum_name"]
+                player_data["role_id"]
             )
             if current_role.is_alias:
                 continue

@@ -15,7 +15,7 @@ from services.game.actions_at_night import (
     save_notification_message,
 )
 from services.game.roles import Forger, Policeman, PolicemanAlias
-from services.game.saving_role_selection import ForgerSaver
+from services.game.saving_role_selection.forger import ForgerSaver
 from states.states import UserFsm
 from utils.tg import delete_message
 from utils.utils import make_pretty

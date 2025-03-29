@@ -6,7 +6,7 @@ from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from services.game.actions_at_night import (
-    take_action_and_register_user,
+    take_action_and_save_data,
 )
 from states.states import UserFsm
 
@@ -36,7 +36,7 @@ async def handle_action(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    await take_action_and_register_user(
+    await take_action_and_save_data(
         callback=callback,
         callback_data=callback_data,
         state=state,

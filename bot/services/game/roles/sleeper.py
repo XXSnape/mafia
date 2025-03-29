@@ -41,7 +41,7 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
         **kwargs
     ):
         user_role = game_data["players"][str(processed_user_id)][
-            "enum_name"
+            "role_id"
         ]
         role: Role = all_roles[user_role]
         if isinstance(role, ActiveRoleAtNight) is False:

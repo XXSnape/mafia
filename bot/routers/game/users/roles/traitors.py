@@ -8,10 +8,10 @@ from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from services.game.actions_at_night import (
-    take_action_and_register_user,
+    take_action_and_save_data,
 )
 from services.game.roles import Mafia, Traitor
-from services.game.saving_role_selection import TraitorSaver
+from services.game.saving_role_selection.traitor import TraitorSaver
 from states.states import UserFsm
 from utils.utils import make_pretty
 

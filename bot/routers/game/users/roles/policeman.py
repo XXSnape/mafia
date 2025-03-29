@@ -21,14 +21,14 @@ from keyboards.inline.keypads.mailing import (
 )
 from keyboards.inline.buttons.common import BACK_BTN
 from services.game.actions_at_night import (
-    take_action_and_register_user,
+    take_action_and_save_data,
     get_game_state_and_data,
     get_game_state_data_and_user_id,
     trace_all_actions,
     save_notification_message,
 )
 from services.game.roles import Policeman
-from services.game.saving_role_selection import PolicemanSaver
+from services.game.saving_role_selection.policeman import PolicemanSaver
 from states.states import UserFsm
 from utils.tg import delete_message
 

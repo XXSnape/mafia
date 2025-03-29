@@ -153,7 +153,7 @@ async def inform_players_and_trace_actions(
         )
 
 
-async def take_action_and_register_user(
+async def take_action_and_save_data(
     callback: CallbackQuery,
     callback_data: UserActionIndexCbData,
     state: FSMContext,
@@ -167,10 +167,10 @@ async def take_action_and_register_user(
             dispatcher=dispatcher,
         )
     )
-    enum_name = game_data["players"][str(callback.from_user.id)][
-        "enum_name"
+    role_id = game_data["players"][str(callback.from_user.id)][
+        "role_id"
     ]
-    current_role: ActiveRoleAtNight = get_data_with_roles(enum_name)
+    current_role: ActiveRoleAtNight = get_data_with_roles(role_id)
     await inform_players_and_trace_actions(
         callback=callback,
         game_data=game_data,

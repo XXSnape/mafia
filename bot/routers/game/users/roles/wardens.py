@@ -11,7 +11,7 @@ from services.game.actions_at_night import (
     save_notification_message,
 )
 from services.game.roles.warden import Warden
-from services.game.saving_role_selection import WardenSaver
+from services.game.saving_role_selection.warden import WardenSaver
 from states.states import UserFsm
 from utils.tg import delete_message
 

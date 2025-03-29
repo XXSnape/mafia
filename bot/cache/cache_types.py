@@ -66,7 +66,8 @@ class UserGameCache(TypedDict, total=False):
     role: NotRequired[RoleName]
     pretty_role: NotRequired[str]
     initial_role: str
-    enum_name: RolesLiteral
+    role_id: RolesLiteral
+    initial_role_id: RolesLiteral
     roles_key: str
     number_died_at_night: int
     user_id: int

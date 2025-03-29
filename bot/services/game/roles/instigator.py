@@ -37,7 +37,7 @@ class Instigator(ProcedureAfterVoting, ActiveRoleAtNight):
         if not [victim, aim] in vote_for:
             return
         aim_data = game_data["players"][str(aim)]
-        role = all_roles[game_data["players"][str(aim)]["enum_name"]]
+        role = all_roles[game_data["players"][str(aim)]["role_id"]]
         if role.grouping != Groupings.civilians:
             money = role.payment_for_murder * 2
         else:

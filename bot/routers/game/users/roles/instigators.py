@@ -12,10 +12,10 @@ from keyboards.inline.buttons.common import BACK_BTN
 from services.game.actions_at_night import (
     get_game_state_data_and_user_id,
     get_game_state_and_data,
-    take_action_and_register_user,
+    take_action_and_save_data,
 )
 from services.game.roles import Instigator
-from services.game.saving_role_selection import InstigatorSaver
+from services.game.saving_role_selection.instigator import InstigatorSaver
 from states.states import UserFsm
 from utils.tg import delete_message
 
