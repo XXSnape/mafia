@@ -127,7 +127,10 @@ class Controller:
                 game_data[current_role.processed_by_boss].clear()
             if current_role.extra_data:
                 for extra in current_role.extra_data:
-                    if extra.need_to_clear and extra.key in game_data:
+                    if (
+                        extra.need_to_clear
+                        and extra.key in game_data
+                    ):
                         game_data[extra.key].clear()
         game_data["pros"].clear()
         game_data["cons"].clear()
