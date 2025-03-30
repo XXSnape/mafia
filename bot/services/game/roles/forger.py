@@ -42,7 +42,7 @@ class Forger(
         self, game_data: GameCache, **kwargs
     ):
         forged_roles = game_data["forged_roles"]
-        if not forged_roles:
+        if not forged_roles or len(forged_roles[0]) != 2:
             return
         disclosed_roles = game_data["disclosed_roles"]
         if (

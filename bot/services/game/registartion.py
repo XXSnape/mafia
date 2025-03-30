@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime, timezone
+from pprint import pprint
 
 from aiogram.filters import CommandObject
 from aiogram.fsm.context import FSMContext
@@ -464,6 +465,12 @@ class Registration(RouterHelper):
             "order_of_roles": order_of_roles or BASES_ROLES,
             "banned_roles": banned_roles,
         }
+        pprint(owner_data)
+        print(
+            order_of_roles,
+            BASES_ROLES,
+            order_of_roles or BASES_ROLES,
+        )
         game_data: GameCache = {
             "game_chat": self.message.chat.id,
             "owner": owner_data,

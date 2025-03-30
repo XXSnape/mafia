@@ -165,7 +165,7 @@ class Game:
         )
         await message.pin()
         await self.controller.mailing()
-        await asyncio.sleep(25)
+        await asyncio.sleep(30)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -182,14 +182,14 @@ class Game:
         )
         await asyncio.sleep(4)
         await self.controller.suggest_vote()
-        await asyncio.sleep(10)
+        await asyncio.sleep(15)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
         )
         result = await self.controller.confirm_final_aim()
         if result:
-            await asyncio.sleep(10)
+            await asyncio.sleep(12)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -416,6 +416,7 @@ class Game:
         game_data: GameCache = await self.state.get_data()
         banned_roles = game_data["owner"]["banned_roles"]
         order_of_roles = game_data["owner"]["order_of_roles"]
+        print("initial", order_of_roles)
         players_ids = game_data["live_players_ids"]
         all_roles = get_data_with_roles()
         criminals: list[RolesLiteral] = []
@@ -464,6 +465,7 @@ class Game:
                 role_type.remove(role)
         winners = set()
         order_of_roles[:] = order_of_roles[:number_of_players]
+        print("order", order_of_roles)
         for role_id, (winner_id, money) in role_and_winner.items():
             if role_id not in order_of_roles:
                 not_winners.append(winner_id)

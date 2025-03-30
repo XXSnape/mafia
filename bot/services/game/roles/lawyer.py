@@ -4,6 +4,7 @@ from services.game.roles.base.roles import Role
 from general.groupings import Groupings
 from services.game.roles.base import ActiveRoleAtNight
 from states.states import UserFsm
+from utils.pretty_text import make_build
 from utils.roles import get_processed_role_and_user_if_exists
 
 
@@ -36,13 +37,13 @@ class Lawyer(ProcedureAfterVoting, ActiveRoleAtNight):
             return
         removed_user[:] = [0]
         if processed_role.grouping == Groupings.civilians:
-            money = int(processed_role.payment_for_treatment * 1.5)
+            money = processed_role.payment_for_treatment * 2
         else:
             money = 0
 
         await self.bot.send_message(
             chat_id=game_data["game_chat"],
-            text=f"У {user_url} есть алиби, поэтому местные жители отпустили гвоздя программы",
+            text=make_build(f"😯У {user_url} есть алиби, поэтому местные жители отпустили гвоздя программы"),
         )
         self.add_money_to_all_allies(
             game_data=game_data,
