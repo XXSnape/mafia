@@ -35,7 +35,7 @@ class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
         ExtraCache(key="disclosed_roles"),
         ExtraCache(
             key="text_about_checks",
-            is_cleared=False,
+            need_to_clear=False,
             data_type=str,
         ),
     ]

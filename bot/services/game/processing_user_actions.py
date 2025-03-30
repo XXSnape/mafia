@@ -85,7 +85,7 @@ class UserManager(RouterHelper):
                 dispatcher=self.dispatcher,
             )
         )
-        deceived_user = game_data.get(Instigator.extra_data[0].key)
+        deceived_user = game_data.get("deceived")
         if (
             deceived_user
             and self.callback.from_user.id == deceived_user[0][0]
@@ -99,13 +99,14 @@ class UserManager(RouterHelper):
         ]["url"]
         voted_url = game_data["players"][str(voted_user_id)]["url"]
         await delete_message(self.callback.message)
+        await game_state.set_data(game_data)
         await self.callback.message.answer(
-            f"Ты выбрал голосовать за {voted_url}"
+            make_build(f"Ты выбрал голосовать за {voted_url}")
         )
         await self.callback.bot.send_message(
             chat_id=game_data["game_chat"],
             text=make_build(
-                f"{voting_url} выступает против {voted_url}!"
+                f"❗️{voting_url} выступает против {voted_url}!"
             ),
             reply_markup=participate_in_social_life(),
         )

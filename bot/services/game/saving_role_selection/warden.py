@@ -32,7 +32,7 @@ class WardenSaver(RouterHelper):
             state=self.state,
             dispatcher=self.dispatcher,
         )
-        checked = game_data[Warden.extra_data[0].key]
+        checked = game_data["checked_for_the_same_groups"]
         processed_user_id = int(self.callback.data)
         if len(checked) == 1 and checked[0][0] == processed_user_id:
             checked.clear()
@@ -64,8 +64,8 @@ class WardenSaver(RouterHelper):
                 ],
             ]
         )
-        user1_id = checked[0][0]
-        user2_id = checked[1][0]
+        user1_id: int = checked[0][0]
+        user2_id: int = checked[1][0]
         for user_id in [user1_id, user2_id]:
             trace_all_actions(
                 callback=self.callback,

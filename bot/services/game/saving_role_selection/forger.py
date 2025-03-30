@@ -29,7 +29,7 @@ class ForgerSaver(RouterHelper):
             )
         )
         url = game_data["players"][str(user_id)]["url"]
-        game_data[Forger.extra_data[0].key].append([user_id])
+        game_data["forged_roles"].append([user_id])
         all_roles = get_data_with_roles()
         current_roles = [
             (all_roles[data["role_id"]].role, data["role_id"])
@@ -49,7 +49,7 @@ class ForgerSaver(RouterHelper):
             state=self.state,
             dispatcher=self.dispatcher,
         )
-        game_data[Forger.extra_data[0].key].clear()
+        game_data["forged_roles"].clear()
         markup = Forger().generate_markup(
             player_id=self.callback.from_user.id, game_data=game_data
         )
@@ -67,7 +67,7 @@ class ForgerSaver(RouterHelper):
         )
         current_role = get_data_with_roles(self.callback.data)
         pretty_role = make_pretty(current_role.role)
-        forger_roles_key = Forger.extra_data[0].key
+        forger_roles_key = "forged_roles"
         game_data[forger_roles_key][0].append(self.callback.data)
         user_id = game_data[forger_roles_key][0][0]
         trace_all_actions(

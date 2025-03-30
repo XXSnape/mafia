@@ -5,7 +5,7 @@ from typing import NotRequired, TypeAlias, TypedDict, Literal
 @dataclass
 class ExtraCache:
     key: str
-    is_cleared: bool = True
+    need_to_clear: bool = True
     data_type: type = list
 
 
@@ -91,7 +91,7 @@ TrackingData: TypeAlias = dict[UserIdStr, InteractionData]
 NumberOfNight: TypeAlias = int
 
 LastInteraction: TypeAlias = dict[UserIdStr, list[NumberOfNight]]
-DisclosedRoles = list[list[UserIdStr, RolesLiteral]]
+DisclosedRoles = list[list[UserIdInt | RolesLiteral]]
 VotedFor: TypeAlias = list[list[UserIdInt]]
 
 
@@ -108,7 +108,7 @@ UsersMoney = list[UserAndMoney]
 RolesAndUsersMoney = dict[RolesLiteral, UsersMoney]
 RoleAndUserMoney = dict[RolesLiteral, UserAndMoney]
 CheckedForTheSameGroups: TypeAlias = list[
-    list[UserIdInt, RolesLiteral]
+    list[UserIdInt | RolesLiteral]
 ]
 
 
@@ -127,7 +127,7 @@ class GameCache(TypedDict, total=False):
     disclosed_roles: DisclosedRoles
     forged_roles: DisclosedRoles
     checked_for_the_same_groups: CheckedForTheSameGroups
-    deceived: PlayersIds
+    deceived: list[PlayersIds]
     poisoned: list[list[UserIdInt] | int]
     pros: PlayersIds
     cons: PlayersIds

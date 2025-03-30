@@ -29,7 +29,7 @@ class InstigatorSaver(RouterHelper):
             )
         )
         url = game_data["players"][str(user_id)]["url"]
-        game_data[Instigator.extra_data[0].key].append([user_id])
+        game_data["deceived"].append([user_id])
         markup = send_selection_to_players_kb(
             players_ids=game_data["live_players_ids"],
             players=game_data["players"],
@@ -53,7 +53,7 @@ class InstigatorSaver(RouterHelper):
             UserFsm.INSTIGATOR_CHOOSES_SUBJECT
         )
         instigator = Instigator()
-        game_data[Instigator.extra_data[0].key].clear()
+        game_data["deceived"].clear()
         await game_state.set_data(game_data)
         await self.callback.message.edit_text(
             text=instigator.mail_message,
@@ -74,16 +74,16 @@ class InstigatorSaver(RouterHelper):
                 dispatcher=self.dispatcher,
             )
         )
-        deceived_user = game_data[Instigator.extra_data[0].key][0]
+        deceived_user = game_data["deceived"][0]
         deceived_user.append(user_id)
         subject_url = game_data["players"][str(deceived_user[0])][
             "url"
         ]
-        object_id = game_data["players"][str(deceived_user[1])][
+        object_url = game_data["players"][str(deceived_user[1])][
             "url"
         ]
         await delete_message(self.callback.message)
         await game_state.set_data(game_data)
         await self.callback.message.answer(
-            text=f"Днём {subject_url} проголосует за {object_id}, если попытается голосовать"
+            text=f"Днём {subject_url} проголосует за {object_url}, если попытается голосовать"
         )

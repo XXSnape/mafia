@@ -30,7 +30,7 @@ class Warden(ProcedureAfterNight, ActiveRoleAtNight):
         ExtraCache(key="checked_for_the_same_groups"),
         ExtraCache(
             key="text_about_checked_for_the_same_groups",
-            is_cleared=False,
+            need_to_clear=False,
             data_type=str,
         ),
     ]
@@ -63,7 +63,7 @@ class Warden(ProcedureAfterNight, ActiveRoleAtNight):
     async def procedure_after_night(
         self, game_data: GameCache, **kwargs
     ):
-        checked_users = game_data[self.extra_data[0].key]
+        checked_users = game_data["checked_for_the_same_groups"]
         if len(checked_users) != 2:
             return
         user1_url, user1_role, user2_url, user2_role = (
@@ -80,14 +80,16 @@ class Warden(ProcedureAfterNight, ActiveRoleAtNight):
             await self.bot.send_message(
                 chat_id=warden_id, text=common_text
             )
-        game_data[self.extra_data[1].key] += common_text + "\n\n"
+        game_data["text_about_checked_for_the_same_groups"] += (
+            common_text + "\n\n"
+        )
 
     async def accrual_of_overnight_rewards(
         self,
         game_data: GameCache,
         **kwargs,
     ):
-        checked_users = game_data[self.extra_data[0].key]
+        checked_users = game_data["checked_for_the_same_groups"]
         if len(checked_users) != 2:
             return
         if self.was_deceived is False:
@@ -104,7 +106,7 @@ class Warden(ProcedureAfterNight, ActiveRoleAtNight):
         self.was_deceived = False
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
-        game_data[self.extra_data[0].key].clear()
+        game_data["checked_for_the_same_groups"].clear()
         return super().cancel_actions(
             game_data=game_data, user_id=user_id
         )

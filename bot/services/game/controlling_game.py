@@ -127,7 +127,7 @@ class Controller:
                 game_data[current_role.processed_by_boss].clear()
             if current_role.extra_data:
                 for extra in current_role.extra_data:
-                    if extra.is_cleared and extra.key in game_data:
+                    if extra.need_to_clear and extra.key in game_data:
                         game_data[extra.key].clear()
         game_data["pros"].clear()
         game_data["cons"].clear()
@@ -320,10 +320,6 @@ class Controller:
         ] = (game_data["number_of_night"] - 1)
         game_data[role.roles_key].remove(user_id)
         if role.alias:
-            # if (
-            #     isinstance(role, BossIsDeadMixin)
-            #     and role.is_alias is False
-            # ):
             await role.boss_is_dead(current_id=user_id)
         if isinstance(role, AliasRole):
             await role.alias_is_dead(

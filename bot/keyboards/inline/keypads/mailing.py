@@ -72,9 +72,7 @@ def send_selection_to_players_kb(
 
 
 def selection_to_warden_kb(game_data: GameCache, user_id: int):
-    from services.game.roles.warden import Warden
-
-    checked = game_data[Warden.extra_data[0].key]
+    checked = game_data["checked_for_the_same_groups"]
     buttons = []
     for player_id in game_data["live_players_ids"]:
         if player_id == user_id:

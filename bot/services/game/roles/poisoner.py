@@ -28,7 +28,7 @@ class Poisoner(
     notification_message = None
     payment_for_treatment = 0
     payment_for_murder = 15
-    extra_data = [ExtraCache(key="poisoned", is_cleared=False)]
+    extra_data = [ExtraCache(key="poisoned", need_to_clear=False)]
 
     def __init__(self):
         self.state_for_waiting_for_action = (
@@ -45,7 +45,7 @@ class Poisoner(
         )
 
     def get_processed_user_id(self, game_data: GameCache):
-        poisoned = game_data.get(self.extra_data[0].key)
+        poisoned = game_data.get("poisoned")
         if poisoned:
             if poisoned[1] == 1:
                 return poisoned[0]
@@ -56,7 +56,7 @@ class Poisoner(
         murdered: list[int],
         **kwargs,
     ):
-        poisoned = game_data[self.extra_data[0].key]
+        poisoned = game_data["poisoned"]
         if poisoned and poisoned[1] == 1:
             murdered.extend(poisoned[0])
 
@@ -66,7 +66,7 @@ class Poisoner(
         victims: set[int],
         **kwargs,
     ):
-        poisoned = game_data[self.extra_data[0].key]
+        poisoned = game_data["poisoned"]
         if not poisoned or poisoned[1] == 0:
             return
         for victim_id in poisoned[0]:
@@ -90,21 +90,22 @@ class Poisoner(
     async def take_action_after_voting(
         self, game_data: GameCache, **kwargs
     ):
-        poisoned = game_data[self.extra_data[0].key]
+        poisoned = game_data["poisoned"]
         if not poisoned or poisoned[1] == 0:
             return
         poisoned.clear()
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
-        if game_data[self.extra_data[0].key]:
-            if game_data[self.extra_data[0].key][1] == 1:
-                game_data[self.extra_data[0].key][1] = 0
+        if game_data["poisoned"]:
+            if game_data["poisoned"][1] == 1:
+                game_data["poisoned"][1] = 0
             else:
-                game_data[self.extra_data[0].key][0].pop()
+                if self.get_processed_user_id(game_data):
+                    game_data["poisoned"][0].pop()
             return super().cancel_actions(
                 game_data=game_data, user_id=user_id
             )
 
     def generate_markup(self, game_data: GameCache, **kwargs):
-        poisoned = game_data[self.extra_data[0].key]
+        poisoned = game_data["poisoned"]
         return kill_or_poison_kb(poisoned)

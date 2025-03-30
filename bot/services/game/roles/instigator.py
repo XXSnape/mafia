@@ -29,7 +29,7 @@ class Instigator(ProcedureAfterVoting, ActiveRoleAtNight):
         **kwargs,
     ):
         vote_for = game_data["vote_for"]
-        deceived_user = game_data[self.extra_data[0].key]
+        deceived_user = game_data["deceived"]
         if not deceived_user:
             return
         victim, aim = deceived_user[0]
@@ -53,5 +53,5 @@ class Instigator(ProcedureAfterVoting, ActiveRoleAtNight):
         )
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
-        game_data[self.extra_data[0].key].clear()
+        game_data["deceived"].clear()
         super().cancel_actions(game_data=game_data, user_id=user_id)

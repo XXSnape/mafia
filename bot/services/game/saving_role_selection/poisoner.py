@@ -24,7 +24,7 @@ class PoisonerSaver(RouterHelper):
             state=self.state,
             dispatcher=self.dispatcher,
         )
-        poisoned = game_data[Poisoner.extra_data[0].key]
+        poisoned = game_data["poisoned"]
         poisoned[1] = 1
         await delete_message(self.callback.message)
         await game_state.set_data(game_data)
@@ -39,7 +39,7 @@ class PoisonerSaver(RouterHelper):
             state=self.state,
             dispatcher=self.dispatcher,
         )
-        poisoned = game_data[Poisoner.extra_data[0].key]
+        poisoned = game_data["poisoned"]
         exclude = (poisoned[0] if poisoned else []) + [
             self.callback.from_user.id
         ]
@@ -60,7 +60,7 @@ class PoisonerSaver(RouterHelper):
             state=self.state,
             dispatcher=self.dispatcher,
         )
-        poisoned = game_data[Poisoner.extra_data[0].key]
+        poisoned = game_data["poisoned"]
         await self.state.set_state(UserFsm.POISONER_CHOOSES_ACTION)
         await self.callback.message.edit_text(
             text=Poisoner.mail_message,
@@ -78,7 +78,7 @@ class PoisonerSaver(RouterHelper):
                 dispatcher=self.dispatcher,
             )
         )
-        poisoned = game_data[Poisoner.extra_data[0].key]
+        poisoned = game_data["poisoned"]
         if poisoned:
             poisoned[0].append(user_id)
         else:

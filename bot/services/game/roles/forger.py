@@ -41,9 +41,7 @@ class Forger(
     async def procedure_after_night(
         self, game_data: GameCache, **kwargs
     ):
-        from services.game.roles.warden import Warden
-
-        forged_roles = game_data[self.extra_data[0].key]
+        forged_roles = game_data["forged_roles"]
         if not forged_roles:
             return
         disclosed_roles = game_data["disclosed_roles"]
@@ -56,7 +54,7 @@ class Forger(
             self.has_policeman_been_deceived = True
             self.all_roles["policeman"].was_deceived = True
 
-        checked = game_data.get(Warden.extra_data[0].key, [])
+        checked = game_data.get("checked_for_the_same_groups", [])
         if len(checked) == 2:
             processed_user_id = forged_roles[0][0]
             index = None
@@ -157,8 +155,8 @@ class Forger(
             )
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
-        if game_data[self.extra_data[0].key]:
-            game_data[self.extra_data[0].key].clear()
+        if game_data["forged_roles"]:
+            game_data["forged_roles"].clear()
         return super().cancel_actions(
             game_data=game_data, user_id=user_id
         )
