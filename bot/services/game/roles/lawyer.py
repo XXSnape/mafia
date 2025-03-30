@@ -43,7 +43,9 @@ class Lawyer(ProcedureAfterVoting, ActiveRoleAtNight):
 
         await self.bot.send_message(
             chat_id=game_data["game_chat"],
-            text=make_build(f"😯У {user_url} есть алиби, поэтому местные жители отпустили гвоздя программы"),
+            text=make_build(
+                f"😯У {user_url} есть алиби, поэтому местные жители отпустили гвоздя программы"
+            ),
         )
         self.add_money_to_all_allies(
             game_data=game_data,
