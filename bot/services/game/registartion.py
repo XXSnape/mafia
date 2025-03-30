@@ -438,7 +438,7 @@ class Registration(RouterHelper):
         await bot.edit_message_text(
             chat_id=user_id,
             text=make_build(
-                f"Ты успешно поставил {self.message.text}{MONEY_SYM} на роль {role.role}!\n"
+                f"Ты успешно поставил {self.message.text}{MONEY_SYM} на роль {role.role}!\n\n"
                 f"Твой текущий баланс: {balance}{MONEY_SYM}"
             ),
             reply_markup=cancel_bet(),

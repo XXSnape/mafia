@@ -55,7 +55,10 @@ def get_data_with_roles(
 
 BASES_ROLES = [
     "don",
+    "policeman",
     "doctor",
+    "general",
+    "general",
     "nurse",
     "nurse",
     # "nurse",

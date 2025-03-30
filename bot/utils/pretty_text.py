@@ -19,6 +19,6 @@ def get_minutes_and_seconds_text(
     minutes = diff // 60
     seconds = diff % 60
     if minutes:
-        message += f"{minutes} м. "
-    message += f"{seconds} с!"
+        message += f"{minutes} мин. "
+    message += f"{seconds} сек!"
     return message

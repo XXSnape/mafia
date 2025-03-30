@@ -248,7 +248,9 @@ class Game:
             text=result
             + winners_text
             + losers_text
-            + make_build(f"\n\n{message}"),
+            + make_build(
+                f"\n\n{message} (Количество ночей: {game_data['number_of_night']})"
+            ),
         )
         await delete_messages_from_to_delete(
             bot=self.bot,
