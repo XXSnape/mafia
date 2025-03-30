@@ -346,12 +346,6 @@ class AliasRole(ABC):
             for alias_id in game_data[self.roles_key]
         ]
         await asyncio.gather(*tasks, return_exceptions=True)
-        # for alias_id in game_data[self.roles_key]:
-        #     await self.bot.send_message(
-        #         chat_id=alias_id,
-        #         text=f"Погиб {role} {url}.\n\n"
-        #         f"Текущие союзники:\n{profiles}",
-        #     )
 
     @classmethod
     @property
@@ -480,10 +474,6 @@ class ActiveRoleAtNight(Role):
                             game_data=game_data,
                         )
                     )
-                    # await self.send_survey(
-                    #     player_id=user_id,
-                    #     game_data=game_data,
-                    # )
         await asyncio.gather(*tasks, return_exceptions=True)
 
     def generate_markup(

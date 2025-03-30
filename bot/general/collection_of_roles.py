@@ -56,32 +56,9 @@ def get_data_with_roles(
 BASES_ROLES = [
     "don",
     "policeman",
-    "general",
-    "general",
     "doctor",
-    "policeman",
-    "mafia",
-    "mafia",
-    # "mafia",
-    # "doctor",
-    # "general",
-    # "general",
-    # "nurse",
-    # "nurse",
-    # "nurse",
-    # "policeman",
-    # "general",
-    # "general",
-    # "general",
-    # "doctor",
-    # "policeman",
-    # "warden",
-    # "don",
-    # "policeman",
-    # "forger",
-    # "doctor",
-    # "policeman",
-    # "civilian",
+    "werewolf",
+    "prime_minister",
 ]
 REQUIRED_ROLES = BASES_ROLES + ["mafia"]
 
@@ -90,3 +67,6 @@ REQUIRED_ROLES = BASES_ROLES + ["mafia"]
 # "doctor"
 # general
 # policeman
+# "traitor",
+# "killer",
+# "civilian",

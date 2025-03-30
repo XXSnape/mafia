@@ -164,12 +164,14 @@ class Controller:
         voting_roles.sort(
             key=attrgetter("number_in_order_after_voting")
         )
-        kwargs = {
-            "game_data": game_data,
-        }
         is_not_there_removed = len(pros) == len(cons) or len(
             pros
         ) < len(cons)
+        kwargs = {
+            "game_data": game_data,
+            "is_not_there_removed": is_not_there_removed,
+            "initial_removed_user_id": removed_user_id,
+        }
         if is_not_there_removed:
             removed_user = [0]
         else:
