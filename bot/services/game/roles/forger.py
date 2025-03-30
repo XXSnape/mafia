@@ -143,12 +143,6 @@ class Forger(
                 role_id="mafia",
                 user_id=forger_id,
             )
-            await notify_aliases_about_transformation(
-                game_data=game_data,
-                bot=self.bot,
-                new_role=MafiaAlias(),
-                user_id=forger_id,
-            )
             await self.bot.send_message(
                 chat_id=game_data["game_chat"],
                 text=f"{make_pretty(self.role)} превращается в {make_pretty(MafiaAlias.role)}",

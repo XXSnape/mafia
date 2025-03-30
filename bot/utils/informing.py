@@ -198,7 +198,8 @@ async def notify_aliases_about_transformation(
                 f"Текущие союзники:\n{profiles}",
             )
             for player_id in game_data[new_role.roles_key]
-        )
+        ),
+        return_exceptions=True,
     )
 
 
@@ -234,7 +235,7 @@ async def send_messages_after_night(
                 tasks.append(
                     bot.send_message(chat_id=chat_id, text=message)
                 )
-    await asyncio.gather(*tasks)
+    await asyncio.gather(*tasks, return_exceptions=True)
 
 
 async def send_request_to_vote(

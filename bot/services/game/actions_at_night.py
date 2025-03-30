@@ -68,7 +68,8 @@ async def inform_aliases(
                 )
                 for alias_id in game_data[current_role.roles_key]
                 if alias_id != callback.from_user.id
-            )
+            ),
+            return_exceptions=True,
         )
         if callback.from_user.id in game_data[
             Mafia.roles_key
@@ -80,7 +81,8 @@ async def inform_aliases(
                         text=f"{pretty_role} ??? выбрал {url}",
                     )
                     for hacker_id in game_data[Hacker.roles_key]
-                )
+                ),
+                return_exceptions=True,
             )
 
 

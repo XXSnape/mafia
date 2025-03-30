@@ -119,5 +119,6 @@ class PolicemanSaver(RouterHelper):
                     f"решил проверить {url}",
                 )
                 for policeman_id in game_data[Policeman.roles_key]
-            )
+            ),
+            return_exceptions=True,
         )

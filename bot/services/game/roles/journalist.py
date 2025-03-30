@@ -1,3 +1,5 @@
+import asyncio
+
 from cache.cache_types import ExtraCache, GameCache
 from services.game.roles.base.roles import Role
 from services.game.roles.base import ActiveRoleAtNight
@@ -48,8 +50,12 @@ class Journalist(ProcedureAfterNight, ActiveRoleAtNight):
             if not visitors
             else f"К {user_url} приходили: {visitors}"
         )
-        await self.bot.send_message(
-            chat_id=game_data[self.roles_key][0], text=message
+        await asyncio.gather(
+            *(
+                self.bot.send_message(chat_id=user_id, text=message)
+                for user_id in game_data[self.roles_key]
+            ),
+            return_exceptions=True,
         )
 
     @get_processed_role_and_user_if_exists

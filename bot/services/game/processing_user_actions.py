@@ -61,16 +61,22 @@ class UserManager(RouterHelper):
                 )
                 for player_id in game_data[aliases]
                 if player_id != self.message.from_user.id
-            )
+            ),
+            return_exceptions=True,
         )
         if self.message.from_user.id in game_data[
             Mafia.roles_key
         ] and game_data.get(Hacker.roles_key):
-            for hacker_id in game_data[Hacker.roles_key]:
-                await self.message.bot.send_message(
-                    chat_id=hacker_id,
-                    text=f"{role} ??? передает:\n\n{self.message.text}",
-                )
+            await asyncio.gather(
+                *(
+                    self.message.bot.send_message(
+                        chat_id=hacker_id,
+                        text=f"{role} ??? передает:\n\n{self.message.text}",
+                    )
+                    for hacker_id in game_data[Hacker.roles_key]
+                ),
+                return_exceptions=True,
+            )
         if len(game_data[aliases]) > 1:
             await self.message.answer(
                 make_build("Сообщение успешно отправлено!")

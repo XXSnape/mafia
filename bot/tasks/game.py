@@ -45,7 +45,8 @@ async def analyze_betting_results(
         *[
             bot.send_message(chat_id=user_id, text=message)
             for user_id, message in messages
-        ]
+        ],
+        return_exceptions=True,
     )
     await rates_dao.add_many(schemas)
     for bet in bids:

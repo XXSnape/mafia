@@ -1,3 +1,7 @@
+from contextlib import suppress
+
+from aiogram.exceptions import TelegramBadRequest
+
 from cache.cache_types import ExtraCache, GameCache
 from general.groupings import Groupings
 from services.game.roles.base import ActiveRoleAtNight, Role
@@ -46,10 +50,11 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
             game_data=game_data, user_id=processed_user_id
         )
         if send_message:
-            await self.bot.send_message(
-                chat_id=processed_user_id,
-                text="Сложно поверить, но все твои действия ночью были лишь сном!",
-            )
+            with suppress(TelegramBadRequest):
+                await self.bot.send_message(
+                    chat_id=processed_user_id,
+                    text="Сложно поверить, но все твои действия ночью были лишь сном!",
+                )
 
     @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(

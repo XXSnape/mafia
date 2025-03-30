@@ -1,3 +1,4 @@
+import asyncio
 from abc import ABC
 from contextlib import suppress
 from random import shuffle
@@ -87,20 +88,29 @@ class Role(ABC):
             make_pretty(self.role)
         )
         game_data["players"][str(new_boss_id)]["role_id"] = role_id
-        print("self", self.role, "game", game_data)
         await self.state.set_data(game_data)
         profiles = get_profiles(
             players_ids=game_data[self.roles_key],
             players=game_data["players"],
             role=True,
         )
-        for player_id in players:
-            await self.bot.send_message(
+        tasks = [
+            self.bot.send_message(
                 chat_id=player_id,
                 text=f"Погиб {role} {url}.\n\n"
                 f"Новый {role} - {new_boss_url}\n\n"
                 f"Текущие союзники:\n{profiles}",
             )
+            for player_id in players
+        ]
+        await asyncio.gather(*tasks, return_exceptions=True)
+        # for player_id in players:
+        #     await self.bot.send_message(
+        #         chat_id=player_id,
+        #         text=f"Погиб {role} {url}.\n\n"
+        #         f"Новый {role} - {new_boss_url}\n\n"
+        #         f"Текущие союзники:\n{profiles}",
+        #     )
 
     @classmethod
     @property
@@ -327,12 +337,21 @@ class AliasRole(ABC):
             players=game_data["players"],
             role=True,
         )
-        for alias_id in game_data[self.roles_key]:
-            await self.bot.send_message(
+        tasks = [
+            self.bot.send_message(
                 chat_id=alias_id,
                 text=f"Погиб {role} {url}.\n\n"
                 f"Текущие союзники:\n{profiles}",
             )
+            for alias_id in game_data[self.roles_key]
+        ]
+        await asyncio.gather(*tasks, return_exceptions=True)
+        # for alias_id in game_data[self.roles_key]:
+        #     await self.bot.send_message(
+        #         chat_id=alias_id,
+        #         text=f"Погиб {role} {url}.\n\n"
+        #         f"Текущие союзники:\n{profiles}",
+        #     )
 
     @classmethod
     @property
@@ -451,13 +470,21 @@ class ActiveRoleAtNight(Role):
         roles: PlayersIds,
         game_data: GameCache,
     ):
+        tasks = []
         if self.alias and len(roles) > 1:
             for user_id in roles[1:]:
                 if self.alias.is_mass_mailing_list:
-                    await self.send_survey(
-                        player_id=user_id,
-                        game_data=game_data,
+                    tasks.append(
+                        self.send_survey(
+                            player_id=user_id,
+                            game_data=game_data,
+                        )
                     )
+                    # await self.send_survey(
+                    #     player_id=user_id,
+                    #     game_data=game_data,
+                    # )
+        await asyncio.gather(*tasks, return_exceptions=True)
 
     def generate_markup(
         self,
@@ -516,11 +543,17 @@ class ActiveRoleAtNight(Role):
             game_data
         )
         if general_text is not None:
-            for user_id in roles:
-                await self.bot.send_message(
-                    chat_id=user_id,
-                    text=general_text,
-                )
+            await asyncio.gather(
+                *(
+                    self.bot.send_message(
+                        chat_id=user_id,
+                        text=general_text,
+                    )
+                    for user_id in roles
+                ),
+                return_exceptions=True,
+            )
+
         await self.send_survey(
             player_id=roles[0],
             game_data=game_data,

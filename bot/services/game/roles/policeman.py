@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram.types import InlineKeyboardButton
 
 from cache.cache_types import ExtraCache, GameCache
@@ -104,10 +106,15 @@ class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
             url = game_data["players"][str(user_id)]["url"]
             role = make_pretty(self.all_roles[role_key].role)
             text = f"🌃Ночь {game_data['number_of_night']}\n{url} - {role}!"
-            for policeman_id in game_data[self.roles_key]:
-                await self.bot.send_message(
-                    chat_id=policeman_id, text=text
-                )
+            await asyncio.gather(
+                *(
+                    self.bot.send_message(
+                        chat_id=policeman_id, text=text
+                    )
+                    for policeman_id in game_data[self.roles_key]
+                ),
+                return_exceptions=True,
+            )
             game_data["text_about_checks"] += text + "\n\n"
         else:
             processed_user_id = self.get_processed_user_id(game_data)

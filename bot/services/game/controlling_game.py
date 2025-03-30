@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.context import FSMContext
+from loguru import logger
 
 from cache.cache_types import (
     GameCache,
@@ -250,16 +251,21 @@ class Controller:
             await role.accrual_of_overnight_rewards(**kwargs)
 
         text_about_dead = ""
+        tasks = []
         for victim_id in victims:
-            await self.remove_user_from_game(
-                game_data=game_data, user_id=victim_id, at_night=True
+            tasks.append(
+                self.remove_user_from_game(
+                    game_data=game_data,
+                    user_id=victim_id,
+                    at_night=True,
+                )
             )
             url = game_data["players"][str(victim_id)]["url"]
             role = game_data["players"][str(victim_id)][
                 "pretty_role"
             ]
             text_about_dead += f"🌹Убит {role} - {url}!\n\n"
-
+        await asyncio.gather(*tasks, return_exceptions=True)
         text_about_dead = (
             text_about_dead or "💕Сегодня ночью все выжили!"
         )
@@ -326,14 +332,19 @@ class Controller:
                 user_id=user_id,
                 bot_id=self.bot.id,
             )
-        await role.report_death(
-            game_data=game_data, at_night=at_night, user_id=user_id
-        )
         game_data["live_players_ids"].remove(user_id)
         game_data["players"][str(user_id)][
             "number_died_at_night"
         ] = (game_data["number_of_night"] - 1)
         game_data[role.roles_key].remove(user_id)
+        try:
+            await role.report_death(
+                game_data=game_data,
+                at_night=at_night,
+                user_id=user_id,
+            )
+        except Exception as e:
+            logger.exception("Error")
         if role.alias:
             await role.boss_is_dead(current_id=user_id)
         if isinstance(role, AliasRole):
@@ -343,6 +354,7 @@ class Controller:
 
     async def mailing(self):
         game_data: GameCache = await self.state.get_data()
+        tasks = []
         for role in self.all_roles:
             current_role: Role = self.all_roles[role]
             if (
@@ -350,7 +362,8 @@ class Controller:
                 or current_role.is_alias
             ):
                 continue
-            await current_role.mailing(game_data=game_data)
+            tasks.append(current_role.mailing(game_data=game_data))
+        await asyncio.gather(*tasks, return_exceptions=True)
 
     async def suggest_vote(self):
         message = await self.bot.send_photo(
@@ -375,10 +388,13 @@ class Controller:
                 )
                 for user_id in live_players
                 if user_id != banned_user
-            )
+            ),
+            return_exceptions=True,
         )
 
     async def familiarize_players(self, game_data: GameCache):
+        roles_tasks = []
+        aliases_tasks = []
         for user_id, player_data in game_data["players"].items():
             player_data: UserGameCache
             current_role = get_data_with_roles(
@@ -387,40 +403,80 @@ class Controller:
             if current_role.is_alias:
                 continue
             persons = game_data[current_role.roles_key]
-            await self.bot.send_photo(
-                chat_id=persons[0],
-                photo=current_role.photo,
-                caption=f"Твоя роль - "
-                f"{make_pretty(current_role.role)}! "
-                f"{current_role.purpose}",
+            roles_tasks.append(
+                self.bot.send_photo(
+                    chat_id=persons[0],
+                    photo=current_role.photo,
+                    caption=f"Твоя роль - "
+                    f"{make_pretty(current_role.role)}! "
+                    f"{current_role.purpose}",
+                )
             )
+            # await self.bot.send_photo(
+            #     chat_id=persons[0],
+            #     photo=current_role.photo,
+            #     caption=f"Твоя роль - "
+            #     f"{make_pretty(current_role.role)}! "
+            #     f"{current_role.purpose}",
+            # )
             if current_role.alias and len(persons) > 1:
                 profiles = get_profiles(
                     players_ids=persons,
                     players=game_data["players"],
                     role=True,
                 )
-                await self.bot.send_message(
-                    chat_id=persons[0],
-                    text="Твои союзники!\n\n" + profiles,
-                )
-                for user_id in persons[1:]:
-                    await self.bot.send_photo(
-                        chat_id=user_id,
-                        photo=current_role.alias.photo,
-                        caption=f"Твоя роль - "
-                        f"{make_pretty(current_role.alias.role)}!"
-                        f" {current_role.alias.purpose}",
-                    )
-                    await self.bot.send_message(
-                        chat_id=user_id,
+                aliases_tasks.append(
+                    self.bot.send_message(
+                        chat_id=persons[0],
                         text="Твои союзники!\n\n" + profiles,
                     )
+                )
+                # await self.bot.send_message(
+                #     chat_id=persons[0],
+                #     text="Твои союзники!\n\n" + profiles,
+                # )
+                for user_id in persons[1:]:
+                    roles_tasks.append(
+                        self.bot.send_photo(
+                            chat_id=user_id,
+                            photo=current_role.alias.photo,
+                            caption=f"Твоя роль - "
+                            f"{make_pretty(current_role.alias.role)}!"
+                            f" {current_role.alias.purpose}",
+                        )
+                    )
+                    # await self.bot.send_photo(
+                    #     chat_id=user_id,
+                    #     photo=current_role.alias.photo,
+                    #     caption=f"Твоя роль - "
+                    #     f"{make_pretty(current_role.alias.role)}!"
+                    #     f" {current_role.alias.purpose}",
+                    # )
+                    aliases_tasks.append(
+                        self.bot.send_message(
+                            chat_id=user_id,
+                            text="Твои союзники!\n\n" + profiles,
+                        )
+                    )
+                    # await self.bot.send_message(
+                    #     chat_id=user_id,
+                    #     text="Твои союзники!\n\n" + profiles,
+                    # )
             if current_role.state_for_waiting_for_action:
                 for person_id in persons:
-                    await get_state_and_assign(
-                        dispatcher=self.dispatcher,
-                        chat_id=person_id,
-                        bot_id=self.bot.id,
-                        new_state=current_role.state_for_waiting_for_action,
+                    roles_tasks.append(
+                        get_state_and_assign(
+                            dispatcher=self.dispatcher,
+                            chat_id=person_id,
+                            bot_id=self.bot.id,
+                            new_state=current_role.state_for_waiting_for_action,
+                        )
                     )
+                    # await get_state_and_assign(
+                    #     dispatcher=self.dispatcher,
+                    #     chat_id=person_id,
+                    #     bot_id=self.bot.id,
+                    #     new_state=current_role.state_for_waiting_for_action,
+                    # )
+        await asyncio.gather(*roles_tasks, return_exceptions=True)
+        await asyncio.gather(*aliases_tasks, return_exceptions=True)

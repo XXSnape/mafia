@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 from operator import itemgetter
+from pprint import pprint
 from random import choice
 
 from aiogram import Dispatcher, Bot
@@ -279,7 +280,8 @@ class Game:
                 for user_id, player_data in game_data[
                     "players"
                 ].items()
-            )
+            ),
+            return_exceptions=True,
         )
         await self.state.clear()
 
@@ -478,7 +480,7 @@ class Game:
             set(players_ids) - (set(not_winners) | winners)
         )
         winners_bets: list[BidForRoleSchema] = []
-        for role_id in order_of_roles[:number_of_players]:
+        for role_id in order_of_roles:
             current_role = get_data_with_roles(role_id)
             winner = role_and_winner.get(role_id)
             if winner is None:
@@ -486,6 +488,7 @@ class Game:
                 not_winners.remove(winner_id)
             else:
                 winner_id = winner[0]
+                role_and_winner.pop(role_id)
                 winners_bets.append(
                     BidForRoleSchema(
                         user_tg_id=winner_id,
