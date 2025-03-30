@@ -178,7 +178,17 @@ class Controller:
                 **kwargs,
                 removed_user=removed_user,
             )
-        if removed_user_id is None or is_not_there_removed:
+        if removed_user_id is None:
+            await self.bot.send_message(
+                chat_id=self.group_chat_id,
+                text=result_text,
+            )
+            return
+
+        if is_not_there_removed:
+            result_text += make_build(
+                f"🥳🥳🥳{game_data['players'][str(removed_user_id)]['url']} дали еще шанс!"
+            )
             await self.bot.send_message(
                 chat_id=self.group_chat_id,
                 text=result_text,
@@ -207,8 +217,10 @@ class Controller:
         await self.bot.send_message(
             chat_id=self.group_chat_id,
             text=result_text
-            + f"Сегодня народ принял тяжелое решение и повесил "
-            f'{user_info["url"]} с ролью {user_info["pretty_role"]}!',
+            + make_build(
+                f"❗️❗️❗️Сегодня народ принял тяжелое решение и повесил "
+                f'{user_info["url"]} с ролью {user_info["pretty_role"]}!'
+            ),
         )
         await self.state.set_data(game_data)
 

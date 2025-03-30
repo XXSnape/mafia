@@ -177,6 +177,12 @@ async def take_action_and_save_data(
     ]
     current_role: ActiveRoleAtNight = get_data_with_roles(role_id)
 
+    await inform_players_and_trace_actions(
+        callback=callback,
+        game_data=game_data,
+        user_id=user_id,
+        current_role=current_role,
+    )
     if current_role.last_interactive_key:
         current_night = game_data["number_of_night"]
         nights = game_data[
@@ -194,10 +200,4 @@ async def take_action_and_save_data(
     ):
         game_data[current_role.processed_by_boss].append(user_id)
     await state.set_data(game_data)
-    await inform_players_and_trace_actions(
-        callback=callback,
-        game_data=game_data,
-        user_id=user_id,
-        current_role=current_role,
-    )
     return game_state, game_data, user_id
