@@ -57,8 +57,8 @@ BASES_ROLES = [
     "policeman",
     "doctor",
     "don",
-    "nurse",
-    "nurse",
+    "general",
+    "general",
 ]
 REQUIRED_ROLES = BASES_ROLES + ["mafia"]
 
@@ -76,3 +76,7 @@ REQUIRED_ROLES = BASES_ROLES + ["mafia"]
 
 # TESTED 2
 # bodyguard
+# nurse
+# doctor
+# policeman
+# general

@@ -30,27 +30,29 @@ from utils.tg import delete_message
 
 class PolicemanSaver(RouterHelper):
     async def policeman_makes_choice(self):
-        data = {
-            POLICEMAN_KILLS_CB: [
-                police_kill_cb_data,
-                "Кого будешь убивать?",
-            ],
-            POLICEMAN_CHECKS_CB: [
-                police_check_cb_data,
-                "Кого будешь проверять?",
-            ],
-        }
         _, game_data = await get_game_state_and_data(
             tg_obj=self.callback,
             state=self.state,
             dispatcher=self.dispatcher,
         )
+        data = {
+            POLICEMAN_KILLS_CB: [
+                police_kill_cb_data,
+                "Кого будешь убивать?",
+                [self.callback.from_user.id],
+            ],
+            POLICEMAN_CHECKS_CB: [
+                police_check_cb_data,
+                "Кого будешь проверять?",
+                game_data[Policeman.roles_key],
+            ],
+        }
         police_action = data[self.callback.data]
         markup = send_selection_to_players_kb(
             players_ids=game_data["live_players_ids"],
             players=game_data["players"],
             extra_buttons=(BACK_BTN,),
-            exclude=self.callback.from_user.id,
+            exclude=police_action[2],
             user_index_cb=police_action[0],
         )
         await self.callback.message.edit_text(
