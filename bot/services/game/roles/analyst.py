@@ -1,5 +1,6 @@
 from aiogram.types import InlineKeyboardButton
 from cache.cache_types import GameCache
+from general.groupings import Groupings
 from keyboards.inline.cb.cb_text import DRAW_CB
 from services.game.roles.base import ActiveRoleAtNight
 from services.game.roles.base.mixins import ProcedureAfterVoting
@@ -8,6 +9,7 @@ from utils.roles import get_processed_user_id_if_exists
 
 
 class Analyst(ProcedureAfterVoting, ActiveRoleAtNight):
+    grouping = Groupings.other
     role = "Политический аналитик"
     photo = "https://habrastorage.org/files/2e3/371/6a2/2e33716a2bb74f8eb67378334960ebb5.png"
     purpose = "Тебе нужно на основе ранее полученных данных предсказать, кого повесят на дневном голосовании"
@@ -26,6 +28,7 @@ class Analyst(ProcedureAfterVoting, ActiveRoleAtNight):
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.ANALYST_ASSUMES
+        self.number_of_predictions = 0
 
     def generate_markup(
         self,
@@ -44,6 +47,20 @@ class Analyst(ProcedureAfterVoting, ActiveRoleAtNight):
             game_data=game_data,
             extra_buttons=extra_buttons,
         )
+
+    def get_money_for_victory_and_nights(
+        self,
+        game_data: GameCache,
+        **kwargs,
+    ):
+        if self.number_of_predictions >= 3:
+            payment = (
+                15
+                * (len(game_data["players"]) // 4)
+                * self.number_of_predictions
+            )
+            return payment, 0
+        return 0, 0
 
     @get_processed_user_id_if_exists
     async def take_action_after_voting(
@@ -67,7 +84,8 @@ class Analyst(ProcedureAfterVoting, ActiveRoleAtNight):
             ]
         )
         if processed_user_id == removed_user:
-            money = 22
+            self.number_of_predictions += 1
+            money = 10
             to_group = "Все, кто читал прогнозы на день, были готовы к дневным событиям!"
             achievement = (
                 "Удача! Действительно никого не повесили"

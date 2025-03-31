@@ -55,6 +55,7 @@ class PolicemanSaver(RouterHelper):
             exclude=police_action[2],
             user_index_cb=police_action[0],
         )
+
         await self.callback.message.edit_text(
             text=police_action[1], reply_markup=markup
         )

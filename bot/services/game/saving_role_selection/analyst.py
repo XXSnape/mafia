@@ -2,6 +2,7 @@ from constants.output import NUMBER_OF_NIGHT
 from services.base import RouterHelper
 from services.game.actions_at_night import get_game_state_and_data
 from services.game.roles import Analyst
+from utils.pretty_text import make_build
 from utils.tg import delete_message
 
 
@@ -15,11 +16,13 @@ class AnalystSaver(RouterHelper):
         game_data[Analyst.processed_users_key].append(0)
         await delete_message(self.callback.message)
         await self.callback.message.answer(
-            text=NUMBER_OF_NIGHT.format(game_data["number_of_night"])
-            + "Ты предположил, что никого не повесят днём"
+            text=make_build(
+                NUMBER_OF_NIGHT.format(game_data["number_of_night"])
+                + "Ты предположил, что никого не повесят днём"
+            )
         )
         await self.callback.bot.send_message(
             chat_id=game_data["game_chat"],
-            text=Analyst.message_to_group_after_action,
+            text=make_build(Analyst.message_to_group_after_action),
         )
         await game_state.set_data(game_data)

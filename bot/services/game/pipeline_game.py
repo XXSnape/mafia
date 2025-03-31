@@ -68,8 +68,8 @@ class Game:
         self.controller = Controller(
             bot=self.bot,
             group_chat_id=self.group_chat_id,
-            state=state,
-            dispatcher=dispatcher,
+            state=self.state,
+            dispatcher=self.dispatcher,
         )
         self.broker = broker
         self.session = session
@@ -164,7 +164,7 @@ class Game:
         )
         await message.pin()
         await self.controller.mailing()
-        await asyncio.sleep(30)
+        await asyncio.sleep(15)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -181,7 +181,7 @@ class Game:
         )
         await asyncio.sleep(4)
         await self.controller.suggest_vote()
-        await asyncio.sleep(15)
+        await asyncio.sleep(7)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
