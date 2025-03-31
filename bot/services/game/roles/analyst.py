@@ -1,6 +1,5 @@
 from aiogram.types import InlineKeyboardButton
 from cache.cache_types import GameCache
-from constants.output import MONEY_SYM
 from keyboards.inline.cb.cb_text import DRAW_CB
 from services.game.roles.base import ActiveRoleAtNight
 from services.game.roles.base.mixins import ProcedureAfterVoting
@@ -71,7 +70,7 @@ class Analyst(ProcedureAfterVoting, ActiveRoleAtNight):
             money = 22
             to_group = "Все, кто читал прогнозы на день, были готовы к дневным событиям!"
             achievement = (
-                f"Удача! Действительно никого не повесили"
+                "Удача! Действительно никого не повесили"
                 if url is None
                 else f"Удачный прогноз! Был повешен {url} ({role})"
             )
@@ -79,7 +78,7 @@ class Analyst(ProcedureAfterVoting, ActiveRoleAtNight):
             money = 0
             to_group = "Обман или чёрный лебедь? Аналитические прогнозы не сбылись!"
             achievement = (
-                f"Неудача! Никого не повесили"
+                "Неудача! Никого не повесили"
                 if url is None
                 else f"Неудачный прогноз! Был повешен {url} ({role})"
             )

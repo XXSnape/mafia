@@ -92,4 +92,5 @@ class GroupManager(RouterHelper):
                     cons=game_data["cons"],
                 )
             )
+        await self.state.set_data(game_data)
         await self.callback.answer()

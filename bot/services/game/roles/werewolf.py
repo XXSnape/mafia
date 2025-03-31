@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from cache.cache_types import GameCache
 from keyboards.inline.keypads.mailing import send_transformation_kb
-from services.game.roles.base import ActiveRoleAtNight, Role
+from services.game.roles.base import ActiveRoleAtNight
 from services.game.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
 

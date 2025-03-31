@@ -4,8 +4,6 @@ from typing import TYPE_CHECKING
 from cache.cache_types import GameCache, UserIdStr
 from general.groupings import Groupings
 
-if TYPE_CHECKING:
-    from services.game.roles.base import Role
 from utils.roles import get_processed_user_id_if_exists
 
 

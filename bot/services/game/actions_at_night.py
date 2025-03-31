@@ -24,12 +24,15 @@ def save_notification_message(
 ):
     if processed_user_id != current_user_id:
         game_data["messages_after_night"].append(
-            [processed_user_id, message]
+            [processed_user_id, make_build(message)]
         )
 
 
 def trace_all_actions(
-    callback: CallbackQuery, game_data: GameCache, user_id: int
+    callback: CallbackQuery,
+    game_data: GameCache,
+    user_id: int,
+    current_role: ActiveRoleAtNight,
 ):
     suffer_tracking = game_data["tracking"].setdefault(
         str(callback.from_user.id), {}
@@ -42,6 +45,20 @@ def trace_all_actions(
     )
     interacting = interacting_tracking.setdefault("interacting", [])
     interacting.append(callback.from_user.id)
+    # if current_role.notification_message:
+    #     save_notification_message(
+    #         game_data=game_data,
+    #         processed_user_id=user_id,
+    #         message=make_build(current_role.notification_message),
+    #         current_user_id=callback.from_user.id,
+    #     )
+    if current_role.notification_message:
+        save_notification_message(
+            game_data=game_data,
+            processed_user_id=user_id,
+            message=current_role.notification_message,
+            current_user_id=callback.from_user.id,
+        )
 
 
 async def inform_aliases(
@@ -128,7 +145,10 @@ async def inform_players_and_trace_actions(
         url=url,
     )
     trace_all_actions(
-        callback=callback, game_data=game_data, user_id=user_id
+        callback=callback,
+        game_data=game_data,
+        user_id=user_id,
+        current_role=current_role,
     )
     if (
         current_role.message_to_group_after_action
@@ -151,13 +171,13 @@ async def inform_players_and_trace_actions(
                 )
             )
         )
-    if current_role.notification_message:
-        save_notification_message(
-            game_data=game_data,
-            processed_user_id=user_id,
-            message=make_build(current_role.notification_message),
-            current_user_id=callback.from_user.id,
-        )
+    # if current_role.notification_message:
+    #     save_notification_message(
+    #         game_data=game_data,
+    #         processed_user_id=user_id,
+    #         message=make_build(current_role.notification_message),
+    #         current_user_id=callback.from_user.id,
+    #     )
 
 
 async def take_action_and_save_data(
@@ -201,5 +221,5 @@ async def take_action_and_save_data(
         == game_data[current_role.roles_key][0]
     ):
         game_data[current_role.processed_by_boss].append(user_id)
-    await state.set_data(game_data)
+    await game_state.set_data(game_data)
     return game_state, game_data, user_id

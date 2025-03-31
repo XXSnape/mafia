@@ -4,7 +4,6 @@ from aiogram.fsm.state import State, StatesGroup
 class GameFsm(StatesGroup):
     REGISTRATION = State()
     STARTED = State()
-    VOTE = State()
     WAIT_FOR_STARTING_GAME = State()
 
 

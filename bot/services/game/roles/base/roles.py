@@ -15,7 +15,6 @@ from cache.cache_types import (
     PlayersIds,
     LastInteraction,
     UserGameCache,
-    RolesLiteral,
 )
 from constants.output import MONEY_SYM
 from database.schemas.results import PersonalResultSchema
@@ -88,7 +87,6 @@ class Role(ABC):
             make_pretty(self.role)
         )
         game_data["players"][str(new_boss_id)]["role_id"] = role_id
-        await self.state.set_data(game_data)
         profiles = get_profiles(
             players_ids=game_data[self.roles_key],
             players=game_data["players"],

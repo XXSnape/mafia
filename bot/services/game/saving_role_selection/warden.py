@@ -7,7 +7,6 @@ from services.base import RouterHelper
 from services.game.actions_at_night import (
     get_game_state_and_data,
     trace_all_actions,
-    save_notification_message,
 )
 from services.game.roles import Warden
 from utils.tg import delete_message
@@ -71,12 +70,7 @@ class WardenSaver(RouterHelper):
                 callback=self.callback,
                 game_data=game_data,
                 user_id=user_id,
-            )
-            save_notification_message(
-                game_data=game_data,
-                processed_user_id=user_id,
-                message=ROLE_IS_KNOWN,
-                current_user_id=self.callback.from_user.id,
+                current_role=Warden(),
             )
         user1_url = game_data["players"][str(user1_id)]["url"]
         user2_url = game_data["players"][str(user2_id)]["url"]

@@ -29,7 +29,7 @@ class ForgerSaver(RouterHelper):
             )
         )
         url = game_data["players"][str(user_id)]["url"]
-        game_data["forged_roles"].append([user_id])
+        game_data["forged_roles"].append(user_id)
         all_roles = get_data_with_roles()
         current_roles = [
             (all_roles[data["role_id"]].role, data["role_id"])
@@ -68,18 +68,13 @@ class ForgerSaver(RouterHelper):
         current_role = get_data_with_roles(self.callback.data)
         pretty_role = make_pretty(current_role.role)
         forger_roles_key = "forged_roles"
-        game_data[forger_roles_key][0].append(self.callback.data)
-        user_id = game_data[forger_roles_key][0][0]
+        game_data[forger_roles_key].append(self.callback.data)
+        user_id = game_data[forger_roles_key][0]
         trace_all_actions(
             callback=self.callback,
             game_data=game_data,
             user_id=user_id,
-        )
-        save_notification_message(
-            game_data=game_data,
-            processed_user_id=user_id,
-            message=Forger.notification_message,
-            current_user_id=self.callback.from_user.id,
+            current_role=Forger(),
         )
         url = game_data["players"][str(user_id)]["url"]
         await delete_message(self.callback.message)

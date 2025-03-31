@@ -87,7 +87,7 @@ class PolicemanSaver(RouterHelper):
             "role_id"
         ]
         url = game_data["players"][str(checked_user_id)]["url"]
-        game_data["disclosed_roles"].append(
+        game_data["disclosed_roles"].extend(
             [checked_user_id, role_key]
         )
         await delete_message(self.callback.message)
@@ -95,12 +95,7 @@ class PolicemanSaver(RouterHelper):
             callback=self.callback,
             game_data=game_data,
             user_id=checked_user_id,
-        )
-        save_notification_message(
-            game_data=game_data,
-            processed_user_id=checked_user_id,
-            message=ROLE_IS_KNOWN,
-            current_user_id=self.callback.from_user.id,
+            current_role=Policeman(),
         )
         await game_state.set_data(game_data)
         await self.callback.bot.send_message(

@@ -61,7 +61,7 @@ class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
             if self.was_deceived is False:
                 processed_role, user_url = get_user_role_and_url(
                     game_data=game_data,
-                    processed_user_id=disclosed_roles[0][0],
+                    processed_user_id=disclosed_roles[0],
                     all_roles=self.all_roles,
                 )
                 self.add_money_to_all_allies(
@@ -102,7 +102,7 @@ class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
     ):
 
         if game_data["disclosed_roles"]:
-            user_id, role_key = game_data["disclosed_roles"][0]
+            user_id, role_key = game_data["disclosed_roles"]
             url = game_data["players"][str(user_id)]["url"]
             role = make_pretty(self.all_roles[role_key].role)
             text = f"🌃Ночь {game_data['number_of_night']}\n{url} - {role}!"
@@ -124,7 +124,7 @@ class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
     def cancel_actions(self, game_data: GameCache, user_id: int):
         if game_data["disclosed_roles"]:
             game_data["messages_after_night"].remove(
-                [game_data["disclosed_roles"][0][0], ROLE_IS_KNOWN]
+                [game_data["disclosed_roles"][0], ROLE_IS_KNOWN]
             )
             game_data["disclosed_roles"].clear()
         return super().cancel_actions(

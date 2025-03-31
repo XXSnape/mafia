@@ -181,6 +181,7 @@ class Controller:
                 **kwargs,
                 removed_user=removed_user,
             )
+        await self.state.set_data(game_data)
         if removed_user_id is None:
             await self.bot.send_message(
                 chat_id=self.group_chat_id,
@@ -293,6 +294,7 @@ class Controller:
         text = get_results_of_goal_identification(
             game_data=game_data
         )
+        await self.state.set_data(game_data)
         await self.bot.send_message(
             chat_id=self.group_chat_id,
             text=text,
@@ -300,7 +302,6 @@ class Controller:
         if aim_id is None:
             return False
         url = game_data["players"][str(aim_id)]["url"]
-        await self.state.set_state(GameFsm.VOTE)
         sent_survey = await self.bot.send_message(
             chat_id=self.group_chat_id,
             text=make_build(f"На кону судьба {url}!"),
@@ -314,6 +315,7 @@ class Controller:
         game_data["to_delete"].append(
             [self.group_chat_id, sent_survey.message_id]
         )
+        await self.state.set_data(game_data)
         return True
 
     async def remove_user_from_game(
@@ -366,6 +368,7 @@ class Controller:
                 continue
             tasks.append(current_role.mailing(game_data=game_data))
         await asyncio.gather(*tasks, return_exceptions=True)
+        await self.state.set_data(game_data)
 
     async def suggest_vote(self):
         message = await self.bot.send_photo(
@@ -393,6 +396,7 @@ class Controller:
             ),
             return_exceptions=True,
         )
+        await self.state.set_data(game_data)
 
     async def familiarize_players(self, game_data: GameCache):
         roles_tasks = []

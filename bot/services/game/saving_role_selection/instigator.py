@@ -29,7 +29,7 @@ class InstigatorSaver(RouterHelper):
             )
         )
         url = game_data["players"][str(user_id)]["url"]
-        game_data["deceived"].append([user_id])
+        game_data["deceived"].append(user_id)
         markup = send_selection_to_players_kb(
             players_ids=game_data["live_players_ids"],
             players=game_data["players"],
@@ -74,7 +74,7 @@ class InstigatorSaver(RouterHelper):
                 dispatcher=self.dispatcher,
             )
         )
-        deceived_user = game_data["deceived"][0]
+        deceived_user = game_data["deceived"]
         deceived_user.append(user_id)
         subject_url = game_data["players"][str(deceived_user[0])][
             "url"

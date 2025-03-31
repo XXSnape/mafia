@@ -11,7 +11,7 @@ from services.game.actions_at_night import (
     get_game_state_and_data,
     get_game_state_data_and_user_id,
 )
-from services.game.roles import Hacker, Mafia, Instigator
+from services.game.roles import Hacker, Mafia
 from utils.tg import delete_message
 from utils.pretty_text import make_build
 
@@ -94,9 +94,9 @@ class UserManager(RouterHelper):
         deceived_user = game_data.get("deceived")
         if (
             deceived_user
-            and self.callback.from_user.id == deceived_user[0][0]
+            and self.callback.from_user.id == deceived_user[0]
         ):
-            voted_user_id = deceived_user[0][1]
+            voted_user_id = deceived_user[1]
         game_data["vote_for"].append(
             [self.callback.from_user.id, voted_user_id]
         )

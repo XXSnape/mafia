@@ -1,7 +1,6 @@
 import asyncio
 import datetime
 from operator import itemgetter
-from pprint import pprint
 from random import choice
 
 from aiogram import Dispatcher, Bot

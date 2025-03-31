@@ -3,10 +3,9 @@ from aiogram.types import InlineKeyboardButton
 from cache.cache_types import (
     ExtraCache,
     GameCache,
-    UserIdInt,
-    RolesLiteral,
     CheckedForTheSameGroups,
 )
+from constants.output import ROLE_IS_KNOWN
 from keyboards.inline.keypads.mailing import selection_to_warden_kb
 from services.game.roles.base import ActiveRoleAtNight
 from services.game.roles.base.mixins import ProcedureAfterNight
@@ -34,9 +33,7 @@ class Warden(ProcedureAfterNight, ActiveRoleAtNight):
             data_type=str,
         ),
     ]
-    notification_message = (
-        "Кто-то взаимодействовал с твоими документами"
-    )
+    notification_message = ROLE_IS_KNOWN
     payment_for_treatment = 15
     payment_for_murder = 16
 

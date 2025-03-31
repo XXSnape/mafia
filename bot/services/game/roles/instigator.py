@@ -1,6 +1,5 @@
 from cache.cache_types import ExtraCache, GameCache
 from services.game.roles.base.mixins import ProcedureAfterVoting
-from services.game.roles.base.roles import Role
 from general.groupings import Groupings
 from services.game.roles.base import ActiveRoleAtNight
 from states.states import UserFsm
@@ -33,9 +32,9 @@ class Instigator(ProcedureAfterVoting, ActiveRoleAtNight):
     ):
         vote_for = game_data["vote_for"]
         deceived_user = game_data["deceived"]
-        if not deceived_user or len(deceived_user[0]) != 2:
+        if len(deceived_user) != 2:
             return
-        victim, aim = deceived_user[0]
+        victim, aim = deceived_user
         if not [victim, aim] in vote_for:
             return
         role, url = get_user_role_and_url(

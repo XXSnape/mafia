@@ -1,6 +1,6 @@
 from cache.cache_types import GameCache, ExtraCache
 from keyboards.inline.keypads.mailing import kill_or_poison_kb
-from services.game.roles.base import ActiveRoleAtNight, Role
+from services.game.roles.base import ActiveRoleAtNight
 from services.game.roles.base.mixins import (
     ProcedureAfterNight,
     ProcedureAfterVoting,

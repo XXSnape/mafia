@@ -91,7 +91,7 @@ TrackingData: TypeAlias = dict[UserIdStr, InteractionData]
 NumberOfNight: TypeAlias = int
 
 LastInteraction: TypeAlias = dict[UserIdStr, list[NumberOfNight]]
-DisclosedRoles = list[list[UserIdInt | RolesLiteral]]
+DisclosedRoles = list[UserIdInt | RolesLiteral]
 VotedFor: TypeAlias = list[list[UserIdInt]]
 
 
@@ -127,7 +127,7 @@ class GameCache(TypedDict, total=False):
     disclosed_roles: DisclosedRoles
     forged_roles: DisclosedRoles
     checked_for_the_same_groups: CheckedForTheSameGroups
-    deceived: list[PlayersIds]
+    deceived: PlayersIds
     poisoned: list[list[UserIdInt] | int]
     pros: PlayersIds
     cons: PlayersIds

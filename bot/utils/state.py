@@ -75,4 +75,4 @@ async def clear_game_data(
         bot_id=bot.id,
         users_ids=game_data["live_players_ids"],
     )
-    await state.clear(),
+    await state.clear()

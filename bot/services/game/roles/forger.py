@@ -1,4 +1,5 @@
 from cache.cache_types import ExtraCache, GameCache
+from constants.output import ROLE_IS_KNOWN
 from general.groupings import Groupings
 from services.game.roles.base import ActiveRoleAtNight
 from services.game.roles.base.mixins import (
@@ -33,7 +34,7 @@ class Forger(
     mail_message = "Кому сегодня подделаешь документы?"
     extra_data = [ExtraCache(key="forged_roles")]
     is_self_selecting = True
-    notification_message = "Твои документы подделаны!"
+    notification_message = ROLE_IS_KNOWN
     payment_for_treatment = 0
     payment_for_murder = 11
     number_in_order_after_voting = 2
@@ -42,12 +43,12 @@ class Forger(
         self, game_data: GameCache, **kwargs
     ):
         forged_roles = game_data["forged_roles"]
-        if not forged_roles or len(forged_roles[0]) != 2:
+        if len(forged_roles) != 2:
             return
         disclosed_roles = game_data["disclosed_roles"]
         if (
             disclosed_roles
-            and disclosed_roles[0][0] == forged_roles[0][0]
+            and disclosed_roles[0] == forged_roles[0]
             and disclosed_roles != forged_roles
         ):
             game_data["disclosed_roles"][:] = forged_roles
@@ -55,23 +56,24 @@ class Forger(
             self.all_roles["policeman"].was_deceived = True
 
         checked = game_data.get("checked_for_the_same_groups", [])
-        if len(checked) == 2:
-            processed_user_id = forged_roles[0][0]
-            index = None
-            for ind, (user_id, _) in enumerate(checked):
-                if user_id == processed_user_id:
-                    index = ind
-                    break
-            if index is not None:
-                checked_role = checked[index][1]
-                forged_role = forged_roles[0][1]
-                if (
-                    self.all_roles[checked_role].grouping
-                    != self.all_roles[forged_role].grouping
-                ):
-                    self.has_warden_been_deceived = True
-                    self.all_roles["warden"].was_deceived = True
-                    checked[index] = forged_roles[0]
+        if len(checked) != 2:
+            return
+        processed_user_id = forged_roles[0]
+        index = None
+        for ind, (user_id, _) in enumerate(checked):
+            if user_id == processed_user_id:
+                index = ind
+                break
+        if index is not None:
+            checked_role = checked[index][1]
+            forged_role = forged_roles[1]
+            if (
+                self.all_roles[checked_role].grouping
+                != self.all_roles[forged_role].grouping
+            ):
+                self.has_warden_been_deceived = True
+                self.all_roles["warden"].was_deceived = True
+                checked[index] = [forged_roles[0], forged_roles[1]]
 
     async def accrual_of_overnight_rewards(
         self, game_data: GameCache, victims: set[int], **kwargs
