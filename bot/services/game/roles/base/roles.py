@@ -516,14 +516,19 @@ class ActiveRoleAtNight(Role):
     ) -> str | None:
         return None
 
+    @staticmethod
+    def allow_sending_mailing(game_data: GameCache):
+        return True
+
     async def mailing(self, game_data: GameCache):
+        if self.allow_sending_mailing(game_data) is not True:
+            return
         roles = self.get_roles(game_data)
         if not roles:
             return
         general_text = self.get_general_text_before_sending(
             game_data
         )
-
         if general_text is not None:
             text = make_build(general_text)
             await asyncio.gather(

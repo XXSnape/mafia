@@ -53,6 +53,12 @@ class Killer(MurderAfterNight, ActiveRoleAtNight):
             beginning_message="Убийство",
         )
 
-    async def mailing(self, game_data: GameCache):
-        if game_data["number_of_night"] % 2 != 0:
-            await super().mailing(game_data)
+    @staticmethod
+    def allow_sending_mailing(game_data: GameCache):
+        from services.game.roles import Mafia
+
+        if (
+            game_data["number_of_night"] % 2 != 0
+            or not game_data[Mafia.roles_key]
+        ):
+            return True

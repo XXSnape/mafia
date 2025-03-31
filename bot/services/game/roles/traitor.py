@@ -41,12 +41,8 @@ class Traitor(ProcedureAfterNight, ActiveRoleAtNight):
     ):
         self.add_money_to_all_allies(
             game_data=game_data,
-            money=16,
+            money=7 * len(game_data["players"]) // 4,
             beginning_message="Проверка",
             user_url=user_url,
             processed_role=processed_role,
         )
-
-    async def mailing(self, game_data: GameCache):
-        if game_data["number_of_night"] % 2 == 0:
-            await super().mailing(game_data)

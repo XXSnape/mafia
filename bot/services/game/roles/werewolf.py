@@ -55,23 +55,12 @@ class Werewolf(ProcedureAfterNight, ActiveRoleAtNight):
     ):
         pass
 
-    def generate_markup(
-        self,
-        player_id: int,
-        game_data: GameCache,
-        extra_buttons: tuple[InlineKeyboardButton, ...] = (),
-    ):
+    def generate_markup(self, game_data: GameCache, **kwargs):
         return send_transformation_kb(game_data)
 
-    async def mailing(
-        self,
-        game_data: GameCache,
-        own_markup: InlineKeyboardMarkup | None = None,
-    ):
+    def allow_sending_mailing(self, game_data: GameCache):
         if (
             game_data["number_of_night"]
             == self.number_of_night_for_transformation
         ):  # TODO 4
-            await super().mailing(
-                game_data=game_data,
-            )
+            return True
