@@ -43,6 +43,7 @@ RolesLiteral = Literal[
     "nurse",
     "general",
     "warden",
+    "poisoner",
 ]
 
 Money: TypeAlias = int

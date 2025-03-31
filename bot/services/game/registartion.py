@@ -1,6 +1,8 @@
+from contextlib import suppress
 from datetime import timedelta, datetime, timezone
 from pprint import pprint
 
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import CommandObject
 from aiogram.fsm.context import FSMContext
 
@@ -249,12 +251,13 @@ class Registration(RouterHelper):
             game_chat=game_chat,
             players_ids=game_data["live_players_ids"],
         )
-        await bot.edit_message_text(
-            chat_id=game_chat,
-            text=text,
-            message_id=game_data["start_message_id"],
-            reply_markup=to_group_markup,
-        )
+        with suppress(TelegramBadRequest):
+            await bot.edit_message_text(
+                chat_id=game_chat,
+                text=text,
+                message_id=game_data["start_message_id"],
+                reply_markup=to_group_markup,
+            )
 
     async def join_to_game(self, command: CommandObject):
         await self.message.delete()

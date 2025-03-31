@@ -284,6 +284,7 @@ class Controller:
             group_chat_id=self.group_chat_id,
         )
         await self.state.set_data(game_data)
+        return game_data
 
     async def confirm_final_aim(
         self,

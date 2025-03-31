@@ -169,7 +169,7 @@ class Game:
             bot=self.bot,
             state=self.state,
         )
-        await self.controller.sum_up_after_night()
+        game_data = await self.controller.sum_up_after_night()
         players_after_night = get_live_players(
             game_data=game_data, all_roles=self.all_roles
         )

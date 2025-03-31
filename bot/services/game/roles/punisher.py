@@ -49,7 +49,7 @@ class Punisher(ProcedureAfterNight, Role):
                 self.killed.append(
                     [
                         game_data[Bodyguard.roles_key][0],
-                        current_role,
+                        Bodyguard(),
                     ]
                 )
             else:

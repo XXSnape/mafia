@@ -7,6 +7,7 @@ from services.game.roles.base.mixins import (
 )
 from general.groupings import Groupings
 from states.states import UserFsm
+from utils.informing import get_profiles
 from utils.roles import get_user_role_and_url
 
 
@@ -67,13 +68,13 @@ class Poisoner(
         self,
         game_data: GameCache,
         victims: set[int],
-        killed_by: dict[UserIdInt, list[ActiveRoleAtNight]],
+        killers_of: dict[UserIdInt, list[ActiveRoleAtNight]],
         **kwargs,
     ):
         poisoned = game_data["poisoned"]
         if not poisoned or poisoned[1] == 0:
             return
-        for victim_id, roles in killed_by.items():
+        for victim_id, roles in killers_of.items():
             if victim_id not in victims or self not in roles:
                 continue
             self.victims += 1
@@ -109,6 +110,17 @@ class Poisoner(
             return super().cancel_actions(
                 game_data=game_data, user_id=user_id
             )
+
+    @staticmethod
+    def get_general_text_before_sending(
+        game_data: GameCache,
+    ) -> str | None:
+        poisoned = game_data["poisoned"]
+        if not poisoned:
+            return "Нет отравленных людей"
+        return "Ранее отравленные игроки\n" + get_profiles(
+            players_ids=poisoned[0], players=game_data["players"]
+        )
 
     def generate_markup(self, game_data: GameCache, **kwargs):
         poisoned = game_data["poisoned"]
