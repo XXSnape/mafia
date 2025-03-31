@@ -1,4 +1,5 @@
 import asyncio
+import orjson
 
 from aiogram import Dispatcher
 from aiogram.fsm.strategy import FSMStrategy
@@ -27,7 +28,7 @@ async def main() -> None:
     scheduler = AsyncIOScheduler()
     scheduler.configure(timezone="Europe/Moscow")
     redis = Redis(host="localhost")
-    storage = RedisStorage(redis=redis)
+    storage = RedisStorage(redis=redis, json_loads=orjson.loads)
     dp = Dispatcher(
         fsm_strategy=FSMStrategy.CHAT,
         scheduler=scheduler,
