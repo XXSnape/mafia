@@ -24,6 +24,7 @@ from services.game.actions_at_night import (
     save_notification_message,
 )
 from services.game.roles import Policeman
+from utils.pretty_text import make_build
 from utils.tg import delete_message
 
 
@@ -100,7 +101,9 @@ class PolicemanSaver(RouterHelper):
         await game_state.set_data(game_data)
         await self.callback.bot.send_message(
             chat_id=game_data["game_chat"],
-            text="Армия насильно заставила кого-то показать документы",
+            text=make_build(
+                "Армия насильно заставила кого-то показать документы!"
+            ),
         )
         await asyncio.gather(
             *(

@@ -353,7 +353,9 @@ class Controller:
         except Exception as e:
             logger.exception("Error")
         if role.alias:
-            await role.boss_is_dead(current_id=user_id)
+            await role.boss_is_dead(
+                current_id=user_id, game_data=game_data
+            )
         if isinstance(role, AliasRole):
             await role.alias_is_dead(
                 current_id=user_id, game_data=game_data

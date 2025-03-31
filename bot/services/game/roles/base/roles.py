@@ -71,9 +71,9 @@ class Role(ABC):
 
     async def boss_is_dead(
         self,
+        game_data: GameCache,
         current_id: int,
     ):
-        game_data: GameCache = await self.state.get_data()
         url = game_data["players"][str(current_id)]["url"]
         role = game_data["players"][str(current_id)]["pretty_role"]
         role_id = game_data["players"][str(current_id)]["role_id"]
@@ -102,13 +102,6 @@ class Role(ABC):
             for player_id in players
         ]
         await asyncio.gather(*tasks, return_exceptions=True)
-        # for player_id in players:
-        #     await self.bot.send_message(
-        #         chat_id=player_id,
-        #         text=f"Погиб {role} {url}.\n\n"
-        #         f"Новый {role} - {new_boss_url}\n\n"
-        #         f"Текущие союзники:\n{profiles}",
-        #     )
 
     @classmethod
     @property
