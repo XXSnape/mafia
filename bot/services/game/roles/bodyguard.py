@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache
+from cache.cache_types import GameCache, UserIdInt
 from services.game.roles.base.roles import Role
 from general.groupings import Groupings
 from services.game.roles.base import ActiveRoleAtNight
@@ -38,6 +38,7 @@ class Bodyguard(ProcedureAfterNight, ActiveRoleAtNight):
         game_data: GameCache,
         recovered: list[int],
         murdered: list[int],
+        killers_of: dict[UserIdInt, list[ActiveRoleAtNight]],
         **kwargs,
     ):
         recovered_id = self.get_processed_user_id(game_data)
@@ -47,9 +48,17 @@ class Bodyguard(ProcedureAfterNight, ActiveRoleAtNight):
             return
         if recovered_id in murdered:
             recovered.append(recovered_id)
-            if game_data[self.roles_key][0] in recovered:
+            saver_id = game_data[self.roles_key][0]
+            if saver_id in recovered:
                 return
-            murdered.append(game_data[self.roles_key][0])
+            for role in killers_of[recovered_id]:
+                game_data[role.processed_users_key][:] = [saver_id]
+            killers_of[saver_id] = list(
+                set(killers_of[saver_id])
+                | set(killers_of[recovered_id])
+            )
+            killers_of[recovered_id] = []
+            murdered.append(saver_id)
 
     @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(
@@ -70,7 +79,11 @@ class Bodyguard(ProcedureAfterNight, ActiveRoleAtNight):
         if processed_role.grouping != Groupings.civilians:
             money = 0
         else:
-            money = processed_role.payment_for_treatment * 7
+            money = (
+                processed_role.payment_for_treatment
+                * 5
+                * (len(game_data["players"]) // 4)
+            )
         self.add_money_to_all_allies(
             game_data=game_data,
             money=money,

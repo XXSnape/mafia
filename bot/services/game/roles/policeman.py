@@ -2,7 +2,7 @@ import asyncio
 
 from aiogram.types import InlineKeyboardButton
 
-from cache.cache_types import ExtraCache, GameCache
+from cache.cache_types import ExtraCache, GameCache, UserIdInt
 
 from general.groupings import Groupings
 from constants.output import ROLE_IS_KNOWN
@@ -98,7 +98,11 @@ class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
         )
 
     async def procedure_after_night(
-        self, game_data: GameCache, murdered: list[int], **kwargs
+        self,
+        game_data: GameCache,
+        murdered: list[int],
+        killers_of: dict[UserIdInt, list[ActiveRoleAtNight]],
+        **kwargs,
     ):
 
         if game_data["disclosed_roles"]:
@@ -119,6 +123,7 @@ class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
         else:
             processed_user_id = self.get_processed_user_id(game_data)
             if processed_user_id:
+                killers_of[processed_user_id].append(self)
                 murdered.append(processed_user_id)
 
     def cancel_actions(self, game_data: GameCache, user_id: int):

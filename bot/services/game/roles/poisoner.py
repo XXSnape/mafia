@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache, ExtraCache
+from cache.cache_types import GameCache, ExtraCache, UserIdInt
 from keyboards.inline.keypads.mailing import kill_or_poison_kb
 from services.game.roles.base import ActiveRoleAtNight
 from services.game.roles.base.mixins import (
@@ -54,23 +54,27 @@ class Poisoner(
         self,
         game_data: GameCache,
         murdered: list[int],
+        killers_of: dict[UserIdInt, list[ActiveRoleAtNight]],
         **kwargs,
     ):
         poisoned = game_data["poisoned"]
         if poisoned and poisoned[1] == 1:
             murdered.extend(poisoned[0])
+            for killed_id in poisoned[0]:
+                killers_of[killed_id].append(self)
 
     async def accrual_of_overnight_rewards(
         self,
         game_data: GameCache,
         victims: set[int],
+        killed_by: dict[UserIdInt, list[ActiveRoleAtNight]],
         **kwargs,
     ):
         poisoned = game_data["poisoned"]
         if not poisoned or poisoned[1] == 0:
             return
-        for victim_id in poisoned[0]:
-            if victim_id not in victims:
+        for victim_id, roles in killed_by.items():
+            if victim_id not in victims or self not in roles:
                 continue
             self.victims += 1
             user_role, user_url = get_user_role_and_url(

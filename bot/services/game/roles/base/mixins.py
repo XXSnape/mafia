@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from cache.cache_types import GameCache, UserIdStr
+from cache.cache_types import GameCache, UserIdStr, UserIdInt
 from general.groupings import Groupings
+from services.game.roles.base import ActiveRoleAtNight
 
 from utils.roles import get_processed_user_id_if_exists
 
@@ -49,9 +50,11 @@ class MurderAfterNight(ProcedureAfterNight):
     async def procedure_after_night(
         self,
         murdered: list[int],
-        processed_user_id: int,
+        processed_user_id: UserIdInt,
+        killers_of: dict[UserIdInt, list[ActiveRoleAtNight]],
         **kwargs,
     ):
+        killers_of[processed_user_id].append(self)
         murdered.append(processed_user_id)
 
 

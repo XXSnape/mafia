@@ -1,4 +1,5 @@
 import asyncio
+from collections import defaultdict
 from collections.abc import Callable
 from operator import attrgetter
 from typing import TYPE_CHECKING
@@ -241,18 +242,19 @@ class Controller:
         victims = set()
         recovered = []
         murdered = []
+        killers_of = defaultdict(list)
         kwargs = {
             "recovered": recovered,
             "murdered": murdered,
             "victims": victims,
             "game_data": game_data,
+            "killers_of": killers_of,
         }
         for role in roles:
             await role.procedure_after_night(**kwargs)
         victims |= set(murdered) - set(recovered)
         for role in roles:
             await role.accrual_of_overnight_rewards(**kwargs)
-
         text_about_dead = ""
         tasks = []
         for victim_id in victims:

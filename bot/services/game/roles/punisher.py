@@ -1,7 +1,7 @@
-from cache.cache_types import GameCache
+from cache.cache_types import GameCache, UserIdInt
 from general.groupings import Groupings
 from services.game.roles import Bodyguard
-from services.game.roles.base import Role
+from services.game.roles.base import Role, ActiveRoleAtNight
 from services.game.roles.base.mixins import ProcedureAfterNight
 
 
@@ -23,6 +23,7 @@ class Punisher(ProcedureAfterNight, Role):
         victims: set[int],
         recovered: list[int],
         murdered: list[int],
+        killers_of: dict[UserIdInt, list[ActiveRoleAtNight]],
         **kwargs
     ):
         punishers = game_data.get(self.roles_key)
@@ -32,19 +33,9 @@ class Punisher(ProcedureAfterNight, Role):
         killed_py_punisher = set()
         if punisher_id not in set(murdered) - set(recovered):
             return
-        for role in self.all_roles:
-            current_role = self.all_roles[role]
-            if current_role.can_kill_at_night is False:
-                continue
-            killed_id = current_role.get_processed_user_id(game_data)
-            if not killed_id:
-                continue
+        for current_role in killers_of[punisher_id]:
             killer_id = game_data[current_role.roles_key][0]
-            if isinstance(killed_id, list):
-                if punisher_id not in killed_id:
-                    continue
-            elif killed_id != punisher_id:
-                continue
+
             treated_by_bodyguard = Bodyguard().get_processed_user_id(
                 game_data
             )
@@ -81,7 +72,11 @@ class Punisher(ProcedureAfterNight, Role):
         for killer_id, current_role in self.killed:
             if killer_id in victims:
                 if current_role.grouping != Groupings.civilians:
-                    money = current_role.payment_for_murder * 2
+                    money = (
+                        current_role.payment_for_murder
+                        * 2
+                        * (len(game_data["players"]) // 4)
+                    )
                 else:
                     money = 0
                 self.add_money_to_all_allies(
