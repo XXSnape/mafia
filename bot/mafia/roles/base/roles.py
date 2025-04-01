@@ -523,11 +523,14 @@ class ActiveRoleAtNight(Role):
             return
         return roles
 
-    @staticmethod
     def get_general_text_before_sending(
+        self,
         game_data: GameCache,
     ) -> str | None:
-        return None
+        if self.grouping == Groupings.criminals:
+            text = game_data.get("mafias_are_shown")
+            if text:
+                return f"Известные роли:\n\n{text}"
 
     @staticmethod
     def allow_sending_mailing(game_data: GameCache):

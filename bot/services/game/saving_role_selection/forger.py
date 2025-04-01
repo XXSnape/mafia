@@ -12,7 +12,7 @@ from services.game.actions_at_night import (
 )
 from mafia.roles import Forger, Policeman, PolicemanAlias
 from utils.tg import delete_message
-from utils.pretty_text import make_pretty
+from utils.pretty_text import make_pretty, make_build
 
 
 class ForgerSaver(RouterHelper):
@@ -80,7 +80,7 @@ class ForgerSaver(RouterHelper):
         await game_state.set_data(game_data)
         await self.callback.bot.send_message(
             chat_id=game_data["game_chat"],
-            text=Forger.message_to_group_after_action,
+            text=make_build(Forger.message_to_group_after_action),
         )
         await self.callback.message.answer(
             text=NUMBER_OF_NIGHT.format(game_data["number_of_night"])

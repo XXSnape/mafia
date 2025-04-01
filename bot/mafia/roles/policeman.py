@@ -140,8 +140,7 @@ class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
     ):
         return kill_or_check_on_policeman()
 
-    @staticmethod
-    def get_general_text_before_sending(game_data: GameCache):
+    def get_general_text_before_sending(self, game_data: GameCache):
         return remind_commissioner_about_inspections(
             game_data=game_data
         )

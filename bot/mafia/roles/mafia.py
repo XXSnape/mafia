@@ -33,14 +33,6 @@ class Mafia(MurderAfterNight, ActiveRoleAtNight):
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.MAFIA_ATTACKS
 
-    @staticmethod
-    def get_general_text_before_sending(
-        game_data: GameCache,
-    ) -> str | None:
-        text = game_data.get("mafias_are_shown")
-        if text:
-            return text
-
     @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(
         self,

@@ -9,6 +9,7 @@ from services.game.actions_at_night import (
     trace_all_actions,
 )
 from mafia.roles import Warden
+from utils.pretty_text import make_build
 from utils.tg import delete_message
 
 
@@ -78,7 +79,7 @@ class WardenSaver(RouterHelper):
         await game_state.set_data(game_data)
         await self.callback.bot.send_message(
             chat_id=game_data["game_chat"],
-            text=Warden.message_to_group_after_action,
+            text=make_build(Warden.message_to_group_after_action),
         )
         await self.callback.message.answer(
             NUMBER_OF_NIGHT.format(game_data["number_of_night"])

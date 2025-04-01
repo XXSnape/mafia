@@ -110,8 +110,8 @@ class Poisoner(
                 game_data=game_data, user_id=user_id
             )
 
-    @staticmethod
     def get_general_text_before_sending(
+        self,
         game_data: GameCache,
     ) -> str | None:
         poisoned = game_data["poisoned"]

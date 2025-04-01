@@ -34,14 +34,6 @@ class Traitor(ProcedureAfterNight, ActiveRoleAtNight):
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.TRAITOR_FINDS_OUT
 
-    @staticmethod
-    def get_general_text_before_sending(
-        game_data: GameCache,
-    ) -> str | None:
-        text = game_data["mafias_are_shown"]
-        if text:
-            return text
-
     async def procedure_after_night(self, **kwargs):
         pass
 

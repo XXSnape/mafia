@@ -19,7 +19,7 @@ class Forger(
 ):
     role = "Румпельштильцхен"
     grouping = Groupings.criminals
-    purpose = "Ты должен обманывать комиссара и подделывать документы на свое усмотрение во имя мафии"
+    purpose = "Ты должен обманывать местную полицию и подделывать документы на свое усмотрение во имя мафии"
     message_to_group_after_action = (
         "Говорят, в лесах завелись персонажи из Шрека, "
         "подговорённые мафией, дискоординирующие государственную армию!"
@@ -38,14 +38,6 @@ class Forger(
     payment_for_treatment = 0
     payment_for_murder = 11
     number_in_order_after_voting = 2
-
-    @staticmethod
-    def get_general_text_before_sending(
-        game_data: GameCache,
-    ) -> str | None:
-        text = game_data.get("mafias_are_shown")
-        if text:
-            return text
 
     async def procedure_after_night(
         self, game_data: GameCache, **kwargs

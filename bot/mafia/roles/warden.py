@@ -70,9 +70,9 @@ class Warden(ProcedureAfterNight, ActiveRoleAtNight):
         )
         common_text = f"🌃Ночь {game_data['number_of_night']}\n{user1_url} и {user2_url} состоят в "
         if user1_role.grouping == user2_role.grouping:
-            common_text += "одной группировке!"
+            common_text += "одной группировке!✅"
         else:
-            common_text += "разных группировках!"
+            common_text += "разных группировках!🚫"
         for warden_id in game_data[self.roles_key]:
             await self.bot.send_message(
                 chat_id=warden_id, text=common_text
@@ -118,8 +118,8 @@ class Warden(ProcedureAfterNight, ActiveRoleAtNight):
             game_data=game_data, user_id=player_id
         )
 
-    @staticmethod
     def get_general_text_before_sending(
+        self,
         game_data: GameCache,
     ) -> str | None:
         return remind_worden_about_inspections(game_data=game_data)
