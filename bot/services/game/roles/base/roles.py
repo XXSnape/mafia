@@ -209,12 +209,7 @@ class Role(ABC):
         self,
         voted_role: Self,
     ):
-        if (
-            self.grouping == Groupings.civilians
-            and voted_role.grouping == Groupings.other
-        ):
-            return 0
-        elif self.grouping == Groupings.other:
+        if self.grouping == Groupings.other:
             return 0
         elif self.grouping != voted_role.grouping:
             return voted_role.payment_for_murder // 2
@@ -244,7 +239,7 @@ class Role(ABC):
             message += " - {money}" + MONEY_SYM
 
             time_of_day = (
-                "🌃Ночь" if at_night else "🌟Голосования дня"
+                "🌃Ночь" if at_night else "🌟Голосование дня"
             )
             game_data["players"][str(player_id)][
                 "achievements"

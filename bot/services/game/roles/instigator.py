@@ -7,13 +7,14 @@ from utils.roles import get_user_role_and_url
 
 
 class Instigator(ProcedureAfterVoting, ActiveRoleAtNight):
-    role = "Психолог"
+    role = "Подстрекатель"
     photo = "https://avatars.dzeninfra.ru/get-zen_doc/3469057/pub_620655d2a7947c53d6c601a2_620671b4b495be46b12c0a0c/scale_1200"
     grouping = Groupings.civilians
     purpose = "Твоя жертва проголосует за того, за кого прикажешь."
     message_to_group_after_action = (
         "Кажется, кому-то вправляют мозги!"
     )
+    need_to_monitor_interaction = False
     mail_message = "Кого направить на правильный путь?"
     notification_message = None
     payment_for_treatment = 7
@@ -43,7 +44,7 @@ class Instigator(ProcedureAfterVoting, ActiveRoleAtNight):
             all_roles=self.all_roles,
         )
         if role.grouping != Groupings.civilians:
-            money = int(role.payment_for_murder * 1.4)
+            money = int(role.payment_for_murder // 1.5)
         else:
             money = 0
         self.add_money_to_all_allies(
@@ -57,4 +58,6 @@ class Instigator(ProcedureAfterVoting, ActiveRoleAtNight):
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
         game_data["deceived"].clear()
-        super().cancel_actions(game_data=game_data, user_id=user_id)
+        return super().cancel_actions(
+            game_data=game_data, user_id=user_id
+        )
