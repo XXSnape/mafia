@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache
+from cache.cache_types import GameCache, ExtraCache
 from mafia.roles.base.mixins import ProcedureAfterNight
 from mafia.roles.base.roles import Role
 from general.groupings import Groupings
@@ -23,9 +23,24 @@ class Traitor(ProcedureAfterNight, ActiveRoleAtNight):
     notification_message = ROLE_IS_KNOWN
     payment_for_treatment = 0
     payment_for_murder = 15
+    extra_data = [
+        ExtraCache(
+            key="mafias_are_shown",
+            need_to_clear=False,
+            data_type=str,
+        )
+    ]
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.TRAITOR_FINDS_OUT
+
+    @staticmethod
+    def get_general_text_before_sending(
+        game_data: GameCache,
+    ) -> str | None:
+        text = game_data["mafias_are_shown"]
+        if text:
+            return text
 
     async def procedure_after_night(self, **kwargs):
         pass
@@ -41,7 +56,7 @@ class Traitor(ProcedureAfterNight, ActiveRoleAtNight):
     ):
         self.add_money_to_all_allies(
             game_data=game_data,
-            money=7 * len(game_data["players"]) // 4,
+            money=10,
             beginning_message="Проверка",
             user_url=user_url,
             processed_role=processed_role,

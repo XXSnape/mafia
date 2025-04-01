@@ -48,7 +48,7 @@ class Role(ABC):
     is_mass_mailing_list: bool = False
     extra_data: list[ExtraCache] | None = None
     state_for_waiting_for_action: State | None = None
-    can_treat: bool = False
+    was_deceived: bool = False
 
     payment_for_treatment = 5
     payment_for_murder = 5
@@ -226,6 +226,8 @@ class Role(ABC):
         at_night: bool = True,
         additional_players: str | None = None,
     ):
+        if self.was_deceived:
+            money = 0
         players = game_data[self.roles_key]
         if additional_players:
             players += game_data[additional_players]
@@ -236,7 +238,8 @@ class Role(ABC):
             else:
                 message = f"{beginning_message} {user_url} ({make_pretty(processed_role.role)})"
             message += " - {money}" + MONEY_SYM
-
+            if self.was_deceived:
+                message += " (🚫ОБМАНУТ ВО ВРЕМЯ ИГРЫ)"
             time_of_day = (
                 "🌃Ночь" if at_night else "🌟Голосование дня"
             )
@@ -248,6 +251,7 @@ class Role(ABC):
                     money,
                 ]
             )
+        self.was_deceived = False
 
     def earn_money_for_voting(
         self,
@@ -353,6 +357,7 @@ class AliasRole(ABC):
 
 class ActiveRoleAtNight(Role):
     state_for_waiting_for_action: State
+    was_deceived: bool
     need_to_process: bool = True
     mail_message: str
     need_to_monitor_interaction: bool = True
@@ -361,6 +366,17 @@ class ActiveRoleAtNight(Role):
     do_not_choose_self: int = 1
     payment_for_treatment = 10
     payment_for_murder = 10
+
+    def get_money_if_are_not_deceived(
+        self, money: int = 9
+    ) -> tuple[str, int]:
+        additional_text = ""
+        if self.was_deceived is True:
+            money = 0
+            additional_text = " (🚫ОБМАНУТ)"
+        else:
+            money = money
+        return additional_text, money
 
     @classmethod
     @property

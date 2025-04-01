@@ -11,6 +11,7 @@ from mafia.roles.base import ActiveRoleAtNight
 from mafia.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
 from utils.informing import remind_worden_about_inspections
+from utils.pretty_text import make_pretty
 
 
 class Warden(ProcedureAfterNight, ActiveRoleAtNight):
@@ -41,7 +42,6 @@ class Warden(ProcedureAfterNight, ActiveRoleAtNight):
         self.state_for_waiting_for_action = (
             UserFsm.SUPERVISOR_COLLECTS_INFORMATION
         )
-        self.was_deceived: bool = False
 
     def _get_user_roles_and_url(
         self,
@@ -89,18 +89,18 @@ class Warden(ProcedureAfterNight, ActiveRoleAtNight):
         checked_users = game_data["checked_for_the_same_groups"]
         if len(checked_users) != 2:
             return
-        if self.was_deceived is False:
-            user1_url, user1_role, user2_url, user2_role = (
-                self._get_user_roles_and_url(
-                    game_data=game_data, checked_users=checked_users
-                )
+        user1_url, user1_role, user2_url, user2_role = (
+            self._get_user_roles_and_url(
+                game_data=game_data, checked_users=checked_users
             )
-            self.add_money_to_all_allies(
-                game_data=game_data,
-                money=15,
-                custom_message=f"Проверка на совпадение групп {user1_url} ({user1_role.role}) и {user2_url} ({user2_role.role})",
-            )
-        self.was_deceived = False
+        )
+        self.add_money_to_all_allies(
+            game_data=game_data,
+            money=9,
+            custom_message=f"Проверка на совпадение групп {user1_url} "
+            f"({make_pretty(user1_role.role)}) и "
+            f"{user2_url} ({make_pretty(user2_role.role)})",
+        )
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
         game_data["checked_for_the_same_groups"].clear()

@@ -47,7 +47,6 @@ class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.POLICEMAN_CHECKS
-        self.was_deceived: bool = False
 
     async def accrual_of_overnight_rewards(
         self,
@@ -57,20 +56,18 @@ class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
     ):
         disclosed_roles = game_data["disclosed_roles"]
         if game_data["disclosed_roles"]:
-            if self.was_deceived is False:
-                processed_role, user_url = get_user_role_and_url(
-                    game_data=game_data,
-                    processed_user_id=disclosed_roles[0],
-                    all_roles=self.all_roles,
-                )
-                self.add_money_to_all_allies(
-                    game_data=game_data,
-                    money=9,
-                    user_url=user_url,
-                    processed_role=processed_role,
-                    beginning_message="Проверка",
-                )
-            self.was_deceived = False
+            processed_role, user_url = get_user_role_and_url(
+                game_data=game_data,
+                processed_user_id=disclosed_roles[0],
+                all_roles=self.all_roles,
+            )
+            self.add_money_to_all_allies(
+                game_data=game_data,
+                money=10,
+                user_url=user_url,
+                processed_role=processed_role,
+                beginning_message=f"Проверка",
+            )
 
         processed_user_id = self.get_processed_user_id(game_data)
         if (

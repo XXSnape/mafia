@@ -23,7 +23,6 @@ class Bodyguard(ProcedureAfterNight, ActiveRoleAtNight):
     message_to_user_after_action = (
         "Ты выбрал пожертвовать собой, чтобы спасти {url}"
     )
-    can_treat = True
     number_in_order_after_night = 3
     payment_for_treatment = 12
     payment_for_murder = 12

@@ -189,9 +189,10 @@ async def notify_aliases_about_transformation(
     )
     await asyncio.gather(
         *(
-            bot.send_message(
+            bot.send_photo(
                 chat_id=player_id,
-                text=NUMBER_OF_NIGHT.format(
+                photo=new_role.photo,
+                caption=NUMBER_OF_NIGHT.format(
                     game_data["number_of_night"]
                 )
                 + f"{initial_role} {url} превратился в {make_pretty(new_role.role)}\n"
