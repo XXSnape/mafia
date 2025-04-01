@@ -15,6 +15,7 @@ class LuckyGay(ProcedureAfterNight, Role):
     )
     number_in_order_after_night = 2
     payment_for_treatment = 6
+    payment_for_night_spent = 7
 
     async def procedure_after_night(
         self,
@@ -35,7 +36,10 @@ class LuckyGay(ProcedureAfterNight, Role):
                     send_to_group = True
         if send_to_group:
             game_data["messages_after_night"].append(
-                [game_data["game_chat"], "Кому - то сегодня повезло"]
+                [
+                    game_data["game_chat"],
+                    "✅Кому - то сегодня повезло",
+                ]
             )
 
     async def accrual_of_overnight_rewards(

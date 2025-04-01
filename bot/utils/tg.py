@@ -1,5 +1,6 @@
 import asyncio
 from contextlib import suppress
+from datetime import timedelta
 
 from aiogram import Bot
 from aiogram.exceptions import TelegramBadRequest
@@ -8,6 +9,7 @@ from aiogram.types import (
     Message,
     ChatMemberOwner,
     ChatMemberAdministrator,
+    ChatPermissions,
 )
 
 
@@ -52,3 +54,18 @@ async def delete_messages_from_to_delete(
         )
     )
     await state.update_data({"to_delete": []})
+
+
+async def ban_user(
+    bot: Bot,
+    chat_id: int,
+    user_id: int,
+    until_date: timedelta | None = None,
+):
+    with suppress(TelegramBadRequest):
+        await bot.restrict_chat_member(
+            chat_id=chat_id,
+            user_id=user_id,
+            permissions=ChatPermissions(can_send_messages=False),
+            until_date=until_date,
+        )

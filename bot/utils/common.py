@@ -27,5 +27,5 @@ def save_notification_message(
         or processed_user_id != current_user_id
     ):
         game_data["messages_after_night"].append(
-            [processed_user_id, make_build(message)]
+            [processed_user_id, message]
         )

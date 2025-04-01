@@ -223,7 +223,7 @@ async def send_messages_after_night(
                     chat_id=chat_id,
                     text=number_of_night
                     + "\n\n".join(
-                        f"{number}) {message}"
+                        make_build(f"{number}) {message}")
                         for number, message in enumerate(
                             sorted(messages, key=len), start=1
                         )
@@ -233,7 +233,9 @@ async def send_messages_after_night(
         else:
             for message in messages:
                 tasks.append(
-                    bot.send_message(chat_id=chat_id, text=message)
+                    bot.send_message(
+                        chat_id=chat_id, text=make_build(message)
+                    )
                 )
     await asyncio.gather(*tasks, return_exceptions=True)
 

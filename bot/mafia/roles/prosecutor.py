@@ -15,6 +15,7 @@ from utils.roles import (
     get_processed_user_id_if_exists,
     get_processed_role_and_user_if_exists,
 )
+from utils.tg import ban_user
 
 
 class Prosecutor(
@@ -40,12 +41,11 @@ class Prosecutor(
     async def procedure_after_night(
         self, game_data: GameCache, processed_user_id: int, **kwargs
     ):
-        with suppress(TelegramBadRequest):
-            await self.bot.restrict_chat_member(
-                chat_id=game_data["game_chat"],
-                user_id=processed_user_id,
-                permissions=ChatPermissions(can_send_messages=False),
-            )
+        await ban_user(
+            bot=self.bot,
+            chat_id=game_data["game_chat"],
+            user_id=processed_user_id,
+        )
 
     @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(

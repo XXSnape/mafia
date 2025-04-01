@@ -1,4 +1,5 @@
 from contextlib import suppress
+from datetime import timedelta
 
 from aiogram.exceptions import TelegramBadRequest
 
@@ -10,7 +11,8 @@ from keyboards.inline.callback_factory.recognize_user import (
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from services.base import RouterHelper
 from mafia.roles import Prosecutor, PrimeMinister
-from utils.tg import delete_message
+from utils.tg import delete_message, ban_user
+
 
 # from utils.utils import add_voice
 
@@ -40,6 +42,12 @@ class GroupManager(RouterHelper):
             game_data
         ):
             await delete_message(message=self.message)
+            await ban_user(
+                bot=self.message.bot,
+                chat_id=game_data["game_chat"],
+                user_id=self.message.from_user.id,
+                until_date=timedelta(seconds=30),
+            )
 
     async def confirm_vote(self, callback_data: AimedUserCbData):
         game_data: GameCache = await self.state.get_data()
