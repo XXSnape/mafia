@@ -10,6 +10,7 @@ from services.game.actions_at_night import (
     get_game_state_data_and_user_id,
     get_game_state_and_data,
     take_action_and_save_data,
+    trace_all_actions,
 )
 from mafia.roles import Instigator
 from states.states import UserFsm
@@ -67,7 +68,7 @@ class InstigatorSaver(RouterHelper):
         self, callback_data: UserActionIndexCbData
     ):
         game_state, game_data, user_id = (
-            await take_action_and_save_data(
+            await get_game_state_data_and_user_id(
                 callback=self.callback,
                 callback_data=callback_data,
                 state=self.state,
@@ -82,8 +83,11 @@ class InstigatorSaver(RouterHelper):
         object_url = game_data["players"][str(deceived_user[1])][
             "url"
         ]
-        await delete_message(self.callback.message)
-        await game_state.set_data(game_data)
-        await self.callback.message.answer(
-            text=f"Днём {subject_url} проголосует за {object_url}, если попытается голосовать"
+        await trace_all_actions(
+            callback=self.callback,
+            game_data=game_data,
+            user_id=deceived_user[0],
+            current_role=Instigator(),
+            message_to_user=f"Днём {subject_url} проголосует за {object_url}, если попытается голосовать",
         )
+        await game_state.set_data(game_data)

@@ -69,20 +69,12 @@ class ForgerSaver(RouterHelper):
         forger_roles_key = "forged_roles"
         game_data[forger_roles_key].append(self.callback.data)
         user_id = game_data[forger_roles_key][0]
-        trace_all_actions(
+        url = game_data["players"][str(user_id)]["url"]
+        await trace_all_actions(
             callback=self.callback,
             game_data=game_data,
             user_id=user_id,
             current_role=Forger(),
+            message_to_user=f"Ты выбрал подменить документы {url} на {pretty_role}",
         )
-        url = game_data["players"][str(user_id)]["url"]
-        await delete_message(self.callback.message)
         await game_state.set_data(game_data)
-        await self.callback.bot.send_message(
-            chat_id=game_data["game_chat"],
-            text=make_build(Forger.message_to_group_after_action),
-        )
-        await self.callback.message.answer(
-            text=NUMBER_OF_NIGHT.format(game_data["number_of_night"])
-            + f"Ты выбрал подменить документы {url} на {pretty_role}"
-        )

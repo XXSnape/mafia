@@ -3,6 +3,8 @@ import asyncio
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
+from pydantic.v1 import NoneIsNotAllowedError
+
 from cache.cache_types import GameCache, UserCache, UserIdInt
 from constants.output import NUMBER_OF_NIGHT
 from general.collection_of_roles import get_data_with_roles
@@ -17,11 +19,51 @@ from utils.tg import delete_message
 from utils.state import get_state_and_assign
 
 
-def trace_all_actions(
+async def send_messages_to_group_and_user(
+    callback: CallbackQuery,
+    game_data: GameCache,
+    message_to_user: bool | str = True,
+    message_to_group: bool | str = True,
+    user_id: int | None = None,
+    current_role: ActiveRoleAtNight | None = None,
+):
+    message_to_group_after_action = None
+    if isinstance(message_to_group, str):
+        message_to_group_after_action = message_to_group
+    elif message_to_group is True:
+        message_to_group_after_action = (
+            current_role.message_to_group_after_action
+        )
+    if message_to_group_after_action:
+        await callback.bot.send_message(
+            chat_id=game_data["game_chat"],
+            text=make_build(message_to_group_after_action),
+        )
+    message_to_user_after_action = None
+    if isinstance(message_to_user, str):
+        message_to_user_after_action = message_to_user
+    elif message_to_user is True:
+        url = game_data["players"][str(user_id)]["url"]
+        message_to_user_after_action = (
+            current_role.message_to_user_after_action.format(url=url)
+        )
+    if message_to_user_after_action is not None:
+        await delete_message(callback.message)
+        await callback.message.answer(
+            make_build(
+                NUMBER_OF_NIGHT.format(game_data["number_of_night"])
+                + message_to_user_after_action
+            )
+        )
+
+
+async def trace_all_actions(
     callback: CallbackQuery,
     game_data: GameCache,
     user_id: int,
     current_role: ActiveRoleAtNight,
+    message_to_group: bool | str = True,
+    message_to_user: bool | str = True,
     need_to_save_notification_message: bool = True,
 ):
     suffer_tracking = game_data["tracking"].setdefault(
@@ -35,6 +77,14 @@ def trace_all_actions(
     )
     interacting = interacting_tracking.setdefault("interacting", [])
     interacting.append(callback.from_user.id)
+    await send_messages_to_group_and_user(
+        callback=callback,
+        game_data=game_data,
+        message_to_user=message_to_user,
+        message_to_group=message_to_group,
+        user_id=user_id,
+        current_role=current_role,
+    )
     if (
         need_to_save_notification_message
         and current_role.notification_message
@@ -130,33 +180,20 @@ async def inform_players_and_trace_actions(
         callback=callback,
         url=url,
     )
-    trace_all_actions(
-        callback=callback,
-        game_data=game_data,
-        user_id=user_id,
-        current_role=current_role,
-    )
+    message_to_group = False
     if (
         current_role.message_to_group_after_action
         and not game_data[current_role.processed_users_key]
     ):
+        message_to_group = True
 
-        await callback.bot.send_message(
-            chat_id=game_data["game_chat"],
-            text=make_build(
-                current_role.message_to_group_after_action
-            ),
-        )
-    if current_role.message_to_user_after_action:
-        await delete_message(callback.message)
-        await callback.message.answer(
-            make_build(
-                NUMBER_OF_NIGHT.format(game_data["number_of_night"])
-                + current_role.message_to_user_after_action.format(
-                    url=url
-                )
-            )
-        )
+    await trace_all_actions(
+        callback=callback,
+        game_data=game_data,
+        user_id=user_id,
+        current_role=current_role,
+        message_to_group=message_to_group,
+    )
 
 
 async def take_action_and_save_data(

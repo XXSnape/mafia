@@ -101,20 +101,16 @@ class PolicemanSaver(RouterHelper):
             message=ROLE_IS_KNOWN,
             current_user_id=self.callback.from_user.id,
         )
-        trace_all_actions(
+        await trace_all_actions(
             callback=self.callback,
             game_data=game_data,
             user_id=checked_user_id,
             current_role=Policeman(),
+            message_to_user=False,
+            message_to_group="Армия насильно заставила кого-то показать документы!",
             need_to_save_notification_message=False,
         )
         await game_state.set_data(game_data)
-        await self.callback.bot.send_message(
-            chat_id=game_data["game_chat"],
-            text=make_build(
-                "Армия насильно заставила кого-то показать документы!"
-            ),
-        )
         await asyncio.gather(
             *(
                 self.callback.bot.send_message(

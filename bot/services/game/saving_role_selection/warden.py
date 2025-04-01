@@ -7,6 +7,7 @@ from services.base import RouterHelper
 from services.game.actions_at_night import (
     get_game_state_and_data,
     trace_all_actions,
+    send_messages_to_group_and_user,
 )
 from mafia.roles import Warden
 from utils.pretty_text import make_build
@@ -67,21 +68,20 @@ class WardenSaver(RouterHelper):
         user1_id: int = checked[0][0]
         user2_id: int = checked[1][0]
         for user_id in [user1_id, user2_id]:
-            trace_all_actions(
+            await trace_all_actions(
                 callback=self.callback,
                 game_data=game_data,
                 user_id=user_id,
+                message_to_group=False,
+                message_to_user=False,
                 current_role=Warden(),
             )
         user1_url = game_data["players"][str(user1_id)]["url"]
         user2_url = game_data["players"][str(user2_id)]["url"]
-        await delete_message(self.callback.message)
+        await send_messages_to_group_and_user(
+            callback=self.callback,
+            game_data=game_data,
+            message_to_user=f"Ты решил проверить на принадлежность одной группировки {user1_url} и {user2_url}",
+            current_role=Warden(),
+        )
         await game_state.set_data(game_data)
-        await self.callback.bot.send_message(
-            chat_id=game_data["game_chat"],
-            text=make_build(Warden.message_to_group_after_action),
-        )
-        await self.callback.message.answer(
-            NUMBER_OF_NIGHT.format(game_data["number_of_night"])
-            + f"Ты решил проверить на принадлежность одной группировки {user1_url} и {user2_url}"
-        )
