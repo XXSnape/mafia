@@ -5,7 +5,7 @@ from keyboards.inline.cb.cb_text import (
 )
 from services.base import RouterHelper
 from services.game.actions_at_night import get_game_state_and_data
-from services.game.roles import (
+from mafia.roles import (
     Mafia,
     MafiaAlias,
     Doctor,

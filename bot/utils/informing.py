@@ -23,7 +23,7 @@ from keyboards.inline.keypads.mailing import (
 from utils.pretty_text import make_build, make_pretty
 
 if TYPE_CHECKING:
-    from services.game.roles.base import Role
+    from mafia.roles import Role
 
 
 def get_live_players(
@@ -225,7 +225,7 @@ async def send_messages_after_night(
                     + "\n\n".join(
                         f"{number}) {message}"
                         for number, message in enumerate(
-                            messages, start=1
+                            sorted(messages, key=len), start=1
                         )
                     ),
                 )

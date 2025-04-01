@@ -6,7 +6,7 @@ from cache.cache_types import RolesLiteral, GameCache
 from utils.pretty_text import make_pretty
 
 if TYPE_CHECKING:
-    from services.game.roles.base import Role
+    from mafia.roles import Role
 
 
 def change_role(

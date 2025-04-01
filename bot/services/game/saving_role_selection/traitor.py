@@ -6,7 +6,7 @@ from keyboards.inline.callback_factory.recognize_user import (
 )
 from services.base import RouterHelper
 from services.game.actions_at_night import take_action_and_save_data
-from services.game.roles import Traitor, Mafia
+from mafia.roles import Traitor, Mafia
 from utils.pretty_text import make_pretty
 
 

@@ -1,7 +1,7 @@
 from constants.output import NUMBER_OF_NIGHT
 from services.base import RouterHelper
 from services.game.actions_at_night import get_game_state_and_data
-from services.game.roles import Analyst
+from mafia.roles import Analyst
 from utils.pretty_text import make_build
 from utils.tg import delete_message
 

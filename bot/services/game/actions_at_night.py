@@ -9,23 +9,12 @@ from general.collection_of_roles import get_data_with_roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
-from services.game.roles import Hacker, Mafia
-from services.game.roles.base import Role, ActiveRoleAtNight
+from mafia.roles import Hacker, Mafia
+from mafia.roles import Role, ActiveRoleAtNight
+from utils.common import save_notification_message
 from utils.pretty_text import make_build
 from utils.tg import delete_message
 from utils.state import get_state_and_assign
-
-
-def save_notification_message(
-    game_data: GameCache,
-    processed_user_id: int,
-    message: str,
-    current_user_id: int,
-):
-    if processed_user_id != current_user_id:
-        game_data["messages_after_night"].append(
-            [processed_user_id, make_build(message)]
-        )
 
 
 def trace_all_actions(
@@ -33,6 +22,7 @@ def trace_all_actions(
     game_data: GameCache,
     user_id: int,
     current_role: ActiveRoleAtNight,
+    need_to_save_notification_message: bool = True,
 ):
     suffer_tracking = game_data["tracking"].setdefault(
         str(callback.from_user.id), {}
@@ -45,14 +35,10 @@ def trace_all_actions(
     )
     interacting = interacting_tracking.setdefault("interacting", [])
     interacting.append(callback.from_user.id)
-    # if current_role.notification_message:
-    #     save_notification_message(
-    #         game_data=game_data,
-    #         processed_user_id=user_id,
-    #         message=make_build(current_role.notification_message),
-    #         current_user_id=callback.from_user.id,
-    #     )
-    if current_role.notification_message:
+    if (
+        need_to_save_notification_message
+        and current_role.notification_message
+    ):
         save_notification_message(
             game_data=game_data,
             processed_user_id=user_id,
@@ -171,13 +157,6 @@ async def inform_players_and_trace_actions(
                 )
             )
         )
-    # if current_role.notification_message:
-    #     save_notification_message(
-    #         game_data=game_data,
-    #         processed_user_id=user_id,
-    #         message=make_build(current_role.notification_message),
-    #         current_user_id=callback.from_user.id,
-    #     )
 
 
 async def take_action_and_save_data(

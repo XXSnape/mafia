@@ -34,7 +34,7 @@ from keyboards.inline.keypads.join import (
 )
 from services.base import RouterHelper
 from services.game.actions_at_night import get_game_state_and_data
-from services.game.pipeline_game import Game
+from mafia.pipeline_game import Game
 from services.settings.order_of_roles import RoleManager
 from states.states import GameFsm
 from scheduler.game import (

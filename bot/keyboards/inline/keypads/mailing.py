@@ -21,7 +21,7 @@ from keyboards.inline.cb.cb_text import (
 
 
 def send_transformation_kb(game_data: GameCache):
-    from services.game.roles import (
+    from mafia.roles import (
         Mafia,
         MafiaAlias,
         Policeman,

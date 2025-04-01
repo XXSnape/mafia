@@ -1,8 +1,8 @@
 from typing import overload
 
 from cache.cache_types import RolesLiteral
-from services.game import roles
-from services.game.roles.base import Role, ActiveRoleAtNight
+from mafia import roles
+from mafia.roles import Role, ActiveRoleAtNight
 
 
 @overload
@@ -54,10 +54,13 @@ def get_data_with_roles(
 
 
 BASES_ROLES = [
-    "suicide_bomber",
+    # "suicide_bomber",
     "don",
     "doctor",
-    "instigator",
+    "killer",
+    "policeman",
+    "angel_of_death",
+    # "masochist",
     # "analyst",
     # "killer",
     # "doctor",
@@ -84,3 +87,4 @@ REQUIRED_ROLES = BASES_ROLES + ["mafia"]
 # analyst
 # prime_minister
 # lawyer
+# instigator

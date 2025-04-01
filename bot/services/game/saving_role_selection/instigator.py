@@ -11,7 +11,7 @@ from services.game.actions_at_night import (
     get_game_state_and_data,
     take_action_and_save_data,
 )
-from services.game.roles import Instigator
+from mafia.roles import Instigator
 from states.states import UserFsm
 from utils.tg import delete_message
 

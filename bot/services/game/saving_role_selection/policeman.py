@@ -21,9 +21,9 @@ from services.game.actions_at_night import (
     take_action_and_save_data,
     get_game_state_data_and_user_id,
     trace_all_actions,
-    save_notification_message,
 )
-from services.game.roles import Policeman
+from utils.common import save_notification_message
+from mafia.roles import Policeman
 from utils.pretty_text import make_build
 from utils.tg import delete_message
 
@@ -95,11 +95,18 @@ class PolicemanSaver(RouterHelper):
             [checked_user_id, role_key]
         )
         await delete_message(self.callback.message)
+        save_notification_message(
+            game_data=game_data,
+            processed_user_id=checked_user_id,
+            message=ROLE_IS_KNOWN,
+            current_user_id=self.callback.from_user.id,
+        )
         trace_all_actions(
             callback=self.callback,
             game_data=game_data,
             user_id=checked_user_id,
             current_role=Policeman(),
+            need_to_save_notification_message=False,
         )
         await game_state.set_data(game_data)
         await self.callback.bot.send_message(

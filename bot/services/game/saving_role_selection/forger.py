@@ -9,9 +9,8 @@ from services.game.actions_at_night import (
     get_game_state_data_and_user_id,
     get_game_state_and_data,
     trace_all_actions,
-    save_notification_message,
 )
-from services.game.roles import Forger, Policeman, PolicemanAlias
+from mafia.roles import Forger, Policeman, PolicemanAlias
 from utils.tg import delete_message
 from utils.pretty_text import make_pretty
 

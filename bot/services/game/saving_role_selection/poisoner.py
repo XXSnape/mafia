@@ -1,4 +1,4 @@
-from constants.output import NUMBER_OF_NIGHT
+from constants.output import NUMBER_OF_NIGHT, ATTEMPT_TO_KILL
 from keyboards.inline.buttons.common import BACK_BTN
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
@@ -12,7 +12,8 @@ from services.game.actions_at_night import (
     get_game_state_and_data,
     take_action_and_save_data,
 )
-from services.game.roles import Poisoner
+from utils.common import save_notification_message
+from mafia.roles import Poisoner
 from states.states import UserFsm
 from utils.tg import delete_message
 
@@ -28,6 +29,13 @@ class PoisonerSaver(RouterHelper):
         poisoned[1] = 1
         await delete_message(self.callback.message)
         await game_state.set_data(game_data)
+        for user_id in poisoned[0]:
+            save_notification_message(
+                game_data=game_data,
+                processed_user_id=user_id,
+                message=ATTEMPT_TO_KILL,
+                current_user_id=self.callback.from_user.id,
+            )
         await self.callback.message.answer(
             text=NUMBER_OF_NIGHT.format(game_data["number_of_night"])
             + "Ты решил всех убить!"

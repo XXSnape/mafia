@@ -9,7 +9,7 @@ from keyboards.inline.callback_factory.recognize_user import (
 )
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from services.base import RouterHelper
-from services.game.roles import Prosecutor, PrimeMinister
+from mafia.roles import Prosecutor, PrimeMinister
 from utils.tg import delete_message
 
 # from utils.utils import add_voice
