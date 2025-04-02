@@ -18,6 +18,7 @@ class Forger(
     ProcedureAfterVoting, ProcedureAfterNight, ActiveRoleAtNight
 ):
     role = "Румпельштильцхен"
+    role_id = "forger"
     grouping = Groupings.criminals
     purpose = "Ты должен обманывать местную полицию и подделывать документы на свое усмотрение во имя мафии"
     message_to_group_after_action = (
@@ -125,7 +126,7 @@ class Forger(
             and mafias
             and mafias[0] != removed_user[0]
         ):
-            if "mafia" not in self.all_roles:
+            if MafiaAlias.role_id not in self.all_roles:
                 mafia = MafiaAlias()
                 mafia(
                     all_roles=self.all_roles,
@@ -133,13 +134,12 @@ class Forger(
                     bot=self.bot,
                     state=self.state,
                 )
-                self.all_roles["mafia"] = mafia
+                self.all_roles[MafiaAlias.role_id] = mafia
             forger_id = forgers[0]
             change_role(
                 game_data=game_data,
                 previous_role=self,
                 new_role=MafiaAlias(),
-                role_id="mafia",
                 user_id=forger_id,
             )
             await notify_aliases_about_transformation(

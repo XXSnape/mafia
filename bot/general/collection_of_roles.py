@@ -11,61 +11,55 @@ def get_data_with_roles() -> dict[str, Role]: ...
 
 @overload
 def get_data_with_roles(
-    role_name: RolesLiteral,
+    role_id: RolesLiteral,
 ) -> Role | ActiveRoleAtNight: ...
 
 
 def get_data_with_roles(
-    role_name: RolesLiteral | None = None,
+    role_id: RolesLiteral | None = None,
 ):
-    all_roles = {
-        "don": roles.Mafia(),
-        "doctor": roles.Doctor(),
-        "policeman": roles.Policeman(),
-        "civilian": roles.Civilian(),
-        "mafia": roles.MafiaAlias(),
-        "traitor": roles.Traitor(),
-        "killer": roles.Killer(),
-        "werewolf": roles.Werewolf(),
-        "forger": roles.Forger(),
-        "hacker": roles.Hacker(),
-        "sleeper": roles.Sleeper(),
-        "agent": roles.Agent(),
-        "journalist": roles.Journalist(),
-        "punisher": roles.Punisher(),
-        "analyst": roles.Analyst(),
-        "suicide_bomber": roles.SuicideBomber(),
-        "instigator": roles.Instigator(),
-        "prime_minister": roles.PrimeMinister(),
-        "poisoner": roles.Poisoner(),
-        "bodyguard": roles.Bodyguard(),
-        "masochist": roles.Masochist(),
-        "lawyer": roles.Lawyer(),
-        "angel_of_death": roles.AngelOfDeath(),
-        "prosecutor": roles.Prosecutor(),
-        "lucky_gay": roles.LuckyGay(),
-        "nurse": roles.DoctorAlias(),
-        "general": roles.PolicemanAlias(),
-        "warden": roles.Warden(),
-    }
-    if role_name:
-        return all_roles[role_name]
+    roles_data = [
+        roles.Mafia(),
+        roles.Doctor(),
+        roles.Policeman(),
+        roles.Civilian(),
+        roles.MafiaAlias(),
+        roles.Traitor(),
+        roles.Killer(),
+        roles.Werewolf(),
+        roles.Forger(),
+        roles.Hacker(),
+        roles.Sleeper(),
+        roles.Agent(),
+        roles.Journalist(),
+        roles.Punisher(),
+        roles.Analyst(),
+        roles.SuicideBomber(),
+        roles.Instigator(),
+        roles.PrimeMinister(),
+        roles.Poisoner(),
+        roles.Bodyguard(),
+        roles.Masochist(),
+        roles.Lawyer(),
+        roles.AngelOfDeath(),
+        roles.Prosecutor(),
+        roles.LuckyGay(),
+        roles.DoctorAlias(),
+        roles.PolicemanAlias(),
+        roles.Warden(),
+    ]
+    all_roles = {role.role_id: role for role in roles_data}
+    if role_id:
+        return all_roles[role_id]
     return all_roles
 
 
 BASES_ROLES = [
-    "policeman",
-    "don",
-    "journalist",
-    "instigator",
-    "poisoner",
-    # "general",
-    # "agent",
-    # "doctor",
-    #
-    # "policeman",
-    # "warden",
-    # "agent",
+    roles.Werewolf.role_id,
+    roles.Mafia.role_id,
+    roles.Poisoner.role_id,
+    roles.Bodyguard.role_id,
+    roles.Policeman.role_id,
 ]
 REQUIRED_ROLES = BASES_ROLES + ["mafia"]
 

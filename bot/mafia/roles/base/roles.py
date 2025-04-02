@@ -15,6 +15,7 @@ from cache.cache_types import (
     PlayersIds,
     LastInteraction,
     UserGameCache,
+    RolesLiteral,
 )
 from constants.output import MONEY_SYM
 from database.schemas.results import PersonalResultSchema
@@ -37,6 +38,7 @@ class Role(ABC):
     bot: Bot
     state: FSMContext
     role: str
+    role_id: RolesLiteral
     need_to_process: bool = False
     photo: str
     clearing_state_after_death: bool = True
@@ -104,7 +106,7 @@ class Role(ABC):
 
     @classmethod
     @property
-    def alias(cls):
+    def alias(cls) -> Optional["Role"]:
         subclasses = cls.__subclasses__()
         if not subclasses:
             return None

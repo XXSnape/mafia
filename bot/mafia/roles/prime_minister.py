@@ -6,6 +6,7 @@ from utils.roles import get_user_role_and_url
 
 class PrimeMinister(ProcedureAfterVoting, Role):
     role = "Премьер-министр"
+    role_id = "prime_minister"
     photo = (
         "https://avatars.mds.yandex.net/i?id=fb2e5e825d183d5344d93bc563"
         "6bc4c4_l-5084109-images-thumbs&n=13"

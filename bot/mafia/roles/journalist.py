@@ -13,6 +13,7 @@ from utils.roles import (
 
 class Journalist(ProcedureAfterNight, ActiveRoleAtNight):
     role = "Журналист"
+    role_id = "journalist"
     mail_message = "У кого взять интервью этой ночью?"
     photo = (
         "https://pics.rbc.ru/v2_companies_s3/resized/960xH/media/"

@@ -7,6 +7,7 @@ from states.states import UserFsm
 
 class Werewolf(ProcedureAfterNight, ActiveRoleAtNight):
     role = "Оборотень"
+    role_id = "werewolf"
     need_to_monitor_interaction = False
     photo = (
         "https://sun9-42.userapi.com/impf/c303604/v303604068/170c/FXQRtSk8e28.jpg?size=484x604&quality="

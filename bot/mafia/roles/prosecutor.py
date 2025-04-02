@@ -22,6 +22,7 @@ class Prosecutor(
     ProcedureAfterVoting, ProcedureAfterNight, ActiveRoleAtNight
 ):
     role = "Прокурор"
+    role_id = "prosecutor"
     mail_message = "Кого арестовать этой ночью?"
     photo = (
         "https://avatars.mds.yandex.net/i?"

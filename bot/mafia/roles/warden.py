@@ -16,6 +16,7 @@ from utils.pretty_text import make_pretty
 
 class Warden(ProcedureAfterNight, ActiveRoleAtNight):
     role = "Соглядатай"
+    role_id = "warden"
     photo = (
         "https://cdn1.tenchat.ru/static"
         "/vbc-gostinder/2024-08-03/2aa74472-db98-47ac-a427-b3f7dbb020cb.jpeg?"

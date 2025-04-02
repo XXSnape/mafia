@@ -13,7 +13,6 @@ def change_role(
     game_data: GameCache,
     previous_role: "Role",
     new_role: "Role",
-    role_id: RolesLiteral,
     user_id: int,
 ):
     game_data[previous_role.roles_key].remove(user_id)
@@ -21,7 +20,7 @@ def change_role(
     game_data["players"][str(user_id)]["pretty_role"] = make_pretty(
         new_role.role
     )
-    game_data["players"][str(user_id)]["role_id"] = role_id
+    game_data["players"][str(user_id)]["role_id"] = new_role.role_id
     game_data["players"][str(user_id)][
         "roles_key"
     ] = new_role.roles_key

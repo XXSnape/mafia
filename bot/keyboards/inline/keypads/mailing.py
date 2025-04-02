@@ -92,10 +92,10 @@ def selection_to_warden_kb(game_data: GameCache, user_id: int):
 def kill_or_poison_kb(poisoned: Poisoned):
     buttons = [
         InlineKeyboardButton(
-            text="Отравить💀", callback_data=POISONER_POISONS_CB
+            text="Отравить🤢", callback_data=POISONER_POISONS_CB
         ),
     ]
-    if poisoned:
+    if poisoned and poisoned[0]:
         buttons.append(
             InlineKeyboardButton(
                 text="Убить☠️", callback_data=POLICEMAN_KILLS_CB
@@ -123,12 +123,16 @@ def kill_or_check_on_policeman(number_of_night: int = 1):
 
 def choose_fake_role_kb(game_data: GameCache):
     from general.collection_of_roles import get_data_with_roles
+    from mafia.roles import Policeman
 
     all_roles = get_data_with_roles()
     current_roles = set()
     for user_id in game_data["live_players_ids"]:
         user_data = game_data["players"][str(user_id)]
-        if user_data["role_id"] not in ("policeman", "general"):
+        if user_data["role_id"] not in (
+            Policeman.role_id,
+            Policeman.alias.role_id,
+        ):
             current_roles.add(
                 (
                     all_roles[user_data["role_id"]].role,

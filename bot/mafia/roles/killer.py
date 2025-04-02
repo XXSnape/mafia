@@ -11,6 +11,7 @@ from utils.roles import get_processed_role_and_user_if_exists
 
 class Killer(MurderAfterNight, ActiveRoleAtNight):
     role = "Наёмный убийца"
+    role_id = "killer"
     need_to_monitor_interaction = False
     photo = (
         "https://steamuserimages-a.akamaihd.net/ugc/633105202506112549/988D"

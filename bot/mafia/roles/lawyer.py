@@ -10,6 +10,7 @@ from utils.roles import get_processed_role_and_user_if_exists
 
 class Lawyer(ProcedureAfterVoting, ActiveRoleAtNight):
     role = "Адвокат"
+    role_id = "lawyer"
     mail_message = "Кого защитить на голосовании?"
     do_not_choose_self = 2
     photo = (

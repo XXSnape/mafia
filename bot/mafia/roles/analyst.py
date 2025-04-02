@@ -9,8 +9,9 @@ from utils.roles import get_processed_user_id_if_exists
 
 
 class Analyst(ProcedureAfterVoting, ActiveRoleAtNight):
-    grouping = Groupings.other
     role = "Политический аналитик"
+    role_id = "analyst"
+    grouping = Groupings.other
     photo = "https://habrastorage.org/files/2e3/371/6a2/2e33716a2bb74f8eb67378334960ebb5.png"
     purpose = "Тебе нужно на основе ранее полученных данных предсказать, кого повесят на дневном голосовании"
     do_not_choose_others = 0

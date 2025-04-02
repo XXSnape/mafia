@@ -11,6 +11,7 @@ from utils.roles import get_processed_role_and_user_if_exists
 
 class Bodyguard(ProcedureAfterNight, ActiveRoleAtNight):
     role = "Телохранитель"
+    role_id = "bodyguard"
     mail_message = "За кого пожертвовать собой?"
     photo = (
         "https://sun6-22.userapi.com/impg/zAaADEA19scv86EFl8bY1wUYRCJyBPGg1qamiA/"

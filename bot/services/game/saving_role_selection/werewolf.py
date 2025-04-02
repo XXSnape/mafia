@@ -26,17 +26,11 @@ from utils.roles import change_role
 class WerewolfSaver(RouterHelper):
     async def werewolf_turns_into(self):
         data = {
-            WEREWOLF_TO_MAFIA_CB: [
-                [Mafia(), "don"],
-                [MafiaAlias(), "mafia"],
-            ],
-            WEREWOLF_TO_DOCTOR_CB: [
-                [Doctor(), "doctor"],
-                [DoctorAlias(), "nurse"],
-            ],
+            WEREWOLF_TO_MAFIA_CB: [Mafia(), Mafia.alias],
+            WEREWOLF_TO_DOCTOR_CB: [Doctor(), Doctor.alias],
             WEREWOLF_TO_POLICEMAN_CB: [
-                [Policeman(), "policeman"],
-                [PolicemanAlias(), "general"],
+                Policeman(),
+                Policeman.alias,
             ],
         }
         game_state, game_data = await get_game_state_and_data(
@@ -47,21 +41,18 @@ class WerewolfSaver(RouterHelper):
 
         user_id = self.callback.from_user.id
         current_roles = data[self.callback.data]
-        roles_key = current_roles[0][0].roles_key
+        roles_key = current_roles[0].roles_key
         await delete_message(self.callback.message)
         are_there_many_senders = False
         if len(game_data[roles_key]) == 0:
-            role_id = current_roles[0][1]
-            new_role = current_roles[0][0]
+            new_role = current_roles[0]
         else:
-            role_id = current_roles[1][1]
-            new_role = current_roles[1][0]
+            new_role = current_roles[1]
             are_there_many_senders = True
         change_role(
             game_data=game_data,
             previous_role=Werewolf(),
             new_role=new_role,
-            role_id=role_id,
             user_id=user_id,
         )
         await game_state.set_data(game_data)

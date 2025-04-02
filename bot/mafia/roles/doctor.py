@@ -15,6 +15,7 @@ from utils.roles import (
 
 class Doctor(ProcedureAfterNight, ActiveRoleAtNight):
     role = "Главный врач"
+    role_id = "doctor"
     mail_message = "Кого вылечить этой ночью?"
     is_self_selecting = True
     do_not_choose_self = 2
@@ -68,6 +69,7 @@ class Doctor(ProcedureAfterNight, ActiveRoleAtNight):
 
 class DoctorAlias(AliasRole, Doctor):
     role = "Медсестра"
+    role_id = "nurse"
     photo = "https://cdn.culture.ru/images/e2464a8d-222e-54b1-9016-86f63e902959"
 
     purpose = "Тебе нужно во всем помогать главврачу. В случае его смерти вступишь в должность."

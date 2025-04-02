@@ -7,6 +7,7 @@ from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNight, Role
 from mafia.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
+from utils.pretty_text import make_build
 from utils.roles import (
     get_processed_user_id_if_exists,
     get_processed_role_and_user_if_exists,
@@ -15,6 +16,7 @@ from utils.roles import (
 
 class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
     role = "Клофелинщица"
+    role_id = "sleeper"
     mail_message = "Кого усыпить этой ночью?"
     photo = (
         "https://masterpiecer-images.s3.yandex.net/c94e9c"
@@ -53,7 +55,9 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
             with suppress(TelegramBadRequest):
                 await self.bot.send_message(
                     chat_id=processed_user_id,
-                    text="Сложно поверить, но все твои действия ночью были лишь сном!",
+                    text=make_build(
+                        "😴Сложно поверить, но все твои действия ночью были лишь сном!"
+                    ),
                 )
 
     @get_processed_role_and_user_if_exists
@@ -70,7 +74,7 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
         ) or processed_role.grouping == Groupings.civilians:
             money = 0
         else:
-            money = processed_role.payment_for_murder
+            money = int(processed_role.payment_for_murder * 1.5)
         self.add_money_to_all_allies(
             game_data=game_data,
             money=money,

@@ -7,6 +7,7 @@ from utils.pretty_text import make_build
 
 class Masochist(SuicideRoleMixin, Role):
     role = "Мазохист"
+    role_id = "masochist"
     photo = "https://i.pinimg.com/736x/14/a5/f5/14a5f5eb5dbd73c4707f24d436d80c0b.jpg"
     grouping = Groupings.other
     purpose = "Тебе нужно умереть на дневном голосовании."

@@ -15,6 +15,7 @@ class AngelOfDeath(
     ProcedureAfterVoting, MurderAfterNight, ActiveRoleAtNight
 ):
     role = "Ангел смерти"
+    role_id = "angel_of_death"
     mail_message = (
         "Глупые людишки тебя линчевали, кому ты отомстишь?"
     )

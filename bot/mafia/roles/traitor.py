@@ -10,6 +10,7 @@ from utils.roles import get_processed_role_and_user_if_exists
 
 class Traitor(ProcedureAfterNight, ActiveRoleAtNight):
     role = "Госизменщик"
+    role_id = "traitor"
     photo = "https://i.playground.ru/p/sLHLRFjDy8_89wYe26RIQw.jpeg"
     grouping = Groupings.criminals
     need_to_monitor_interaction = False

@@ -16,6 +16,7 @@ from utils.roles import get_processed_role_and_user_if_exists
 
 class Mafia(MurderAfterNight, ActiveRoleAtNight):
     role = "Дон. Высшее звание в преступных группировках"
+    role_id = "don"
     photo = (
         "https://avatars.mds.yandex.net/i?id="
         "a7b2f1eed9cca869784091017f8a66ff_l-7677819-images-thumbs&n=13"
@@ -67,6 +68,7 @@ class Mafia(MurderAfterNight, ActiveRoleAtNight):
 
 class MafiaAlias(AliasRole, Mafia):
     role = "Мафия"
+    role_id = "mafia"
     photo = "https://i.pinimg.com/736x/a1/10/db/a110db3eaba78bf6423bcea68f330a64.jpg"
     purpose = (
         "Тебе нужно уничтожить всех горожан и подчиняться дону."

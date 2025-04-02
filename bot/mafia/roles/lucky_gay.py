@@ -9,6 +9,7 @@ from mafia.roles.base.mixins import (
 
 class LuckyGay(ProcedureAfterNight, Role):
     role = "Везунчик"
+    role_id = "lucky_gay"
     photo = "https://avatars.mds.yandex.net/get-mpic/5031100/img_id5520953584482126492.jpeg/orig"
     purpose = (
         "Возможно тебе повезет и ты останешься жив после покушения."
