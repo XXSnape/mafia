@@ -91,10 +91,11 @@ class UserManager(RouterHelper):
                 dispatcher=self.dispatcher,
             )
         )
-        deceived_user = game_data.get("deceived")
+        deceived_user = game_data.get("deceived", [])
         if (
-            deceived_user
+            len(deceived_user) == 2
             and self.callback.from_user.id == deceived_user[0]
+            and deceived_user[1] in game_data["live_players_ids"]
         ):
             voted_user_id = deceived_user[1]
         game_data["vote_for"].append(

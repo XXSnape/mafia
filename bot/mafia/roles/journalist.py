@@ -38,9 +38,9 @@ class Journalist(ProcedureAfterNight, ActiveRoleAtNight):
             for user_id in game_data["tracking"]
             .get(str(processed_user_id), {})
             .get("interacting", [])
-            if user_id != game_data[self.roles_key][0]
+            if user_id not in game_data[self.roles_key]
         ]
-        self.number_of_visitors = len(interacting) - 1
+        self.number_of_visitors = len(interacting)
         visitors = ", ".join(interacting)
         user_url = game_data["players"][str(processed_user_id)][
             "url"
@@ -70,7 +70,7 @@ class Journalist(ProcedureAfterNight, ActiveRoleAtNight):
         if self.number_of_visitors == 0:
             return
 
-        money = 3 * self.number_of_visitors
+        money = 5 * self.number_of_visitors
         self.add_money_to_all_allies(
             game_data=game_data,
             money=money,

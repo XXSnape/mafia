@@ -61,9 +61,16 @@ class PolicemanSaver(RouterHelper):
         )
 
     async def policeman_cancels_selection(self):
+        _, game_data = await get_game_state_and_data(
+            tg_obj=self.callback,
+            state=self.state,
+            dispatcher=self.dispatcher,
+        )
         await self.callback.message.edit_text(
             text=Policeman.mail_message,
-            reply_markup=kill_or_check_on_policeman(),
+            reply_markup=kill_or_check_on_policeman(
+                number_of_night=game_data["number_of_night"]
+            ),
         )
 
     async def policeman_chose_to_kill(

@@ -104,17 +104,20 @@ def kill_or_poison_kb(poisoned: Poisoned):
     return generate_inline_kb(data_with_buttons=buttons)
 
 
-def kill_or_check_on_policeman():
+def kill_or_check_on_policeman(number_of_night: int = 1):
     buttons = [
         InlineKeyboardButton(
             text="Проверить🔍",
             callback_data=POLICEMAN_CHECKS_CB,
         ),
-        InlineKeyboardButton(
-            text="Стрелять🔫",
-            callback_data=POLICEMAN_KILLS_CB,
-        ),
     ]
+    if number_of_night > 1:
+        buttons.append(
+            InlineKeyboardButton(
+                text="Стрелять🔫",
+                callback_data=POLICEMAN_KILLS_CB,
+            ),
+        )
     return generate_inline_kb(data_with_buttons=buttons)
 
 

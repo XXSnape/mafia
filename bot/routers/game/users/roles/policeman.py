@@ -38,9 +38,13 @@ async def policeman_makes_choice(
 @router.callback_query(
     UserFsm.POLICEMAN_CHECKS, F.data == PLAYER_BACKS_CB
 )
-async def policeman_cancels_selection(callback: CallbackQuery):
+async def policeman_cancels_selection(
+    callback: CallbackQuery,
+    state: FSMContext,
+    dispatcher: Dispatcher,
+):
     saver = PolicemanSaver(
-        callback=callback,
+        callback=callback, state=state, dispatcher=dispatcher
     )
     await saver.policeman_cancels_selection()
 
