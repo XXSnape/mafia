@@ -89,12 +89,18 @@ def selection_to_warden_kb(game_data: GameCache, user_id: int):
     return generate_inline_kb(data_with_buttons=buttons)
 
 
-def kill_or_poison_kb(poisoned: Poisoned):
-    buttons = [
-        InlineKeyboardButton(
-            text="Отравить🤢", callback_data=POISONER_POISONS_CB
-        ),
-    ]
+def kill_or_poison_kb(game_data: GameCache):
+    poisoned = game_data["poisoned"]
+    buttons = []
+    if (
+        not poisoned
+        or len(poisoned[0]) < len(game_data["live_players_ids"]) - 1
+    ):
+        buttons.append(
+            InlineKeyboardButton(
+                text="Отравить🤢", callback_data=POISONER_POISONS_CB
+            ),
+        )
     if poisoned and poisoned[0]:
         buttons.append(
             InlineKeyboardButton(

@@ -55,11 +55,14 @@ def get_data_with_roles(
 
 
 BASES_ROLES = [
-    roles.Werewolf.role_id,
+    roles.Poisoner.role_id,
+    # roles.Werewolf.role_id,
     roles.Mafia.role_id,
-    roles.Policeman.role_id,
-    roles.Warden.role_id,
-    roles.Forger.role_id,
+    roles.Bodyguard.role_id,
+    roles.Doctor.role_id,
+    # roles.Policeman.role_id,
+    # roles.Warden.role_id,
+    # roles.Forger.role_id,
     # roles.Mafia.role_id,
     # roles.Policeman.role_id,
     # roles.Doctor.role_id,

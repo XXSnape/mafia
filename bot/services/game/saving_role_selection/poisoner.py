@@ -70,11 +70,10 @@ class PoisonerSaver(RouterHelper):
             state=self.state,
             dispatcher=self.dispatcher,
         )
-        poisoned = game_data["poisoned"]
         await self.state.set_state(UserFsm.POISONER_CHOOSES_ACTION)
         await self.callback.message.edit_text(
             text=Poisoner.mail_message,
-            reply_markup=kill_or_poison_kb(poisoned=poisoned),
+            reply_markup=kill_or_poison_kb(game_data=game_data),
         )
 
     async def poisoner_chose_victim(

@@ -88,10 +88,11 @@ def get_profiles(
     role: bool = False,
     initial_role: bool = False,
     money_need: bool = False,
+    if_there_are_no_players: str = "Пока нет участников!",
 ) -> str:
     result = ""
     if not players_ids:
-        return "Пока нет участников!"
+        return if_there_are_no_players
 
     for (
         index,

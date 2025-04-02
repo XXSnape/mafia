@@ -127,12 +127,11 @@ class Poisoner(
         game_data: GameCache,
     ) -> str | None:
         poisoned = game_data["poisoned"]
-        if not poisoned:
+        if not poisoned or not poisoned[0]:
             return "Нет отравленных людей"
         return "Ранее отравленные игроки\n" + get_profiles(
             players_ids=poisoned[0], players=game_data["players"]
         )
 
     def generate_markup(self, game_data: GameCache, **kwargs):
-        poisoned = game_data["poisoned"]
-        return kill_or_poison_kb(poisoned)
+        return kill_or_poison_kb(game_data=game_data)

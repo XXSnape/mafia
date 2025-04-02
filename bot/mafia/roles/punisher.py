@@ -21,7 +21,6 @@ class Punisher(ProcedureAfterNight, Role):
     async def procedure_after_night(
         self,
         game_data: GameCache,
-        victims: set[int],
         recovered: list[int],
         murdered: list[int],
         killers_of: dict[UserIdInt, list[ActiveRoleAtNight]],
