@@ -49,8 +49,7 @@ class Bodyguard(ProcedureAfterNight, ActiveRoleAtNight):
         if recovered_id in murdered:
             recovered.append(recovered_id)
             saver_id = game_data[self.roles_key][0]
-            if saver_id in recovered:
-                return
+            murdered.append(saver_id)
             for role in killers_of[recovered_id]:
                 game_data[role.processed_users_key][:] = [saver_id]
             killers_of[saver_id] = list(
@@ -58,7 +57,6 @@ class Bodyguard(ProcedureAfterNight, ActiveRoleAtNight):
                 | set(killers_of[recovered_id])
             )
             killers_of[recovered_id] = []
-            murdered.append(saver_id)
 
     @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(

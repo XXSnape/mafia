@@ -39,19 +39,21 @@ class Punisher(ProcedureAfterNight, Role):
             treated_by_bodyguard = Bodyguard().get_processed_user_id(
                 game_data
             )
-            if (
-                treated_by_bodyguard == killer_id
-                and recovered.count(killer_id) == 1
-            ):
-                killed_py_punisher.add(
-                    game_data[Bodyguard.roles_key][0]
-                )
-                self.killed.append(
-                    [
-                        game_data[Bodyguard.roles_key][0],
-                        Bodyguard(),
-                    ]
-                )
+            if treated_by_bodyguard == killer_id:
+                print("treated_by_bodyguard")
+                print(recovered.count(killer_id))
+                if recovered.count(killer_id) == 0:
+                    killed_py_punisher.add(
+                        game_data[Bodyguard.roles_key][0]
+                    )
+                    self.killed.append(
+                        [
+                            game_data[Bodyguard.roles_key][0],
+                            Bodyguard(),
+                        ]
+                    )
+                else:
+                    continue
             else:
                 killed_py_punisher.add(killer_id)
                 self.killed.append([killer_id, current_role])
@@ -62,6 +64,7 @@ class Punisher(ProcedureAfterNight, Role):
                 "Все нарушители твоего покоя будут наказаны!",
             ]
         )
+        print("mur", list(killed_py_punisher))
         murdered.extend(list(killed_py_punisher))
 
     async def accrual_of_overnight_rewards(
