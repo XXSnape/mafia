@@ -29,14 +29,7 @@ class ForgerSaver(RouterHelper):
         )
         url = game_data["players"][str(user_id)]["url"]
         game_data["forged_roles"].append(user_id)
-        all_roles = get_data_with_roles()
-        current_roles = [
-            (all_roles[data["role_id"]].role, data["role_id"])
-            for _, data in game_data["players"].items()
-            if data["role"]
-            not in (Policeman.role, PolicemanAlias.role)
-        ]
-        markup = choose_fake_role_kb(current_roles)
+        markup = choose_fake_role_kb(game_data)
         await game_state.set_data(game_data)
         await self.callback.message.edit_text(
             text=f"Выбери для {url} новую роль", reply_markup=markup

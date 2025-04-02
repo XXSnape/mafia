@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from operator import attrgetter
 
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
@@ -117,10 +118,25 @@ def kill_or_check_on_policeman():
     return generate_inline_kb(data_with_buttons=buttons)
 
 
-def choose_fake_role_kb(roles: list[tuple[str, str]]):
+def choose_fake_role_kb(game_data: GameCache):
+    from general.collection_of_roles import get_data_with_roles
+
+    all_roles = get_data_with_roles()
+    current_roles = set()
+    for user_id in game_data["live_players_ids"]:
+        user_data = game_data["players"][str(user_id)]
+        if user_data["role_id"] not in ("policeman", "general"):
+            current_roles.add(
+                (
+                    all_roles[user_data["role_id"]].role,
+                    user_data["role_id"],
+                )
+            )
+
     buttons = [
         InlineKeyboardButton(text=role[0], callback_data=role[1])
-        for role in roles
+        for role in current_roles
     ]
+    buttons.sort(key=attrgetter("text"))
     buttons.append(BACK_BTN)
     return generate_inline_kb(data_with_buttons=buttons)
