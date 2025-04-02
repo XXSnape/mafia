@@ -50,7 +50,6 @@ class Role(ABC):
     is_mass_mailing_list: bool = False
     extra_data: list[ExtraCache] | None = None
     state_for_waiting_for_action: State | None = None
-    was_deceived: bool = False
 
     payment_for_treatment = 5
     payment_for_murder = 5
@@ -69,6 +68,7 @@ class Role(ABC):
         self.dispatcher = dispatcher
         self.bot = bot
         self.state = state
+        self.temporary_roles = {}
 
     async def boss_is_dead(
         self,
@@ -228,7 +228,7 @@ class Role(ABC):
         at_night: bool = True,
         additional_players: str | None = None,
     ):
-        if self.was_deceived:
+        if self.temporary_roles:
             money = 0
         players = game_data[self.roles_key]
         if additional_players:
@@ -240,7 +240,7 @@ class Role(ABC):
             else:
                 message = f"{beginning_message} {user_url} ({make_pretty(processed_role.role)})"
             message += " - {money}" + MONEY_SYM
-            if self.was_deceived:
+            if self.temporary_roles:
                 message += " (🚫ОБМАНУТ ВО ВРЕМЯ ИГРЫ)"
             time_of_day = (
                 "🌃Ночь" if at_night else "🌟Голосование дня"
@@ -253,7 +253,7 @@ class Role(ABC):
                     money,
                 ]
             )
-        self.was_deceived = False
+        self.temporary_roles.clear()
 
     def earn_money_for_voting(
         self,

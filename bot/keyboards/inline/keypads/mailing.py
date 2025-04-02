@@ -79,7 +79,7 @@ def selection_to_warden_kb(game_data: GameCache, user_id: int):
         if player_id == user_id:
             continue
         text = game_data["players"][str(player_id)]["full_name"]
-        if checked and player_id == checked[0][0]:
+        if checked and player_id == checked[0]:
             text = "✅" + text
         buttons.append(
             InlineKeyboardButton(

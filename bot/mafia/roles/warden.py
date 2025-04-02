@@ -1,9 +1,11 @@
+import asyncio
+
 from aiogram.types import InlineKeyboardButton
 
 from cache.cache_types import (
     ExtraCache,
     GameCache,
-    CheckedForTheSameGroups,
+    DisclosedRoles,
 )
 from constants.output import ROLE_IS_KNOWN
 from keyboards.inline.keypads.mailing import selection_to_warden_kb
@@ -36,6 +38,7 @@ class Warden(ProcedureAfterNight, ActiveRoleAtNight):
         ),
     ]
     notification_message = ROLE_IS_KNOWN
+    number_in_order_after_night = 2
     payment_for_treatment = 15
     payment_for_murder = 16
 
@@ -43,20 +46,37 @@ class Warden(ProcedureAfterNight, ActiveRoleAtNight):
         self.state_for_waiting_for_action = (
             UserFsm.SUPERVISOR_COLLECTS_INFORMATION
         )
+        self.temporary_roles = {}
 
     def _get_user_roles_and_url(
         self,
         game_data: GameCache,
-        checked_users: CheckedForTheSameGroups,
+        checked_users: DisclosedRoles,
+        use_temporary_roles: bool = True,
     ):
-        user1_data, user2_data = checked_users
-        user1_id, user1_role_key = user1_data
-        user2_id, user2_role_key = user2_data
-        user1_role = self.all_roles[user1_role_key]
-        user2_role = self.all_roles[user2_role_key]
-        user_1_url = game_data["players"][str(user1_id)]["url"]
-        user_2_url = game_data["players"][str(user2_id)]["url"]
-        return user_1_url, user1_role, user_2_url, user2_role
+
+        user1_id, user2_id = checked_users
+        if use_temporary_roles:
+            user1_role_id = self.temporary_roles.get(
+                user1_id,
+                game_data["players"][str(user1_id)]["role_id"],
+            )
+            user2_role_id = self.temporary_roles.get(
+                user2_id,
+                game_data["players"][str(user2_id)]["role_id"],
+            )
+        else:
+            user1_role_id = game_data["players"][str(user1_id)][
+                "role_id"
+            ]
+            user2_role_id = game_data["players"][str(user2_id)][
+                "role_id"
+            ]
+        user1_role = self.all_roles[user1_role_id]
+        user2_role = self.all_roles[user2_role_id]
+        user1_url = game_data["players"][str(user1_id)]["url"]
+        user2_url = game_data["players"][str(user2_id)]["url"]
+        return user1_url, user1_role, user2_url, user2_role
 
     async def procedure_after_night(
         self, game_data: GameCache, **kwargs
@@ -74,10 +94,15 @@ class Warden(ProcedureAfterNight, ActiveRoleAtNight):
             common_text += "одной группировке!✅"
         else:
             common_text += "разных группировках!🚫"
-        for warden_id in game_data[self.roles_key]:
-            await self.bot.send_message(
-                chat_id=warden_id, text=common_text
-            )
+        await asyncio.gather(
+            *(
+                self.bot.send_message(
+                    chat_id=warden_id, text=common_text
+                )
+                for warden_id in game_data[self.roles_key]
+            ),
+            return_exceptions=True,
+        )
         game_data["text_about_checked_for_the_same_groups"] += (
             common_text + "\n\n"
         )
@@ -92,7 +117,9 @@ class Warden(ProcedureAfterNight, ActiveRoleAtNight):
             return
         user1_url, user1_role, user2_url, user2_role = (
             self._get_user_roles_and_url(
-                game_data=game_data, checked_users=checked_users
+                game_data=game_data,
+                checked_users=checked_users,
+                use_temporary_roles=False,
             )
         )
         self.add_money_to_all_allies(

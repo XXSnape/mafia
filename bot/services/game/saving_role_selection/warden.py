@@ -35,7 +35,7 @@ class WardenSaver(RouterHelper):
         )
         checked = game_data["checked_for_the_same_groups"]
         processed_user_id = int(self.callback.data)
-        if len(checked) == 1 and checked[0][0] == processed_user_id:
+        if len(checked) == 1 and checked[0] == processed_user_id:
             checked.clear()
             await self._generate_markup_after_selection(
                 game_state=game_state,
@@ -43,30 +43,16 @@ class WardenSaver(RouterHelper):
             )
             return
         elif len(checked) == 0:
-            checked.append(
-                [
-                    processed_user_id,
-                    game_data["players"][str(processed_user_id)][
-                        "role_id"
-                    ],
-                ]
-            )
+            checked.append(processed_user_id)
             await self._generate_markup_after_selection(
                 game_state=game_state,
                 game_data=game_data,
             )
             return
 
-        checked.append(
-            [
-                processed_user_id,
-                game_data["players"][str(processed_user_id)][
-                    "role_id"
-                ],
-            ]
-        )
-        user1_id: int = checked[0][0]
-        user2_id: int = checked[1][0]
+        checked.append(processed_user_id)
+        user1_id: int = checked[0]
+        user2_id: int = checked[1]
         for user_id in [user1_id, user2_id]:
             await trace_all_actions(
                 callback=self.callback,

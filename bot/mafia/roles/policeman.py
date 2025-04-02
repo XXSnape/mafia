@@ -48,6 +48,7 @@ class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.POLICEMAN_CHECKS
+        self.temporary_roles = {}
 
     async def accrual_of_overnight_rewards(
         self,
@@ -69,6 +70,7 @@ class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
                 processed_role=processed_role,
                 beginning_message=f"Проверка",
             )
+            return
 
         processed_user_id = self.get_processed_user_id(game_data)
         if (
@@ -103,9 +105,13 @@ class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
     ):
 
         if game_data["disclosed_roles"]:
-            user_id, role_key = game_data["disclosed_roles"]
+            user_id = game_data["disclosed_roles"][0]
             url = game_data["players"][str(user_id)]["url"]
-            role = make_pretty(self.all_roles[role_key].role)
+            user_role_id = self.temporary_roles.get(
+                user_id,
+                game_data["players"][str(user_id)]["role_id"],
+            )
+            role = make_pretty(self.all_roles[user_role_id].role)
             text = f"🌃Ночь {game_data['number_of_night']}\n{url} - {role}!"
             await asyncio.gather(
                 *(

@@ -43,44 +43,46 @@ class Forger(
     async def procedure_after_night(
         self, game_data: GameCache, **kwargs
     ):
+        from .policeman import Policeman
+        from .warden import Warden
+
         forged_roles = game_data["forged_roles"]
         if len(forged_roles) != 2:
             return
+        forged_user_id, forged_role_id = forged_roles
         disclosed_roles = game_data.get("disclosed_roles")
-        if (
-            disclosed_roles
-            and disclosed_roles[0] == forged_roles[0]
-            and disclosed_roles != forged_roles
-        ):
-            game_data["disclosed_roles"][:] = forged_roles
-            self.has_policeman_been_deceived = True
-            self.all_roles["policeman"].was_deceived = True
+        user_role_id = game_data["players"][str(forged_user_id)][
+            "role_id"
+        ]
+        if disclosed_roles:
+            user_id = disclosed_roles[0]
+            if (
+                user_id == forged_user_id
+                and user_role_id != forged_role_id
+            ):
+                self.has_policeman_been_deceived = True
+                self.all_roles[Policeman.role_id].temporary_roles[
+                    forged_user_id
+                ] = forged_role_id
 
         checked = game_data.get("checked_for_the_same_groups", [])
         if len(checked) != 2:
             return
-        processed_user_id = forged_roles[0]
-        index = None
-        for ind, (user_id, _) in enumerate(checked):
-            if user_id == processed_user_id:
-                index = ind
-                break
-        if index is not None:
-            checked_role = checked[index][1]
-            forged_role = forged_roles[1]
-            if (
-                self.all_roles[checked_role].grouping
-                != self.all_roles[forged_role].grouping
-            ):
-                self.has_warden_been_deceived = True
-                self.all_roles["warden"].was_deceived = True
-                checked[index] = [forged_roles[0], forged_roles[1]]
+        if (
+            forged_user_id in checked
+            and self.all_roles[user_role_id].grouping
+            != self.all_roles[forged_role_id].grouping
+        ):
+            self.has_warden_been_deceived = True
+            self.all_roles[Warden.role_id].temporary_roles[
+                forged_user_id
+            ] = forged_role_id
 
     async def accrual_of_overnight_rewards(
         self, game_data: GameCache, victims: set[int], **kwargs
     ):
         from .policeman import Policeman
-        from mafia.roles.warden import Warden
+        from .warden import Warden
 
         deceived_users = []
         if self.has_policeman_been_deceived:
@@ -88,6 +90,7 @@ class Forger(
             url = game_data["players"][str(policeman)]["url"]
             money = 14
             deceived_users.append([url, money, Policeman()])
+
         if self.has_warden_been_deceived:
             warden = game_data[Warden.roles_key][0]
             url = game_data["players"][str(warden)]["url"]

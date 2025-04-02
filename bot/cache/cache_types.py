@@ -92,8 +92,9 @@ TrackingData: TypeAlias = dict[UserIdStr, InteractionData]
 NumberOfNight: TypeAlias = int
 
 LastInteraction: TypeAlias = dict[UserIdStr, list[NumberOfNight]]
-DisclosedRoles = list[UserIdInt | RolesLiteral]
+DisclosedRoles = list[UserIdInt]
 VotedFor: TypeAlias = list[list[UserIdInt]]
+ForgedRoles: TypeAlias = list[UserIdInt | RolesLiteral]
 
 
 class OwnerCache(TypedDict):
@@ -108,9 +109,9 @@ UsersMoney = list[UserAndMoney]
 
 RolesAndUsersMoney = dict[RolesLiteral, UsersMoney]
 RoleAndUserMoney = dict[RolesLiteral, UserAndMoney]
-CheckedForTheSameGroups: TypeAlias = list[
-    list[UserIdInt | RolesLiteral]
-]
+# CheckedForTheSameGroups: TypeAlias = list[
+#     list[UserIdInt | RolesLiteral]
+# ]
 
 
 class UserCache(TypedDict, total=False):
@@ -126,8 +127,8 @@ class GameCache(TypedDict, total=False):
     start_message_id: int
     messages_after_night: MessagesAfterNight
     disclosed_roles: DisclosedRoles
-    forged_roles: DisclosedRoles
-    checked_for_the_same_groups: CheckedForTheSameGroups
+    forged_roles: ForgedRoles
+    checked_for_the_same_groups: DisclosedRoles
     deceived: PlayersIds
     poisoned: list[list[UserIdInt] | int]
     pros: PlayersIds

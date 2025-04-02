@@ -18,6 +18,7 @@ class Werewolf(ProcedureAfterNight, ActiveRoleAtNight):
     mail_message = "Реши, в кого сегодня превратишься!"
     payment_for_treatment = 11
     payment_for_murder = 12
+    number_in_order_after_night = 0
     number_of_night_for_transformation = 2
 
     async def procedure_after_night(
