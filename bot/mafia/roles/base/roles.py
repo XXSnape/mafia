@@ -389,9 +389,10 @@ class ActiveRoleAtNight(Role):
         self, game_data: GameCache, suffer_id: int
     ):
         if self.notification_message:
-            game_data["messages_after_night"].remove(
-                [suffer_id, self.notification_message]
-            )
+            with suppress(ValueError):
+                game_data["messages_after_night"].remove(
+                    [suffer_id, self.notification_message]
+                )
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
         suffers = (

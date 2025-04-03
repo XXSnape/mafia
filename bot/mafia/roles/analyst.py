@@ -49,6 +49,14 @@ class Analyst(ProcedureAfterVoting, ActiveRoleAtNight):
             extra_buttons=extra_buttons,
         )
 
+    def cancel_actions(self, game_data: GameCache, user_id: int):
+        if self.get_processed_user_id(game_data) == 0:
+            game_data[self.processed_users_key].clear()
+            return True
+        return super().cancel_actions(
+            game_data=game_data, user_id=user_id
+        )
+
     def get_money_for_victory_and_nights(
         self,
         game_data: GameCache,
