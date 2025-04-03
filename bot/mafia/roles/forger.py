@@ -1,5 +1,5 @@
 from cache.cache_types import ExtraCache, GameCache
-from constants.output import ROLE_IS_KNOWN
+from general.text import ROLE_IS_KNOWN
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNight
 from mafia.roles.base.mixins import (

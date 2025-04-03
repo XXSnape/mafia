@@ -1,5 +1,6 @@
 import asyncio
 from collections import defaultdict
+from collections.abc import Iterable
 from typing import TYPE_CHECKING
 
 from aiogram import Bot
@@ -11,7 +12,7 @@ from cache.cache_types import (
     UsersInGame,
     LivePlayersIds,
 )
-from constants.output import MONEY_SYM, NUMBER_OF_NIGHT
+from general.text import MONEY_SYM, NUMBER_OF_NIGHT
 from general.groupings import Groupings
 from keyboards.inline.callback_factory.recognize_user import (
     UserVoteIndexCbData,
@@ -260,6 +261,22 @@ async def send_request_to_vote(
         ),
     )
     game_data["to_delete"].append([user_id, sent_message.message_id])
+
+
+async def send_a_lot_of_messages_safely(
+    bot: Bot,
+    users: list[UserIdInt],
+    text: str,
+    exclude: Iterable[UserIdInt] = (),
+):
+    await asyncio.gather(
+        *(
+            bot.send_message(chat_id=user_id, text=text)
+            for user_id in users
+            if user_id not in exclude
+        ),
+        return_exceptions=True,
+    )
 
 
 def remind_worden_about_inspections(game_data: GameCache):

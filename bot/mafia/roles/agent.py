@@ -4,6 +4,7 @@ from cache.cache_types import ExtraCache, GameCache
 from mafia.roles.base import ActiveRoleAtNight, Role
 from mafia.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
+from utils.informing import send_a_lot_of_messages_safely
 from utils.roles import (
     get_processed_user_id_if_exists,
     get_processed_role_and_user_if_exists,
@@ -40,17 +41,13 @@ class Agent(ProcedureAfterNight, ActiveRoleAtNight):
         user_url = game_data["players"][str(processed_user_id)][
             "url"
         ]
-        message = (
+        text = (
             f"{user_url} cегодня ни к кому не ходил"
             if not visitors
             else f"{user_url} навещал: {visitors}"
         )
-        await asyncio.gather(
-            *(
-                self.bot.send_message(chat_id=user_id, text=message)
-                for user_id in game_data[self.roles_key]
-            ),
-            return_exceptions=True,
+        await send_a_lot_of_messages_safely(
+            bot=self.bot, users=game_data[self.roles_key], text=text
         )
 
     @get_processed_role_and_user_if_exists

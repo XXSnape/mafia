@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from cache.cache_types import GameCache, UserIdStr, UserIdInt
-from constants.output import ATTEMPT_TO_KILL
+from general.text import ATTEMPT_TO_KILL
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNight
 

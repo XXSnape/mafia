@@ -1,6 +1,6 @@
 import asyncio
 
-from constants.output import NUMBER_OF_NIGHT
+from general.text import NUMBER_OF_NIGHT
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )

@@ -8,7 +8,7 @@ from database.schemas.games import EndOfGameSchema
 from database.schemas.results import PersonalResultSchema
 from tasks.dependencies import SessionWithCommitDep
 
-from constants.output import MONEY_SYM
+from general.text import MONEY_SYM
 from database.dao.rates import RatesDao
 from database.dao.users import UsersDao
 from database.schemas.bids import (
@@ -72,7 +72,8 @@ async def report_role_outside_game(bids: list[BidForRoleSchema]):
         *[
             bot.send_message(chat_id=user_id, text=message)
             for user_id, message in messages
-        ]
+        ],
+        return_exceptions=True,
     )
 
 

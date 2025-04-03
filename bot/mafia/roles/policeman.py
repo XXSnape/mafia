@@ -1,11 +1,9 @@
-import asyncio
-
 from aiogram.types import InlineKeyboardButton
 
 from cache.cache_types import ExtraCache, GameCache, UserIdInt
 
 from general.groupings import Groupings
-from constants.output import ROLE_IS_KNOWN, ATTEMPT_TO_KILL
+from general.text import ROLE_IS_KNOWN, ATTEMPT_TO_KILL
 from keyboards.inline.keypads.mailing import (
     kill_or_check_on_policeman,
 )
@@ -16,7 +14,10 @@ from mafia.roles.base import (
 from mafia.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
 from utils.pretty_text import make_pretty
-from utils.informing import remind_commissioner_about_inspections
+from utils.informing import (
+    remind_commissioner_about_inspections,
+    send_a_lot_of_messages_safely,
+)
 from utils.roles import (
     get_user_role_and_url,
 )
@@ -113,14 +114,10 @@ class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
             )
             role = make_pretty(self.all_roles[user_role_id].role)
             text = f"🌃Ночь {game_data['number_of_night']}\n{url} - {role}!"
-            await asyncio.gather(
-                *(
-                    self.bot.send_message(
-                        chat_id=policeman_id, text=text
-                    )
-                    for policeman_id in game_data[self.roles_key]
-                ),
-                return_exceptions=True,
+            await send_a_lot_of_messages_safely(
+                bot=self.bot,
+                users=game_data[self.roles_key],
+                text=text,
             )
             game_data["text_about_checks"] += text + "\n\n"
         else:

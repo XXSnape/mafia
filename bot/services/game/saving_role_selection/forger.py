@@ -1,4 +1,3 @@
-from constants.output import NUMBER_OF_NIGHT
 from general.collection_of_roles import get_data_with_roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
@@ -10,9 +9,8 @@ from services.game.actions_at_night import (
     get_game_state_and_data,
     trace_all_actions,
 )
-from mafia.roles import Forger, Policeman, PolicemanAlias
-from utils.tg import delete_message
-from utils.pretty_text import make_pretty, make_build
+from mafia.roles import Forger
+from utils.pretty_text import make_pretty
 
 
 class ForgerSaver(RouterHelper):

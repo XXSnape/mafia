@@ -17,7 +17,7 @@ from cache.cache_types import (
     UserGameCache,
     RolesLiteral,
 )
-from constants.output import MONEY_SYM
+from general.text import MONEY_SYM
 from database.schemas.results import PersonalResultSchema
 from general.groupings import Groupings
 from keyboards.inline.keypads.mailing import (
@@ -29,7 +29,10 @@ from utils.pretty_text import (
     make_build,
 )
 from utils.common import get_the_most_frequently_encountered_id
-from utils.informing import get_profiles
+from utils.informing import (
+    get_profiles,
+    send_a_lot_of_messages_safely,
+)
 from utils.state import get_state_and_assign
 
 
@@ -93,16 +96,13 @@ class Role(ABC):
             players=game_data["players"],
             role=True,
         )
-        tasks = [
-            self.bot.send_message(
-                chat_id=player_id,
-                text=f"Погиб {role} {url}.\n\n"
-                f"Новый {role} - {new_boss_url}\n\n"
-                f"Текущие союзники:\n{profiles}",
-            )
-            for player_id in players
-        ]
-        await asyncio.gather(*tasks, return_exceptions=True)
+        await send_a_lot_of_messages_safely(
+            bot=self.bot,
+            users=players,
+            text=f"❗️❗️❗️Погиб {role} {url}.\n\n"
+            f"Новый {role} - {new_boss_url}\n\n"
+            f"Текущие союзники:\n{profiles}",
+        )
 
     @classmethod
     @property
@@ -328,15 +328,14 @@ class AliasRole(ABC):
             players=game_data["players"],
             role=True,
         )
-        tasks = [
-            self.bot.send_message(
-                chat_id=alias_id,
-                text=f"Погиб {role} {url}.\n\n"
-                f"Текущие союзники:\n{profiles}",
-            )
-            for alias_id in game_data[self.roles_key]
-        ]
-        await asyncio.gather(*tasks, return_exceptions=True)
+        text = (
+            f"❗️Погиб {role} {url}.\n\nТекущие союзники:\n{profiles}"
+        )
+        await send_a_lot_of_messages_safely(
+            bot=self.bot,
+            users=game_data[self.roles_key],
+            text=text,
+        )
 
     @classmethod
     @property
@@ -555,15 +554,10 @@ class ActiveRoleAtNight(Role):
         )
         if general_text is not None:
             text = make_build(general_text)
-            await asyncio.gather(
-                *(
-                    self.bot.send_message(
-                        chat_id=user_id,
-                        text=text,
-                    )
-                    for user_id in roles
-                ),
-                return_exceptions=True,
+            await send_a_lot_of_messages_safely(
+                bot=self.bot,
+                users=roles,
+                text=text,
             )
 
         await self.send_survey(

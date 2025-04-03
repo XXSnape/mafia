@@ -1,6 +1,4 @@
-import asyncio
-
-from constants.output import ROLE_IS_KNOWN, NUMBER_OF_NIGHT
+from general.text import ROLE_IS_KNOWN, NUMBER_OF_NIGHT
 from keyboards.inline.buttons.common import BACK_BTN
 from keyboards.inline.callback_factory.recognize_user import (
     police_kill_cb_data,
@@ -24,7 +22,7 @@ from services.game.actions_at_night import (
 )
 from utils.common import save_notification_message
 from mafia.roles import Policeman
-from utils.pretty_text import make_build
+from utils.informing import send_a_lot_of_messages_safely
 from utils.tg import delete_message
 
 
@@ -113,18 +111,14 @@ class PolicemanSaver(RouterHelper):
             need_to_save_notification_message=False,
         )
         await game_state.set_data(game_data)
-        await asyncio.gather(
-            *(
-                self.callback.bot.send_message(
-                    chat_id=policeman_id,
-                    text=NUMBER_OF_NIGHT.format(
-                        game_data["number_of_night"]
-                    )
-                    + f"{game_data['players'][str(self.callback.from_user.id)]['pretty_role']} "
-                    f"{game_data['players'][str(self.callback.from_user.id)]['url']} "
-                    f"решил проверить {url}",
-                )
-                for policeman_id in game_data[Policeman.roles_key]
-            ),
-            return_exceptions=True,
+        text = NUMBER_OF_NIGHT.format(
+            game_data["number_of_night"]
+        ) + (
+            f"🔍{game_data['players'][str(self.callback.from_user.id)]['pretty_role']} "
+            f"{game_data['players'][str(self.callback.from_user.id)]['url']} принял решение проверить роль {url}"
+        )
+        await send_a_lot_of_messages_safely(
+            bot=self.callback.bot,
+            text=text,
+            users=game_data[Policeman.roles_key],
         )

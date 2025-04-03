@@ -1,5 +1,5 @@
 from cache.cache_types import GameCache
-from constants.output import ATTEMPT_TO_KILL
+from general.text import ATTEMPT_TO_KILL
 from utils.common import save_notification_message
 from mafia.roles.base.roles import Role
 from general.groupings import Groupings

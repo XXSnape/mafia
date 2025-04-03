@@ -2,7 +2,7 @@ from cache.cache_types import GameCache, ExtraCache
 from mafia.roles.base.mixins import ProcedureAfterNight
 from mafia.roles.base.roles import Role
 from general.groupings import Groupings
-from constants.output import ROLE_IS_KNOWN
+from general.text import ROLE_IS_KNOWN
 from mafia.roles.base import ActiveRoleAtNight
 from states.states import UserFsm
 from utils.roles import get_processed_role_and_user_if_exists

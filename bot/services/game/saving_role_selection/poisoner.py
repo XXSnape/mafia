@@ -1,4 +1,4 @@
-from constants.output import NUMBER_OF_NIGHT, ATTEMPT_TO_KILL
+from general.text import ATTEMPT_TO_KILL
 from keyboards.inline.buttons.common import BACK_BTN
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
@@ -16,7 +16,6 @@ from services.game.actions_at_night import (
 from utils.common import save_notification_message
 from mafia.roles import Poisoner
 from states.states import UserFsm
-from utils.tg import delete_message
 
 
 class PoisonerSaver(RouterHelper):

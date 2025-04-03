@@ -1,5 +1,3 @@
-import asyncio
-
 from aiogram.types import InlineKeyboardButton
 
 from cache.cache_types import (
@@ -7,12 +5,15 @@ from cache.cache_types import (
     GameCache,
     DisclosedRoles,
 )
-from constants.output import ROLE_IS_KNOWN
+from general.text import ROLE_IS_KNOWN
 from keyboards.inline.keypads.mailing import selection_to_warden_kb
 from mafia.roles.base import ActiveRoleAtNight
 from mafia.roles.base.mixins import ProcedureAfterNight
 from states.states import UserFsm
-from utils.informing import remind_worden_about_inspections
+from utils.informing import (
+    remind_worden_about_inspections,
+    send_a_lot_of_messages_safely,
+)
 from utils.pretty_text import make_pretty
 
 
@@ -94,14 +95,10 @@ class Warden(ProcedureAfterNight, ActiveRoleAtNight):
             common_text += "одной группировке!✅"
         else:
             common_text += "разных группировках!🚫"
-        await asyncio.gather(
-            *(
-                self.bot.send_message(
-                    chat_id=warden_id, text=common_text
-                )
-                for warden_id in game_data[self.roles_key]
-            ),
-            return_exceptions=True,
+        await send_a_lot_of_messages_safely(
+            bot=self.bot,
+            users=game_data[self.roles_key],
+            text=common_text,
         )
         game_data["text_about_checked_for_the_same_groups"] += (
             common_text + "\n\n"

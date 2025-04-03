@@ -18,7 +18,7 @@ from cache.cache_types import (
     RolesLiteral,
     RolesAndUsersMoney,
 )
-from constants.output import MONEY_SYM
+from general.text import MONEY_SYM
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.dao.users import UsersDao

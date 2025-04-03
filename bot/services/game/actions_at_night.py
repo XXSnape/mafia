@@ -1,12 +1,9 @@
-import asyncio
-
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
-from pydantic.v1 import NoneIsNotAllowedError
 
 from cache.cache_types import GameCache, UserCache, UserIdInt
-from constants.output import NUMBER_OF_NIGHT
+from general.text import NUMBER_OF_NIGHT
 from general.collection_of_roles import get_data_with_roles
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
@@ -14,6 +11,7 @@ from keyboards.inline.callback_factory.recognize_user import (
 from mafia.roles import Hacker, Mafia
 from mafia.roles import Role, ActiveRoleAtNight
 from utils.common import save_notification_message
+from utils.informing import send_a_lot_of_messages_safely
 from utils.pretty_text import make_build
 from utils.tg import delete_message
 from utils.state import get_state_and_assign
@@ -110,32 +108,23 @@ async def inform_aliases(
         pretty_role = game_data["players"][
             str(callback.from_user.id)
         ]["pretty_role"]
-        message = make_build(
+        text = make_build(
             NUMBER_OF_NIGHT.format(game_data["number_of_night"])
             + f"{pretty_role} {current_url} выбрал {url}"
         )
-        await asyncio.gather(
-            *(
-                callback.bot.send_message(
-                    chat_id=alias_id, text=message
-                )
-                for alias_id in game_data[current_role.roles_key]
-                if alias_id != callback.from_user.id
-            ),
-            return_exceptions=True,
+        await send_a_lot_of_messages_safely(
+            bot=callback.bot,
+            users=game_data[current_role.roles_key],
+            text=text,
+            exclude=[callback.from_user.id],
         )
         if callback.from_user.id in game_data[
             Mafia.roles_key
         ] and game_data.get(Hacker.roles_key):
-            await asyncio.gather(
-                *(
-                    callback.bot.send_message(
-                        chat_id=hacker_id,
-                        text=f"{pretty_role} ??? выбрал {url}",
-                    )
-                    for hacker_id in game_data[Hacker.roles_key]
-                ),
-                return_exceptions=True,
+            await send_a_lot_of_messages_safely(
+                bot=callback.bot,
+                users=game_data[Hacker.roles_key],
+                text=f"{pretty_role} ??? выбрал {url}",
             )
 
 

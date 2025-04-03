@@ -18,7 +18,7 @@ from cache.cache_types import (
     RoleAndUserMoney,
     UserIdStr,
 )
-from constants.output import MONEY_SYM
+from general.text import MONEY_SYM
 from database.dao.games import GamesDao
 from database.schemas.bids import (
     BidForRoleSchema,

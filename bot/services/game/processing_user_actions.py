@@ -12,6 +12,7 @@ from services.game.actions_at_night import (
     get_game_state_data_and_user_id,
 )
 from mafia.roles import Hacker, Mafia
+from utils.informing import send_a_lot_of_messages_safely
 from utils.tg import delete_message
 from utils.pretty_text import make_build
 
@@ -53,29 +54,19 @@ class UserManager(RouterHelper):
         aliases = game_data["players"][
             str(self.message.from_user.id)
         ]["roles_key"]
-        await asyncio.gather(
-            *(
-                self.message.bot.send_message(
-                    chat_id=player_id,
-                    text=f"{role} {url} передает:\n\n{self.message.text}",
-                )
-                for player_id in game_data[aliases]
-                if player_id != self.message.from_user.id
-            ),
-            return_exceptions=True,
+        await send_a_lot_of_messages_safely(
+            bot=self.message.bot,
+            users=game_data[aliases],
+            text=f"{role} {url} передает:\n\n{self.message.text}",
+            exclude=[self.message.from_user.id],
         )
         if self.message.from_user.id in game_data[
             Mafia.roles_key
         ] and game_data.get(Hacker.roles_key):
-            await asyncio.gather(
-                *(
-                    self.message.bot.send_message(
-                        chat_id=hacker_id,
-                        text=f"{role} ??? передает:\n\n{self.message.text}",
-                    )
-                    for hacker_id in game_data[Hacker.roles_key]
-                ),
-                return_exceptions=True,
+            await send_a_lot_of_messages_safely(
+                bot=self.message.bot,
+                text=f"{role} ??? передает:\n\n{self.message.text}",
+                users=game_data[Hacker.roles_key],
             )
         if len(game_data[aliases]) > 1:
             await self.message.answer(
