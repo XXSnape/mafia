@@ -53,7 +53,7 @@ class Role(ABC):
 
     payment_for_treatment = 5
     payment_for_murder = 5
-    payment_for_night_spent = 2
+    payment_for_night_spent = 4
 
     is_alias: bool = False
 

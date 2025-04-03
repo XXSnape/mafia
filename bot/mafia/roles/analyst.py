@@ -17,6 +17,7 @@ class Analyst(ProcedureAfterVoting, ActiveRoleAtNight):
     do_not_choose_others = 0
     do_not_choose_self = 0
     is_self_selecting = True
+    need_to_monitor_interaction = False
     mail_message = "Кого повесят сегодня днём?"
     message_to_group_after_action = (
         "Составляется прогноз на завтрашний день"

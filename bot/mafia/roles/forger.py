@@ -34,10 +34,11 @@ class Forger(
     do_not_choose_others = 2
     mail_message = "Кому сегодня подделаешь документы?"
     extra_data = [ExtraCache(key="forged_roles")]
+    need_to_monitor_interaction = False
     is_self_selecting = True
     notification_message = ROLE_IS_KNOWN
     payment_for_treatment = 0
-    payment_for_murder = 11
+    payment_for_murder = 16
     number_in_order_after_voting = 2
 
     async def procedure_after_night(
