@@ -44,10 +44,11 @@ class Bodyguard(ProcedureAfterNight, ActiveRoleAtNight):
         recovered_id = self.get_processed_user_id(game_data)
         if not recovered_id:
             return
-        if recovered_id in recovered:
-            return
-        if recovered_id in murdered:
-            recovered.append(recovered_id)
+        recovered.append(recovered_id)
+        if (
+            recovered_id in murdered
+            and recovered.count(recovered_id) == 1
+        ):
             saver_id = game_data[self.roles_key][0]
             murdered.append(saver_id)
             for role in killers_of[recovered_id]:
@@ -71,7 +72,7 @@ class Bodyguard(ProcedureAfterNight, ActiveRoleAtNight):
     ):
         if (processed_user_id not in murdered) or (
             processed_user_id in murdered
-            and game_data[self.roles_key][0] in recovered
+            and recovered.count(processed_user_id) > 1
         ):
             return
         if processed_role.grouping != Groupings.civilians:

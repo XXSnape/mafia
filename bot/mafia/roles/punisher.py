@@ -23,7 +23,7 @@ class Punisher(ProcedureAfterNight, Role):
         game_data: GameCache,
         recovered: list[int],
         murdered: list[int],
-        killers_of: dict[UserIdInt, list[ActiveRoleAtNight]],
+        killers_of: dict[UserIdInt, list[Role]],
         **kwargs
     ):
         punishers = game_data.get(self.roles_key)
@@ -42,7 +42,7 @@ class Punisher(ProcedureAfterNight, Role):
             if treated_by_bodyguard == killer_id:
                 print("treated_by_bodyguard")
                 print(recovered.count(killer_id))
-                if recovered.count(killer_id) == 0:
+                if recovered.count(killer_id) == 1:
                     killed_py_punisher.add(
                         game_data[Bodyguard.roles_key][0]
                     )
@@ -52,20 +52,23 @@ class Punisher(ProcedureAfterNight, Role):
                             Bodyguard(),
                         ]
                     )
+
                 else:
                     continue
             else:
                 killed_py_punisher.add(killer_id)
                 self.killed.append([killer_id, current_role])
-
-        game_data["messages_after_night"].append(
-            [
-                punisher_id,
-                "Все нарушители твоего покоя будут наказаны!",
-            ]
-        )
-        print("mur", list(killed_py_punisher))
-        murdered.extend(list(killed_py_punisher))
+        if killed_py_punisher:
+            game_data["messages_after_night"].append(
+                [
+                    punisher_id,
+                    "Ты наказал нарушителей твоего покоя!",
+                ]
+            )
+            for user_id in killed_py_punisher:
+                killers_of[user_id].append(self)
+            print("mur", list(killed_py_punisher))
+            murdered.extend(list(killed_py_punisher))
 
     async def accrual_of_overnight_rewards(
         self, game_data: GameCache, victims: set[int], **kwargs

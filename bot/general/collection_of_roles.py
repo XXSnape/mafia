@@ -60,6 +60,7 @@ BASES_ROLES = [
     roles.Bodyguard.role_id,
     roles.Doctor.role_id,
     roles.Mafia.role_id,
+    roles.Killer.role_id,
     # roles.MafiaAlias.role_id,
     # roles.Werewolf.role_id,
     # roles.Mafia.role_id,
