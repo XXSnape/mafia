@@ -115,9 +115,9 @@ class Poisoner(
         if game_data["poisoned"]:
             if game_data["poisoned"][1] == 1:
                 game_data["poisoned"][1] = 0
-            else:
-                if self.get_processed_user_id(game_data):
-                    game_data["poisoned"][0].pop()
+                return True
+            if self.get_processed_user_id(game_data):
+                game_data["poisoned"][0].pop()
             return super().cancel_actions(
                 game_data=game_data, user_id=user_id
             )
