@@ -398,28 +398,33 @@ class ActiveRoleAtNight(Role):
             game_data["tracking"]
             .get(str(user_id), {})
             .get("sufferers", [])
-        )
+        )[:]
         if not suffers:
             return False
         for suffer in suffers:
+            self.deleting_notification_messages(
+                game_data=game_data, suffer_id=suffer
+            )
             if (
                 self.processed_users_key
                 and suffer in game_data[self.processed_users_key]
             ):
                 game_data[self.processed_users_key].remove(suffer)
-            self.deleting_notification_messages(
-                game_data=game_data, suffer_id=suffer
-            )
             with suppress(KeyError, ValueError):
                 game_data["tracking"][str(suffer)][
                     "interacting"
                 ].remove(user_id)
+            with suppress(KeyError, ValueError):
+                game_data["tracking"][str(user_id)][
+                    "sufferers"
+                ].remove(suffer)
 
         if (
             self.processed_by_boss
             and user_id == game_data[self.roles_key][0]
         ):
             game_data[self.processed_by_boss].clear()
+
         if self.last_interactive_key:
             data: LastInteraction = game_data[
                 self.last_interactive_key

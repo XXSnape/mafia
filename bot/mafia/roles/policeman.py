@@ -129,12 +129,21 @@ class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
                 killers_of[processed_user_id].append(self)
                 murdered.append(processed_user_id)
 
-    def cancel_actions(self, game_data: GameCache, user_id: int):
-        if game_data["disclosed_roles"]:
+    def deleting_notification_messages(
+        self, game_data: GameCache, suffer_id: int
+    ):
+
+        if not self.get_processed_user_id(game_data):
             game_data["messages_after_night"].remove(
-                [game_data["disclosed_roles"][0], ROLE_IS_KNOWN]
+                [suffer_id, ROLE_IS_KNOWN]
             )
-            game_data["disclosed_roles"].clear()
+            return
+        return super().deleting_notification_messages(
+            game_data=game_data, suffer_id=suffer_id
+        )
+
+    def cancel_actions(self, game_data: GameCache, user_id: int):
+        game_data["disclosed_roles"].clear()
         return super().cancel_actions(
             game_data=game_data, user_id=user_id
         )
