@@ -35,6 +35,9 @@ class Traitor(ProcedureAfterNight, ActiveRoleAtNight):
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.TRAITOR_FINDS_OUT
 
+    def cancel_actions(self, **kwargs):
+        return False
+
     async def procedure_after_night(self, **kwargs):
         pass
 

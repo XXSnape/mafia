@@ -37,6 +37,7 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
         self.state_for_waiting_for_action = (
             UserFsm.CLOFFELINE_GIRL_PUTS_TO_SLEEP
         )
+        self.was_euthanized: bool = False
 
     @get_processed_user_id_if_exists
     async def procedure_after_night(
@@ -52,6 +53,7 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
             game_data=game_data, user_id=processed_user_id
         )
         if send_message:
+            self.was_euthanized = True
             with suppress(TelegramBadRequest):
                 await self.bot.send_message(
                     chat_id=processed_user_id,
@@ -69,9 +71,9 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
         processed_user_id: int,
         **kwargs
     ):
-        if (
-            isinstance(processed_role, ActiveRoleAtNight) is False
-        ) or processed_role.grouping == Groupings.civilians:
+        if self.was_euthanized is False:
+            return
+        if processed_role.grouping == Groupings.civilians:
             money = 0
         else:
             money = int(processed_role.payment_for_murder * 1.5)
@@ -82,3 +84,4 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
             processed_role=processed_role,
             beginning_message="Усыпление",
         )
+        self.was_euthanized = False
