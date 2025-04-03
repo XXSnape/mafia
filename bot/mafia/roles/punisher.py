@@ -34,7 +34,10 @@ class Punisher(ProcedureAfterNight, Role):
         if punisher_id not in set(murdered) - set(recovered):
             return
         for current_role in killers_of[punisher_id]:
-            killer_id = game_data[current_role.roles_key][0]
+            killers = game_data[current_role.roles_key]
+            if not killers:
+                continue
+            killer_id = killers[0]
 
             treated_by_bodyguard = Bodyguard().get_processed_user_id(
                 game_data
@@ -57,7 +60,7 @@ class Punisher(ProcedureAfterNight, Role):
         game_data["messages_after_night"].append(
             [
                 punisher_id,
-                "Ты накажешь нарушителей твоего покоя!",
+                "Ты накажешь нарушителей своего покоя!",
             ]
         )
         for user_id in killed_py_punisher:
