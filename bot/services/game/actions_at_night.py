@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
@@ -17,14 +19,18 @@ from utils.tg import delete_message
 from utils.state import get_state_and_assign
 
 
-async def send_messages_to_group_and_user(
+async def send_messages_and_remove_from_expected(
     callback: CallbackQuery,
     game_data: GameCache,
     message_to_user: bool | str = True,
     message_to_group: bool | str = True,
     user_id: int | None = None,
     current_role: ActiveRoleAtNight | None = None,
+    need_to_remove_from_expected: bool = True,
 ):
+    if need_to_remove_from_expected:
+        with suppress(ValueError):
+            game_data["wait_for"].remove(callback.from_user.id)
     message_to_group_after_action = None
     if isinstance(message_to_group, str):
         message_to_group_after_action = message_to_group
@@ -63,6 +69,7 @@ async def trace_all_actions(
     message_to_group: bool | str = True,
     message_to_user: bool | str = True,
     need_to_save_notification_message: bool = True,
+    need_to_remove_from_expected: bool = True,
 ):
     suffer_tracking = game_data["tracking"].setdefault(
         str(callback.from_user.id), {}
@@ -75,13 +82,14 @@ async def trace_all_actions(
     )
     interacting = interacting_tracking.setdefault("interacting", [])
     interacting.append(callback.from_user.id)
-    await send_messages_to_group_and_user(
+    await send_messages_and_remove_from_expected(
         callback=callback,
         game_data=game_data,
         message_to_user=message_to_user,
         message_to_group=message_to_group,
         user_id=user_id,
         current_role=current_role,
+        need_to_remove_from_expected=need_to_remove_from_expected,
     )
     if (
         need_to_save_notification_message

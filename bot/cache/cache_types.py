@@ -125,6 +125,7 @@ class GameCache(TypedDict, total=False):
     bids: RolesAndUsersMoney
     game_chat: int
     start_message_id: int
+    wait_for: PlayersIds
     messages_after_night: MessagesAfterNight
     disclosed_roles: DisclosedRoles
     forged_roles: ForgedRoles

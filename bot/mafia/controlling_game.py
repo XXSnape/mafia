@@ -325,18 +325,23 @@ class Controller:
         return True
 
     async def remove_user_from_game(
-        self, game_data: GameCache, user_id: int, at_night: bool
+        self,
+        game_data: GameCache,
+        user_id: int,
+        at_night: bool | None,
     ):
         user_role = game_data["players"][str(user_id)]["role_id"]
         role: Role = self.all_roles[user_role]
-        if at_night:
+        if at_night is True:
             await get_state_and_assign(
                 dispatcher=self.dispatcher,
                 chat_id=user_id,
                 bot_id=self.bot.id,
                 new_state=UserFsm.WAIT_FOR_LATEST_LETTER,
             )
-        elif role.clearing_state_after_death:
+        elif at_night is None or (
+            at_night is False and role.clearing_state_after_death
+        ):
             await reset_user_state(
                 dispatcher=self.dispatcher,
                 user_id=user_id,
@@ -406,6 +411,50 @@ class Controller:
         )
         await self.state.set_data(game_data)
 
+    @check_end_of_game
+    async def removing_inactive_players(self):
+        game_data: GameCache = await self.state.get_data()
+        wait_for = game_data["wait_for"]
+        potentially_deleted = set()
+        inactive_users = []
+        for user_id in wait_for:
+            if user_id not in game_data["live_players_ids"]:
+                continue
+            if user_id in potentially_deleted:
+                inactive_users.append(user_id)
+            else:
+                potentially_deleted.add(user_id)
+        if not inactive_users:
+            return
+        wait_for[:] = list(
+            user_id
+            for user_id in set(wait_for) - set(inactive_users)
+            if user_id in game_data["live_players_ids"]
+        )
+        profiles = get_profiles(
+            players_ids=inactive_users,
+            players=game_data["players"],
+            role=True,
+        )
+        text = f"{make_build('❗️Игроки выбывают:')}\n{profiles}"
+        await self.bot.send_photo(
+            chat_id=self.group_chat_id,
+            photo="https://media.zenfs.com/en/nerdist_761/342f5f2b17659cb424aaabef1951a1a1",
+            caption=text,
+        )
+        await asyncio.gather(
+            *(
+                self.remove_user_from_game(
+                    game_data=game_data,
+                    user_id=user_id,
+                    at_night=None,
+                )
+                for user_id in inactive_users
+            ),
+            return_exceptions=True,
+        )
+        await self.state.set_data(game_data)
+
     async def familiarize_players(self, game_data: GameCache):
         roles_tasks = []
         aliases_tasks = []
@@ -435,7 +484,7 @@ class Controller:
                 aliases_tasks.append(
                     self.bot.send_message(
                         chat_id=persons[0],
-                        text="Твои союзники!\n\n" + profiles,
+                        text="Твои союзники:\n" + profiles,
                     )
                 )
                 for user_id in persons[1:]:

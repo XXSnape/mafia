@@ -6,7 +6,7 @@ from services.base import RouterHelper
 from services.game.actions_at_night import (
     get_game_state_and_data,
     trace_all_actions,
-    send_messages_to_group_and_user,
+    send_messages_and_remove_from_expected,
 )
 from mafia.roles import Warden
 
@@ -58,10 +58,11 @@ class WardenSaver(RouterHelper):
                 message_to_group=False,
                 message_to_user=False,
                 current_role=Warden(),
+                need_to_remove_from_expected=False,
             )
         user1_url = game_data["players"][str(user1_id)]["url"]
         user2_url = game_data["players"][str(user2_id)]["url"]
-        await send_messages_to_group_and_user(
+        await send_messages_and_remove_from_expected(
             callback=self.callback,
             game_data=game_data,
             message_to_user=f"Ты решил проверить на принадлежность одной группировки {user1_url} и {user2_url}",

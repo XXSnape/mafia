@@ -164,7 +164,7 @@ class Game:
         )
         await message.pin()
         await self.controller.mailing()
-        await asyncio.sleep(30)
+        await asyncio.sleep(15)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -194,7 +194,7 @@ class Game:
             state=self.state,
         )
         await self.controller.sum_up_after_voting()
-        await asyncio.sleep(2)
+        await self.controller.removing_inactive_players()
         await self.controller.clear_data_after_all_actions()
 
     async def give_out_rewards(self, e: GameIsOver):

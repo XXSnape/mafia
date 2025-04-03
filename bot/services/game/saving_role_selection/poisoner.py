@@ -11,7 +11,7 @@ from services.base import RouterHelper
 from services.game.actions_at_night import (
     get_game_state_and_data,
     take_action_and_save_data,
-    send_messages_to_group_and_user,
+    send_messages_and_remove_from_expected,
 )
 from utils.common import save_notification_message
 from mafia.roles import Poisoner
@@ -27,7 +27,7 @@ class PoisonerSaver(RouterHelper):
         )
         poisoned = game_data["poisoned"]
         poisoned[1] = 1
-        await send_messages_to_group_and_user(
+        await send_messages_and_remove_from_expected(
             callback=self.callback,
             game_data=game_data,
             message_to_user="Ты решил всех убить!",

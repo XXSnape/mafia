@@ -490,7 +490,7 @@ class Registration(RouterHelper):
             "bids": {},
             "start_of_registration": start_of_registration,
             "end_of_registration": end_of_registration,
-            # 'wait_for': [],
+            "wait_for": [],
             "number_of_night": 0,
         }
         await self.state.set_data(game_data)

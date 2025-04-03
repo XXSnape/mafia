@@ -16,6 +16,7 @@ from cache.cache_types import (
     LastInteraction,
     UserGameCache,
     RolesLiteral,
+    UserIdInt,
 )
 from general.text import MONEY_SYM
 from database.schemas.results import PersonalResultSchema
@@ -72,6 +73,7 @@ class Role(ABC):
         self.bot = bot
         self.state = state
         self.temporary_roles = {}
+        self.dropped_out: set[UserIdInt] = set()
 
     async def boss_is_dead(
         self,
@@ -164,15 +166,17 @@ class Role(ABC):
             "number_died_at_night", count_of_nights
         )
         nights_lived_text = f"Дней и ночей прожито: {nights_lived} из {count_of_nights}"
-
-        money_for_victory, money_for_nights = (
-            self.get_money_for_victory_and_nights(
-                game_data=game_data,
-                winning_group=winning_group,
-                nights_lived=nights_lived,
-                user_id=user_id,
+        if int(user_id) in self.dropped_out:
+            money_for_victory, money_for_nights = 0, 0
+        else:
+            money_for_victory, money_for_nights = (
+                self.get_money_for_victory_and_nights(
+                    game_data=game_data,
+                    winning_group=winning_group,
+                    nights_lived=nights_lived,
+                    user_id=user_id,
+                )
             )
-        )
         if money_for_victory:
             user_data["money"] += (
                 money_for_victory + money_for_nights
@@ -296,21 +300,22 @@ class Role(ABC):
         return None
 
     async def report_death(
-        self, game_data: GameCache, at_night: bool, user_id: int
+        self,
+        game_data: GameCache,
+        at_night: bool | None,
+        user_id: int,
     ):
-        if at_night:
-            message = make_build(
-                "К сожалению, тебя убили! Отправь напоследок все, что думаешь!"
-            )
-            await self.bot.send_message(
-                chat_id=user_id,
-                text=message,
-            )
+        if at_night is True:
+            message = "К сожалению, тебя убили! Отправь напоследок все, что думаешь!"
+        elif at_night is False:
+            message = "К несчастью, тебя линчевали на голосовании!"
         else:
-            message = make_build("Тебя линчевали на голосовании!")
-            await self.bot.send_message(
-                chat_id=user_id, text=message
-            )
+            message = ("😡Ты выбываешь из игры за неактивность! "
+                       "Ты проиграешь вне зависимости от былых заслуг и результатов команды.")
+            self.dropped_out.add(user_id)
+        await self.bot.send_message(
+            chat_id=user_id, text=make_build(message)
+        )
 
 
 class AliasRole(ABC):
@@ -367,17 +372,6 @@ class ActiveRoleAtNight(Role):
     do_not_choose_self: int = 1
     payment_for_treatment = 10
     payment_for_murder = 10
-
-    def get_money_if_are_not_deceived(
-        self, money: int = 9
-    ) -> tuple[str, int]:
-        additional_text = ""
-        if self.was_deceived is True:
-            money = 0
-            additional_text = " (🚫ОБМАНУТ)"
-        else:
-            money = money
-        return additional_text, money
 
     @classmethod
     @property
@@ -450,19 +444,20 @@ class ActiveRoleAtNight(Role):
             text=self.mail_message,
             reply_markup=markup,
         )
-        await self.save_msg_to_delete_and_change_state(
+        await self.save_information_about_mail_and_change_state(
             game_data=game_data,
             player_id=player_id,
             message_id=sent_survey.message_id,
         )
 
-    async def save_msg_to_delete_and_change_state(
+    async def save_information_about_mail_and_change_state(
         self,
         game_data: GameCache,
         player_id: int,
         message_id: int,
     ):
         game_data["to_delete"].append([player_id, message_id])
+        game_data["wait_for"].append(player_id)
         await get_state_and_assign(
             dispatcher=self.dispatcher,
             chat_id=player_id,
