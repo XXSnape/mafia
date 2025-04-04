@@ -121,7 +121,6 @@ class Forger(
         if not policeman:
             return game_data[self.roles_key]
 
-
     def cancel_actions(self, game_data: GameCache, user_id: int):
         if game_data["forged_roles"]:
             game_data["forged_roles"].clear()
