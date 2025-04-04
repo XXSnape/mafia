@@ -4,8 +4,8 @@ from aiogram.exceptions import TelegramBadRequest
 
 from cache.cache_types import ExtraCache, GameCache
 from general.groupings import Groupings
-from mafia.roles.base import ActiveRoleAtNight, Role
-from mafia.roles.base.mixins import ProcedureAfterNight
+from mafia.roles.base import ActiveRoleAtNightABC, RoleABC
+from mafia.roles.base.mixins import ProcedureAfterNightABC
 from states.states import UserFsm
 from utils.pretty_text import make_build
 from utils.roles import (
@@ -14,7 +14,7 @@ from utils.roles import (
 )
 
 
-class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
+class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Клофелинщица"
     role_id = "sleeper"
     mail_message = "Кого усыпить этой ночью?"
@@ -46,8 +46,8 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
         user_role = game_data["players"][str(processed_user_id)][
             "role_id"
         ]
-        role: Role = self.all_roles[user_role]
-        if isinstance(role, ActiveRoleAtNight) is False:
+        role: RoleABC = self.all_roles[user_role]
+        if isinstance(role, ActiveRoleAtNightABC) is False:
             return
         send_message = role.cancel_actions(
             game_data=game_data, user_id=processed_user_id
@@ -66,7 +66,7 @@ class Sleeper(ProcedureAfterNight, ActiveRoleAtNight):
     async def accrual_of_overnight_rewards(
         self,
         game_data: GameCache,
-        processed_role: Role,
+        processed_role: RoleABC,
         user_url: str,
         processed_user_id: int,
         **kwargs

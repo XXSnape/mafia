@@ -1,11 +1,11 @@
 from cache.cache_types import GameCache, UserIdInt
 from general.groupings import Groupings
 from mafia.roles import Bodyguard
-from mafia.roles.base import Role, ActiveRoleAtNight
-from mafia.roles.base.mixins import ProcedureAfterNight
+from mafia.roles.base import RoleABC, ActiveRoleAtNightABC
+from mafia.roles.base.mixins import ProcedureAfterNightABC
 
 
-class Punisher(ProcedureAfterNight, Role):
+class Punisher(ProcedureAfterNightABC, RoleABC):
     role = "Каратель"
     role_id = "punisher"
     photo = "https://lastfm.freetls.fastly.net/i/u/ar0/d04cdfdf3f65412bc1e7870ec6599ed7.png"
@@ -23,7 +23,7 @@ class Punisher(ProcedureAfterNight, Role):
         game_data: GameCache,
         recovered: list[int],
         murdered: list[int],
-        killers_of: dict[UserIdInt, list[Role]],
+        killers_of: dict[UserIdInt, list[RoleABC]],
         **kwargs
     ):
         punishers = game_data.get(self.roles_key)

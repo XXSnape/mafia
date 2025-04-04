@@ -1,7 +1,7 @@
-from mafia.roles.base import Role
+from mafia.roles.base import RoleABC
 
 
-class Hacker(Role):
+class Hacker(RoleABC):
     role = "Белый хакер"
     role_id = "hacker"
     photo = "https://i.pinimg.com/originals/d0/e0/b5/d0e0b5198b0ea334fa243b9afd459f6b.png"

@@ -36,16 +36,17 @@ from utils.informing import (
 )
 from utils.state import get_state_and_assign, reset_user_state
 
-from mafia.protocols.protocols import (
-    VictimsOfVote,
-)
-from mafia.roles import Mafia, Killer, Prosecutor
+from mafia.roles import Mafia, Killer, Prosecutor, Forger, Traitor
 from mafia.roles.base import (
-    AliasRole,
-    Role,
-    ActiveRoleAtNight,
+    AliasRoleABC,
+    RoleABC,
+    ActiveRoleAtNightABC,
 )
-from mafia.roles.base.mixins import ProcedureAfterNight
+from mafia.roles.base.mixins import (
+    ProcedureAfterNightABC,
+    FinalNightABC,
+    ProcedureAfterVotingABC,
+)
 
 if TYPE_CHECKING:
     from mafia.pipeline_game import Game
@@ -65,7 +66,7 @@ def check_end_of_game(async_func: Callable):
                 raise GameIsOver(winner=Groupings.killer)
         criminals_count = 0
         for role in self.all_roles:
-            current_role: Role = self.all_roles[role]
+            current_role: RoleABC = self.all_roles[role]
             if current_role.grouping == Groupings.criminals:
                 if current_role.is_alias:
                     continue
@@ -99,10 +100,11 @@ class Controller:
         self.group_chat_id = group_chat_id
         self.all_roles = {}
 
-    async def clear_data_after_all_actions(self):
+    async def end_night(self):
         game_data: GameCache = await self.state.get_data()
+        tasks = []
         for role in self.all_roles:
-            current_role: Role = self.all_roles[role]
+            current_role: RoleABC = self.all_roles[role]
             if (
                 current_role.alias
                 and current_role.alias.is_mass_mailing_list
@@ -137,6 +139,11 @@ class Controller:
                         and extra.key in game_data
                     ):
                         game_data[extra.key].clear()
+            if isinstance(current_role, FinalNightABC):
+                tasks.append(
+                    current_role.end_night(game_data=game_data)
+                )
+        await asyncio.gather(*tasks, return_exceptions=True)
         game_data["pros"].clear()
         game_data["cons"].clear()
         game_data["vote_for"].clear()
@@ -147,7 +154,9 @@ class Controller:
         return [
             self.all_roles[role]
             for role in self.all_roles
-            if isinstance(self.all_roles[role], VictimsOfVote)
+            if isinstance(
+                self.all_roles[role], ProcedureAfterVotingABC
+            )
             and self.all_roles[role].is_alias is False
         ]
 
@@ -235,10 +244,12 @@ class Controller:
     @check_end_of_game
     async def sum_up_after_night(self):
         game_data: GameCache = await self.state.get_data()
-        roles: list[ProcedureAfterNight] = [
+        roles: list[ProcedureAfterNightABC] = [
             self.all_roles[role]
             for role in self.all_roles
-            if isinstance(self.all_roles[role], ProcedureAfterNight)
+            if isinstance(
+                self.all_roles[role], ProcedureAfterNightABC
+            )
             and self.all_roles[role].is_alias is False
         ]
         roles.sort(key=attrgetter("number_in_order_after_night"))
@@ -331,7 +342,7 @@ class Controller:
         at_night: bool | None,
     ):
         user_role = game_data["players"][str(user_id)]["role_id"]
-        role: Role = self.all_roles[user_role]
+        role: RoleABC = self.all_roles[user_role]
         if at_night is True:
             await get_state_and_assign(
                 dispatcher=self.dispatcher,
@@ -364,7 +375,7 @@ class Controller:
             await role.boss_is_dead(
                 current_id=user_id, game_data=game_data
             )
-        if isinstance(role, AliasRole):
+        if isinstance(role, AliasRoleABC):
             await role.alias_is_dead(
                 current_id=user_id, game_data=game_data
             )
@@ -373,9 +384,10 @@ class Controller:
         game_data: GameCache = await self.state.get_data()
         tasks = []
         for role in self.all_roles:
-            current_role: Role = self.all_roles[role]
+            current_role: RoleABC = self.all_roles[role]
             if (
-                isinstance(current_role, ActiveRoleAtNight) is False
+                isinstance(current_role, ActiveRoleAtNightABC)
+                is False
                 or current_role.is_alias
             ):
                 continue
@@ -413,6 +425,7 @@ class Controller:
 
     @check_end_of_game
     async def removing_inactive_players(self):
+        return
         game_data: GameCache = await self.state.get_data()
         wait_for = game_data["wait_for"]
         potentially_deleted = set()
@@ -458,11 +471,20 @@ class Controller:
     async def familiarize_players(self, game_data: GameCache):
         roles_tasks = []
         aliases_tasks = []
+        to_criminals_messages = defaultdict(list)
         for user_id, player_data in game_data["players"].items():
             player_data: UserGameCache
             current_role = get_data_with_roles(
                 player_data["role_id"]
             )
+            if current_role.grouping == Groupings.criminals:
+                roles = [Mafia, Forger, Traitor]
+                for role in roles:
+                    if role.roles_key != current_role.roles_key:
+                        users = game_data.get(role.roles_key, [])
+                        to_criminals_messages[int(user_id)].extend(
+                            users
+                        )
             if current_role.is_alias:
                 continue
             persons = game_data[current_role.roles_key]
@@ -515,3 +537,18 @@ class Controller:
                     )
         await asyncio.gather(*roles_tasks, return_exceptions=True)
         await asyncio.gather(*aliases_tasks, return_exceptions=True)
+        await asyncio.gather(
+            *(
+                self.bot.send_message(
+                    chat_id=user_id,
+                    text=make_build("❗️Сокомандники:\n")
+                    + get_profiles(
+                        players_ids=teammates,
+                        players=game_data["players"],
+                        role=True,
+                    ),
+                )
+                for user_id, teammates in to_criminals_messages.items()
+            ),
+            return_exceptions=True,
+        )

@@ -2,17 +2,17 @@ from typing import overload
 
 from cache.cache_types import RolesLiteral
 from mafia import roles
-from mafia.roles import Role, ActiveRoleAtNight
+from mafia.roles import RoleABC, ActiveRoleAtNightABC
 
 
 @overload
-def get_data_with_roles() -> dict[str, Role]: ...
+def get_data_with_roles() -> dict[str, RoleABC]: ...
 
 
 @overload
 def get_data_with_roles(
     role_id: RolesLiteral,
-) -> Role | ActiveRoleAtNight: ...
+) -> RoleABC | ActiveRoleAtNightABC: ...
 
 
 def get_data_with_roles(
@@ -44,8 +44,8 @@ def get_data_with_roles(
         roles.AngelOfDeath(),
         roles.Prosecutor(),
         roles.LuckyGay(),
-        roles.DoctorAlias(),
-        roles.PolicemanAlias(),
+        roles.DoctorAliasABC(),
+        roles.PolicemanAliasABC(),
         roles.Warden(),
     ]
     all_roles = {role.role_id: role for role in roles_data}
@@ -57,10 +57,14 @@ def get_data_with_roles(
 BASES_ROLES = [
     # roles.Journalist.role_id,
     roles.Policeman.role_id,
+    roles.Traitor.role_id,
     roles.Mafia.role_id,
-    roles.MafiaAlias.role_id,
+    roles.Forger.role_id,
     roles.Doctor.role_id,
-    roles.PolicemanAlias.role_id,
+    # roles.Mafia.role_id,
+    # roles.MafiaAlias.role_id,
+    # roles.Doctor.role_id,
+    # roles.PolicemanAliasABC.role_id,
     # roles.Mafia.role_id,
     # roles.Werewolf.role_id,
     # roles.MafiaAlias.role_id,

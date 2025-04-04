@@ -1,10 +1,10 @@
 from cache.cache_types import GameCache
-from mafia.roles.base import Role
-from mafia.roles.base.mixins import ProcedureAfterVoting
+from mafia.roles.base import RoleABC
+from mafia.roles.base.mixins import ProcedureAfterVotingABC
 from utils.roles import get_user_role_and_url
 
 
-class PrimeMinister(ProcedureAfterVoting, Role):
+class PrimeMinister(ProcedureAfterVotingABC, RoleABC):
     role = "Премьер-министр"
     role_id = "prime_minister"
     photo = (
@@ -15,7 +15,7 @@ class PrimeMinister(ProcedureAfterVoting, Role):
     payment_for_treatment = 12
     payment_for_murder = 12
 
-    def get_money_for_voting(self, voted_role: Role):
+    def get_money_for_voting(self, voted_role: RoleABC):
         return super().get_money_for_voting(voted_role) * 2
 
     async def take_action_after_voting(

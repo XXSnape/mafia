@@ -3,7 +3,7 @@ from .analyst import Analyst
 from .angel_of_death import AngelOfDeath
 from .bodyguard import Bodyguard
 from .civilian import Civilian
-from .doctor import Doctor, DoctorAlias
+from .doctor import Doctor, DoctorAliasABC
 from .forger import Forger
 from .hacker import Hacker
 from .instigator import Instigator
@@ -13,7 +13,7 @@ from .lawyer import Lawyer
 from .lucky_gay import LuckyGay
 from .mafia import Mafia, MafiaAlias
 from .masochist import Masochist
-from .policeman import Policeman, PolicemanAlias
+from .policeman import Policeman, PolicemanAliasABC
 from .prime_minister import PrimeMinister
 from .prosecutor import Prosecutor
 from .punisher import Punisher
@@ -23,4 +23,4 @@ from .traitor import Traitor
 from .werewolf import Werewolf
 from .poisoner import Poisoner
 from .warden import Warden
-from .base import ActiveRoleAtNight, Role, AliasRole
+from .base import ActiveRoleAtNightABC, RoleABC, AliasRoleABC

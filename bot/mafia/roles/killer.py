@@ -1,15 +1,15 @@
 from cache.cache_types import GameCache
-from mafia.roles.base.roles import Role
+from mafia.roles.base.roles import RoleABC
 from general.groupings import Groupings
-from mafia.roles.base import ActiveRoleAtNight
+from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
-    MurderAfterNight,
+    MurderAfterNightABC,
 )
 from states.states import UserFsm
 from utils.roles import get_processed_role_and_user_if_exists
 
 
-class Killer(MurderAfterNight, ActiveRoleAtNight):
+class Killer(MurderAfterNightABC, ActiveRoleAtNightABC):
     role = "Наёмный убийца"
     role_id = "killer"
     need_to_monitor_interaction = False
@@ -36,7 +36,7 @@ class Killer(MurderAfterNight, ActiveRoleAtNight):
         self,
         game_data: GameCache,
         victims: set[int],
-        processed_role: Role,
+        processed_role: RoleABC,
         user_url: str,
         processed_user_id: int,
         **kwargs

@@ -1,11 +1,16 @@
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 from cache.cache_types import GameCache, UserIdStr, UserIdInt
 from general.text import ATTEMPT_TO_KILL
 from general.groupings import Groupings
-from mafia.roles.base import ActiveRoleAtNight
+from mafia.roles.base import ActiveRoleAtNightABC
+from utils.informing import notify_aliases_about_transformation
+from utils.pretty_text import make_pretty
 
-from utils.roles import get_processed_user_id_if_exists
+if TYPE_CHECKING:
+    from mafia.roles import RoleABC
+from utils.roles import get_processed_user_id_if_exists, change_role
 
 
 class SuicideRoleMixin:
@@ -28,7 +33,7 @@ class SuicideRoleMixin:
         return 0, 0
 
 
-class ProcedureAfterNight(ABC):
+class ProcedureAfterNightABC(ABC):
     number_in_order_after_night: int = 1
 
     @abstractmethod
@@ -44,7 +49,7 @@ class ProcedureAfterNight(ABC):
         pass
 
 
-class MurderAfterNight(ProcedureAfterNight):
+class MurderAfterNightABC(ProcedureAfterNightABC):
     notification_message = ATTEMPT_TO_KILL
 
     @get_processed_user_id_if_exists
@@ -52,14 +57,14 @@ class MurderAfterNight(ProcedureAfterNight):
         self,
         murdered: list[int],
         processed_user_id: UserIdInt,
-        killers_of: dict[UserIdInt, list[ActiveRoleAtNight]],
+        killers_of: dict[UserIdInt, list[ActiveRoleAtNightABC]],
         **kwargs,
     ):
         killers_of[processed_user_id].append(self)
         murdered.append(processed_user_id)
 
 
-class ProcedureAfterVoting(ABC):
+class ProcedureAfterVotingABC(ABC):
     number_in_order_after_voting: int = 1
 
     @abstractmethod
@@ -68,3 +73,49 @@ class ProcedureAfterVoting(ABC):
         game_data: GameCache,
         **kwargs,
     ): ...
+
+
+class FinalNightABC(ABC):
+    @abstractmethod
+    async def end_night(self, game_data: GameCache): ...
+
+
+class MafiaConverterABC(FinalNightABC):
+    @abstractmethod
+    def check_for_possibility_to_transform(
+        self, game_data: GameCache
+    ) -> list["RoleABC"] | None: ...
+
+    async def end_night(self, game_data: GameCache):
+        from mafia.roles import MafiaAlias
+
+        roles = self.check_for_possibility_to_transform(game_data)
+        if not roles:
+            return
+        user_id = roles[0]
+        if MafiaAlias.role_id not in self.all_roles:
+            mafia = MafiaAlias()
+            mafia(
+                all_roles=self.all_roles,
+                dispatcher=self.dispatcher,
+                bot=self.bot,
+                state=self.state,
+            )
+            self.all_roles[MafiaAlias.role_id] = mafia
+        change_role(
+            game_data=game_data,
+            previous_role=self,
+            new_role=MafiaAlias(),
+            user_id=user_id,
+        )
+        await notify_aliases_about_transformation(
+            game_data=game_data,
+            bot=self.bot,
+            new_role=MafiaAlias(),
+            user_id=user_id,
+        )
+        await self.bot.send_photo(
+            chat_id=game_data["game_chat"],
+            photo=MafiaAlias.photo,
+            caption=f"{make_pretty(self.role)} превращается в {make_pretty(MafiaAlias.role)}",
+        )

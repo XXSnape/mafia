@@ -29,3 +29,13 @@ def save_notification_message(
         game_data["messages_after_night"].append(
             [processed_user_id, message]
         )
+
+
+def get_criminals_ids(game_data: GameCache) -> PlayersIds:
+    from mafia.roles import Mafia, Forger, Traitor
+
+    return (
+        game_data.get(Mafia.roles_key, [])
+        + game_data.get(Forger.roles_key, [])
+        + game_data.get(Traitor.roles_key, [])
+    )

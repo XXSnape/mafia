@@ -1,5 +1,7 @@
 import asyncio
 
+from general.collection_of_roles import get_data_with_roles
+from general.groupings import Groupings
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
@@ -12,6 +14,7 @@ from services.game.actions_at_night import (
     get_game_state_data_and_user_id,
 )
 from mafia.roles import Hacker, Mafia
+from utils.common import get_criminals_ids
 from utils.informing import send_a_lot_of_messages_safely
 from utils.tg import delete_message
 from utils.pretty_text import make_build
@@ -51,27 +54,36 @@ class UserManager(RouterHelper):
         role = game_data["players"][str(self.message.from_user.id)][
             "pretty_role"
         ]
-        aliases = game_data["players"][
-            str(self.message.from_user.id)
-        ]["roles_key"]
+        current_role = get_data_with_roles(
+            game_data["players"][str(self.message.from_user.id)][
+                "role_id"
+            ]
+        )
+        criminals_ids = get_criminals_ids(game_data)
+        if current_role.grouping == Groupings.criminals:
+            aliases = criminals_ids
+        else:
+            aliases = game_data[current_role.roles_key]
+        if len(aliases) == 1:
+            return
         await send_a_lot_of_messages_safely(
             bot=self.message.bot,
-            users=game_data[aliases],
+            users=aliases,
             text=f"{role} {url} передает:\n\n{self.message.text}",
             exclude=[self.message.from_user.id],
         )
-        if self.message.from_user.id in game_data[
-            Mafia.roles_key
-        ] and game_data.get(Hacker.roles_key):
+        if (
+            self.message.from_user.id in criminals_ids
+            and game_data.get(Hacker.roles_key)
+        ):
             await send_a_lot_of_messages_safely(
                 bot=self.message.bot,
                 text=f"{role} ??? передает:\n\n{self.message.text}",
                 users=game_data[Hacker.roles_key],
             )
-        if len(game_data[aliases]) > 1:
-            await self.message.answer(
-                make_build("Сообщение успешно отправлено!")
-            )
+        await self.message.answer(
+            make_build("Сообщение успешно отправлено!")
+        )
 
     async def vote_for(self, callback_data: UserActionIndexCbData):
         game_state, game_data, voted_user_id = (

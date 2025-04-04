@@ -1,11 +1,11 @@
 from cache.cache_types import GameCache
 from mafia.roles.base.mixins import SuicideRoleMixin
 from general.groupings import Groupings
-from mafia.roles.base import Role
+from mafia.roles.base import RoleABC
 from utils.pretty_text import make_build
 
 
-class Masochist(SuicideRoleMixin, Role):
+class Masochist(SuicideRoleMixin, RoleABC):
     role = "Мазохист"
     role_id = "masochist"
     photo = "https://i.pinimg.com/736x/14/a5/f5/14a5f5eb5dbd73c4707f24d436d80c0b.jpg"

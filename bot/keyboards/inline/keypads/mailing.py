@@ -19,6 +19,7 @@ from keyboards.inline.cb.cb_text import (
     WEREWOLF_TO_POLICEMAN_CB,
     POISONER_POISONS_CB,
 )
+from utils.common import get_criminals_ids
 
 
 def send_transformation_kb(game_data: GameCache):
@@ -38,9 +39,9 @@ def send_transformation_kb(game_data: GameCache):
             text=Doctor.role, callback_data=WEREWOLF_TO_DOCTOR_CB
         ),
     ]
-    if len(game_data[Mafia.roles_key]) + 1 < (
-        len(game_data["live_players_ids"])
-        - (len(game_data[Mafia.roles_key]) + 1)
+    criminals_ids = get_criminals_ids(game_data)
+    if len(criminals_ids) + 1 < (
+        len(game_data["live_players_ids"]) - (len(criminals_ids) + 1)
     ):
         buttons.append(
             InlineKeyboardButton(

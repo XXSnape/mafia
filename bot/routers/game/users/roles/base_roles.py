@@ -20,7 +20,7 @@ router = Router(name=__name__)
         UserFsm.ANGEL_TAKES_REVENGE,
         UserFsm.BODYGUARD_PROTECTS,
         UserFsm.DOCTOR_TREATS,
-        # UserFsm.INSTIGATOR_LYING,
+        UserFsm.TRAITOR_FINDS_OUT,
         UserFsm.JOURNALIST_TAKES_INTERVIEW,
         UserFsm.KILLER_ATTACKS,
         UserFsm.LAWYER_PROTECTS,

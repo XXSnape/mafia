@@ -1,9 +1,9 @@
 import asyncio
 
 from cache.cache_types import ExtraCache, GameCache
-from mafia.roles.base.roles import Role
-from mafia.roles.base import ActiveRoleAtNight
-from mafia.roles.base.mixins import ProcedureAfterNight
+from mafia.roles.base.roles import RoleABC
+from mafia.roles.base import ActiveRoleAtNightABC
+from mafia.roles.base.mixins import ProcedureAfterNightABC
 from states.states import UserFsm
 from utils.informing import send_a_lot_of_messages_safely
 from utils.roles import (
@@ -12,7 +12,7 @@ from utils.roles import (
 )
 
 
-class Journalist(ProcedureAfterNight, ActiveRoleAtNight):
+class Journalist(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Журналист"
     role_id = "journalist"
     mail_message = "У кого взять интервью этой ночью?"
@@ -64,13 +64,13 @@ class Journalist(ProcedureAfterNight, ActiveRoleAtNight):
         game_data: GameCache,
         user_url: str,
         processed_user_id: int,
-        processed_role: Role,
+        processed_role: RoleABC,
         **kwargs,
     ):
         if self.number_of_visitors == 0:
             return
 
-        money = 5 * self.number_of_visitors
+        money = 6 * self.number_of_visitors
         self.add_money_to_all_allies(
             game_data=game_data,
             money=money,
@@ -85,3 +85,7 @@ class Journalist(ProcedureAfterNight, ActiveRoleAtNight):
             UserFsm.JOURNALIST_TAKES_INTERVIEW
         )
         self.number_of_visitors = 0
+
+    def allow_sending_mailing(self, game_data: GameCache):
+        if game_data["number_of_night"] % 2 == 0:
+            return True

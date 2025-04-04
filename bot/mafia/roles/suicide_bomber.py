@@ -1,11 +1,11 @@
 from cache.cache_types import GameCache
 from mafia.roles.base.mixins import SuicideRoleMixin
 from general.groupings import Groupings
-from mafia.roles.base import Role
+from mafia.roles.base import RoleABC
 from utils.pretty_text import make_build
 
 
-class SuicideBomber(SuicideRoleMixin, Role):
+class SuicideBomber(SuicideRoleMixin, RoleABC):
     role = "Ночной смертник"
     role_id = "suicide_bomber"
     photo = (

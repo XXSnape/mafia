@@ -8,10 +8,10 @@ from keyboards.inline.keypads.mailing import (
     kill_or_check_on_policeman,
 )
 from mafia.roles.base import (
-    ActiveRoleAtNight,
-    AliasRole,
+    ActiveRoleAtNightABC,
+    AliasRoleABC,
 )
-from mafia.roles.base.mixins import ProcedureAfterNight
+from mafia.roles.base.mixins import ProcedureAfterNightABC
 from states.states import UserFsm
 from utils.pretty_text import make_pretty
 from utils.informing import (
@@ -23,7 +23,7 @@ from utils.roles import (
 )
 
 
-class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
+class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Маршал. Верховный главнокомандующий армии"
     role_id = "policeman"
     photo = "https://avatars.mds.yandex.net/get-kinopoisk-image/1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x"
@@ -101,7 +101,7 @@ class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
         self,
         game_data: GameCache,
         murdered: list[int],
-        killers_of: dict[UserIdInt, list[ActiveRoleAtNight]],
+        killers_of: dict[UserIdInt, list[ActiveRoleAtNightABC]],
         **kwargs,
     ):
 
@@ -161,7 +161,7 @@ class Policeman(ProcedureAfterNight, ActiveRoleAtNight):
         )
 
 
-class PolicemanAlias(AliasRole, Policeman):
+class PolicemanAliasABC(AliasRoleABC, Policeman):
     role = "Генерал"
     role_id = "general"
     photo = "https://img.clipart-library.com/2/clip-monsters-vs-aliens/clip-monsters-vs-aliens-21.gif"

@@ -1,7 +1,7 @@
-from mafia.roles.base import Role
+from mafia.roles.base import RoleABC
 
 
-class Civilian(Role):
+class Civilian(RoleABC):
     role = "Мирный житель"
     role_id = "civilian"
     photo = "https://cdn.culture.ru/c/820179.jpg"

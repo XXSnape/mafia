@@ -130,6 +130,7 @@ class GameCache(TypedDict, total=False):
     disclosed_roles: DisclosedRoles
     forged_roles: ForgedRoles
     checked_for_the_same_groups: DisclosedRoles
+    mafias_are_shown: DisclosedRoles
     deceived: PlayersIds
     poisoned: list[list[UserIdInt] | int]
     pros: PlayersIds
@@ -138,7 +139,6 @@ class GameCache(TypedDict, total=False):
     players: UsersInGame
     tracking: TrackingData
     text_about_checks: str
-    mafias_are_shown: str
     text_about_checked_for_the_same_groups: str
     to_delete: ChatsAndMessagesIds
     vote_for: VotedFor

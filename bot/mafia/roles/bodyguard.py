@@ -1,15 +1,15 @@
 from cache.cache_types import GameCache, UserIdInt
-from mafia.roles.base.roles import Role
+from mafia.roles.base.roles import RoleABC
 from general.groupings import Groupings
-from mafia.roles.base import ActiveRoleAtNight
+from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
-    ProcedureAfterNight,
+    ProcedureAfterNightABC,
 )
 from states.states import UserFsm
 from utils.roles import get_processed_role_and_user_if_exists
 
 
-class Bodyguard(ProcedureAfterNight, ActiveRoleAtNight):
+class Bodyguard(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Телохранитель"
     role_id = "bodyguard"
     mail_message = "За кого пожертвовать собой?"
@@ -38,7 +38,7 @@ class Bodyguard(ProcedureAfterNight, ActiveRoleAtNight):
         game_data: GameCache,
         recovered: list[int],
         murdered: list[int],
-        killers_of: dict[UserIdInt, list[ActiveRoleAtNight]],
+        killers_of: dict[UserIdInt, list[ActiveRoleAtNightABC]],
         **kwargs,
     ):
         recovered_id = self.get_processed_user_id(game_data)
@@ -65,7 +65,7 @@ class Bodyguard(ProcedureAfterNight, ActiveRoleAtNight):
         game_data: GameCache,
         recovered: list[int],
         murdered: list[int],
-        processed_role: Role,
+        processed_role: RoleABC,
         user_url: str,
         processed_user_id: int,
         **kwargs,

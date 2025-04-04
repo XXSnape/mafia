@@ -1,10 +1,10 @@
 from cache.cache_types import ExtraCache, GameCache
-from mafia.roles.base.roles import Role
+from mafia.roles.base.roles import RoleABC
 from general.groupings import Groupings
-from mafia.roles.base import ActiveRoleAtNight
+from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
-    MurderAfterNight,
-    ProcedureAfterVoting,
+    MurderAfterNightABC,
+    ProcedureAfterVotingABC,
 )
 from states.states import UserFsm
 from utils.state import reset_user_state
@@ -12,7 +12,9 @@ from utils.roles import get_processed_role_and_user_if_exists
 
 
 class AngelOfDeath(
-    ProcedureAfterVoting, MurderAfterNight, ActiveRoleAtNight
+    ProcedureAfterVotingABC,
+    MurderAfterNightABC,
+    ActiveRoleAtNightABC,
 ):
     role = "Ангел смерти"
     role_id = "angel_of_death"
@@ -40,7 +42,7 @@ class AngelOfDeath(
         self,
         game_data: GameCache,
         victims: set[int],
-        processed_role: Role,
+        processed_role: RoleABC,
         user_url: str,
         processed_user_id: int,
         **kwargs

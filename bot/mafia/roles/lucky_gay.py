@@ -1,13 +1,13 @@
 from random import randint
 
 from cache.cache_types import GameCache
-from mafia.roles.base import Role
+from mafia.roles.base import RoleABC
 from mafia.roles.base.mixins import (
-    ProcedureAfterNight,
+    ProcedureAfterNightABC,
 )
 
 
-class LuckyGay(ProcedureAfterNight, Role):
+class LuckyGay(ProcedureAfterNightABC, RoleABC):
     role = "Везунчик"
     role_id = "lucky_gay"
     photo = "https://avatars.mds.yandex.net/get-mpic/5031100/img_id5520953584482126492.jpeg/orig"

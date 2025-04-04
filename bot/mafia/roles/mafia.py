@@ -1,20 +1,20 @@
 from cache.cache_types import GameCache
 from general.text import ATTEMPT_TO_KILL
 from utils.common import save_notification_message
-from mafia.roles.base.roles import Role
+from mafia.roles.base.roles import RoleABC
 from general.groupings import Groupings
 from mafia.roles.base import (
-    ActiveRoleAtNight,
-    AliasRole,
+    ActiveRoleAtNightABC,
+    AliasRoleABC,
 )
 from mafia.roles.base.mixins import (
-    MurderAfterNight,
+    MurderAfterNightABC,
 )
 from states.states import UserFsm
 from utils.roles import get_processed_role_and_user_if_exists
 
 
-class Mafia(MurderAfterNight, ActiveRoleAtNight):
+class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
     role = "Дон. Высшее звание в преступных группировках"
     role_id = "don"
     photo = (
@@ -39,7 +39,7 @@ class Mafia(MurderAfterNight, ActiveRoleAtNight):
         self,
         game_data: GameCache,
         victims: set[int],
-        processed_role: Role,
+        processed_role: RoleABC,
         user_url: str,
         processed_user_id: int,
         **kwargs
@@ -66,7 +66,7 @@ class Mafia(MurderAfterNight, ActiveRoleAtNight):
         )
 
 
-class MafiaAlias(AliasRole, Mafia):
+class MafiaAlias(AliasRoleABC, Mafia):
     role = "Мафия"
     role_id = "mafia"
     photo = "https://i.pinimg.com/736x/a1/10/db/a110db3eaba78bf6423bcea68f330a64.jpg"

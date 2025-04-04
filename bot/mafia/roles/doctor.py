@@ -1,11 +1,11 @@
 from cache.cache_types import GameCache
-from mafia.roles.base.roles import Role
+from mafia.roles.base.roles import RoleABC
 from general.groupings import Groupings
 from mafia.roles.base import (
-    ActiveRoleAtNight,
-    AliasRole,
+    ActiveRoleAtNightABC,
+    AliasRoleABC,
 )
-from mafia.roles.base.mixins import ProcedureAfterNight
+from mafia.roles.base.mixins import ProcedureAfterNightABC
 from states.states import UserFsm
 from utils.roles import (
     get_processed_user_id_if_exists,
@@ -13,7 +13,7 @@ from utils.roles import (
 )
 
 
-class Doctor(ProcedureAfterNight, ActiveRoleAtNight):
+class Doctor(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Главный врач"
     role_id = "doctor"
     mail_message = "Кого вылечить этой ночью?"
@@ -44,7 +44,7 @@ class Doctor(ProcedureAfterNight, ActiveRoleAtNight):
         self,
         game_data: GameCache,
         murdered: list[int],
-        processed_role: Role,
+        processed_role: RoleABC,
         user_url: str,
         processed_user_id: int,
         **kwargs,
@@ -67,7 +67,7 @@ class Doctor(ProcedureAfterNight, ActiveRoleAtNight):
         self.state_for_waiting_for_action = UserFsm.DOCTOR_TREATS
 
 
-class DoctorAlias(AliasRole, Doctor):
+class DoctorAliasABC(AliasRoleABC, Doctor):
     role = "Медсестра"
     role_id = "nurse"
     photo = "https://cdn.culture.ru/images/e2464a8d-222e-54b1-9016-86f63e902959"

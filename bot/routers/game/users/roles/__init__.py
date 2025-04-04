@@ -18,7 +18,7 @@ from .instigators import router as instigators_router
 from .policeman import router as policeman_router
 
 # from .prosecutors import router as prosecutors_router
-from .traitors import router as traitors_router
+# from .traitors import router as traitors_router
 from .werewolves import router as werewolves_router
 from .poisoners import router as poisoners_router
 from .wardens import router as wardens_router
@@ -46,6 +46,6 @@ router.include_routers(
     # killers_router,
     forgers_router,
     werewolves_router,
-    traitors_router,
+    # traitors_router,
     instigators_router,
 )

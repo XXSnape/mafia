@@ -35,7 +35,7 @@ from general.groupings import Groupings
 
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
 from mafia.controlling_game import Controller
-from mafia.roles import Role
+from mafia.roles import RoleABC
 from states.states import GameFsm
 from utils.sorting import sorting_by_rate, sorting_by_money
 from utils.tg import delete_messages_from_to_delete
@@ -164,7 +164,7 @@ class Game:
         )
         await message.pin()
         await self.controller.mailing()
-        await asyncio.sleep(15)
+        await asyncio.sleep(32)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -195,7 +195,7 @@ class Game:
         )
         await self.controller.sum_up_after_voting()
         await self.controller.removing_inactive_players()
-        await self.controller.clear_data_after_all_actions()
+        await self.controller.end_night()
 
     async def give_out_rewards(self, e: GameIsOver):
         game_data: GameCache = await self.state.get_data()
@@ -207,7 +207,7 @@ class Game:
         personal_results: dict[UserIdStr, PersonalResultSchema] = {}
         for user_id, player in game_data["players"].items():
             role_id = player["role_id"]
-            current_role: Role = self.all_roles[role_id]
+            current_role: RoleABC = self.all_roles[role_id]
             personal_result = current_role.earn_money_for_winning(
                 winning_group=e.winner,
                 game_data=game_data,
@@ -317,7 +317,7 @@ class Game:
         )
 
     @staticmethod
-    def initialization_by_role(game_data: GameCache, role: Role):
+    def initialization_by_role(game_data: GameCache, role: RoleABC):
         if (
             role.is_alias is False
             and role.roles_key not in game_data

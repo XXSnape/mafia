@@ -1,8 +1,8 @@
 import asyncio
 
 from cache.cache_types import ExtraCache, GameCache
-from mafia.roles.base import ActiveRoleAtNight, Role
-from mafia.roles.base.mixins import ProcedureAfterNight
+from mafia.roles.base import ActiveRoleAtNightABC, RoleABC
+from mafia.roles.base.mixins import ProcedureAfterNightABC
 from states.states import UserFsm
 from utils.informing import send_a_lot_of_messages_safely
 from utils.roles import (
@@ -11,7 +11,7 @@ from utils.roles import (
 )
 
 
-class Agent(ProcedureAfterNight, ActiveRoleAtNight):
+class Agent(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Агент 008"
     role_id = "agent"
     mail_message = "За кем следить этой ночью?"
@@ -54,7 +54,7 @@ class Agent(ProcedureAfterNight, ActiveRoleAtNight):
     async def accrual_of_overnight_rewards(
         self,
         game_data: GameCache,
-        processed_role: Role,
+        processed_role: RoleABC,
         user_url: str,
         processed_user_id: int,
         **kwargs,

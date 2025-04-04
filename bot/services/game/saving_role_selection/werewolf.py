@@ -9,16 +9,20 @@ from mafia.roles import (
     Mafia,
     MafiaAlias,
     Doctor,
-    DoctorAlias,
+    DoctorAliasABC,
     Policeman,
-    PolicemanAlias,
+    PolicemanAliasABC,
     Werewolf,
 )
+from utils.common import get_criminals_ids
 from utils.tg import delete_message
 from utils.pretty_text import make_pretty
 from utils.informing import (
     notify_aliases_about_transformation,
     remind_commissioner_about_inspections,
+    get_profiles,
+    send_a_lot_of_messages_safely,
+    remind_criminals_about_inspections,
 )
 from utils.roles import change_role
 
@@ -80,3 +84,21 @@ class WerewolfSaver(RouterHelper):
             await self.callback.message.answer(
                 text=remind_commissioner_about_inspections(game_data)
             )
+        if self.callback == WEREWOLF_TO_MAFIA_CB:
+            criminals = get_criminals_ids(game_data)
+            text = (
+                "В стане мафии пополнение! Вся команда:\n"
+                + get_profiles(
+                    players_ids=criminals,
+                    players=game_data["players"],
+                    role=True,
+                )
+            )
+            await send_a_lot_of_messages_safely(
+                bot=self.callback.bot, users=criminals, text=text
+            )
+            remind_text = remind_criminals_about_inspections(
+                game_data
+            )
+            if remind_text:
+                await self.callback.message.answer(text=remind_text)

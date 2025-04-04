@@ -1,14 +1,14 @@
 from cache.cache_types import GameCache
-from mafia.roles.base.mixins import ProcedureAfterVoting
-from mafia.roles.base.roles import Role
+from mafia.roles.base.mixins import ProcedureAfterVotingABC
+from mafia.roles.base.roles import RoleABC
 from general.groupings import Groupings
-from mafia.roles.base import ActiveRoleAtNight
+from mafia.roles.base import ActiveRoleAtNightABC
 from states.states import UserFsm
 from utils.pretty_text import make_build
 from utils.roles import get_processed_role_and_user_if_exists
 
 
-class Lawyer(ProcedureAfterVoting, ActiveRoleAtNight):
+class Lawyer(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
     role = "Адвокат"
     role_id = "lawyer"
     mail_message = "Кого защитить на голосовании?"
@@ -28,7 +28,7 @@ class Lawyer(ProcedureAfterVoting, ActiveRoleAtNight):
     async def take_action_after_voting(
         self,
         game_data: GameCache,
-        processed_role: Role,
+        processed_role: RoleABC,
         user_url: str,
         removed_user: list[int],
         processed_user_id: int,

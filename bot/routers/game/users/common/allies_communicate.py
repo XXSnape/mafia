@@ -13,6 +13,8 @@ router = Router(name=__name__)
     StateFilter(
         UserFsm.DON_ATTACKS,
         UserFsm.MAFIA_ATTACKS,
+        UserFsm.TRAITOR_FINDS_OUT,
+        UserFsm.FORGER_FAKES,
         UserFsm.POLICEMAN_CHECKS,
         UserFsm.DOCTOR_TREATS,
     ),

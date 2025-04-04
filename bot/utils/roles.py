@@ -6,13 +6,13 @@ from cache.cache_types import RolesLiteral, GameCache
 from utils.pretty_text import make_pretty
 
 if TYPE_CHECKING:
-    from mafia.roles import Role
+    from mafia.roles import RoleABC
 
 
 def change_role(
     game_data: GameCache,
-    previous_role: "Role",
-    new_role: "Role",
+    previous_role: "RoleABC",
+    new_role: "RoleABC",
     user_id: int,
 ):
     game_data[previous_role.roles_key].remove(user_id)
@@ -29,7 +29,7 @@ def change_role(
 def get_user_role_and_url(
     game_data: GameCache,
     processed_user_id: int,
-    all_roles: dict[str, "Role"],
+    all_roles: dict[str, "RoleABC"],
 ):
     role_id = game_data["players"][str(processed_user_id)]["role_id"]
     return (
@@ -40,7 +40,7 @@ def get_user_role_and_url(
 
 def get_processed_role_and_user_if_exists(async_func: Callable):
     @wraps(async_func)
-    async def wrapper(role: "Role", **kwargs):
+    async def wrapper(role: "RoleABC", **kwargs):
         game_data: GameCache = kwargs["game_data"]
         processed_user_id = role.get_processed_user_id(game_data)
         if processed_user_id is None:
@@ -63,7 +63,7 @@ def get_processed_role_and_user_if_exists(async_func: Callable):
 
 def get_processed_user_id_if_exists(async_func: Callable):
     @wraps(async_func)
-    async def wrapper(role: "Role", **kwargs):
+    async def wrapper(role: "RoleABC", **kwargs):
         game_data: GameCache = kwargs["game_data"]
         processed_user_id = role.get_processed_user_id(game_data)
         if processed_user_id is None:

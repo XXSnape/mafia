@@ -1,11 +1,11 @@
 from cache.cache_types import GameCache
 from keyboards.inline.keypads.mailing import send_transformation_kb
-from mafia.roles.base import ActiveRoleAtNight
-from mafia.roles.base.mixins import ProcedureAfterNight
+from mafia.roles.base import ActiveRoleAtNightABC
+from mafia.roles.base.mixins import ProcedureAfterNightABC
 from states.states import UserFsm
 
 
-class Werewolf(ProcedureAfterNight, ActiveRoleAtNight):
+class Werewolf(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Оборотень"
     role_id = "werewolf"
     need_to_monitor_interaction = False

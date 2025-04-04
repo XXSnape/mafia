@@ -3,12 +3,12 @@ from contextlib import suppress
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import ChatPermissions
 from cache.cache_types import GameCache
-from mafia.roles.base.roles import Role
+from mafia.roles.base.roles import RoleABC
 from general.groupings import Groupings
-from mafia.roles.base import ActiveRoleAtNight
+from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
-    ProcedureAfterNight,
-    ProcedureAfterVoting,
+    ProcedureAfterNightABC,
+    ProcedureAfterVotingABC,
 )
 from states.states import UserFsm
 from utils.roles import (
@@ -19,7 +19,9 @@ from utils.tg import ban_user
 
 
 class Prosecutor(
-    ProcedureAfterVoting, ProcedureAfterNight, ActiveRoleAtNight
+    ProcedureAfterVotingABC,
+    ProcedureAfterNightABC,
+    ActiveRoleAtNightABC,
 ):
     role = "Прокурор"
     role_id = "prosecutor"
@@ -52,7 +54,7 @@ class Prosecutor(
     async def accrual_of_overnight_rewards(
         self,
         game_data: GameCache,
-        processed_role: Role,
+        processed_role: RoleABC,
         user_url: str,
         processed_user_id: int,
         **kwargs,

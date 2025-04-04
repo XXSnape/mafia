@@ -1,21 +1,17 @@
 from cache.cache_types import ExtraCache, GameCache
 from general.text import ROLE_IS_KNOWN
 from general.groupings import Groupings
-from mafia.roles.base import ActiveRoleAtNight
+from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
-    ProcedureAfterNight,
-    ProcedureAfterVoting,
+    ProcedureAfterNightABC,
+    MafiaConverterABC,
 )
+
 from states.states import UserFsm
-from utils.pretty_text import make_pretty
-from utils.informing import notify_aliases_about_transformation
-from utils.roles import (
-    change_role,
-)
 
 
 class Forger(
-    ProcedureAfterVoting, ProcedureAfterNight, ActiveRoleAtNight
+    MafiaConverterABC, ProcedureAfterNightABC, ActiveRoleAtNightABC
 ):
     role = "Румпельштильцхен"
     role_id = "forger"
@@ -110,53 +106,62 @@ class Forger(
                 beginning_message="Спецоперация по подделке документов прошла успешно. Обманут",
             )
 
-    async def take_action_after_voting(
-        self,
-        game_data: GameCache,
-        removed_user: list[int],
-        **kwargs,
+    def check_for_possibility_to_transform(
+        self, game_data: GameCache
     ):
         from .policeman import Policeman
-        from .mafia import MafiaAlias
 
-        forgers = game_data[self.roles_key]
-        if not forgers:
-            return
         policeman = game_data.get(Policeman.roles_key)
-        mafias = game_data.get(MafiaAlias.roles_key)
+        if not policeman:
+            return game_data[self.roles_key]
 
-        if (
-            (not policeman or policeman[0] == removed_user[0])
-            and mafias
-            and mafias[0] != removed_user[0]
-        ):
-            if MafiaAlias.role_id not in self.all_roles:
-                mafia = MafiaAlias()
-                mafia(
-                    all_roles=self.all_roles,
-                    dispatcher=self.dispatcher,
-                    bot=self.bot,
-                    state=self.state,
-                )
-                self.all_roles[MafiaAlias.role_id] = mafia
-            forger_id = forgers[0]
-            change_role(
-                game_data=game_data,
-                previous_role=self,
-                new_role=MafiaAlias(),
-                user_id=forger_id,
-            )
-            await notify_aliases_about_transformation(
-                game_data=game_data,
-                bot=self.bot,
-                new_role=MafiaAlias(),
-                user_id=forger_id,
-            )
-            await self.bot.send_photo(
-                chat_id=game_data["game_chat"],
-                photo=MafiaAlias.photo,
-                caption=f"{make_pretty(self.role)} превращается в {make_pretty(MafiaAlias.role)}",
-            )
+    # async def take_action_after_voting(
+    #     self,
+    #     game_data: GameCache,
+    #     removed_user: list[int],
+    #     **kwargs,
+    # ):
+    #     from .policeman import Policeman
+    #     from .mafia import MafiaAlias
+    #
+    #     forgers = game_data[self.roles_key]
+    #     if not forgers:
+    #         return
+    #     policeman = game_data.get(Policeman.roles_key)
+    #     mafias = game_data.get(MafiaAlias.roles_key)
+    #
+    #     if (
+    #         (not policeman or policeman[0] == removed_user[0])
+    #         and mafias
+    #         and mafias[0] != removed_user[0]
+    #     ):
+    #         if MafiaAlias.role_id not in self.all_roles:
+    #             mafia = MafiaAlias()
+    #             mafia(
+    #                 all_roles=self.all_roles,
+    #                 dispatcher=self.dispatcher,
+    #                 bot=self.bot,
+    #                 state=self.state,
+    #             )
+    #             self.all_roles[MafiaAlias.role_id] = mafia
+    #         forger_id = forgers[0]
+    #         change_role(
+    #             game_data=game_data,
+    #             previous_role=self,
+    #             new_role=MafiaAlias(),
+    #             user_id=forger_id,
+    #         )
+    #         await notify_aliases_about_transformation(
+    #             game_data=game_data,
+    #             bot=self.bot,
+    #             new_role=MafiaAlias(),
+    #             user_id=forger_id,
+    #         )
+    #         await self.bot.send_photo(
+    #             chat_id=game_data["game_chat"],
+    #             photo=MafiaAlias.photo,
+    #             caption=f"{make_pretty(self.role)} превращается в {make_pretty(MafiaAlias.role)}",
+    #         )
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
         if game_data["forged_roles"]:

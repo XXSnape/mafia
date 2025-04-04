@@ -24,11 +24,11 @@ from keyboards.inline.keypads.mailing import (
 from utils.pretty_text import make_build, make_pretty
 
 if TYPE_CHECKING:
-    from mafia.roles import Role
+    from mafia.roles import RoleABC
 
 
 def get_live_players(
-    game_data: GameCache, all_roles: dict[str, "Role"]
+    game_data: GameCache, all_roles: dict[str, "RoleABC"]
 ):
     profiles = get_profiles(
         players_ids=game_data["live_players_ids"],
@@ -46,7 +46,7 @@ def get_live_players(
 
 
 def get_live_roles(
-    game_data: GameCache, all_roles: dict[str, "Role"]
+    game_data: GameCache, all_roles: dict[str, "RoleABC"]
 ):
     gropings: dict[Groupings, list[tuple[str, int]]] = {
         Groupings.civilians: [],
@@ -179,7 +179,7 @@ def get_results_of_voting(
 async def notify_aliases_about_transformation(
     game_data: GameCache,
     bot: Bot,
-    new_role: "Role",
+    new_role: "RoleABC",
     user_id: int,
 ):
     url = game_data["players"][str(user_id)]["url"]
@@ -286,6 +286,24 @@ def remind_worden_about_inspections(game_data: GameCache):
         "По результатам прошлых проверок выяснено:\n\n"
         + game_data["text_about_checked_for_the_same_groups"]
     )
+
+
+def remind_criminals_about_inspections(
+    game_data: GameCache,
+):
+    users = [
+        user_id
+        for user_id in game_data.get("mafias_are_shown", [])
+        if user_id in game_data["live_players_ids"]
+    ]
+    if not users:
+        return
+    profiles = get_profiles(
+        players_ids=users,
+        players=game_data["players"],
+        role=True,
+    )
+    return "По результатам прошлых проверок выяснено:\n" + profiles
 
 
 def remind_commissioner_about_inspections(

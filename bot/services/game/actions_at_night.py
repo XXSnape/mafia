@@ -11,7 +11,7 @@ from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from mafia.roles import Hacker, Mafia
-from mafia.roles import Role, ActiveRoleAtNight
+from mafia.roles import RoleABC, ActiveRoleAtNightABC
 from utils.common import save_notification_message
 from utils.informing import send_a_lot_of_messages_safely
 from utils.pretty_text import make_build
@@ -25,7 +25,7 @@ async def send_messages_and_remove_from_expected(
     message_to_user: bool | str = True,
     message_to_group: bool | str = True,
     user_id: int | None = None,
-    current_role: ActiveRoleAtNight | None = None,
+    current_role: ActiveRoleAtNightABC | None = None,
     need_to_remove_from_expected: bool = True,
 ):
     if need_to_remove_from_expected:
@@ -65,7 +65,7 @@ async def trace_all_actions(
     callback: CallbackQuery,
     game_data: GameCache,
     user_id: int,
-    current_role: ActiveRoleAtNight,
+    current_role: ActiveRoleAtNightABC,
     message_to_group: bool | str = True,
     message_to_user: bool | str = True,
     need_to_save_notification_message: bool = True,
@@ -104,7 +104,7 @@ async def trace_all_actions(
 
 
 async def inform_aliases(
-    current_role: Role,
+    current_role: RoleABC,
     game_data: GameCache,
     callback: CallbackQuery,
     url: str,
@@ -168,7 +168,7 @@ async def inform_players_and_trace_actions(
     callback: CallbackQuery,
     game_data: GameCache,
     user_id: int,
-    current_role: ActiveRoleAtNight,
+    current_role: ActiveRoleAtNightABC,
 ):
     url = game_data["players"][str(user_id)]["url"]
     await inform_aliases(
@@ -210,7 +210,7 @@ async def take_action_and_save_data(
     role_id = game_data["players"][str(callback.from_user.id)][
         "role_id"
     ]
-    current_role: ActiveRoleAtNight = get_data_with_roles(role_id)
+    current_role: ActiveRoleAtNightABC = get_data_with_roles(role_id)
 
     await inform_players_and_trace_actions(
         callback=callback,

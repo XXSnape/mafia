@@ -33,11 +33,12 @@ from utils.common import get_the_most_frequently_encountered_id
 from utils.informing import (
     get_profiles,
     send_a_lot_of_messages_safely,
+    remind_criminals_about_inspections,
 )
 from utils.state import get_state_and_assign
 
 
-class Role(ABC):
+class RoleABC(ABC):
     dispatcher: Dispatcher
     bot: Bot
     state: FSMContext
@@ -66,7 +67,7 @@ class Role(ABC):
         dispatcher: Dispatcher,
         bot: Bot,
         state: FSMContext,
-        all_roles: dict[str, "Role"],
+        all_roles: dict[str, "RoleABC"],
     ):
         self.all_roles = all_roles
         self.dispatcher = dispatcher
@@ -108,7 +109,7 @@ class Role(ABC):
 
     @classmethod
     @property
-    def alias(cls) -> Optional["Role"]:
+    def alias(cls) -> Optional["RoleABC"]:
         subclasses = cls.__subclasses__()
         if not subclasses:
             return None
@@ -129,7 +130,7 @@ class Role(ABC):
     @property
     def last_interactive_key(cls):
         if (
-            issubclass(cls, ActiveRoleAtNight)
+            issubclass(cls, ActiveRoleAtNightABC)
             and cls.need_to_monitor_interaction
         ):
             return f"{cls.__name__}_history"
@@ -228,7 +229,7 @@ class Role(ABC):
         custom_message: str | None = None,
         beginning_message: str | None = None,
         user_url: str | None = None,
-        processed_role: Optional["Role"] = None,
+        processed_role: Optional["RoleABC"] = None,
         at_night: bool = True,
         additional_players: str | None = None,
     ):
@@ -320,7 +321,7 @@ class Role(ABC):
         )
 
 
-class AliasRole(ABC):
+class AliasRoleABC(ABC):
     is_alias = True
     is_mass_mailing_list: bool = False
     there_may_be_several: bool = True
@@ -363,7 +364,7 @@ class AliasRole(ABC):
         return super_classes[1].last_interactive_key
 
 
-class ActiveRoleAtNight(Role):
+class ActiveRoleAtNightABC(RoleABC):
     state_for_waiting_for_action: State
     was_deceived: bool
     need_to_process: bool = True
@@ -532,19 +533,22 @@ class ActiveRoleAtNight(Role):
         game_data: GameCache,
     ) -> str | None:
         if self.grouping == Groupings.criminals:
-            text = game_data.get("mafias_are_shown")
-            if text:
-                return f"Известные роли:\n\n{text}"
+            return remind_criminals_about_inspections(game_data)
 
     @staticmethod
-    def allow_sending_mailing(game_data: GameCache):
+    def allow_sending_mailing(game_data: GameCache) -> bool:
         return True
 
     async def mailing(self, game_data: GameCache):
-        if self.allow_sending_mailing(game_data) is not True:
-            return
         roles = self.get_roles(game_data)
         if not roles:
+            return
+        if self.allow_sending_mailing(game_data) is not True:
+            await send_a_lot_of_messages_safely(
+                bot=self.bot,
+                users=[roles[0]],
+                text=make_build("😜У тебя сегодня выходной!"),
+            )
             return
         general_text = self.get_general_text_before_sending(
             game_data

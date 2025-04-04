@@ -7,8 +7,8 @@ from cache.cache_types import (
 )
 from general.text import ROLE_IS_KNOWN
 from keyboards.inline.keypads.mailing import selection_to_warden_kb
-from mafia.roles.base import ActiveRoleAtNight
-from mafia.roles.base.mixins import ProcedureAfterNight
+from mafia.roles.base import ActiveRoleAtNightABC
+from mafia.roles.base.mixins import ProcedureAfterNightABC
 from states.states import UserFsm
 from utils.informing import (
     remind_worden_about_inspections,
@@ -17,7 +17,7 @@ from utils.informing import (
 from utils.pretty_text import make_pretty
 
 
-class Warden(ProcedureAfterNight, ActiveRoleAtNight):
+class Warden(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Соглядатай"
     role_id = "warden"
     photo = (

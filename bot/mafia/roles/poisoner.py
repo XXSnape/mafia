@@ -1,9 +1,10 @@
 from cache.cache_types import GameCache, ExtraCache, UserIdInt
 from keyboards.inline.keypads.mailing import kill_or_poison_kb
-from mafia.roles.base import ActiveRoleAtNight
+from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
-    ProcedureAfterNight,
-    ProcedureAfterVoting,
+    ProcedureAfterNightABC,
+    ProcedureAfterVotingABC,
+    FinalNightABC,
 )
 from general.groupings import Groupings
 from states.states import UserFsm
@@ -12,7 +13,7 @@ from utils.roles import get_user_role_and_url
 
 
 class Poisoner(
-    ProcedureAfterVoting, ProcedureAfterNight, ActiveRoleAtNight
+    FinalNightABC, ProcedureAfterNightABC, ActiveRoleAtNightABC
 ):
     role = "Отравитель"
     role_id = "poisoner"
@@ -51,7 +52,7 @@ class Poisoner(
         self,
         game_data: GameCache,
         murdered: list[int],
-        killers_of: dict[UserIdInt, list[ActiveRoleAtNight]],
+        killers_of: dict[UserIdInt, list[ActiveRoleAtNightABC]],
         **kwargs,
     ):
         poisoned = game_data["poisoned"]
@@ -64,7 +65,7 @@ class Poisoner(
         self,
         game_data: GameCache,
         victims: set[int],
-        killers_of: dict[UserIdInt, list[ActiveRoleAtNight]],
+        killers_of: dict[UserIdInt, list[ActiveRoleAtNightABC]],
         **kwargs,
     ):
         poisoned = game_data["poisoned"]
@@ -88,12 +89,7 @@ class Poisoner(
                 beginning_message="Убийство",
             )
 
-    async def take_action_after_voting(
-        self,
-        game_data: GameCache,
-        removed_user: list[UserIdInt | None],
-        **kwargs,
-    ):
+    async def end_night(self, game_data: GameCache):
         poisoned = game_data["poisoned"]
         if not poisoned:
             return
@@ -103,9 +99,6 @@ class Poisoner(
                 for user_id in poisoned[0]
                 if user_id not in game_data["live_players_ids"]
             ]
-            removed_user_id = removed_user[0]
-            if removed_user_id in poisoned[0]:
-                murdered.append(removed_user_id)
             for murdered_id in murdered:
                 poisoned[0].remove(murdered_id)
             return
