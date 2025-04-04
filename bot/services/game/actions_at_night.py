@@ -12,7 +12,6 @@ from keyboards.inline.callback_factory.recognize_user import (
 )
 from mafia.roles import Hacker, Mafia
 from mafia.roles import RoleABC, ActiveRoleAtNightABC
-from utils.common import save_notification_message
 from utils.informing import send_a_lot_of_messages_safely
 from utils.pretty_text import make_build
 from utils.tg import delete_message
@@ -68,7 +67,6 @@ async def trace_all_actions(
     current_role: ActiveRoleAtNightABC,
     message_to_group: bool | str = True,
     message_to_user: bool | str = True,
-    need_to_save_notification_message: bool = True,
     need_to_remove_from_expected: bool = True,
 ):
     suffer_tracking = game_data["tracking"].setdefault(
@@ -91,16 +89,6 @@ async def trace_all_actions(
         current_role=current_role,
         need_to_remove_from_expected=need_to_remove_from_expected,
     )
-    if (
-        need_to_save_notification_message
-        and current_role.notification_message
-    ):
-        save_notification_message(
-            game_data=game_data,
-            processed_user_id=user_id,
-            message=current_role.notification_message,
-            current_user_id=callback.from_user.id,
-        )
 
 
 async def inform_aliases(

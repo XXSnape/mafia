@@ -1,6 +1,5 @@
 from cache.cache_types import GameCache
 from general.text import ATTEMPT_TO_KILL
-from utils.common import save_notification_message
 from mafia.roles.base.roles import RoleABC
 from general.groupings import Groupings
 from mafia.roles.base import (
@@ -27,9 +26,9 @@ class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
     message_to_user_after_action = "Ты выбрал убить {url}"
     mail_message = "Кого убить этой ночью?"
     need_to_monitor_interaction = False
+    notification_message = ATTEMPT_TO_KILL
     payment_for_treatment = 0
     payment_for_murder = 20
-    notification_message = None
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.MAFIA_ATTACKS
@@ -44,12 +43,6 @@ class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
         processed_user_id: int,
         **kwargs
     ):
-        save_notification_message(
-            game_data=game_data,
-            processed_user_id=processed_user_id,
-            message=ATTEMPT_TO_KILL,
-            current_user_id=None,
-        )
         if processed_user_id not in victims:
             return
         money = (

@@ -1,4 +1,7 @@
+import asyncio
+
 from cache.cache_types import ExtraCache, GameCache
+from general.text import ATTEMPT_TO_KILL
 from mafia.roles.base.roles import RoleABC
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
@@ -29,6 +32,7 @@ class AngelOfDeath(
     message_to_user_after_action = "Ты выбрал отомстить {url}"
     payment_for_night_spent = 5
     clearing_state_after_death = False
+    notification_message = ATTEMPT_TO_KILL
 
     async def take_action_after_voting(
         self, game_data: GameCache, removed_user: list[int], **kwargs
@@ -54,7 +58,6 @@ class AngelOfDeath(
                 bot_id=self.bot.id,
             )
         if processed_user_id not in victims:
-            game_data["angels_died"].clear()
             return
         if processed_role.grouping == Groupings.civilians:
             money = 0
@@ -68,7 +71,6 @@ class AngelOfDeath(
             processed_role=processed_role,
             additional_players="angels_died",
         )
-        game_data["angels_died"].clear()
 
     async def report_death(
         self, game_data: GameCache, at_night: bool, user_id: int
@@ -86,21 +88,27 @@ class AngelOfDeath(
     async def mailing(self, game_data: GameCache):
         if "angels_died" not in game_data:
             return
-        current_number = game_data["number_of_night"]
+        # current_number = game_data["number_of_night"]
         angels = []
-        for angel_id in game_data["angels_died"]:
-            if (
-                current_number
-                - game_data["players"][str(angel_id)][
-                    "number_died_at_night"
-                ]
-            ) == 2:
-                angels.append(angel_id)
-
-        for angel_id in angels:
-            await self.send_survey(
-                player_id=angel_id, game_data=game_data
-            )
+        for angel_id in game_data["angels_died"][:]:
+            game_data["angels_died"].remove(angel_id)
+            angels.append(angel_id)
+            # if (
+            #     current_number
+            #     - game_data["players"][str(angel_id)][
+            #         "number_died_at_night"
+            #     ]
+            # ) == 2:
+            #     angels.append(angel_id)
+        await asyncio.gather(
+            *(
+                self.send_survey(
+                    player_id=angel_id, game_data=game_data
+                )
+                for angel_id in angels
+            ),
+            return_exceptions=True
+        )
 
     def __init__(self):
         self.state_for_waiting_for_action = (

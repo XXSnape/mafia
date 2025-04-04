@@ -73,3 +73,17 @@ def get_processed_user_id_if_exists(async_func: Callable):
         )
 
     return wrapper
+
+
+def get_processed_user_id_if_need_to_notify(sync_func: Callable):
+    @wraps(sync_func)
+    def wrapper(role: "RoleABC", **kwargs):
+        game_data: GameCache = kwargs["game_data"]
+        processed_user_id = role.get_processed_user_id(game_data)
+        if not processed_user_id:
+            return
+        return sync_func(
+            role, **kwargs, processed_user_id=processed_user_id
+        )
+
+    return wrapper

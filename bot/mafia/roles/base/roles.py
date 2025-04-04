@@ -5,6 +5,7 @@ from random import shuffle
 from typing import Callable, Optional, Self
 
 from aiogram import Bot, Dispatcher
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.types import InlineKeyboardButton
@@ -34,6 +35,10 @@ from utils.informing import (
     get_profiles,
     send_a_lot_of_messages_safely,
     remind_criminals_about_inspections,
+)
+from utils.roles import (
+    get_processed_user_id_if_exists,
+    get_processed_user_id_if_need_to_notify,
 )
 from utils.state import get_state_and_assign
 
@@ -381,13 +386,15 @@ class ActiveRoleAtNightABC(RoleABC):
     def notification_message(cls) -> str:
         return f"С тобой этой ночью взаимодействовал {make_pretty(cls.role)}"
 
-    def deleting_notification_messages(
-        self, game_data: GameCache, suffer_id: int
+    def leave_notification_message(
+        self,
+        game_data: GameCache,
     ):
         if self.notification_message:
-            with suppress(ValueError):
-                game_data["messages_after_night"].remove(
-                    [suffer_id, self.notification_message]
+            processed_user_id = self.get_processed_user_id(game_data)
+            if processed_user_id:
+                game_data["messages_after_night"].append(
+                    [processed_user_id, self.notification_message]
                 )
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
@@ -399,9 +406,6 @@ class ActiveRoleAtNightABC(RoleABC):
         if not suffers:
             return False
         for suffer in suffers:
-            self.deleting_notification_messages(
-                game_data=game_data, suffer_id=suffer
-            )
             if (
                 self.processed_users_key
                 and suffer in game_data[self.processed_users_key]
@@ -442,16 +446,18 @@ class ActiveRoleAtNightABC(RoleABC):
             player_id=player_id,
             game_data=game_data,
         )
-        sent_survey = await self.bot.send_message(
-            chat_id=player_id,
-            text=self.mail_message,
-            reply_markup=markup,
-        )
-        await self.save_information_about_mail_and_change_state(
-            game_data=game_data,
-            player_id=player_id,
-            message_id=sent_survey.message_id,
-        )
+        game_data["wait_for"].append(player_id)
+        with suppress(TelegramBadRequest):
+            sent_survey = await self.bot.send_message(
+                chat_id=player_id,
+                text=self.mail_message,
+                reply_markup=markup,
+            )
+            await self.save_information_about_mail_and_change_state(
+                game_data=game_data,
+                player_id=player_id,
+                message_id=sent_survey.message_id,
+            )
 
     async def save_information_about_mail_and_change_state(
         self,
@@ -460,7 +466,6 @@ class ActiveRoleAtNightABC(RoleABC):
         message_id: int,
     ):
         game_data["to_delete"].append([player_id, message_id])
-        game_data["wait_for"].append(player_id)
         await get_state_and_assign(
             dispatcher=self.dispatcher,
             chat_id=player_id,

@@ -1,4 +1,5 @@
 from cache.cache_types import GameCache, ExtraCache, UserIdInt
+from general.text import ATTEMPT_TO_KILL
 from keyboards.inline.keypads.mailing import kill_or_poison_kb
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
@@ -27,7 +28,7 @@ class Poisoner(
     grouping = Groupings.other
     message_to_user_after_action = "Ты выбрал отравить {url}"
     mail_message = "Отравишь или убьешь?"
-    notification_message = None
+    notification_message = ATTEMPT_TO_KILL
     payment_for_treatment = 0
     payment_for_murder = 15
     extra_data = [ExtraCache(key="poisoned", need_to_clear=False)]
@@ -88,6 +89,19 @@ class Poisoner(
                 processed_role=user_role,
                 beginning_message="Убийство",
             )
+
+    def leave_notification_message(
+        self,
+        game_data: GameCache,
+    ):
+        poisoned = game_data["poisoned"]
+        if not poisoned:
+            return
+        if poisoned[1] == 1:
+            for user_id in poisoned[0]:
+                game_data["messages_after_night"].append(
+                    [user_id, self.notification_message]
+                )
 
     async def end_night(self, game_data: GameCache):
         poisoned = game_data["poisoned"]

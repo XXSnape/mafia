@@ -20,7 +20,6 @@ from services.game.actions_at_night import (
     get_game_state_data_and_user_id,
     trace_all_actions,
 )
-from utils.common import save_notification_message
 from mafia.roles import Policeman
 from utils.informing import send_a_lot_of_messages_safely
 from utils.tg import delete_message
@@ -95,12 +94,6 @@ class PolicemanSaver(RouterHelper):
         url = game_data["players"][str(checked_user_id)]["url"]
         game_data["disclosed_roles"].append(checked_user_id)
         await delete_message(self.callback.message)
-        save_notification_message(
-            game_data=game_data,
-            processed_user_id=checked_user_id,
-            message=ROLE_IS_KNOWN,
-            current_user_id=self.callback.from_user.id,
-        )
         await trace_all_actions(
             callback=self.callback,
             game_data=game_data,
@@ -108,7 +101,6 @@ class PolicemanSaver(RouterHelper):
             current_role=Policeman(),
             message_to_user=False,
             message_to_group="Армия насильно заставила кого-то показать документы!",
-            need_to_save_notification_message=False,
         )
         await game_state.set_data(game_data)
         text = NUMBER_OF_NIGHT.format(

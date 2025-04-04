@@ -15,22 +15,6 @@ def get_the_most_frequently_encountered_id(ids: PlayersIds):
     return most_common[0][0]
 
 
-def save_notification_message(
-    game_data: GameCache,
-    processed_user_id: int,
-    message: str,
-    current_user_id: int | None,
-):
-
-    if (
-        current_user_id is None
-        or processed_user_id != current_user_id
-    ):
-        game_data["messages_after_night"].append(
-            [processed_user_id, message]
-        )
-
-
 def get_criminals_ids(game_data: GameCache) -> PlayersIds:
     from mafia.roles import Mafia, Forger, Traitor
 

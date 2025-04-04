@@ -127,6 +127,18 @@ class Warden(ProcedureAfterNightABC, ActiveRoleAtNightABC):
             f"{user2_url} ({make_pretty(user2_role.role)})",
         )
 
+    def leave_notification_message(
+        self,
+        game_data: GameCache,
+    ):
+        users = game_data["checked_for_the_same_groups"]
+        if len(users) != 2:
+            return
+        for user_id in users:
+            game_data["messages_after_night"].append(
+                [user_id, ROLE_IS_KNOWN]
+            )
+
     def cancel_actions(self, game_data: GameCache, user_id: int):
         game_data["checked_for_the_same_groups"].clear()
         return super().cancel_actions(

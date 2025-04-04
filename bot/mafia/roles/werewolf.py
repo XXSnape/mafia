@@ -9,6 +9,7 @@ class Werewolf(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Оборотень"
     role_id = "werewolf"
     need_to_monitor_interaction = False
+    need_to_process = False
     photo = (
         "https://sun9-42.userapi.com/impf/c303604/v303604068/170c/FXQRtSk8e28.jpg?size=484x604&quality="
         "96&sign=bf5555ef2b801954b0b92848975525fd&type=album"

@@ -13,7 +13,6 @@ from services.game.actions_at_night import (
     take_action_and_save_data,
     send_messages_and_remove_from_expected,
 )
-from utils.common import save_notification_message
 from mafia.roles import Poisoner
 from states.states import UserFsm
 
@@ -33,13 +32,6 @@ class PoisonerSaver(RouterHelper):
             message_to_user="Ты решил всех убить!",
             message_to_group=False,
         )
-        for user_id in poisoned[0]:
-            save_notification_message(
-                game_data=game_data,
-                processed_user_id=user_id,
-                message=ATTEMPT_TO_KILL,
-                current_user_id=self.callback.from_user.id,
-            )
         await game_state.set_data(game_data)
 
     async def poisoner_poisons(self):

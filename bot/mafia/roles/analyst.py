@@ -5,7 +5,10 @@ from keyboards.inline.cb.cb_text import DRAW_CB
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import ProcedureAfterVotingABC
 from states.states import UserFsm
-from utils.roles import get_processed_user_id_if_exists
+from utils.roles import (
+    get_processed_user_id_if_exists,
+    get_processed_user_id_if_need_to_notify,
+)
 
 
 class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):

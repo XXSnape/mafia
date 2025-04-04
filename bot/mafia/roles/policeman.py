@@ -1,3 +1,5 @@
+from typing import override
+
 from aiogram.types import InlineKeyboardButton
 
 from cache.cache_types import ExtraCache, GameCache, UserIdInt
@@ -126,18 +128,17 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
                 killers_of[processed_user_id].append(self)
                 murdered.append(processed_user_id)
 
-    def deleting_notification_messages(
-        self, game_data: GameCache, suffer_id: int
+    def leave_notification_message(
+        self,
+        game_data: GameCache,
     ):
-
-        if not self.get_processed_user_id(game_data):
-            game_data["messages_after_night"].remove(
-                [suffer_id, ROLE_IS_KNOWN]
+        if game_data["disclosed_roles"]:
+            user_id = game_data["disclosed_roles"][0]
+            game_data["messages_after_night"].append(
+                [user_id, ROLE_IS_KNOWN]
             )
             return
-        return super().deleting_notification_messages(
-            game_data=game_data, suffer_id=suffer_id
-        )
+        return super().leave_notification_message(game_data)
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
         game_data["disclosed_roles"].clear()

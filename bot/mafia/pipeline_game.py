@@ -227,6 +227,7 @@ class Game:
             initial_role=True,
             money_need=True,
             role=True,
+            if_there_are_no_players="Де-факто нет победителей!",
         )
         losers_text = make_build(
             "\n\n🚫Проигравшие:\n"

@@ -1,4 +1,5 @@
 import asyncio
+from abc import ABC
 from collections import defaultdict
 from collections.abc import Callable
 from operator import attrgetter
@@ -150,13 +151,13 @@ class Controller:
         game_data["messages_after_night"].clear()
         await self.state.set_data(game_data)
 
-    def get_voting_roles(self):
+    def get_roles_if_isinstance[P: ABC](
+        self, parent: type[P]
+    ) -> list[P]:
         return [
             self.all_roles[role]
             for role in self.all_roles
-            if isinstance(
-                self.all_roles[role], ProcedureAfterVotingABC
-            )
+            if isinstance(self.all_roles[role], parent)
             and self.all_roles[role].is_alias is False
         ]
 
@@ -173,7 +174,9 @@ class Controller:
         result_text = get_results_of_voting(
             game_data=game_data, removed_user_id=removed_user_id
         )
-        voting_roles = self.get_voting_roles()
+        voting_roles = self.get_roles_if_isinstance(
+            parent=ProcedureAfterVotingABC
+        )
         voting_roles.sort(
             key=attrgetter("number_in_order_after_voting")
         )
@@ -244,14 +247,9 @@ class Controller:
     @check_end_of_game
     async def sum_up_after_night(self):
         game_data: GameCache = await self.state.get_data()
-        roles: list[ProcedureAfterNightABC] = [
-            self.all_roles[role]
-            for role in self.all_roles
-            if isinstance(
-                self.all_roles[role], ProcedureAfterNightABC
-            )
-            and self.all_roles[role].is_alias is False
-        ]
+        roles = self.get_roles_if_isinstance(
+            parent=ProcedureAfterNightABC
+        )
         roles.sort(key=attrgetter("number_in_order_after_night"))
         victims = set()
         recovered = []
@@ -269,6 +267,14 @@ class Controller:
         victims |= set(murdered) - set(recovered)
         for role in roles:
             await role.accrual_of_overnight_rewards(**kwargs)
+
+        active_roles = self.get_roles_if_isinstance(
+            parent=ActiveRoleAtNightABC
+        )
+        for active_role in active_roles:
+            active_role.leave_notification_message(
+                game_data=game_data
+            )
         text_about_dead = ""
         tasks = []
         for victim_id in victims:
