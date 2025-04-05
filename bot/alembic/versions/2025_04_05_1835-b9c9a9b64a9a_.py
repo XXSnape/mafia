@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: a06c5378e641
+Revision ID: b9c9a9b64a9a
 Revises:
-Create Date: 2025-03-22 15:48:44.061107
+Create Date: 2025-04-05 18:35:12.908474
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "a06c5378e641"
+revision: str = "b9c9a9b64a9a"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -29,30 +29,23 @@ def upgrade() -> None:
     op.create_table(
         "users",
         sa.Column(
-            "tg_id",
-            sa.Integer(),
-            autoincrement=False,
-            nullable=False,
+            "tg_id", sa.BigInteger(), autoincrement=False, nullable=False
         ),
-        sa.Column(
-            "balance",
-            sa.Integer(),
-            server_default="0",
-            nullable=False,
-        ),
+        sa.Column("balance", sa.Integer(), server_default="0", nullable=False),
         sa.Column(
             "registration_date",
             sa.DateTime(),
-            server_default=sa.text("(CURRENT_TIMESTAMP)"),
+            server_default=sa.text("now()"),
             nullable=False,
         ),
         sa.Column("is_banned", sa.Boolean(), nullable=False),
+        sa.CheckConstraint("balance >= 0"),
         sa.PrimaryKeyConstraint("tg_id"),
     )
     op.create_table(
         "games",
-        sa.Column("chat_id", sa.Integer(), nullable=False),
-        sa.Column("creator_tg_id", sa.Integer(), nullable=True),
+        sa.Column("chat_id", sa.BigInteger(), nullable=False),
+        sa.Column("creator_tg_id", sa.BigInteger(), nullable=True),
         sa.Column("winning_group", sa.String(), nullable=True),
         sa.Column("number_of_nights", sa.Integer(), nullable=True),
         sa.Column("start", sa.DateTime(), nullable=False),
@@ -62,30 +55,28 @@ def upgrade() -> None:
             ["creator_tg_id"], ["users.tg_id"], ondelete="SET NULL"
         ),
         sa.ForeignKeyConstraint(
-            ["winning_group"],
-            ["groupings.name"],
-            ondelete="SET NULL",
+            ["winning_group"], ["groupings.name"], ondelete="SET NULL"
         ),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
         "roles",
-        sa.Column("name", sa.String(), nullable=False),
         sa.Column("key", sa.String(), nullable=False),
         sa.Column("grouping", sa.String(), nullable=False),
         sa.ForeignKeyConstraint(
             ["grouping"], ["groupings.name"], ondelete="RESTRICT"
         ),
-        sa.PrimaryKeyConstraint("name"),
+        sa.PrimaryKeyConstraint("key"),
     )
     op.create_table(
         "orders",
-        sa.Column("user_tg_id", sa.Integer(), nullable=False),
-        sa.Column("role", sa.String(), nullable=False),
+        sa.Column("user_tg_id", sa.BigInteger(), nullable=False),
+        sa.Column("role_id", sa.String(), nullable=False),
         sa.Column("number", sa.Integer(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
+        sa.CheckConstraint("number > 0"),
         sa.ForeignKeyConstraint(
-            ["role"], ["roles.name"], ondelete="CASCADE"
+            ["role_id"], ["roles.key"], ondelete="CASCADE"
         ),
         sa.ForeignKeyConstraint(
             ["user_tg_id"], ["users.tg_id"], ondelete="CASCADE"
@@ -94,11 +85,29 @@ def upgrade() -> None:
     )
     op.create_table(
         "prohibited_roles",
-        sa.Column("user_tg_id", sa.Integer(), nullable=False),
-        sa.Column("role", sa.String(), nullable=False),
+        sa.Column("user_tg_id", sa.BigInteger(), nullable=False),
+        sa.Column("role_id", sa.String(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["role"], ["roles.name"], ondelete="CASCADE"
+            ["role_id"], ["roles.key"], ondelete="CASCADE"
+        ),
+        sa.ForeignKeyConstraint(
+            ["user_tg_id"], ["users.tg_id"], ondelete="CASCADE"
+        ),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_table(
+        "rates",
+        sa.Column("money", sa.Integer(), nullable=False),
+        sa.Column("is_winner", sa.Boolean(), nullable=False),
+        sa.Column("game_id", sa.Integer(), nullable=False),
+        sa.Column("user_tg_id", sa.BigInteger(), nullable=False),
+        sa.Column("role_id", sa.String(), nullable=False),
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.CheckConstraint("money > 0"),
+        sa.ForeignKeyConstraint(["game_id"], ["games.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["role_id"], ["roles.key"], ondelete="CASCADE"
         ),
         sa.ForeignKeyConstraint(
             ["user_tg_id"], ["users.tg_id"], ondelete="CASCADE"
@@ -107,18 +116,17 @@ def upgrade() -> None:
     )
     op.create_table(
         "results",
-        sa.Column("user_tg_id", sa.Integer(), nullable=False),
+        sa.Column("user_tg_id", sa.BigInteger(), nullable=False),
         sa.Column("game_id", sa.Integer(), nullable=False),
-        sa.Column("role", sa.String(), nullable=False),
+        sa.Column("role_id", sa.String(), nullable=False),
         sa.Column("is_winner", sa.Boolean(), nullable=False),
         sa.Column("nights_lived", sa.Integer(), nullable=False),
         sa.Column("money", sa.Integer(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
+        sa.CheckConstraint("money >= 0"),
+        sa.ForeignKeyConstraint(["game_id"], ["games.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(
-            ["game_id"], ["games.id"], ondelete="CASCADE"
-        ),
-        sa.ForeignKeyConstraint(
-            ["role"], ["roles.name"], ondelete="SET NULL"
+            ["role_id"], ["roles.key"], ondelete="SET NULL"
         ),
         sa.ForeignKeyConstraint(
             ["user_tg_id"], ["users.tg_id"], ondelete="SET NULL"
@@ -131,6 +139,7 @@ def upgrade() -> None:
 def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table("results")
+    op.drop_table("rates")
     op.drop_table("prohibited_roles")
     op.drop_table("orders")
     op.drop_table("roles")

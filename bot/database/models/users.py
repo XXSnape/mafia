@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import func, BigInteger
+from sqlalchemy import func, BigInteger, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 
@@ -8,6 +8,7 @@ from database.common.base import BaseModel
 
 
 class UserModel(BaseModel):
+    __table_args__ = (CheckConstraint("balance >= 0"),)
     tg_id: Mapped[int] = mapped_column(
         BigInteger, primary_key=True, autoincrement=False
     )

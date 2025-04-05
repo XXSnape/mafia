@@ -7,6 +7,7 @@ from database.common.base import BaseModel, IdMixin
 
 
 class GameModel(IdMixin, BaseModel):
+
     chat_id: Mapped[int] = mapped_column(BigInteger)
     creator_tg_id: Mapped[int | None] = mapped_column(
         BigInteger, ForeignKey("users.tg_id", ondelete="SET NULL")
