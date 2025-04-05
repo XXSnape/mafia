@@ -9,7 +9,7 @@ class UserMoneySchema(BaseModel):
 
 
 class BidForRoleSchema(UserMoneySchema):
-    role_key: RolesLiteral
+    role_id: RolesLiteral
 
 
 class ResultBidForRoleSchema(BidForRoleSchema):
@@ -20,6 +20,6 @@ class ResultBidForRoleSchema(BidForRoleSchema):
 class RateSchema(BaseModel):
     user_tg_id: int
     money: int
-    role: str
+    role_id: str
     is_winner: bool
     game_id: int

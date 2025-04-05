@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class BeginningOfGameSchema(BaseModel):
-    chat_id: int
+    group_tg_id: int
     creator_tg_id: int
     start: datetime
 

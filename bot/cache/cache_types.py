@@ -98,9 +98,9 @@ VotedFor: TypeAlias = list[list[UserIdInt]]
 ForgedRoles: TypeAlias = list[UserIdInt | RolesLiteral]
 
 
-class OwnerCache(TypedDict):
-    user_id: int
-    full_name: str
+class GameSettingsCache(TypedDict):
+    creator_user_id: int
+    creator_full_name: str
     order_of_roles: list[RolesLiteral]
     banned_roles: list[RolesLiteral]
 
@@ -122,7 +122,7 @@ class UserCache(TypedDict, total=False):
 
 
 class GameCache(TypedDict, total=False):
-    owner: OwnerCache
+    settings: GameSettingsCache
     bids: RolesAndUsersMoney
     game_chat: int
     start_message_id: int

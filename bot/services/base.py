@@ -8,7 +8,7 @@ from faststream.rabbit import RabbitBroker
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.dao.prohibited_roles import ProhibitedRolesDAO
-from database.schemas.roles import UserTgId
+from database.schemas.common import UserTgId
 from utils.pretty_text import make_build
 
 

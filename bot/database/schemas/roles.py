@@ -1,14 +1,5 @@
-from pydantic import BaseModel
-
 from cache.cache_types import RolesLiteral
-
-
-class UserId(BaseModel):
-    tg_id: int
-
-
-class UserTgId(BaseModel):
-    user_tg_id: int
+from database.schemas.common import UserTgId
 
 
 class ProhibitedRoleSchema(UserTgId):

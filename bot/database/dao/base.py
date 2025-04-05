@@ -11,7 +11,7 @@ from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.common.base import BaseModel as Base
 from database.models import RoleModel
-from database.schemas.roles import UserTgId
+from database.schemas.common import UserTgId
 
 T = TypeVar("T", bound=Base)
 
@@ -103,7 +103,7 @@ class BaseDAO(Generic[T]):
             return new_instance
         except SQLAlchemyError as e:
             logger.error(f"Ошибка при добавлении записи: {e}")
-            raise
+            await self._session.rollback()
 
     async def add_many(
         self,

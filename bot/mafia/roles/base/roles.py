@@ -195,7 +195,7 @@ class RoleABC(ABC):
             return PersonalResultSchema(
                 user_tg_id=int(user_id),
                 game_id=game_id,
-                role=user_data["role"],
+                role_id=user_data["initial_role_id"],
                 is_winner=True,
                 nights_lived=nights_lived,
                 money=user_data["money"],
@@ -210,7 +210,7 @@ class RoleABC(ABC):
             return PersonalResultSchema(
                 user_tg_id=int(user_id),
                 game_id=game_id,
-                role=user_data["role"],
+                role_id=user_data["initial_role_id"],
                 is_winner=False,
                 nights_lived=nights_lived,
                 money=user_data["money"],

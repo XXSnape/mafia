@@ -1,5 +1,5 @@
 from contextlib import suppress
-from datetime import timedelta, datetime, timezone
+from datetime import timedelta, datetime, timezone, UTC
 from pprint import pprint
 
 from aiogram.exceptions import TelegramBadRequest
@@ -14,7 +14,7 @@ from cache.cache_types import (
     GameCache,
     UserCache,
     UserGameCache,
-    OwnerCache,
+    GameSettingsCache,
     RolesLiteral,
     RolesAndUsersMoney,
 )
@@ -22,7 +22,7 @@ from general.text import MONEY_SYM
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.dao.users import UsersDao
-from database.schemas.roles import UserId, UserTgId
+from database.schemas.common import TgId, UserTgId
 from general.collection_of_roles import (
     get_data_with_roles,
     BASES_ROLES,
@@ -69,7 +69,7 @@ def verification_for_admin_or_creator(async_func):
         )
         if (
             is_admin is False
-            and game_data["owner"]["user_id"] != user_id
+            and game_data["settings"]["creator_user_id"] != user_id
         ):
             return
         return await async_func(registration, game_data=game_data)
@@ -101,11 +101,9 @@ class Registration(RouterHelper):
     async def _get_user_or_create(self):
         user_id = self._get_user_id()
         users_dao = UsersDao(session=self.session)
-        user = await users_dao.find_one_or_none(
-            UserId(tg_id=user_id)
-        )
+        user = await users_dao.find_one_or_none(TgId(tg_id=user_id))
         if user is None:
-            user = await users_dao.add(UserId(tg_id=user_id))
+            user = await users_dao.add(TgId(tg_id=user_id))
         return user
 
     async def _get_user_balance(self):
@@ -172,7 +170,7 @@ class Registration(RouterHelper):
 
     @verification_for_admin_or_creator
     async def extend_registration(self, game_data: GameCache):
-        now = int(datetime.utcnow().timestamp())
+        now = int(datetime.now(UTC).timestamp())
         start_of_registration = game_data["start_of_registration"]
         if now - start_of_registration > 60:  # TODO 60 * 5
             await self.message.answer(
@@ -219,14 +217,14 @@ class Registration(RouterHelper):
 
     async def _offer_bet(self, game_data: GameCache, balance: int):
         to_user_markup = await offer_to_place_bet(
-            banned_roles=game_data["owner"]["banned_roles"]
+            banned_roles=game_data["settings"]["banned_roles"]
         )
         text = make_build(
             f"Ты в игре! Удачи!\n"
             f"Твой баланс: {balance}{MONEY_SYM}.\n"
             f"Если хочешь, можешь сделать ставку на разрешенную роль:\n\n"
         ) + RoleManager.get_current_order_text(
-            selected_roles=game_data["owner"]["order_of_roles"]
+            selected_roles=game_data["settings"]["order_of_roles"]
         )
 
         if self.message:
@@ -328,9 +326,9 @@ class Registration(RouterHelper):
         )
         if (
             is_admin is False
-            and game_data["owner"]["user_id"] != user_id
+            and game_data["settings"]["creator_user_id"] != user_id
         ):
-            full_name = game_data["owner"]["full_name"]
+            full_name = game_data["settings"]["creator_full_name"]
             await self.callback.answer(
                 f"Пожалуйста, попроси {full_name} или администраторов начать игру!",
                 show_alert=True,
@@ -463,14 +461,16 @@ class Registration(RouterHelper):
         )
         order_of_roles = await OrderOfRolesDAO(
             session=self.session
-        ).get_key_of_order_of_roles(UserTgId(user_tg_id=owner_id))
-        owner_data: OwnerCache = {
-            "user_id": owner_id,
-            "full_name": self.message.from_user.full_name,
-            "order_of_roles": order_of_roles or BASES_ROLES,
+        ).get_roles_ids_of_order_of_roles(
+            UserTgId(user_tg_id=owner_id)
+        )
+        settings: GameSettingsCache = {
+            "creator_user_id": owner_id,
+            "creator_full_name": self.message.from_user.full_name,
+            "order_of_roles": list(order_of_roles or BASES_ROLES),
             "banned_roles": banned_roles,
         }
-        pprint(owner_data)
+        pprint(settings)
         print(
             order_of_roles,
             BASES_ROLES,
@@ -478,7 +478,7 @@ class Registration(RouterHelper):
         )
         game_data: GameCache = {
             "game_chat": self.message.chat.id,
-            "owner": owner_data,
+            "settings": settings,
             "pros": [],
             "cons": [],
             "start_message_id": message_id,

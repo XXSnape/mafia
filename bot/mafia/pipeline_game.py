@@ -103,7 +103,7 @@ class Game:
         self.beginning_game = int(beginning_dt.timestamp())
         game_instance = await dao.add(
             BeginningOfGameSchema(
-                chat_id=self.group_chat_id,
+                group_tg_id=self.group_chat_id,
                 creator_tg_id=creator_id,
                 start=beginning_dt,
             )
@@ -126,7 +126,7 @@ class Game:
             ),
         )
         await self.create_game_in_db(
-            creator_id=game_data["owner"]["user_id"]
+            creator_id=game_data["settings"]["creator_user_id"]
         )
         await self.state.set_state(GameFsm.STARTED)
         game_data = await self.select_roles()
@@ -353,7 +353,7 @@ class Game:
                 for user_id, money in rates:
                     loser = BidForRoleSchema(
                         user_tg_id=user_id,
-                        role_key=role_key,
+                        role_id=role_key,
                         money=money,
                     )
                     losers.append(loser)
@@ -365,7 +365,7 @@ class Game:
                 for user_id, money in rates[1:]:
                     loser = BidForRoleSchema(
                         user_tg_id=user_id,
-                        role_key=role_key,
+                        role_id=role_key,
                         money=money,
                     )
                     losers.append(loser)
@@ -395,7 +395,7 @@ class Game:
                 )
             )
         for loser in losers_bets:
-            if loser.role_key in order_of_roles:
+            if loser.role_id in order_of_roles:
                 rates.append(
                     ResultBidForRoleSchema(
                         **loser.model_dump(),
@@ -414,8 +414,8 @@ class Game:
 
     async def select_roles(self):
         game_data: GameCache = await self.state.get_data()
-        banned_roles = game_data["owner"]["banned_roles"]
-        order_of_roles = game_data["owner"]["order_of_roles"]
+        banned_roles = game_data["settings"]["banned_roles"]
+        order_of_roles = game_data["settings"]["order_of_roles"]
         print("initial", order_of_roles)
         players_ids = game_data["live_players_ids"]
         all_roles = get_data_with_roles()
@@ -472,7 +472,7 @@ class Game:
                 losers.append(
                     BidForRoleSchema(
                         user_tg_id=winner_id,
-                        role_key=role_id,
+                        role_id=role_id,
                         money=money,
                     )
                 )
@@ -494,7 +494,7 @@ class Game:
                 winners_bets.append(
                     BidForRoleSchema(
                         user_tg_id=winner_id,
-                        role_key=role_id,
+                        role_id=role_id,
                         money=winner[1],
                     )
                 )
@@ -502,13 +502,11 @@ class Game:
             roles = game_data[current_role.roles_key]
             user_data: UserGameCache = {
                 "number": number,
-                "role": current_role.role,
                 "pretty_role": make_pretty(current_role.role),
                 "initial_role": make_pretty(current_role.role),
                 "role_id": role_id,
                 "initial_role_id": role_id,
                 "roles_key": current_role.roles_key,
-                "user_id": winner_id,
             }
             game_data["players"][str(winner_id)].update(user_data)
             roles.append(winner_id)

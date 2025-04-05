@@ -5,7 +5,8 @@ from aiogram.exceptions import TelegramBadRequest
 from cache.cache_types import PollBannedRolesCache, RolesLiteral
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
-from database.schemas.roles import UserTgId, ProhibitedRoleSchema
+from database.schemas.roles import ProhibitedRoleSchema
+from database.schemas.common import UserTgId
 from general.collection_of_roles import (
     get_data_with_roles,
     REQUIRED_ROLES,
@@ -49,7 +50,7 @@ class RoleAttendant(RouterHelper):
         await prohibited_dao.add_many(prohibited_roles)
         order_of_roles_dao = OrderOfRolesDAO(session=self.session)
         used_roles = set(
-            await order_of_roles_dao.get_key_of_order_of_roles(
+            await order_of_roles_dao.get_roles_ids_of_order_of_roles(
                 user_filter
             )
         )

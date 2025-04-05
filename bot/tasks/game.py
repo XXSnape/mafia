@@ -13,7 +13,6 @@ from database.dao.rates import RatesDao
 from database.dao.users import UsersDao
 from database.schemas.bids import (
     ResultBidForRoleSchema,
-    RateSchema,
     BidForRoleSchema,
 )
 from general.collection_of_roles import get_data_with_roles
@@ -29,16 +28,13 @@ async def analyze_betting_results(
     roles_data = get_data_with_roles()
     schemas = []
     for bet in bids:
-        role = roles_data[bet.role_key].role
+        role = roles_data[bet.role_id].role
         if bet.is_winner is True:
             message = f"✅Твоя ставка {bet.money}{MONEY_SYM} на {role} зашла!"
         else:
             message = f"🚫Твоя ставка {bet.money}{MONEY_SYM} на {role} не зашла!"
         messages.append((bet.user_tg_id, make_build(message)))
-        rate_schema = RateSchema(
-            **bet.model_dump(exclude={"role_key"}), role=role
-        )
-        schemas.append(rate_schema)
+        schemas.append(bet)
     rates_dao = RatesDao(session=session)
     users_dao = UsersDao(session=session)
     await asyncio.gather(
@@ -63,7 +59,7 @@ async def report_role_outside_game(bids: list[BidForRoleSchema]):
         (
             bet.user_tg_id,
             make_build(
-                f"🚫Твоя ставка {bet.money}{MONEY_SYM} на {roles_data[bet.role_key].role} не зашла! Роли нет в игре!"
+                f"🚫Твоя ставка {bet.money}{MONEY_SYM} на {roles_data[bet.role_id].role} не зашла! Роли нет в игре!"
             ),
         )
         for bet in bids

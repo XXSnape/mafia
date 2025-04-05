@@ -2,7 +2,7 @@ from sqlalchemy import select
 
 from database.dao.base import BaseDAO
 from database.models import ProhibitedRoleModel, RoleModel
-from database.schemas.roles import UserTgId
+from database.schemas.common import UserTgId
 
 
 class ProhibitedRolesDAO(BaseDAO[ProhibitedRoleModel]):

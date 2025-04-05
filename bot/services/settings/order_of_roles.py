@@ -3,7 +3,8 @@ from collections.abc import Iterable
 from cache.cache_types import OrderOfRolesCache, RolesLiteral
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
-from database.schemas.roles import UserTgId, OrderOfRolesSchema
+from database.schemas.roles import OrderOfRolesSchema
+from database.schemas.common import UserTgId
 from general.collection_of_roles import (
     get_data_with_roles,
     BASES_ROLES,

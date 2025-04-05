@@ -5,13 +5,13 @@ from sqlalchemy import select
 from cache.cache_types import RolesLiteral
 from database.dao.base import BaseDAO
 from database.models import OrderModel, RoleModel
-from database.schemas.roles import UserTgId
+from database.schemas.common import UserTgId
 
 
 class OrderOfRolesDAO(BaseDAO[OrderModel]):
     model = OrderModel
 
-    async def get_key_of_order_of_roles(
+    async def get_roles_ids_of_order_of_roles(
         self,
         user_filter: UserTgId,
     ) -> Iterable[RolesLiteral]:
