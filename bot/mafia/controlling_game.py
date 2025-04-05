@@ -45,7 +45,7 @@ from mafia.roles.base import (
 )
 from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,
-    FinalNightABC,
+    FinisherOfNight,
     ProcedureAfterVotingABC,
 )
 
@@ -140,7 +140,7 @@ class Controller:
                         and extra.key in game_data
                     ):
                         game_data[extra.key].clear()
-            if isinstance(current_role, FinalNightABC):
+            if isinstance(current_role, FinisherOfNight):
                 tasks.append(
                     current_role.end_night(game_data=game_data)
                 )
@@ -555,6 +555,7 @@ class Controller:
                     ),
                 )
                 for user_id, teammates in to_criminals_messages.items()
+                if teammates
             ),
             return_exceptions=True,
         )

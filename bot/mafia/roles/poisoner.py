@@ -5,7 +5,7 @@ from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,
     ProcedureAfterVotingABC,
-    FinalNightABC,
+    FinisherOfNight,
 )
 from general.groupings import Groupings
 from states.states import UserFsm
@@ -14,7 +14,7 @@ from utils.roles import get_user_role_and_url
 
 
 class Poisoner(
-    FinalNightABC, ProcedureAfterNightABC, ActiveRoleAtNightABC
+    FinisherOfNight, ProcedureAfterNightABC, ActiveRoleAtNightABC
 ):
     role = "Отравитель"
     role_id = "poisoner"

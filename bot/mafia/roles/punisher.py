@@ -12,7 +12,7 @@ class Punisher(ProcedureAfterNightABC, RoleABC):
     purpose = "Спровоцируй мафию и забери её с собой!"
     number_in_order_after_night = 4
     payment_for_treatment = 0
-    payment_for_murder = 0
+    payment_for_murder = 10
     payment_for_night_spent = 8
 
     def __init__(self):

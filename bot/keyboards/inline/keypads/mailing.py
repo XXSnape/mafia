@@ -69,6 +69,7 @@ def send_selection_to_players_kb(
         for index, player_id in enumerate(players_ids)
         if player_id not in exclude
     ]
+    buttons.sort(key=attrgetter("text"))
     buttons += extra_buttons
     return generate_inline_kb(data_with_buttons=buttons)
 

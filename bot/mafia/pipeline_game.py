@@ -164,7 +164,7 @@ class Game:
         )
         await message.pin()
         await self.controller.mailing()
-        await asyncio.sleep(32)
+        await asyncio.sleep(15)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -483,7 +483,7 @@ class Game:
             set(players_ids) - (set(not_winners) | winners)
         )
         winners_bets: list[BidForRoleSchema] = []
-        for role_id in order_of_roles:
+        for number, role_id in enumerate(order_of_roles, 1):
             current_role = get_data_with_roles(role_id)
             winner = role_and_winner.get(role_id)
             if winner is None:
@@ -502,6 +502,7 @@ class Game:
             self.initialization_by_role(game_data, role=current_role)
             roles = game_data[current_role.roles_key]
             user_data: UserGameCache = {
+                "number": number,
                 "role": current_role.role,
                 "pretty_role": make_pretty(current_role.role),
                 "initial_role": make_pretty(current_role.role),

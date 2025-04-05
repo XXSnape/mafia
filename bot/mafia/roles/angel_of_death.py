@@ -8,13 +8,16 @@ from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     MurderAfterNightABC,
     ProcedureAfterVotingABC,
+    FinisherOfNight,
 )
 from states.states import UserFsm
+from utils.pretty_text import make_build
 from utils.state import reset_user_state
 from utils.roles import get_processed_role_and_user_if_exists
 
 
 class AngelOfDeath(
+    FinisherOfNight,
     ProcedureAfterVotingABC,
     MurderAfterNightABC,
     ActiveRoleAtNightABC,
@@ -28,9 +31,9 @@ class AngelOfDeath(
     photo = "https://avatars.mds.yandex.net/get-entity_search/10844899/935958285/S600xU_2x"
     purpose = "Если ты умрешь на голосовании, сможешь ночью забрать кого-нибудь с собой"
     grouping = Groupings.civilians
-    extra_data = [ExtraCache("angels_died", False)]
+    extra_data = [ExtraCache(key="angels_died", need_to_clear=False)]
     message_to_user_after_action = "Ты выбрал отомстить {url}"
-    payment_for_night_spent = 5
+    payment_for_night_spent = 7
     clearing_state_after_death = False
     notification_message = ATTEMPT_TO_KILL
 
@@ -40,6 +43,23 @@ class AngelOfDeath(
         removed_user_id = removed_user[0]
         if removed_user_id in game_data.get(self.roles_key, []):
             game_data["angels_died"].append(removed_user_id)
+
+    async def end_night(self, game_data: GameCache):
+        for angel_id in game_data["angels_died"][:]:
+            if (
+                game_data["number_of_night"]
+                == game_data["players"][str(angel_id)][
+                    "number_died_at_night"
+                ]
+                + 1
+            ):
+                continue
+            game_data["angels_died"].remove(angel_id)
+            await reset_user_state(
+                dispatcher=self.dispatcher,
+                user_id=angel_id,
+                bot_id=self.bot.id,
+            )
 
     @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(
@@ -51,12 +71,6 @@ class AngelOfDeath(
         processed_user_id: int,
         **kwargs
     ):
-        for angel_id in game_data[self.roles_key]:
-            await reset_user_state(
-                dispatcher=self.dispatcher,
-                user_id=angel_id,
-                bot_id=self.bot.id,
-            )
         if processed_user_id not in victims:
             return
         if processed_role.grouping == Groupings.civilians:
@@ -78,7 +92,9 @@ class AngelOfDeath(
         if at_night is False:
             await self.bot.send_message(
                 chat_id=user_id,
-                text="Тебя линчевали на голосовании, не забудь отомстить обидчикам!",
+                text=make_build(
+                    "Тебя линчевали на голосовании, не забудь отомстить обидчикам!"
+                ),
             )
             return
         await super().report_death(
@@ -86,26 +102,14 @@ class AngelOfDeath(
         )
 
     async def mailing(self, game_data: GameCache):
-        if "angels_died" not in game_data:
+        if not game_data["angels_died"]:
             return
-        # current_number = game_data["number_of_night"]
-        angels = []
-        for angel_id in game_data["angels_died"][:]:
-            game_data["angels_died"].remove(angel_id)
-            angels.append(angel_id)
-            # if (
-            #     current_number
-            #     - game_data["players"][str(angel_id)][
-            #         "number_died_at_night"
-            #     ]
-            # ) == 2:
-            #     angels.append(angel_id)
         await asyncio.gather(
             *(
                 self.send_survey(
                     player_id=angel_id, game_data=game_data
                 )
-                for angel_id in angels
+                for angel_id in game_data["angels_died"][:]
             ),
             return_exceptions=True
         )

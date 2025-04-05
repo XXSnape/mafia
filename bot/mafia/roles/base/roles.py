@@ -18,8 +18,9 @@ from cache.cache_types import (
     UserGameCache,
     RolesLiteral,
     UserIdInt,
+    NumberOfNight,
 )
-from general.text import MONEY_SYM
+from general.text import MONEY_SYM, NUMBER_OF_NIGHT
 from database.schemas.results import PersonalResultSchema
 from general.groupings import Groupings
 from keyboards.inline.keypads.mailing import (
@@ -549,10 +550,14 @@ class ActiveRoleAtNightABC(RoleABC):
         if not roles:
             return
         if self.allow_sending_mailing(game_data) is not True:
+            text = (
+                NUMBER_OF_NIGHT.format(game_data["number_of_night"])
+                + "😜У тебя сегодня выходной!"
+            )
             await send_a_lot_of_messages_safely(
                 bot=self.bot,
                 users=[roles[0]],
-                text=make_build("😜У тебя сегодня выходной!"),
+                text=make_build(text),
             )
             return
         general_text = self.get_general_text_before_sending(

@@ -64,6 +64,7 @@ class PollBannedRolesCache(TypedDict, total=False):
 class UserGameCache(TypedDict, total=False):
     full_name: str
     url: Url
+    number: int
     role: NotRequired[RoleName]
     pretty_role: NotRequired[str]
     initial_role: str

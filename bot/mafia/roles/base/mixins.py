@@ -75,12 +75,12 @@ class ProcedureAfterVotingABC(ABC):
     ): ...
 
 
-class FinalNightABC(ABC):
+class FinisherOfNight(ABC):
     @abstractmethod
     async def end_night(self, game_data: GameCache): ...
 
 
-class MafiaConverterABC(FinalNightABC):
+class MafiaConverterABC(FinisherOfNight):
     @abstractmethod
     def check_for_possibility_to_transform(
         self, game_data: GameCache

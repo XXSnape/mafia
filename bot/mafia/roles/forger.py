@@ -40,7 +40,7 @@ class Forger(
     number_in_order_after_voting = 2
 
     def get_processed_user_id(self, game_data: GameCache):
-        with suppress(IndexError):
+        if len(game_data["forged_roles"]) == 2:
             return game_data["forged_roles"][0]
 
     async def procedure_after_night(

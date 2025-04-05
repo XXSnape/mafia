@@ -38,7 +38,7 @@ def get_live_players(
         game_data=game_data, all_roles=all_roles
     )
     return (
-        f"{make_build('💗Живые игроки:')}\n"
+        f"{make_build(f'💗Живые игроки ({len(game_data["live_players_ids"])}):')}\n"
         f"{profiles}\n\n"
         f"{make_build('Состав группировок:')}\n"
         f"{live_roles}\n\n"
@@ -91,15 +91,18 @@ def get_profiles(
     money_need: bool = False,
     if_there_are_no_players: str = "Пока нет участников!",
 ) -> str:
+    def sorting_by_number(player_id: UserIdInt):
+        return players[str(player_id)].get("number", 0)
+
     result = ""
     if not players_ids:
         return if_there_are_no_players
 
-    for (
-        index,
-        user_id,
-    ) in enumerate(players_ids, start=1):
+    for index, user_id in enumerate(
+        sorted(players_ids, key=sorting_by_number), 1
+    ):
         url = players[str(user_id)]["url"]
+        number = players[str(user_id)].get("number", index)
         if role:
             if initial_role:
                 role = players[str(user_id)]["initial_role"]
@@ -107,13 +110,11 @@ def get_profiles(
                 role = players[str(user_id)]["pretty_role"]
             if money_need:
                 money = players[str(user_id)]["money"]
-                result += (
-                    f"\n{index}) {url} - {role} ({money}{MONEY_SYM})"
-                )
+                result += f"\n{number}) {url} - {role} ({money}{MONEY_SYM})"
             else:
-                result += f"\n{index}) {url} - {role}"
+                result += f"\n{number}) {url} - {role}"
         else:
-            result += f"\n{index}) {url}"
+            result += f"\n{number}) {url}"
     return result
 
 
