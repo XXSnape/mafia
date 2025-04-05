@@ -7,18 +7,16 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 def generate_inline_kb(
     data_with_buttons=(),
     sizes: Iterable[int] = (1,),
+    leave_1_each: int | None = None,
 ) -> InlineKeyboardMarkup:
-    """
-    Генерирует клавиатуру по различным данным
-    :param data_with_url: итерируемый объект с названием и url
-    :param data_with_buttons: итерируемый объект с готовыми кнопками
-    :param data_with_cb: итерируемый объект с текстом и данными
-    :param sizes: расположение кнопок
-    :return: InlineKeyboardMarkup
-    """
     builder = InlineKeyboardBuilder()
     for data in data_with_buttons:
         if data:
             builder.add(data)
+    if leave_1_each:
+        sizes = [
+            *[2] * ((len(data_with_buttons) - leave_1_each) // 2),
+            1,
+        ]
     builder.adjust(*sizes)
     return builder.as_markup()

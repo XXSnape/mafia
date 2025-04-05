@@ -1,15 +1,20 @@
-from cache.cache_types import OrderOfRolesCache
+from collections.abc import Iterable
+
+from cache.cache_types import OrderOfRolesCache, RolesLiteral
 from database.dao.order import OrderOfRolesDAO
+from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.schemas.roles import UserTgId, OrderOfRolesSchema
 from general.collection_of_roles import (
     get_data_with_roles,
     BASES_ROLES,
 )
 from general.groupings import Groupings
+from general.text import REQUIRE_TO_SAVE
 from keyboards.inline.keypads.settings import (
     edit_roles_kb,
     get_next_role_kb,
 )
+from mafia.roles import Doctor, Policeman, Mafia
 
 from services.base import RouterHelper
 from states.settings import SettingsFsm
@@ -22,37 +27,41 @@ class RoleManager(RouterHelper):
     )
 
     async def _delete_old_order_of_roles_and_add_new(
-        self, roles: list[str]
+        self, roles: list[RolesLiteral]
     ):
         await self.state.set_data({})
         dao = OrderOfRolesDAO(session=self.session)
         await dao.delete(
             UserTgId(user_tg_id=self.callback.from_user.id)
         )
-        all_roles = get_data_with_roles()
         order_of_roles = [
             OrderOfRolesSchema(
                 user_tg_id=self.callback.from_user.id,
-                role=all_roles[role].role,
+                role_id=role_id,
                 number=number,
             )
-            for number, role in enumerate(roles, 1)
+            for number, role_id in enumerate(roles, 1)
         ]
         await dao.add_many(order_of_roles)
 
     @classmethod
     def get_current_order_text(
-        cls, selected_roles: list[str], to_save: bool = True
+        cls,
+        selected_roles: Iterable[RolesLiteral],
+        to_save: bool = True,
     ):
         all_roles = get_data_with_roles()
         result = cls.CURRENT_ORDER_OF_ROLES
         if not selected_roles:
             selected_roles = BASES_ROLES
         if to_save and len(selected_roles) > 4:
-            result = cls.REQUIRE_TO_SAVE + result
+            result = REQUIRE_TO_SAVE + result
         for index, role in enumerate(selected_roles, 1):
-            result += f"{index}) {all_roles[role].role}\n"
-        return result
+            result += (
+                f"{index}) {all_roles[role].role}"
+                f"{all_roles[role].grouping.value.name[-1]}\n"
+            )
+        return make_build(result)
 
     async def view_order_of_roles(self):
         dao = OrderOfRolesDAO(session=self.session)
@@ -61,34 +70,48 @@ class RoleManager(RouterHelper):
             sort_fields=["number"],
         )
         text = self.CURRENT_ORDER_OF_ROLES
+        all_roles = get_data_with_roles()
         if not order_of_roles:
             text = self.get_current_order_text(BASES_ROLES)
         else:
             for record in order_of_roles:
-                text += f"{record.number}) {record.role}\n"
+                text += (
+                    f"{record.number}) "
+                    f"{all_roles[record.role_id].role}"
+                    f"{all_roles[record.role_id].grouping.value.name[-1]}\n"
+                )
         await self.state.clear()
         await self.state.set_state(SettingsFsm.ORDER_OF_ROLES)
         await self.callback.message.edit_text(
-            text=text,
+            text=make_build(text),
             reply_markup=edit_roles_kb(bool(order_of_roles)),
         )
 
     async def start_editing_order(self):
         attacking = []
         other = []
-        banned_roles = await self._get_banned_roles()
+        banned_roles_ids = await ProhibitedRolesDAO(
+            session=self.session
+        ).get_roles_ids_of_banned_roles(
+            UserTgId(user_tg_id=self.callback.from_user.id)
+        )
+
         all_roles = get_data_with_roles()
-        for key, role in all_roles.items():
-            if role.role not in banned_roles and key not in [
-                "don",
-                "doctor",
-                "policeman",
-            ]:
+        for role_id, role in all_roles.items():
+            if (
+                role.role not in banned_roles_ids
+                and role_id
+                not in {
+                    Mafia.role_id,
+                    Doctor.role_id,
+                    Policeman.role_id,
+                }
+            ):
                 if role.grouping != Groupings.criminals:
-                    other.append(key)
+                    other.append(role_id)
                 else:
-                    attacking.append(key)
-        selected = BASES_ROLES.copy()
+                    attacking.append(role_id)
+        selected = list(BASES_ROLES)
         order_data: OrderOfRolesCache = {
             "attacking": attacking,
             "other": other,
@@ -113,7 +136,7 @@ class RoleManager(RouterHelper):
         if role.there_may_be_several is False:
             order_data[key].remove(self.callback.data)
         order_data["selected"].append(self.callback.data)
-        if len(order_data["selected"]) == 30:
+        if len(order_data["selected"]) == 30:  # TODO FROM SETTINGS
             await self.callback.answer(
                 "Пока можно выбрать только 30 ролей!",
                 show_alert=True,

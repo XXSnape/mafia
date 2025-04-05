@@ -16,5 +16,5 @@ class ProhibitedRoleSchema(UserTgId):
 
 
 class OrderOfRolesSchema(UserTgId):
-    role: str
+    role_id: RolesLiteral
     number: int

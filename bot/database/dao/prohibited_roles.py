@@ -8,7 +8,7 @@ from database.schemas.roles import UserTgId
 class ProhibitedRolesDAO(BaseDAO[ProhibitedRoleModel]):
     model = ProhibitedRoleModel
 
-    async def get_keys_of_banned_roles(
+    async def get_roles_ids_of_banned_roles(
         self,
         user_filter: UserTgId,
     ):

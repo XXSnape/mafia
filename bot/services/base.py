@@ -21,9 +21,6 @@ class RouterHelper:
     dispatcher: Dispatcher | None = None
     scheduler: AsyncIOScheduler | None = None
     broker: RabbitBroker | None = None
-    REQUIRE_TO_SAVE: str = make_build(
-        "❗️Чтобы сохранить изменения, нажмите «Сохранить💾»\n\n"
-    )
 
     def _get_user_id(self):
         obj = self.callback or self.message

@@ -23,6 +23,7 @@ from keyboards.inline.cb.cb_text import (
     DELETE_LATEST_ROLE_IN_ORDER_CB,
     BAN_EVERYTHING_CB,
 )
+from mafia.roles import MafiaAlias
 from utils.sorting import sorting_roles_by_name
 
 
@@ -84,14 +85,16 @@ def suggest_banning_roles_kb(
             sym = "✅"
         buttons.append(
             InlineKeyboardButton(
-                text=sym + all_roles[key].role, callback_data=key
+                text=sym
+                + all_roles[key].role
+                + all_roles[key].grouping.value.name[-1],
+                callback_data=key,
             )
         )
 
     buttons.extend([SAVE_BTN, CANCEL_BTN])
     return generate_inline_kb(
-        data_with_buttons=buttons,
-        sizes=[*[2] * ((len(buttons) - 2) // 2), 1],
+        data_with_buttons=buttons, leave_1_each=2
     )
 
 
@@ -100,9 +103,10 @@ def get_next_role_kb(
 ):
     all_roles = get_data_with_roles()
     buttons = []
+    leave_1_each = 1
     if (len(order_data["selected"]) + 1) % 4 == 0:
         if automatic_attacking and len(order_data["attacking"]) == 1:
-            order_data["selected"].append("mafia")
+            order_data["selected"].append(MafiaAlias.role_id)
             return get_next_role_kb(order_data)
         key = "attacking"
     else:
@@ -111,7 +115,9 @@ def get_next_role_kb(
         current_role = all_roles[role_key]
         buttons.append(
             InlineKeyboardButton(
-                text=current_role.role, callback_data=role_key
+                text=current_role.role
+                + current_role.grouping.value.name[-1],
+                callback_data=role_key,
             )
         )
     buttons.sort(key=attrgetter("text"))
@@ -119,11 +125,14 @@ def get_next_role_kb(
         buttons.extend(
             [
                 InlineKeyboardButton(
-                    text="Убрать последний🗑️",
+                    text="🗑️Убрать последний",
                     callback_data=DELETE_LATEST_ROLE_IN_ORDER_CB,
                 ),
                 SAVE_BTN,
             ]
         )
+        leave_1_each = 3
     buttons.append(CANCEL_BTN)
-    return generate_inline_kb(data_with_buttons=buttons)
+    return generate_inline_kb(
+        data_with_buttons=buttons, leave_1_each=leave_1_each
+    )

@@ -10,6 +10,7 @@ from general.collection_of_roles import (
     get_data_with_roles,
     REQUIRED_ROLES,
 )
+from general.text import REQUIRE_TO_SAVE
 from keyboards.inline.buttons.common import SAVE_BTN
 from keyboards.inline.keypads.settings import (
     edit_roles_kb,
@@ -28,7 +29,10 @@ class RoleAttendant(RouterHelper):
         result = "🚫Забаненные роли:\n\n"
         all_roles = get_data_with_roles()
         for num, role_id in enumerate(roles_ids, 1):
-            result += f"{num}) {all_roles[role_id].role}\n"
+            result += (
+                f"{num}) {all_roles[role_id].role}"
+                f"{all_roles[role_id].grouping.value.name[-1]}\n"
+            )
         return make_build(result)
 
     async def _save_new_prohibited_roles(
@@ -80,7 +84,7 @@ class RoleAttendant(RouterHelper):
         await self.state.clear()
         dao = ProhibitedRolesDAO(session=self.session)
         user_filter = UserTgId(user_tg_id=self.callback.from_user.id)
-        banned_roles_ids = await dao.get_keys_of_banned_roles(
+        banned_roles_ids = await dao.get_roles_ids_of_banned_roles(
             user_filter
         )
         if banned_roles_ids:
@@ -128,8 +132,7 @@ class RoleAttendant(RouterHelper):
         text = (
             "Выбери роли, которые нужно забанить.\n"
             "✅ - роль не забанена\n"
-            "🚫 - роль уже забанена\n\n"
-            f"❗️Чтобы сохранить изменения, обязательно нажмите «{SAVE_BTN.text}»"
+            "🚫 - роль уже забанена\n\n" + REQUIRE_TO_SAVE
         )
         await self.callback.message.edit_text(
             make_build(text),
