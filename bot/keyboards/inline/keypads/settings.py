@@ -70,7 +70,7 @@ def edit_roles_kb(are_there_roles: bool, to_ban: bool = False):
 
 
 def suggest_banning_roles_kb(
-    banned_roles_keys: list[RolesLiteral],
+    banned_roles_ids: list[RolesLiteral],
 ):
     buttons = []
     all_roles = get_data_with_roles()
@@ -78,7 +78,7 @@ def suggest_banning_roles_kb(
     for key in sort_keys:
         if key in REQUIRED_ROLES:
             continue
-        if key in banned_roles_keys:
+        if key in banned_roles_ids:
             sym = "🚫"
         else:
             sym = "✅"
@@ -89,7 +89,10 @@ def suggest_banning_roles_kb(
         )
 
     buttons.extend([SAVE_BTN, CANCEL_BTN])
-    return generate_inline_kb(data_with_buttons=buttons)
+    return generate_inline_kb(
+        data_with_buttons=buttons,
+        sizes=[*[2] * ((len(buttons) - 2) // 2), 1],
+    )
 
 
 def get_next_role_kb(

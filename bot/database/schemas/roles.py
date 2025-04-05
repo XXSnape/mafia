@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 
+from cache.cache_types import RolesLiteral
+
 
 class UserId(BaseModel):
     tg_id: int
@@ -10,7 +12,7 @@ class UserTgId(BaseModel):
 
 
 class ProhibitedRoleSchema(UserTgId):
-    role: str | None = None
+    role_id: RolesLiteral
 
 
 class OrderOfRolesSchema(UserTgId):

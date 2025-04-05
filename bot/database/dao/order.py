@@ -1,5 +1,8 @@
+from collections.abc import Iterable
+
 from sqlalchemy import select
 
+from cache.cache_types import RolesLiteral
 from database.dao.base import BaseDAO
 from database.models import OrderModel, RoleModel
 from database.schemas.roles import UserTgId
@@ -11,7 +14,7 @@ class OrderOfRolesDAO(BaseDAO[OrderModel]):
     async def get_key_of_order_of_roles(
         self,
         user_filter: UserTgId,
-    ):
+    ) -> Iterable[RolesLiteral]:
         query = (
             select(RoleModel.key)
             .select_from(self.model)

@@ -1,4 +1,4 @@
-from typing import overload
+from typing import overload, Final
 
 from cache.cache_types import RolesLiteral
 from mafia import roles
@@ -6,7 +6,7 @@ from mafia.roles import RoleABC, ActiveRoleAtNightABC
 
 
 @overload
-def get_data_with_roles() -> dict[str, RoleABC]: ...
+def get_data_with_roles() -> dict[RolesLiteral, RoleABC]: ...
 
 
 @overload
@@ -54,46 +54,13 @@ def get_data_with_roles(
     return all_roles
 
 
-BASES_ROLES = [
-    # roles.Journalist.role_id,
+BASES_ROLES: Final[tuple[RolesLiteral, ...]] = (
     roles.Mafia.role_id,
-    roles.MafiaAlias.role_id,
-    roles.MafiaAlias.role_id,
-    roles.Sleeper.role_id,
-    # roles.Doctor.role_id,
-    # roles.Bodyguard.role_id,
-    # roles.Killer.role_id,
-    # roles.Poisoner.role_id,
-    # roles.AngelOfDeath.role_id,
-    # roles.Traitor.role_id,
-    # roles.Werewolf.role_id,
-    # roles.Journalist.role_id,
-    # roles.Poisoner.role_id,
-]
-REQUIRED_ROLES = BASES_ROLES + ["mafia"]
+    roles.Policeman.role_id,
+    roles.Doctor.role_id,
+    roles.Civilian.role_id,
+)
 
-# TESTED 2
-# bodyguard
-# nurse
-# doctor
-# policeman
-# general
-# don
-# mafia
-# killer
-# traitor
-# werewolf
-# civilian
-# angel_of_death
-# hacker
-# analyst
-# prime_minister
-# lawyer
-# instigator
-# suicide_bomber
-# masochist
-# lucky_gay
-# prosecutor
-# forger
-# agent
-# journalist
+REQUIRED_ROLES: Final[tuple[RolesLiteral, ...]] = BASES_ROLES + (
+    roles.MafiaAlias.role_id,
+)

@@ -27,7 +27,6 @@ router.callback_query.filter(F.message.chat.type == ChatType.PRIVATE)
 router.message.middleware(DatabaseMiddlewareWithCommit())
 router.callback_query.middleware(DatabaseMiddlewareWithCommit())
 router.callback_query.middleware(DatabaseMiddlewareWithoutCommit())
-router.poll_answer.middleware(DatabaseMiddlewareWithCommit())
 
 
 @router.callback_query(

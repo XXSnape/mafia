@@ -17,7 +17,6 @@ async def fill_database_with_roles():
         all_roles = get_data_with_roles()
         roles = [
             RoleModel(
-                name=role.role,
                 key=key,
                 grouping=role.grouping.value.name,
             )

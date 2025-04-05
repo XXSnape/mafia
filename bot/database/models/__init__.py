@@ -6,3 +6,5 @@ from .results import ResultModel
 from .prohibited_roles import ProhibitedRoleModel
 from .orders import OrderModel
 from .rates import RateModel
+from .groups import GroupModel
+from .settings import SettingModel

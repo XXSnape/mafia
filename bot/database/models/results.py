@@ -1,6 +1,7 @@
 from sqlalchemy import ForeignKey, BigInteger, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
+from cache.cache_types import RolesLiteral
 from database.common.base import BaseModel, IdMixin
 
 
@@ -12,7 +13,7 @@ class ResultModel(IdMixin, BaseModel):
     game_id: Mapped[int] = mapped_column(
         ForeignKey("games.id", ondelete="CASCADE")
     )
-    role_id: Mapped[str] = mapped_column(
+    role_id: Mapped[RolesLiteral] = mapped_column(
         ForeignKey("roles.key", ondelete="SET NULL"),
     )
     is_winner: Mapped[bool]

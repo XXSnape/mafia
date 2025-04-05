@@ -17,6 +17,8 @@ from database.models import (
     ProhibitedRoleModel,
     OrderModel,
     RateModel,
+    GroupModel,
+    SettingModel,
 )
 from general import settings
 
