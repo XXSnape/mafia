@@ -1,6 +1,6 @@
 import asyncio
 from collections import defaultdict
-from collections.abc import Iterable
+from collections.abc import Iterable, Callable
 from typing import TYPE_CHECKING
 
 from aiogram import Bot
@@ -22,6 +22,7 @@ from keyboards.inline.keypads.mailing import (
 )
 
 from utils.pretty_text import make_build, make_pretty
+from utils.sorting import sorting_by_number
 
 if TYPE_CHECKING:
     from mafia.roles import RoleABC
@@ -89,17 +90,15 @@ def get_profiles(
     role: bool = False,
     initial_role: bool = False,
     money_need: bool = False,
+    sorting_factory: Callable = sorting_by_number,
     if_there_are_no_players: str = "Пока нет участников!",
 ) -> str:
-    def sorting_by_number(player_id: UserIdInt):
-        return players[str(player_id)].get("number", 0)
-
+    sorting_func = sorting_factory(players=players)
     result = ""
     if not players_ids:
         return if_there_are_no_players
-
     for index, user_id in enumerate(
-        sorted(players_ids, key=sorting_by_number), 1
+        sorted(players_ids, key=sorting_func), 1
     ):
         url = players[str(user_id)]["url"]
         number = players[str(user_id)].get("number", index)

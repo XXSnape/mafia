@@ -84,7 +84,7 @@ class WerewolfSaver(RouterHelper):
             await self.callback.message.answer(
                 text=remind_commissioner_about_inspections(game_data)
             )
-        if self.callback == WEREWOLF_TO_MAFIA_CB:
+        if self.callback.data == WEREWOLF_TO_MAFIA_CB:
             criminals = get_criminals_ids(game_data)
             text = (
                 "В стане мафии пополнение! Вся команда:\n"

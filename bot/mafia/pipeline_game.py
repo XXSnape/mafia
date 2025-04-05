@@ -164,7 +164,7 @@ class Game:
         )
         await message.pin()
         await self.controller.mailing()
-        await asyncio.sleep(15)
+        await asyncio.sleep(32)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -219,8 +219,6 @@ class Game:
             else:
                 losers.append(user_id)
             personal_results[user_id] = personal_result
-        sorting_func = sorting_by_money(game_data=game_data)
-        winners.sort(key=sorting_func, reverse=True)
         winners_text = make_build("🔥Победители:\n") + get_profiles(
             players_ids=winners,
             players=game_data["players"],
@@ -228,6 +226,7 @@ class Game:
             money_need=True,
             role=True,
             if_there_are_no_players="Де-факто нет победителей!",
+            sorting_factory=sorting_by_money,
         )
         losers_text = make_build(
             "\n\n🚫Проигравшие:\n"

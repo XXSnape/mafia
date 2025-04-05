@@ -23,7 +23,7 @@ from keyboards.inline.cb.cb_text import (
     DELETE_LATEST_ROLE_IN_ORDER_CB,
     BAN_EVERYTHING_CB,
 )
-from utils.sorting import sort_roles_by_name
+from utils.sorting import sorting_roles_by_name
 
 
 def select_setting_kb():
@@ -74,7 +74,7 @@ def suggest_banning_roles_kb(
 ):
     buttons = []
     all_roles = get_data_with_roles()
-    sort_keys = sorted(all_roles.keys(), key=sort_roles_by_name)
+    sort_keys = sorted(all_roles.keys(), key=sorting_roles_by_name)
     for key in sort_keys:
         if key in REQUIRED_ROLES:
             continue
