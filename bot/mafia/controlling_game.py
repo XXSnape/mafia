@@ -388,17 +388,26 @@ class Controller:
 
     async def mailing(self):
         game_data: GameCache = await self.state.get_data()
-        tasks = []
-        for role in self.all_roles:
-            current_role: RoleABC = self.all_roles[role]
-            if (
-                isinstance(current_role, ActiveRoleAtNightABC)
-                is False
-                or current_role.is_alias
-            ):
-                continue
-            tasks.append(current_role.mailing(game_data=game_data))
-        await asyncio.gather(*tasks, return_exceptions=True)
+        # tasks = []
+        active_roles = self.get_roles_if_isinstance(
+            ActiveRoleAtNightABC
+        )
+        # for role in self.all_roles:
+        #     current_role: RoleABC = self.all_roles[role]
+        #     if (
+        #         isinstance(current_role, ActiveRoleAtNightABC)
+        #         is False
+        #         or current_role.is_alias
+        #     ):
+        #         continue
+        #     tasks.append(current_role.mailing(game_data=game_data))
+        await asyncio.gather(
+            *(
+                role.mailing(game_data=game_data)
+                for role in active_roles
+            ),
+            return_exceptions=True,
+        )
         await self.state.set_data(game_data)
 
     async def suggest_vote(self):
@@ -412,7 +421,10 @@ class Controller:
         game_data: GameCache = await self.state.get_data()
         live_players = game_data["live_players_ids"]
         players = game_data["players"]
-        banned_user = Prosecutor().get_processed_user_id(game_data)
+        banned_user = None
+        prosecutor = self.all_roles.get(Prosecutor.role_id)
+        if prosecutor:
+            banned_user = prosecutor.get_processed_user_id(game_data)
         await asyncio.gather(
             *(
                 send_request_to_vote(

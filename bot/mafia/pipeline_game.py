@@ -181,7 +181,7 @@ class Game:
         )
         await asyncio.sleep(4)
         await self.controller.suggest_vote()
-        await asyncio.sleep(7)
+        await asyncio.sleep(15)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,

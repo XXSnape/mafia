@@ -56,7 +56,7 @@ class GroupManager(RouterHelper):
             not in game_data["live_players_ids"]
         ):
             await self.callback.answer(
-                "Мертвые не могут голосовать!", show_alert=True
+                "Ты не в игре!", show_alert=True
             )
             return
 

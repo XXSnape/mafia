@@ -73,7 +73,12 @@ class Poisoner(
         if not poisoned or poisoned[1] == 0:
             return
         for victim_id, roles in killers_of.items():
-            if victim_id not in victims or self not in roles:
+            if self not in roles:
+                continue
+            game_data["messages_after_night"].append(
+                [victim_id, self.notification_message]
+            )
+            if victim_id not in victims:
                 continue
             self.victims += 1
             user_role, user_url = get_user_role_and_url(
@@ -94,14 +99,7 @@ class Poisoner(
         self,
         game_data: GameCache,
     ):
-        poisoned = game_data["poisoned"]
-        if not poisoned:
-            return
-        if poisoned[1] == 1:
-            for user_id in poisoned[0]:
-                game_data["messages_after_night"].append(
-                    [user_id, self.notification_message]
-                )
+        return
 
     async def end_night(self, game_data: GameCache):
         poisoned = game_data["poisoned"]
