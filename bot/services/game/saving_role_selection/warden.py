@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 from cache.cache_types import GameCache
 from keyboards.inline.keypads.mailing import selection_to_warden_kb
 from services.base import RouterHelper
-from services.game.actions_at_night import (
+from services.game.game_assistants import (
     get_game_state_and_data,
     trace_all_actions,
     send_messages_and_remove_from_expected,

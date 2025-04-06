@@ -5,7 +5,7 @@ from aiogram.types import CallbackQuery
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
-from services.game.actions_at_night import (
+from services.game.game_assistants import (
     take_action_and_save_data,
 )
 from states.states import UserFsm

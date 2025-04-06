@@ -119,6 +119,7 @@ class UserCache(TypedDict, total=False):
     game_chat: int
     message_with_offer_id: int
     coveted_role: RolesLiteral
+    balance: int
 
 
 class GameCache(TypedDict, total=False):

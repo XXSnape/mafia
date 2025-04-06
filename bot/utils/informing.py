@@ -91,7 +91,7 @@ def get_profiles(
     initial_role: bool = False,
     money_need: bool = False,
     sorting_factory: Callable = sorting_by_number,
-    if_there_are_no_players: str = "Пока нет участников!",
+    if_there_are_no_players: str = "\nПока нет участников!",
 ) -> str:
     sorting_func = sorting_factory(players=players)
     result = ""
@@ -122,7 +122,7 @@ def get_profiles_during_registration(
 ) -> str:
     profiles = get_profiles(live_players_ids, players)
     return make_build(
-        f"Скорее присоединяйся к игре!\nУчастники:\n{profiles}"
+        f"❤️Скорее присоединяйся к игре!\n\nУчастники:\n{profiles}"
     )
 
 

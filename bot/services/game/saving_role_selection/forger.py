@@ -4,7 +4,7 @@ from keyboards.inline.callback_factory.recognize_user import (
 )
 from keyboards.inline.keypads.mailing import choose_fake_role_kb
 from services.base import RouterHelper
-from services.game.actions_at_night import (
+from services.game.game_assistants import (
     get_game_state_data_and_user_id,
     get_game_state_and_data,
     trace_all_actions,

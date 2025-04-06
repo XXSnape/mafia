@@ -8,7 +8,7 @@ from keyboards.inline.keypads.mailing import (
     kill_or_poison_kb,
 )
 from services.base import RouterHelper
-from services.game.actions_at_night import (
+from services.game.game_assistants import (
     get_game_state_and_data,
     take_action_and_save_data,
     send_messages_and_remove_from_expected,

@@ -33,7 +33,7 @@ from keyboards.inline.keypads.join import (
     cancel_bet,
 )
 from services.base import RouterHelper
-from services.game.actions_at_night import get_game_state_and_data
+from services.game.game_assistants import get_game_state_and_data
 from mafia.pipeline_game import Game
 from services.settings.order_of_roles import RoleManager
 from states.states import GameFsm
@@ -49,6 +49,7 @@ from utils.pretty_text import (
     get_profile_link,
     make_build,
     get_minutes_and_seconds_text,
+    make_pretty,
 )
 from utils.informing import get_profiles_during_registration
 from utils.state import (
@@ -105,10 +106,6 @@ class Registration(RouterHelper):
         if user is None:
             user = await users_dao.add(TgId(tg_id=user_id))
         return user
-
-    async def _get_user_balance(self):
-        user = await self._get_user_or_create()
-        return user.balance
 
     async def start_registration(self):
         await self.message.delete()
@@ -216,15 +213,26 @@ class Registration(RouterHelper):
         )
 
     async def _offer_bet(self, game_data: GameCache, balance: int):
-        to_user_markup = await offer_to_place_bet(
-            banned_roles=game_data["settings"]["banned_roles"]
-        )
+        to_user_markup = None
+        offer_for_role = "Ты не можешь сделать ставку на роль\n\n"
+        if balance > 0:
+            to_user_markup = await offer_to_place_bet(
+                banned_roles=game_data["settings"]["banned_roles"]
+            )
+            offer_for_role = f"Если хочешь, можешь сделать ставку на разрешенную роль:\n\n"
+
         text = make_build(
-            f"Ты в игре! Удачи!\n"
-            f"Твой баланс: {balance}{MONEY_SYM}.\n"
-            f"Если хочешь, можешь сделать ставку на разрешенную роль:\n\n"
-        ) + RoleManager.get_current_order_text(
-            selected_roles=game_data["settings"]["order_of_roles"]
+            (
+                f"✅Ты в игре! Удачи!\n\n"
+                f"Твой баланс: {balance}{MONEY_SYM}.\n\n"
+            )
+            + offer_for_role
+            + RoleManager.get_current_order_text(
+                selected_roles=game_data["settings"][
+                    "order_of_roles"
+                ],
+                to_save=False,
+            )
         )
 
         if self.message:
@@ -283,7 +291,7 @@ class Registration(RouterHelper):
         user_id = self._get_user_id()
         full_name = self.message.from_user.full_name
         game_data: GameCache = await game_state.get_data()
-        balance = await self._get_user_balance()
+        balance = (await self._get_user_or_create()).balance
         user_game_data: UserGameCache = {
             "full_name": full_name,
             "url": get_profile_link(
@@ -301,6 +309,7 @@ class Registration(RouterHelper):
         user_data: UserCache = {
             "game_chat": game_chat,
             "message_with_offer_id": sent_message.message_id,
+            "balance": balance,
         }
         await self.state.set_data(user_data)
         await self.state.set_state(GameFsm.WAIT_FOR_STARTING_GAME)
@@ -311,7 +320,9 @@ class Registration(RouterHelper):
         await self._change_message_in_group(
             game_data=game_data, game_chat=game_chat
         )
-        if len(game_data["live_players_ids"]) == 30:  # TODO 30
+        if (
+            len(game_data["live_players_ids"]) == 30
+        ):  # TODO FROM SETTINGS
             await self._start_game(
                 game_data=game_data, game_state=game_state
             )
@@ -339,15 +350,16 @@ class Registration(RouterHelper):
         )
 
     async def request_money(self):
-        balance = await self._get_user_balance()
+        user_data: UserCache = await self.state.get_data()
+        balance = user_data["balance"]
         role_key: RolesLiteral = self.callback.data
         coveted_role = get_data_with_roles(role_key)
         user_data: UserCache = {"coveted_role": role_key}
         await self.state.update_data(user_data)
         await self.callback.message.edit_text(
             text=make_build(
-                f"Ты выбрал поставить на {coveted_role.role}.\n"
-                f"Твой баланс: {balance}{MONEY_SYM}.\n"
+                f"Ты выбрал поставить на {make_pretty(coveted_role.role)}.\n\n"
+                f"Твой баланс: {balance}{MONEY_SYM}.\n\n"
                 f"Введи сумму денег или отмени"
             ),
             reply_markup=cancel_bet(),
@@ -381,7 +393,7 @@ class Registration(RouterHelper):
         del user_data["coveted_role"]
         await self.state.set_data(user_data)
         await game_state.set_data(game_data)
-        balance = await self._get_user_balance()
+        balance = user_data["balance"]
         await self._offer_bet(balance=balance, game_data=game_data)
 
     async def leave_game(self, command: CommandObject):
@@ -417,19 +429,18 @@ class Registration(RouterHelper):
 
     async def set_bet(self):
         await self.message.delete()
+        user_data: UserCache = await self.state.get_data()
         rate = int(self.message.text)
-        balance = await self._get_user_balance()
+        balance = user_data["balance"]
         if rate > balance:
             return
-        user_data: UserCache = await self.state.get_data()
         bot = self._get_bot()
         user_id = self._get_user_id()
-        game_state = await get_state_and_assign(
+        game_state, game_data = await get_game_state_and_data(
+            tg_obj=self.message,
+            state=self.state,
             dispatcher=self.dispatcher,
-            chat_id=user_data["game_chat"],
-            bot_id=bot.id,
         )
-        game_data: GameCache = await game_state.get_data()
         bids: RolesAndUsersMoney = game_data["bids"]
         bids.setdefault(user_data["coveted_role"], []).append(
             [user_id, rate]
@@ -440,7 +451,7 @@ class Registration(RouterHelper):
         await bot.edit_message_text(
             chat_id=user_id,
             text=make_build(
-                f"Ты успешно поставил {self.message.text}{MONEY_SYM} на роль {role.role}!\n\n"
+                f"✅Ты успешно поставил {self.message.text}{MONEY_SYM} на роль {make_pretty(role.role)}!\n\n"
                 f"Твой текущий баланс: {balance}{MONEY_SYM}"
             ),
             reply_markup=cancel_bet(),

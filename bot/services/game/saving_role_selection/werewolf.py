@@ -4,7 +4,7 @@ from keyboards.inline.cb.cb_text import (
     WEREWOLF_TO_POLICEMAN_CB,
 )
 from services.base import RouterHelper
-from services.game.actions_at_night import get_game_state_and_data
+from services.game.game_assistants import get_game_state_and_data
 from mafia.roles import (
     Mafia,
     MafiaAlias,

@@ -6,7 +6,7 @@ from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
 from services.base import RouterHelper
-from services.game.actions_at_night import (
+from services.game.game_assistants import (
     get_game_state_data_and_user_id,
     get_game_state_and_data,
     take_action_and_save_data,

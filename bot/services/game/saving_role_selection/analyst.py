@@ -1,5 +1,5 @@
 from services.base import RouterHelper
-from services.game.actions_at_night import (
+from services.game.game_assistants import (
     get_game_state_and_data,
     send_messages_and_remove_from_expected,
 )

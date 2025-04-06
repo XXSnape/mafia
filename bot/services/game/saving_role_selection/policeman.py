@@ -14,7 +14,7 @@ from keyboards.inline.keypads.mailing import (
     kill_or_check_on_policeman,
 )
 from services.base import RouterHelper
-from services.game.actions_at_night import (
+from services.game.game_assistants import (
     get_game_state_and_data,
     take_action_and_save_data,
     get_game_state_data_and_user_id,

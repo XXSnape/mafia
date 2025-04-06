@@ -9,7 +9,7 @@ from keyboards.inline.keypads.to_bot import (
     participate_in_social_life,
 )
 from services.base import RouterHelper
-from services.game.actions_at_night import (
+from services.game.game_assistants import (
     get_game_state_and_data,
     get_game_state_data_and_user_id,
 )
