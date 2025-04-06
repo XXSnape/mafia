@@ -35,10 +35,11 @@ class UsersDao(BaseDAO[UserModel]):
         await self._session.execute(update_stmt)
         await self._session.flush()
 
-    async def create_user(self, tg_id: TgId) -> Optional[UserModel]:
+    async def get_user_or_create(self, tg_id: TgId) -> UserModel:
+        user = await self.find_one_or_none(filters=tg_id)
+        if user:
+            return user
         user = await self.add(tg_id)
-        if not user:
-            return None
         settings_dao = SettingsDao(session=self._session)
         await settings_dao.add(UserTgId(user_tg_id=user.tg_id))
         return user

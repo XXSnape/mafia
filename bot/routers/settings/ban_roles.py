@@ -18,7 +18,7 @@ from middlewares.db import (
     DatabaseMiddlewareWithCommit,
     DatabaseMiddlewareWithoutCommit,
 )
-from services.settings.ban_roles import RoleAttendant
+from services.settings.banned_roles import RoleAttendant
 from states.settings import SettingsFsm
 
 router = Router(name=__name__)

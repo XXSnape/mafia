@@ -14,6 +14,9 @@ from keyboards.inline.buttons.common import (
     CANCEL_BTN,
     SAVE_BTN,
 )
+from keyboards.inline.callback_factory.settings import (
+    GroupSettingsCbData,
+)
 from keyboards.inline.cb.cb_text import (
     VIEW_BANNED_ROLES_CB,
     EDIT_SETTINGS_CB,
@@ -25,6 +28,24 @@ from keyboards.inline.cb.cb_text import (
 )
 from mafia.roles import MafiaAlias
 from utils.sorting import sorting_roles_by_name
+
+
+def set_up_group_kb(group_id: int):
+    buttons = [
+        InlineKeyboardButton(
+            text="Применять свои настройки",
+            callback_data=GroupSettingsCbData(
+                group_id=group_id, apply_own=True
+            ).pack(),
+        ),
+        InlineKeyboardButton(
+            text="Разрешить настройки создателя",
+            callback_data=GroupSettingsCbData(
+                group_id=group_id, apply_own=False
+            ).pack(),
+        ),
+    ]
+    return generate_inline_kb(data_with_buttons=buttons)
 
 
 def select_setting_kb():

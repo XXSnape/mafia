@@ -18,7 +18,7 @@ router.message.middleware(DatabaseMiddlewareWithCommit())
 async def greetings_to_user(
     message: Message, session_with_commit: AsyncSession
 ):
-    await UsersDao(session=session_with_commit).create_user(
+    await UsersDao(session=session_with_commit).get_user_or_create(
         tg_id=TgId(tg_id=message.from_user.id)
     )
     await message.answer(

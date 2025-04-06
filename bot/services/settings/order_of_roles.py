@@ -23,9 +23,6 @@ from utils.pretty_text import make_build
 
 
 class RoleManager(RouterHelper):
-    CURRENT_ORDER_OF_ROLES = make_build(
-        "ℹ️Текущий порядок ролей:\n\n"
-    )
 
     async def _delete_old_order_of_roles_and_add_new(
         self, roles: list[RolesLiteral]
@@ -45,14 +42,13 @@ class RoleManager(RouterHelper):
         ]
         await dao.add_many(order_of_roles)
 
-    @classmethod
+    @staticmethod
     def get_current_order_text(
-        cls,
         selected_roles: Iterable[RolesLiteral],
         to_save: bool = True,
     ):
         all_roles = get_data_with_roles()
-        result = cls.CURRENT_ORDER_OF_ROLES
+        result = "ℹ️Текущий порядок ролей:\n\n"
         if not selected_roles:
             selected_roles = BASES_ROLES
         if to_save and len(selected_roles) > 4:
@@ -66,21 +62,10 @@ class RoleManager(RouterHelper):
 
     async def view_order_of_roles(self):
         dao = OrderOfRolesDAO(session=self.session)
-        order_of_roles = await dao.find_all(
+        order_of_roles = await dao.get_roles_ids_of_order_of_roles(
             UserTgId(user_tg_id=self.callback.from_user.id),
-            sort_fields=["number"],
         )
-        text = self.CURRENT_ORDER_OF_ROLES
-        all_roles = get_data_with_roles()
-        if not order_of_roles:
-            text = self.get_current_order_text(BASES_ROLES)
-        else:
-            for record in order_of_roles:
-                text += (
-                    f"{record.number}) "
-                    f"{all_roles[record.role_id].role}"
-                    f"{all_roles[record.role_id].grouping.value.name[-1]}\n"
-                )
+        text = self.get_current_order_text(order_of_roles)
         await self.state.clear()
         await self.state.set_state(SettingsFsm.ORDER_OF_ROLES)
         await self.callback.message.edit_text(

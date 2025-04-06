@@ -102,10 +102,9 @@ class Registration(RouterHelper):
     async def _get_user_or_create(self):
         user_id = self._get_user_id()
         users_dao = UsersDao(session=self.session)
-        user = await users_dao.find_one_or_none(TgId(tg_id=user_id))
-        if user is None:
-            user = await users_dao.create_user(TgId(tg_id=user_id))
-        return user
+        return await users_dao.get_user_or_create(
+            TgId(tg_id=user_id)
+        )
 
     async def start_registration(self):
         await self.message.delete()
@@ -478,7 +477,7 @@ class Registration(RouterHelper):
         settings: GameSettingsCache = {
             "creator_user_id": owner_id,
             "creator_full_name": self.message.from_user.full_name,
-            "order_of_roles": list(order_of_roles or BASES_ROLES),
+            "order_of_roles": order_of_roles,
             "banned_roles": banned_roles,
         }
         pprint(settings)

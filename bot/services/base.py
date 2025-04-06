@@ -29,9 +29,3 @@ class RouterHelper:
     def _get_bot(self):
         obj = self.callback or self.message
         return obj.bot
-
-    async def _get_banned_roles(self):
-        user_id = self._get_user_id()
-        dao = ProhibitedRolesDAO(session=self.session)
-        result = await dao.find_all(UserTgId(user_tg_id=user_id))
-        return [record.role for record in result]
