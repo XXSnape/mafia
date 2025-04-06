@@ -18,6 +18,8 @@ from cache.cache_types import (
     RolesLiteral,
     RolesAndUsersMoney,
 )
+from database.dao.groups import GroupsDao
+from database.dao.settings import SettingsDao
 from general.text import MONEY_SYM
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
@@ -216,7 +218,7 @@ class Registration(RouterHelper):
         offer_for_role = "Ты не можешь сделать ставку на роль\n\n"
         if balance > 0:
             to_user_markup = await offer_to_place_bet(
-                banned_roles=game_data["users"]["banned_roles"]
+                banned_roles=game_data["settings"]["banned_roles"]
             )
             offer_for_role = f"Если хочешь, можешь сделать ставку на разрешенную роль:\n\n"
 
@@ -227,7 +229,9 @@ class Registration(RouterHelper):
             )
             + offer_for_role
             + RoleManager.get_current_order_text(
-                selected_roles=game_data["users"]["order_of_roles"],
+                selected_roles=game_data["settings"][
+                    "order_of_roles"
+                ],
                 to_save=False,
             )
         )
@@ -334,9 +338,9 @@ class Registration(RouterHelper):
         )
         if (
             is_admin is False
-            and game_data["users"]["creator_user_id"] != user_id
+            and game_data["settings"]["creator_user_id"] != user_id
         ):
-            full_name = game_data["users"]["creator_full_name"]
+            full_name = game_data["settings"]["creator_full_name"]
             await self.callback.answer(
                 f"Пожалуйста, попроси {full_name} или администраторов начать игру!",
                 show_alert=True,
@@ -462,31 +466,24 @@ class Registration(RouterHelper):
         end_of_registration: int,
     ):
         owner_id = self._get_user_id()
-        banned_roles = await ProhibitedRolesDAO(
+        group_settings_schema = await GroupsDao(
             session=self.session
-        ).get_roles_ids_of_banned_roles(
-            UserTgId(user_tg_id=owner_id)
-        )
-        order_of_roles = await OrderOfRolesDAO(
-            session=self.session
-        ).get_roles_ids_of_order_of_roles(
-            UserTgId(user_tg_id=owner_id)
+        ).get_group_settings(
+            group_tg_id=TgId(tg_id=self.message.chat.id),
+            user_tg_id=UserTgId(user_tg_id=owner_id),
         )
         settings: GameSettingsCache = {
             "creator_user_id": owner_id,
             "creator_full_name": self.message.from_user.full_name,
-            "order_of_roles": order_of_roles,
-            "banned_roles": banned_roles,
+            "order_of_roles": group_settings_schema.order_of_roles,
+            "banned_roles": group_settings_schema.banned_roles,
+            "time_for_night": group_settings_schema.time_for_night,
+            "time_for_day": group_settings_schema.time_for_day,
         }
         pprint(settings)
-        print(
-            order_of_roles,
-            BASES_ROLES,
-            order_of_roles or BASES_ROLES,
-        )
         game_data: GameCache = {
             "game_chat": self.message.chat.id,
-            "users": settings,
+            "settings": settings,
             "pros": [],
             "cons": [],
             "start_message_id": message_id,

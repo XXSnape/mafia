@@ -103,6 +103,8 @@ class GameSettingsCache(TypedDict):
     creator_full_name: str
     order_of_roles: list[RolesLiteral]
     banned_roles: list[RolesLiteral]
+    time_for_night: int
+    time_for_day: int
 
 
 UserAndMoney = list[int]

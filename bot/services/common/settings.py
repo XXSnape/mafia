@@ -71,7 +71,7 @@ class SettingsRouter(RouterHelper):
         )
         chat_info = await self.message.bot.get_chat(group_tg_id)
         group_name = f"Настройки группы «{chat_info.title}»\n\n"
-        if group_schema.banned_roles is None:
+        if group_schema.is_there_settings is False:
             await self.message.bot.send_message(
                 chat_id=self.message.from_user.id,
                 text=group_name
@@ -111,7 +111,8 @@ class SettingsRouter(RouterHelper):
                     f"❗️Ты можешь поменять настройки группы «{chat_info.title}» с помощью кнопок ниже:"
                 ),
                 reply_markup=set_up_group_kb(
-                    group_id=group_schema.id
+                    group_id=group_schema.id,
+                    is_there_settings=group_schema.is_there_settings,
                 ),
             )
 

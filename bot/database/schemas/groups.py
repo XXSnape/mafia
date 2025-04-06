@@ -5,10 +5,11 @@ from cache.cache_types import RolesLiteral
 
 class GroupSettingsSchema(BaseModel):
     id: int
-    banned_roles: list[RolesLiteral] | None = None
-    order_of_roles: list[RolesLiteral] | None = None
-    time_for_night: int | None = None
-    time_for_day: int | None = None
+    banned_roles: list[RolesLiteral]
+    order_of_roles: list[RolesLiteral]
+    time_for_night: int
+    time_for_day: int
+    is_there_settings: bool
 
 
 class GroupSettingIdSchema(BaseModel):

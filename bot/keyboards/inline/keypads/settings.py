@@ -30,21 +30,25 @@ from mafia.roles import MafiaAlias
 from utils.sorting import sorting_roles_by_name
 
 
-def set_up_group_kb(group_id: int):
+def set_up_group_kb(group_id: int, is_there_settings: bool):
     buttons = [
         InlineKeyboardButton(
-            text="Применять свои настройки",
+            text="Применить мои настройки",
             callback_data=GroupSettingsCbData(
                 group_id=group_id, apply_own=True
             ).pack(),
-        ),
-        InlineKeyboardButton(
-            text="Разрешить настройки создателя",
-            callback_data=GroupSettingsCbData(
-                group_id=group_id, apply_own=False
-            ).pack(),
-        ),
+        )
     ]
+    if is_there_settings:
+        buttons.append(
+            InlineKeyboardButton(
+                text="Разрешить настройки создателя",
+                callback_data=GroupSettingsCbData(
+                    group_id=group_id, apply_own=False
+                ).pack(),
+            )
+        ),
+
     return generate_inline_kb(data_with_buttons=buttons)
 
 

@@ -409,8 +409,8 @@ class Game:
 
     async def select_roles(self):
         game_data: GameCache = await self.state.get_data()
-        banned_roles = game_data["users"]["banned_roles"]
-        order_of_roles = game_data["users"]["order_of_roles"]
+        banned_roles = game_data["settings"]["banned_roles"]
+        order_of_roles = game_data["settings"]["order_of_roles"]
         print("initial", order_of_roles)
         players_ids = game_data["live_players_ids"][:]
         all_roles = get_data_with_roles()
