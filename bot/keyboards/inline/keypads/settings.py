@@ -16,6 +16,8 @@ from keyboards.inline.buttons.common import (
 )
 from keyboards.inline.callback_factory.settings import (
     GroupSettingsCbData,
+    TimeOfDay,
+    TimeOfDayCbData,
 )
 from keyboards.inline.cb.cb_text import (
     VIEW_BANNED_ROLES_CB,
@@ -25,9 +27,31 @@ from keyboards.inline.cb.cb_text import (
     MENU_CB,
     DELETE_LATEST_ROLE_IN_ORDER_CB,
     BAN_EVERYTHING_CB,
+    LENGTH_OF_NIGHT_CB,
+    LENGTH_OF_DAY_CB,
 )
 from mafia.roles import MafiaAlias
 from utils.sorting import sorting_roles_by_name
+
+
+def adjust_time_kb(current_time: int, time_of_day: TimeOfDay):
+    buttons = []
+    for seconds in range(45, 121, 15):
+        text = str(seconds)
+        if current_time == seconds:
+            text = "✅" + text
+        buttons.append(
+            InlineKeyboardButton(
+                text=text,
+                callback_data=TimeOfDayCbData(
+                    time_of_day=time_of_day, seconds=seconds
+                ).pack(),
+            )
+        )
+    buttons.append(BACK_TO_SELECTING_ACTIONS_FOR_ROLES)
+    return generate_inline_kb(
+        data_with_buttons=buttons, leave_1_each=1
+    )
 
 
 def set_up_group_kb(group_id: int, is_there_settings: bool):
@@ -61,6 +85,14 @@ def select_setting_kb():
         InlineKeyboardButton(
             text="Забаненные роли🚫",
             callback_data=VIEW_BANNED_ROLES_CB,
+        ),
+        InlineKeyboardButton(
+            text="Продолжительность ночи🌃",
+            callback_data=LENGTH_OF_NIGHT_CB,
+        ),
+        InlineKeyboardButton(
+            text="Продолжительность дня🌟",
+            callback_data=LENGTH_OF_DAY_CB,
         ),
         InlineKeyboardButton(
             text="Главное меню✨", callback_data=MENU_CB
