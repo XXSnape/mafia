@@ -88,7 +88,7 @@ class BaseDAO(Generic[T]):
             )
             raise
 
-    async def add(self, values: BaseModel):
+    async def add(self, values: BaseModel) -> T:
         values_dict = values.model_dump(exclude_unset=True)
         logger.info(
             f"Добавление записи {self.model.__name__} с параметрами: {values_dict}"
@@ -109,7 +109,7 @@ class BaseDAO(Generic[T]):
         self,
         instances: List[BaseModel],
         exclude: set[str] | None = None,
-    ):
+    ) -> list[T]:
         values_list = [
             item.model_dump(exclude_unset=True, exclude=exclude)
             for item in instances
@@ -133,7 +133,9 @@ class BaseDAO(Generic[T]):
             )
             raise
 
-    async def update(self, filters: BaseModel, values: BaseModel):
+    async def update(
+        self, filters: BaseModel, values: BaseModel
+    ) -> int:
         filter_dict = filters.model_dump(exclude_unset=True)
         values_dict = values.model_dump(exclude_unset=True)
         logger.info(
@@ -159,7 +161,7 @@ class BaseDAO(Generic[T]):
             logger.error(f"Ошибка при обновлении записей: {e}")
             raise
 
-    async def delete(self, filters: BaseModel):
+    async def delete(self, filters: BaseModel) -> int:
         filter_dict = filters.model_dump(exclude_unset=True)
         logger.info(
             f"Удаление записей {self.model.__name__} по фильтру: {filter_dict}"

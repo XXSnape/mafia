@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+from collections import defaultdict
 from operator import itemgetter
 from random import choice
 
@@ -18,6 +19,7 @@ from cache.cache_types import (
     RoleAndUserMoney,
     UserIdStr,
 )
+from database.schemas.common import TgId
 from general.text import MONEY_SYM
 from database.dao.games import GamesDao
 from database.schemas.bids import (
@@ -35,11 +37,11 @@ from general.groupings import Groupings
 
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
 from mafia.controlling_game import Controller
-from mafia.roles import RoleABC
+from mafia.roles import RoleABC, Mafia, Forger, Traitor
 from states.states import GameFsm
 from utils.sorting import sorting_by_rate, sorting_by_money
 from utils.tg import delete_messages_from_to_delete
-from utils.state import reset_user_state
+from utils.state import reset_user_state, get_state_and_assign
 from utils.pretty_text import (
     make_pretty,
     make_build,
@@ -97,18 +99,13 @@ class Game:
             )
         self.controller.all_roles = all_roles
 
-    async def create_game_in_db(self, creator_id: UserIdInt):
+    async def create_game_in_db(self):
         dao = GamesDao(session=self.session)
         beginning_dt = datetime.datetime.now()
         self.beginning_game = int(beginning_dt.timestamp())
-        game_instance = await dao.add(
-            BeginningOfGameSchema(
-                group_tg_id=self.group_chat_id,
-                creator_tg_id=creator_id,
-                start=beginning_dt,
-            )
+        self.game_id = await dao.create_game(
+            tg_id=TgId(tg_id=self.group_chat_id), start=beginning_dt
         )
-        self.game_id = game_instance.id
         await self.session.commit()
 
     async def start_game(
@@ -125,12 +122,10 @@ class Game:
                 message_id=game_data["start_message_id"],
             ),
         )
-        await self.create_game_in_db(
-            creator_id=game_data["settings"]["creator_user_id"]
-        )
+        await self.create_game_in_db()
         await self.state.set_state(GameFsm.STARTED)
         game_data = await self.select_roles()
-        await self.controller.familiarize_players(game_data)
+        await self.familiarize_players(game_data)
         self.init_existing_roles(game_data)
         await self.bot.send_message(
             chat_id=self.group_chat_id,
@@ -417,7 +412,7 @@ class Game:
         banned_roles = game_data["settings"]["banned_roles"]
         order_of_roles = game_data["settings"]["order_of_roles"]
         print("initial", order_of_roles)
-        players_ids = game_data["live_players_ids"]
+        players_ids = game_data["live_players_ids"][:]
         all_roles = get_data_with_roles()
         criminals: list[RolesLiteral] = []
         other: list[RolesLiteral] = []
@@ -501,7 +496,7 @@ class Game:
             self.initialization_by_role(game_data, role=current_role)
             roles = game_data[current_role.roles_key]
             user_data: UserGameCache = {
-                "number": number,
+                "number": players_ids.index(winner_id) + 1,
                 "pretty_role": make_pretty(current_role.role),
                 "initial_role": make_pretty(current_role.role),
                 "role_id": role_id,
@@ -510,6 +505,7 @@ class Game:
             }
             game_data["players"][str(winner_id)].update(user_data)
             roles.append(winner_id)
+
         await self.record_data_about_betting_results(
             order_of_roles=order_of_roles,
             winners_bets=winners_bets,
@@ -517,3 +513,89 @@ class Game:
         )
         await self.state.set_data(game_data)
         return game_data
+
+    async def familiarize_players(self, game_data: GameCache):
+        roles_tasks = []
+        aliases_tasks = []
+        to_criminals_messages = defaultdict(list)
+        for user_id, player_data in game_data["players"].items():
+            player_data: UserGameCache
+            current_role = get_data_with_roles(
+                player_data["role_id"]
+            )
+            if current_role.grouping == Groupings.criminals:
+                roles = [Mafia, Forger, Traitor]
+                for role in roles:
+                    if role.roles_key != current_role.roles_key:
+                        users = game_data.get(role.roles_key, [])
+                        to_criminals_messages[int(user_id)].extend(
+                            users
+                        )
+            if current_role.is_alias:
+                continue
+            persons = game_data[current_role.roles_key]
+            roles_tasks.append(
+                self.bot.send_photo(
+                    chat_id=persons[0],
+                    photo=current_role.photo,
+                    caption=f"Твоя роль - "
+                    f"{make_pretty(current_role.role)}! "
+                    f"{current_role.purpose}",
+                )
+            )
+            if current_role.alias and len(persons) > 1:
+                profiles = get_profiles(
+                    players_ids=persons,
+                    players=game_data["players"],
+                    role=True,
+                )
+                aliases_tasks.append(
+                    self.bot.send_message(
+                        chat_id=persons[0],
+                        text="Твои союзники:\n" + profiles,
+                    )
+                )
+                for user_id in persons[1:]:
+                    roles_tasks.append(
+                        self.bot.send_photo(
+                            chat_id=user_id,
+                            photo=current_role.alias.photo,
+                            caption=f"Твоя роль - "
+                            f"{make_pretty(current_role.alias.role)}!"
+                            f" {current_role.alias.purpose}",
+                        )
+                    )
+                    aliases_tasks.append(
+                        self.bot.send_message(
+                            chat_id=user_id,
+                            text="Твои союзники!\n\n" + profiles,
+                        )
+                    )
+            if current_role.state_for_waiting_for_action:
+                for person_id in persons:
+                    roles_tasks.append(
+                        get_state_and_assign(
+                            dispatcher=self.dispatcher,
+                            chat_id=person_id,
+                            bot_id=self.bot.id,
+                            new_state=current_role.state_for_waiting_for_action,
+                        )
+                    )
+        await asyncio.gather(*roles_tasks, return_exceptions=True)
+        await asyncio.gather(*aliases_tasks, return_exceptions=True)
+        await asyncio.gather(
+            *(
+                self.bot.send_message(
+                    chat_id=user_id,
+                    text=make_build("❗️Сокомандники:\n")
+                    + get_profiles(
+                        players_ids=teammates,
+                        players=game_data["players"],
+                        role=True,
+                    ),
+                )
+                for user_id, teammates in to_criminals_messages.items()
+                if teammates
+            ),
+            return_exceptions=True,
+        )

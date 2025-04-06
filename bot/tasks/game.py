@@ -17,7 +17,7 @@ from database.schemas.bids import (
 )
 from general.collection_of_roles import get_data_with_roles
 from general.config import broker, bot
-from utils.pretty_text import make_build
+from utils.pretty_text import make_build, make_pretty
 
 
 @broker.subscriber("betting_results")
@@ -30,9 +30,9 @@ async def analyze_betting_results(
     for bet in bids:
         role = roles_data[bet.role_id].role
         if bet.is_winner is True:
-            message = f"✅Твоя ставка {bet.money}{MONEY_SYM} на {role} зашла!"
+            message = f"✅Твоя ставка {bet.money}{MONEY_SYM} на {make_pretty(role)} зашла!"
         else:
-            message = f"🚫Твоя ставка {bet.money}{MONEY_SYM} на {role} не зашла!"
+            message = f"🚫Твоя ставка {bet.money}{MONEY_SYM} на {make_pretty(role)} не зашла!"
         messages.append((bet.user_tg_id, make_build(message)))
         schemas.append(bet)
     rates_dao = RatesDao(session=session)
@@ -59,7 +59,8 @@ async def report_role_outside_game(bids: list[BidForRoleSchema]):
         (
             bet.user_tg_id,
             make_build(
-                f"🚫Твоя ставка {bet.money}{MONEY_SYM} на {roles_data[bet.role_id].role} не зашла! Роли нет в игре!"
+                f"🚫Твоя ставка {bet.money}{MONEY_SYM} на "
+                f"{make_pretty(roles_data[bet.role_id].role)} не зашла! Роли нет в игре!"
             ),
         )
         for bet in bids
