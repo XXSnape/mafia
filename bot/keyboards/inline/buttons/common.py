@@ -1,5 +1,6 @@
 from aiogram.types import InlineKeyboardButton
 
+from general import settings
 from general.text import TO_SAVE
 from keyboards.inline.cb.cb_text import (
     PLAYER_BACKS_CB,
@@ -21,5 +22,5 @@ CANCEL_BTN = InlineKeyboardButton(
 SAVE_BTN = InlineKeyboardButton(text=TO_SAVE, callback_data=SAVE_CB)
 TO_BOT = InlineKeyboardButton(
     text="Сделать ставку!",
-    url="t.me/Drivenicebot",  # TODO from settings
+    url=settings.bot.url,
 )

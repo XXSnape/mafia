@@ -104,7 +104,7 @@ class Registration(RouterHelper):
         users_dao = UsersDao(session=self.session)
         user = await users_dao.find_one_or_none(TgId(tg_id=user_id))
         if user is None:
-            user = await users_dao.add(TgId(tg_id=user_id))
+            user = await users_dao.create_user(TgId(tg_id=user_id))
         return user
 
     async def start_registration(self):

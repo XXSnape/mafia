@@ -16,6 +16,7 @@ from routers.settings import (
     common_router,
 )
 from routers.groups.adding import router as adding_router
+from routers.users.start import router as start_router
 
 from redis.asyncio import Redis
 
@@ -44,6 +45,7 @@ async def main() -> None:
         order_of_roles_router,
         common_router,
         adding_router,
+        start_router,
     )
     commands = [
         BotCommand(

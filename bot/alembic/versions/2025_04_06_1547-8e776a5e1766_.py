@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: bb9ec161d19d
+Revision ID: 8e776a5e1766
 Revises:
-Create Date: 2025-04-06 12:55:46.647768
+Create Date: 2025-04-06 15:47:19.306647
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "bb9ec161d19d"
+revision: str = "8e776a5e1766"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -91,8 +91,8 @@ def upgrade() -> None:
         sa.Column("time_for_night", sa.Integer(), nullable=False),
         sa.Column("time_for_day", sa.Integer(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.CheckConstraint("time_for_day > 25"),
-        sa.CheckConstraint("time_for_night > 25"),
+        sa.CheckConstraint("time_for_day > 10"),
+        sa.CheckConstraint("time_for_night > 10"),
         sa.ForeignKeyConstraint(
             ["user_tg_id"], ["users.tg_id"], ondelete="CASCADE"
         ),
@@ -107,6 +107,7 @@ def upgrade() -> None:
             ["setting_id"], ["settings.id"], ondelete="SET NULL"
         ),
         sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("tg_id"),
     )
     op.create_table(
         "orders",

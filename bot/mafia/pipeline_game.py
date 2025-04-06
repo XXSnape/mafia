@@ -244,7 +244,7 @@ class Game:
             + winners_text
             + losers_text
             + make_build(
-                f"\n\n{message} (Количество ночей: {game_data['number_of_night']})"
+                f"\n\n{message} Количество ночей: {game_data['number_of_night']}"
             ),
             reply_markup=get_to_bot_kb("К результатам!"),
         )

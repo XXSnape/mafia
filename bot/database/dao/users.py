@@ -1,8 +1,12 @@
+from typing import Optional
+
 from sqlalchemy import update
 
 from database.dao.base import BaseDAO
+from database.dao.settings import SettingsDao
 from database.models import UserModel
 from database.schemas.bids import UserMoneySchema
+from database.schemas.common import TgId, UserTgId
 
 
 class UsersDao(BaseDAO[UserModel]):
@@ -30,3 +34,11 @@ class UsersDao(BaseDAO[UserModel]):
         )
         await self._session.execute(update_stmt)
         await self._session.flush()
+
+    async def create_user(self, tg_id: TgId) -> Optional[UserModel]:
+        user = await self.add(tg_id)
+        if not user:
+            return None
+        settings_dao = SettingsDao(session=self._session)
+        await settings_dao.add(UserTgId(user_tg_id=user.tg_id))
+        return user
