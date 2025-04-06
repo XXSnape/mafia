@@ -10,8 +10,6 @@ from database.schemas.common import TgId
 from middlewares.db import DatabaseMiddlewareWithCommit
 
 router = Router(name=__name__)
-router.message.filter(F.chat.type == ChatType.PRIVATE)
-router.message.middleware(DatabaseMiddlewareWithCommit())
 
 
 @router.message(CommandStart(), StateFilter(default_state))

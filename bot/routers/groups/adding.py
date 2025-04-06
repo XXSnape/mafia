@@ -5,11 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.dao.groups import GroupsDao
 from database.schemas.common import TgId
-from middlewares.db import DatabaseMiddlewareWithCommit
 
 router = Router(name=__name__)
-router.my_chat_member.middleware(DatabaseMiddlewareWithCommit())
-router.message.middleware(DatabaseMiddlewareWithCommit())
 
 
 @router.my_chat_member(

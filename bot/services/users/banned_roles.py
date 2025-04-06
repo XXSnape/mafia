@@ -27,6 +27,8 @@ class RoleAttendant(RouterHelper):
 
     @staticmethod
     def get_banned_roles_text(roles_ids: list[RolesLiteral]):
+        if not roles_ids:
+            return make_build("✅Все роли могут участвовать в игре!")
         result = "🚫Забаненные роли:\n\n"
         all_roles = get_data_with_roles()
         for num, role_id in enumerate(roles_ids, 1):
@@ -88,12 +90,7 @@ class RoleAttendant(RouterHelper):
         banned_roles_ids = await dao.get_roles_ids_of_banned_roles(
             user_filter
         )
-        if banned_roles_ids:
-            message = self.get_banned_roles_text(banned_roles_ids)
-        else:
-            message = make_build(
-                "✅Все роли могут участвовать в игре!"
-            )
+        message = self.get_banned_roles_text(banned_roles_ids)
         poll_data: PollBannedRolesCache = {
             "banned_roles_ids": banned_roles_ids
         }

@@ -10,14 +10,13 @@ from general.log import configure_logging
 from routers.game.users import router as game_users_router
 from aiogram.fsm.storage.redis import RedisStorage
 from routers.game.groups import router as game_groups_router
-from routers.settings import (
-    ban_router,
-    order_of_roles_router,
-    common_router,
-)
-from routers.groups.adding import router as adding_router
-from routers.users.start import router as start_router
-from routers.groups.settings import router as groups_settings_router
+from routers.users import router as users_router
+from routers.groups import router as groups_router
+
+
+# from routers.groups.adding import router as adding_router
+# from routers.users.start import router as start_router
+# from routers.groups.settings import router as groups_settings_router
 
 from redis.asyncio import Redis
 
@@ -42,20 +41,20 @@ async def main() -> None:
     dp.include_routers(
         game_groups_router,
         game_users_router,
-        ban_router,
-        order_of_roles_router,
-        common_router,
-        adding_router,
-        start_router,
-        groups_settings_router,
+        users_router,
+        groups_router,
     )
     commands = [
         BotCommand(
             command="registration", description="Запустить бота"
         ),
         BotCommand(
-            command="settings",
+            command="my_settings",
             description="Персональные настройки игры",
+        ),
+        BotCommand(
+            command="settings",
+            description="Общие настройки игры",
         ),
         BotCommand(
             command="extend", description="Продлить регистрацию"

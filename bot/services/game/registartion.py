@@ -35,7 +35,7 @@ from keyboards.inline.keypads.join import (
 from services.base import RouterHelper
 from services.game.game_assistants import get_game_state_and_data
 from mafia.pipeline_game import Game
-from services.settings.order_of_roles import RoleManager
+from services.users.order_of_roles import RoleManager
 from states.states import GameFsm
 from scheduler.game import (
     start_game,
@@ -59,13 +59,13 @@ from utils.state import (
 
 
 def verification_for_admin_or_creator(async_func):
-    async def _wrapper(registration: "Registration"):
-        await registration.message.delete()
-        game_data: GameCache = await registration.state.get_data()
-        user_id = registration.message.from_user.id
+    async def _wrapper(self: "Registration"):
+        await self.message.delete()
+        game_data: GameCache = await self.state.get_data()
+        user_id = self.message.from_user.id
         is_admin = await check_user_for_admin_rights(
-            bot=registration.message.bot,
-            chat_id=registration.message.chat.id,
+            bot=self.message.bot,
+            chat_id=self.message.chat.id,
             user_id=user_id,
         )
         if (
@@ -73,7 +73,7 @@ def verification_for_admin_or_creator(async_func):
             and game_data["settings"]["creator_user_id"] != user_id
         ):
             return
-        return await async_func(registration, game_data=game_data)
+        return await async_func(self, game_data=game_data)
 
     return _wrapper
 
@@ -216,7 +216,7 @@ class Registration(RouterHelper):
         offer_for_role = "Ты не можешь сделать ставку на роль\n\n"
         if balance > 0:
             to_user_markup = await offer_to_place_bet(
-                banned_roles=game_data["settings"]["banned_roles"]
+                banned_roles=game_data["users"]["banned_roles"]
             )
             offer_for_role = f"Если хочешь, можешь сделать ставку на разрешенную роль:\n\n"
 
@@ -227,9 +227,7 @@ class Registration(RouterHelper):
             )
             + offer_for_role
             + RoleManager.get_current_order_text(
-                selected_roles=game_data["settings"][
-                    "order_of_roles"
-                ],
+                selected_roles=game_data["users"]["order_of_roles"],
                 to_save=False,
             )
         )
@@ -336,9 +334,9 @@ class Registration(RouterHelper):
         )
         if (
             is_admin is False
-            and game_data["settings"]["creator_user_id"] != user_id
+            and game_data["users"]["creator_user_id"] != user_id
         ):
-            full_name = game_data["settings"]["creator_full_name"]
+            full_name = game_data["users"]["creator_full_name"]
             await self.callback.answer(
                 f"Пожалуйста, попроси {full_name} или администраторов начать игру!",
                 show_alert=True,
@@ -488,7 +486,7 @@ class Registration(RouterHelper):
         )
         game_data: GameCache = {
             "game_chat": self.message.chat.id,
-            "settings": settings,
+            "users": settings,
             "pros": [],
             "cons": [],
             "start_message_id": message_id,

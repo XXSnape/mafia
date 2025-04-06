@@ -29,9 +29,17 @@ def upgrade() -> None:
     op.create_table(
         "users",
         sa.Column(
-            "tg_id", sa.BigInteger(), autoincrement=False, nullable=False
+            "tg_id",
+            sa.BigInteger(),
+            autoincrement=False,
+            nullable=False,
         ),
-        sa.Column("balance", sa.Integer(), server_default="0", nullable=False),
+        sa.Column(
+            "balance",
+            sa.Integer(),
+            server_default="0",
+            nullable=False,
+        ),
         sa.Column(
             "registration_date",
             sa.DateTime(),
@@ -86,7 +94,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("key"),
     )
     op.create_table(
-        "settings",
+        "users",
         sa.Column("user_tg_id", sa.BigInteger(), nullable=False),
         sa.Column("time_for_night", sa.Integer(), nullable=False),
         sa.Column("time_for_day", sa.Integer(), nullable=False),
@@ -104,7 +112,7 @@ def upgrade() -> None:
         sa.Column("setting_id", sa.BigInteger(), nullable=True),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["setting_id"], ["settings.id"], ondelete="SET NULL"
+            ["setting_id"], ["users.id"], ondelete="SET NULL"
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("tg_id"),
@@ -217,7 +225,9 @@ def upgrade() -> None:
             ["group_id"], ["groups.id"], ondelete="CASCADE"
         ),
         sa.ForeignKeyConstraint(
-            ["winning_group"], ["groupings.name"], ondelete="SET NULL"
+            ["winning_group"],
+            ["groupings.name"],
+            ondelete="SET NULL",
         ),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -264,7 +274,9 @@ def upgrade() -> None:
         ),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.CheckConstraint("money > 0"),
-        sa.ForeignKeyConstraint(["game_id"], ["games.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["game_id"], ["games.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(
             ["role_id"], ["roles.key"], ondelete="CASCADE"
         ),
@@ -317,7 +329,9 @@ def upgrade() -> None:
         sa.Column("money", sa.Integer(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.CheckConstraint("money >= 0"),
-        sa.ForeignKeyConstraint(["game_id"], ["games.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(
+            ["game_id"], ["games.id"], ondelete="CASCADE"
+        ),
         sa.ForeignKeyConstraint(
             ["role_id"], ["roles.key"], ondelete="SET NULL"
         ),
@@ -337,7 +351,7 @@ def downgrade() -> None:
     op.drop_table("prohibited_roles")
     op.drop_table("orders")
     op.drop_table("groups")
-    op.drop_table("settings")
+    op.drop_table("users")
     op.drop_table("roles")
     op.drop_table("users")
     op.drop_table("groupings")

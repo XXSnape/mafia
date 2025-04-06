@@ -18,15 +18,10 @@ from middlewares.db import (
     DatabaseMiddlewareWithCommit,
     DatabaseMiddlewareWithoutCommit,
 )
-from services.settings.banned_roles import RoleAttendant
+from services.users.banned_roles import RoleAttendant
 from states.settings import SettingsFsm
 
 router = Router(name=__name__)
-router.message.filter(F.chat.type == ChatType.PRIVATE)
-router.callback_query.filter(F.message.chat.type == ChatType.PRIVATE)
-router.message.middleware(DatabaseMiddlewareWithCommit())
-router.callback_query.middleware(DatabaseMiddlewareWithCommit())
-router.callback_query.middleware(DatabaseMiddlewareWithoutCommit())
 
 
 @router.callback_query(

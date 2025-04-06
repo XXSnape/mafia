@@ -19,15 +19,10 @@ from middlewares.db import (
     DatabaseMiddlewareWithoutCommit,
 )
 
-from services.settings.order_of_roles import RoleManager
+from services.users.order_of_roles import RoleManager
 from states.settings import SettingsFsm
 
 router = Router(name=__name__)
-router.message.filter(F.chat.type == ChatType.PRIVATE)
-router.callback_query.filter(F.message.chat.type == ChatType.PRIVATE)
-router.message.middleware(DatabaseMiddlewareWithCommit())
-router.callback_query.middleware(DatabaseMiddlewareWithCommit())
-router.callback_query.middleware(DatabaseMiddlewareWithoutCommit())
 
 
 @router.callback_query(
