@@ -7,12 +7,8 @@ from database.common.base import BaseModel, IdMixin
 
 
 class GameModel(IdMixin, BaseModel):
-
-    group_tg_id: Mapped[int] = mapped_column(
-        BigInteger, ForeignKey("groups.tg_id", ondelete="SET NULL")
-    )
-    creator_tg_id: Mapped[int | None] = mapped_column(
-        BigInteger, ForeignKey("users.tg_id", ondelete="SET NULL")
+    group_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("groups.id", ondelete="CASCADE")
     )
     winning_group: Mapped[str | None] = mapped_column(
         ForeignKey("groupings.name", ondelete="SET NULL"),

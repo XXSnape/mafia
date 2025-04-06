@@ -96,13 +96,13 @@ class BaseDAO(Generic[T]):
         try:
             new_instance = self.model(**values_dict)
             self._session.add(new_instance)
+            await self._session.flush()
             logger.info(
                 f"Запись {self.model.__name__} успешно добавлена."
             )
-            await self._session.flush()
             return new_instance
         except SQLAlchemyError as e:
-            logger.error(f"Ошибка при добавлении записи: {e}")
+            logger.error("Ошибка при добавлении записи {}", e)
             await self._session.rollback()
 
     async def add_many(
@@ -122,10 +122,10 @@ class BaseDAO(Generic[T]):
                 self.model(**values) for values in values_list
             ]
             self._session.add_all(new_instances)
+            await self._session.flush()
             logger.info(
                 f"Успешно добавлено {len(new_instances)} записей."
             )
-            await self._session.flush()
             return new_instances
         except SQLAlchemyError as e:
             logger.error(
@@ -152,8 +152,8 @@ class BaseDAO(Generic[T]):
                 .execution_options(synchronize_session="fetch")
             )
             result = await self._session.execute(query)
-            logger.info(f"Обновлено {result.rowcount} записей.")
             await self._session.flush()
+            logger.info(f"Обновлено {result.rowcount} записей.")
             return result.rowcount
         except SQLAlchemyError as e:
             logger.error(f"Ошибка при обновлении записей: {e}")
@@ -174,8 +174,8 @@ class BaseDAO(Generic[T]):
                 **filter_dict
             )
             result = await self._session.execute(query)
-            logger.info(f"Удалено {result.rowcount} записей.")
             await self._session.flush()
+            logger.info(f"Удалено {result.rowcount} записей.")
             return result.rowcount
         except SQLAlchemyError as e:
             logger.error(f"Ошибка при удалении записей: {e}")
@@ -222,8 +222,8 @@ class BaseDAO(Generic[T]):
                 result = await self._session.execute(stmt)
                 updated_count += result.rowcount
 
-            logger.info(f"Обновлено {updated_count} записей")
             await self._session.flush()
+            logger.info(f"Обновлено {updated_count} записей")
             return updated_count
         except SQLAlchemyError as e:
             logger.error(f"Ошибка при массовом обновлении: {e}")

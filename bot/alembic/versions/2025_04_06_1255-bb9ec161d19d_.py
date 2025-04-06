@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: b75959039fc6
+Revision ID: bb9ec161d19d
 Revises:
-Create Date: 2025-04-05 19:51:38.521602
+Create Date: 2025-04-06 12:55:46.647768
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "b75959039fc6"
+revision: str = "bb9ec161d19d"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -100,14 +100,13 @@ def upgrade() -> None:
     )
     op.create_table(
         "groups",
-        sa.Column(
-            "tg_id", sa.BigInteger(), autoincrement=False, nullable=False
-        ),
+        sa.Column("tg_id", sa.BigInteger(), nullable=False),
         sa.Column("setting_id", sa.BigInteger(), nullable=True),
+        sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["setting_id"], ["settings.id"], ondelete="SET NULL"
         ),
-        sa.PrimaryKeyConstraint("tg_id"),
+        sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
         "orders",
@@ -207,18 +206,14 @@ def upgrade() -> None:
     )
     op.create_table(
         "games",
-        sa.Column("group_tg_id", sa.BigInteger(), nullable=False),
-        sa.Column("creator_tg_id", sa.BigInteger(), nullable=True),
+        sa.Column("group_id", sa.BigInteger(), nullable=False),
         sa.Column("winning_group", sa.String(), nullable=True),
         sa.Column("number_of_nights", sa.Integer(), nullable=True),
         sa.Column("start", sa.DateTime(), nullable=False),
         sa.Column("end", sa.DateTime(), nullable=True),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["creator_tg_id"], ["users.tg_id"], ondelete="SET NULL"
-        ),
-        sa.ForeignKeyConstraint(
-            ["group_tg_id"], ["groups.tg_id"], ondelete="SET NULL"
+            ["group_id"], ["groups.id"], ondelete="CASCADE"
         ),
         sa.ForeignKeyConstraint(
             ["winning_group"], ["groupings.name"], ondelete="SET NULL"
