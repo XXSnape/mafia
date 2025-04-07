@@ -12,6 +12,10 @@ from aiogram.types import (
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from general.config import bot, broker
 from general.log import configure_logging
+from middlewares.errors import (
+    HandleMessageErrorMiddleware,
+    HandleCallbackErrorMiddleware,
+)
 from routers.game.users import router as game_users_router
 from aiogram.fsm.storage.redis import RedisStorage
 from routers.game.groups import router as game_groups_router
@@ -43,6 +47,8 @@ async def main() -> None:
         broker=broker,
         storage=storage,
     )
+    dp.callback_query.middleware(HandleCallbackErrorMiddleware())
+    dp.message.middleware(HandleMessageErrorMiddleware())
     dp.include_routers(
         game_groups_router,
         game_users_router,

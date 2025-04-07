@@ -1,11 +1,13 @@
 import asyncio
+from contextlib import suppress
 
 from aiogram import Dispatcher, Bot
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.fsm.storage.base import StorageKey
 
-from cache.cache_types import UserIdInt, GameCache
+from cache.cache_types import UserIdInt, GameCache, UserCache
 from utils.tg import delete_messages_from_to_delete
 
 
@@ -39,6 +41,20 @@ async def reset_user_state(
     await state.clear()
 
 
+async def reset_user_state_if_in_game(
+    dispatcher: Dispatcher, user_id: int, bot_id: int, group_id: int
+):
+    state = await get_state_and_assign(
+        dispatcher=dispatcher,
+        chat_id=user_id,
+        bot_id=bot_id,
+    )
+    user_game_data: UserCache = await state.get_data()
+    if user_game_data.get("game_chat") != group_id:
+        return
+    await state.clear()
+
+
 async def reset_state_to_all_users(
     dispatcher: Dispatcher, bot_id: int, users_ids: list[UserIdInt]
 ):
@@ -63,9 +79,10 @@ async def clear_game_data(
     state: FSMContext,
     message_id: int,
 ):
-    await bot.delete_message(
-        chat_id=game_data["game_chat"], message_id=message_id
-    )
+    with suppress(TelegramBadRequest):
+        await bot.delete_message(
+            chat_id=game_data["game_chat"], message_id=message_id
+        )
     await delete_messages_from_to_delete(
         bot=bot,
         state=state,

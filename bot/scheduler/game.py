@@ -1,6 +1,8 @@
+from contextlib import suppress
 from datetime import datetime
 
 from aiogram import Bot, Dispatcher
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
@@ -37,12 +39,13 @@ async def start_game(
             state=state,
             message_id=game_data["start_message_id"],
         )
-        await bot.send_message(
-            chat_id=game_data["game_chat"],
-            text=make_build(
-                "Недостаточно игроков для начала игры! Нужно минимум 4. Игра отменяется."
+        with suppress(TelegramBadRequest):
+            await bot.send_message(
+                chat_id=game_data["game_chat"],
+                text=make_build(
+                    "Недостаточно игроков для начала игры! Нужно минимум 4. Игра отменяется."
+                ),
             ),
-        ),
         return
 
     game = Game(
@@ -74,6 +77,7 @@ async def remind_of_beginning_of_game(bot: Bot, state: FSMContext):
     message = get_minutes_and_seconds_text(
         start=now, end=end_of_registration
     )
-    await bot.send_message(
-        chat_id=game_data["game_chat"], text=make_build(message)
-    )
+    with suppress(TelegramBadRequest):
+        await bot.send_message(
+            chat_id=game_data["game_chat"], text=make_build(message)
+        )

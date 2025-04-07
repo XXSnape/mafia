@@ -10,6 +10,7 @@ from aiogram.fsm.context import FSMContext
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
+from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from cache.cache_types import (
@@ -20,7 +21,8 @@ from cache.cache_types import (
     RoleAndUserMoney,
     UserIdStr,
 )
-from database.schemas.common import TgId
+from database.schemas.common import TgId, IdSchema
+from database.schemas.groups import GroupIdSchema
 from general.text import MONEY_SYM
 from database.dao.games import GamesDao
 from database.schemas.bids import (
@@ -45,13 +47,21 @@ from mafia.roles import RoleABC, Mafia, Forger, Traitor
 from states.states import GameFsm
 from utils.sorting import sorting_by_rate, sorting_by_money
 from utils.tg import delete_messages_from_to_delete
-from utils.state import reset_user_state, get_state_and_assign
+from utils.state import (
+    reset_user_state,
+    get_state_and_assign,
+    reset_user_state_if_in_game,
+)
 from utils.pretty_text import (
     make_pretty,
     make_build,
     get_minutes_and_seconds_text,
 )
-from utils.informing import get_live_players, get_profiles
+from utils.informing import (
+    get_live_players,
+    get_profiles,
+    send_a_lot_of_messages_safely,
+)
 
 
 class Game:
@@ -81,6 +91,7 @@ class Game:
         self.session = session
         self.game_id: int | None = None
         self.beginning_game: int | None = None
+        self.winners_bets = []
 
     def init_existing_roles(self, game_data: GameCache):
         all_roles = get_data_with_roles()
@@ -115,33 +126,68 @@ class Game:
     async def start_game(
         self,
     ):
-        game_data: GameCache = await self.state.get_data()
-        await asyncio.gather(
-            delete_messages_from_to_delete(
-                bot=self.bot,
-                state=self.state,
-            ),
-            self.bot.delete_message(
+        try:
+            game_data: GameCache = await self.state.get_data()
+            await asyncio.gather(
+                delete_messages_from_to_delete(
+                    bot=self.bot,
+                    state=self.state,
+                ),
+                self.bot.delete_message(
+                    chat_id=self.group_chat_id,
+                    message_id=game_data["start_message_id"],
+                ),
+            )
+            await self.create_game_in_db()
+            await self.state.set_state(GameFsm.STARTED)
+            game_data = await self.select_roles()
+            await self.familiarize_players(game_data)
+            self.init_existing_roles(game_data)
+            await self.bot.send_message(
                 chat_id=self.group_chat_id,
-                message_id=game_data["start_message_id"],
-            ),
+                text=make_build("Игра начинается!"),
+                reply_markup=get_to_bot_kb(),
+            )
+            while True:
+                try:
+                    await self.start_night()
+                except GameIsOver as e:
+                    await self.give_out_rewards(e=e)
+                    return
+        except Exception as e:
+            await self.crash_game(e=e)
+
+    async def crash_game(self, e: Exception):
+        logger.error("Произошла ошибка во время игры {}", e)
+        game_data: GameCache = await self.state.get_data()
+        await delete_messages_from_to_delete(
+            bot=self.bot,
+            state=self.state,
         )
-        await self.create_game_in_db()
-        await self.state.set_state(GameFsm.STARTED)
-        game_data = await self.select_roles()
-        await self.familiarize_players(game_data)
-        self.init_existing_roles(game_data)
-        await self.bot.send_message(
-            chat_id=self.group_chat_id,
-            text=make_build("Игра начинается!"),
-            reply_markup=get_to_bot_kb(),
+        await asyncio.gather(
+            *(
+                reset_user_state_if_in_game(
+                    dispatcher=self.dispatcher,
+                    user_id=int(user_id),
+                    bot_id=self.bot.id,
+                    group_id=self.group_chat_id,
+                )
+                for user_id in game_data["players"]
+            )
         )
-        while True:
-            try:
-                await self.start_night()
-            except GameIsOver as e:
-                await self.give_out_rewards(e=e)
-                return
+        await send_a_lot_of_messages_safely(
+            bot=self.bot,
+            text=make_build("Извините, игра аварийно завершилась!"),
+            users=list(game_data["players"].keys())
+            + [self.group_chat_id],
+        )
+        await self.state.clear()
+        if self.game_id:
+            dao = GamesDao(session=self.session)
+            await dao.delete(IdSchema(id=self.game_id))
+        await self.broker.publish(
+            message=self.winners_bets, queue="refund_money_for_bets"
+        )
 
     async def start_night(
         self,
@@ -309,10 +355,11 @@ class Game:
         text += achievements_text
         text += make_build(f"\n\nИтого: {result.money}{MONEY_SYM}")
         await self.bot.send_message(chat_id=int(user_id), text=text)
-        await reset_user_state(
+        await reset_user_state_if_in_game(
             dispatcher=self.dispatcher,
             user_id=int(user_id),
             bot_id=self.bot.id,
+            group_id=self.group_chat_id,
         )
 
     @staticmethod
@@ -385,6 +432,7 @@ class Game:
     ):
         rates = []
         roles_are_not_in_game = []
+        self.winners_bets = winners_bets
         for winner in winners_bets:
             rates.append(
                 ResultBidForRoleSchema(

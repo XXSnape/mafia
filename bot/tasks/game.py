@@ -92,13 +92,40 @@ async def save_personal_results(
     result_dao = ResultsDao(session=session)
     users_dao = UsersDao(session=session)
     await result_dao.add_many(personal_results, exclude={"text"})
-
     for result in personal_results:
         if result.money == 0:
             continue
         await users_dao.update_balance(
             user_money=result, add_money=True
         )
+
+
+@broker.subscriber("refund_money_for_bets")
+async def refund_money_for_bets(
+    bids: list[BidForRoleSchema],
+    session: SessionWithCommitDep,
+):
+    roles_data = get_data_with_roles()
+    messages_to_users_tasks = []
+    updates_tasks = []
+    users_dao = UsersDao(session=session)
+    for bet in bids:
+        current_role = roles_data[bet.role_id]
+        messages_to_users_tasks.append(
+            bot.send_message(
+                chat_id=bet.user_tg_id,
+                text=make_build(
+                    f"Возвращены {bet.money}{MONEY_SYM} за ставку на {make_pretty(current_role.role)}"
+                ),
+            )
+        )
+        updates_tasks.append(
+            users_dao.update_balance(user_money=bet, add_money=True)
+        )
+    await asyncio.gather(*updates_tasks)
+    await asyncio.gather(
+        *messages_to_users_tasks, return_exceptions=True
+    )
 
 
 async def main():
