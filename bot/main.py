@@ -3,7 +3,12 @@ import orjson
 
 from aiogram import Dispatcher
 from aiogram.fsm.strategy import FSMStrategy
-from aiogram.types import BotCommand, BotCommandScopeDefault
+from aiogram.types import (
+    BotCommand,
+    BotCommandScopeDefault,
+    BotCommandScopeAllPrivateChats,
+    BotCommandScopeAllGroupChats,
+)
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from general.config import bot, broker
 from general.log import configure_logging
@@ -44,17 +49,19 @@ async def main() -> None:
         users_router,
         groups_router,
     )
-    commands = [
-        BotCommand(
-            command="registration", description="Запустить бота"
-        ),
+    private_commands = [
         BotCommand(
             command="my_settings",
             description="Персональные настройки игры",
         ),
         BotCommand(
-            command="settings",
-            description="Общие настройки игры",
+            command="profile",
+            description="Данные обо мне",
+        ),
+    ]
+    group_commands = [
+        BotCommand(
+            command="registration", description="Запустить бота"
         ),
         BotCommand(
             command="extend", description="Продлить регистрацию"
@@ -62,9 +69,20 @@ async def main() -> None:
         BotCommand(
             command="revoke", description="Отменить регистрацию"
         ),
+        BotCommand(
+            command="settings",
+            description="Общие настройки игры",
+        ),
+        BotCommand(
+            command="statistics", description="Статистика группы"
+        ),
     ]
-
-    await bot.set_my_commands(commands, BotCommandScopeDefault())
+    await bot.set_my_commands(
+        private_commands, BotCommandScopeAllPrivateChats()
+    )
+    await bot.set_my_commands(
+        group_commands, BotCommandScopeAllGroupChats()
+    )
     scheduler.start()
     await broker.connect()
     await dp.start_polling(bot)

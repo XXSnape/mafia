@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import select, func, Integer
+from sqlalchemy import select, func, Integer, desc
 
 from database.dao.base import BaseDAO
 from database.dao.groups import GroupsDao
@@ -27,7 +27,9 @@ class GamesDao(BaseDAO[GameModel]):
     ):
         query = (
             select(
-                func.count(self.model.winning_group),
+                func.count(self.model.winning_group).label(
+                    "number_of_wins"
+                ),
                 self.model.winning_group,
             )
             .group_by(self.model.winning_group)
@@ -36,6 +38,7 @@ class GamesDao(BaseDAO[GameModel]):
                 self.model.end.is_not(None),
                 self.model.winning_group.is_not(None),
             )
+            .order_by(desc("number_of_wins"))
         )
         result = await self._session.execute(query)
         return result.all()
@@ -50,7 +53,6 @@ class GamesDao(BaseDAO[GameModel]):
                 func.avg(self.model.end - self.model.start).label(
                     "average_time"
                 ),
-                func.count(ResultModel.user_tg_id),
             )
             .filter_by(**group_id_filter.model_dump())
             .filter(
@@ -58,16 +60,13 @@ class GamesDao(BaseDAO[GameModel]):
                 self.model.winning_group.is_not(None),
             )
             .group_by(self.model.group_id)
-            .join(ResultModel, ResultModel.game_id == self.model.id)
         )
-        print(query)
         result = await self._session.execute(query)
         return result.one_or_none()
 
     async def get_average_number_of_players(
         self, group_id_filter: GroupIdSchema
     ):
-        # game group count
 
         sub_query = (
             select(
@@ -84,10 +83,47 @@ class GamesDao(BaseDAO[GameModel]):
                 self.model.winning_group.is_not(None),
             )
         ).subquery()
-        print(sub_query)
-        #
         query = select(
-            func.avg(sub_query.c.number_of_players)
+            func.cast(
+                func.avg(sub_query.c.number_of_players), Integer
+            )
         ).select_from(sub_query)
-        print(query)
         return await self._session.scalar(query)
+
+    async def get_statistics_of_players_by_group(
+        self, group_id_filter: GroupIdSchema
+    ):
+        query = (
+            select(
+                ResultModel.user_tg_id,
+                func.count(ResultModel.user_tg_id).label(
+                    "number_of_games"
+                ),
+                func.sum(
+                    func.cast(ResultModel.is_winner, Integer)
+                ).label("number_of_wins"),
+                func.cast(
+                    func.sum(
+                        func.cast(ResultModel.is_winner, Integer)
+                    )
+                    / func.count(ResultModel.user_tg_id)
+                    * 100,
+                    Integer,
+                ).label("efficiency"),
+            )
+            .select_from(self.model)
+            .join(ResultModel, ResultModel.game_id == self.model.id)
+            .filter(
+                self.model.group_id == group_id_filter.group_id,
+                self.model.end.is_not(None),
+                self.model.winning_group.is_not(None),
+            )
+            .group_by(ResultModel.user_tg_id)
+            .having(
+                func.count(ResultModel.user_tg_id) >= 3,
+            )
+            .order_by(desc("number_of_games"), desc("efficiency"))
+            .limit(15)
+        )
+        result = await self._session.execute(query)
+        return result.all()

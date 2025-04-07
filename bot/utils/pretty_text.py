@@ -11,14 +11,18 @@ def make_pretty(string: str) -> str:
 
 
 def get_minutes_and_seconds_text(
-    start: int,
-    end: int,
+    start: int | None = None,
+    end: int | None = None,
+    seconds: int | None = None,
     message="До начала игры осталось примерно ",
 ) -> str:
-    diff = end - start
+    if seconds:
+        diff = seconds
+    else:
+        diff = end - start
     minutes = diff // 60
     seconds = diff % 60
     if minutes:
         message += f"{minutes} мин. "
-    message += f"{seconds} сек!"
+    message += f"{seconds} сек."
     return message

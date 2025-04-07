@@ -20,11 +20,18 @@ class ResultsDao(BaseDAO[ResultModel]):
                     "nights_lived_count"
                 ),
                 func.sum(self.model.money).label("money_sum"),
+                func.cast(
+                    func.sum(
+                        func.cast(self.model.is_winner, Integer)
+                    )
+                    / func.count()
+                    * 100,
+                    Integer,
+                ).label("efficiency"),
             )
             .filter_by(**user_tg_id.model_dump())
             .group_by(self.model.role_id)
             .order_by(desc("money_sum"))
         )
-        print("q", query)
         result = await self._session.execute(query)
         return result.all()
