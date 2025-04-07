@@ -10,19 +10,23 @@ class RatesDao(BaseDAO[RateModel]):
 
     async def get_results(self, user_tg_id: UserTgId):
         query = select(
-            func.count().label("count"),
-            func.sum(
-                case(
-                    (
-                        self.model.is_winner.is_(True),
-                        self.model.money,
-                    ),
-                    else_=0,
-                )
+            func.count(self.model.id).label("count"),
+            func.coalesce(
+                func.sum(
+                    case(
+                        (
+                            self.model.is_winner.is_(True),
+                            self.model.money,
+                        ),
+                        else_=0,
+                    )
+                ),
+                0,
             ).label("money"),
-            func.sum(func.cast(self.model.is_winner, Integer)).label(
-                "is_winner_count"
-            ),
+            func.coalesce(
+                func.sum(func.cast(self.model.is_winner, Integer)), 0
+            ).label("is_winner_count"),
         ).filter_by(**user_tg_id.model_dump())
-        result = await self._session.scalar(query)
-        return result
+        print(query)
+        result = await self._session.execute(query)
+        return result.one_or_none()

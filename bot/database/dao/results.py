@@ -1,4 +1,4 @@
-from sqlalchemy import select, func, Integer
+from sqlalchemy import select, func, Integer, desc
 
 from database.dao.base import BaseDAO
 from database.models import ResultModel
@@ -23,7 +23,8 @@ class ResultsDao(BaseDAO[ResultModel]):
             )
             .filter_by(**user_tg_id.model_dump())
             .group_by(self.model.role_id)
-            .order_by(func.count())
+            .order_by(desc("money_sum"))
         )
+        print("q", query)
         result = await self._session.execute(query)
         return result.all()
