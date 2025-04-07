@@ -11,11 +11,13 @@ from .order_of_roles import router as order_of_roles_router
 from .settings import router as settings_router
 from .start import router as start_router
 from .time import router as time_router
+from .statistics import router as statistics_router
 
 router = Router(name=__name__)
 router.message.filter(F.chat.type == ChatType.PRIVATE)
 router.callback_query.filter(F.message.chat.type == ChatType.PRIVATE)
 router.message.middleware(DatabaseMiddlewareWithCommit())
+router.message.middleware(DatabaseMiddlewareWithoutCommit())
 router.callback_query.middleware(DatabaseMiddlewareWithCommit())
 router.callback_query.middleware(DatabaseMiddlewareWithoutCommit())
 
@@ -26,4 +28,5 @@ router.include_routers(
     settings_router,
     start_router,
     time_router,
+    statistics_router,
 )

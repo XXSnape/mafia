@@ -1,5 +1,4 @@
-from aiogram import Router, F
-from aiogram.enums import ChatType
+from aiogram import Router
 from aiogram.filters import CommandStart, StateFilter
 from aiogram.fsm.state import default_state
 from aiogram.types import Message
@@ -7,7 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.dao.users import UsersDao
 from database.schemas.common import TgId
-from middlewares.db import DatabaseMiddlewareWithCommit
 
 router = Router(name=__name__)
 
