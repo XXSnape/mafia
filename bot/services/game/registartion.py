@@ -5,6 +5,7 @@ from pprint import pprint
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import CommandObject
 from aiogram.fsm.context import FSMContext
+from aiogram.types import ChatMemberAdministrator
 
 from aiogram.utils.payload import decode_payload
 from apscheduler.triggers.date import DateTrigger
@@ -46,6 +47,7 @@ from scheduler.game import (
 )
 from utils.tg import (
     check_user_for_admin_rights,
+    delete_message,
 )
 from utils.pretty_text import (
     get_profile_link,
@@ -108,8 +110,35 @@ class Registration(RouterHelper):
             TgId(tg_id=user_id)
         )
 
+    async def checking_for_necessary_permissions_to_start_game(
+        self,
+    ) -> bool:
+        chat_member = await self.message.bot.get_chat_member(
+            chat_id=self.message.chat.id, user_id=self.message.bot.id
+        )
+        if isinstance(chat_member, ChatMemberAdministrator) is False:
+            return False
+        return all(
+            [
+                chat_member.can_delete_messages,
+                chat_member.can_restrict_members,
+                chat_member.can_pin_messages,
+            ]
+        )
+
     async def start_registration(self):
-        await self.message.delete()
+        if (
+            await self.checking_for_necessary_permissions_to_start_game()
+            is False
+        ):
+            await self.message.answer(
+                make_build(
+                    "Чтобы начать игру, дайте боту возможность писать в группу, "
+                    "удалять чужие сообщения, банить пользователей, закреплять сообщения."
+                )
+            )
+            return
+        await delete_message(self.message)
         markup = await get_join_kb(
             bot=self._get_bot(),
             game_chat=self.message.chat.id,
