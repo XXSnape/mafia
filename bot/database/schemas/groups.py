@@ -12,5 +12,9 @@ class GroupSettingsSchema(BaseModel):
     is_there_settings: bool
 
 
+class GroupIdSchema(BaseModel):
+    group_id: int
+
+
 class GroupSettingIdSchema(BaseModel):
     setting_id: int | None

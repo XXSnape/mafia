@@ -2,6 +2,7 @@ import asyncio
 import datetime
 from collections import defaultdict
 from operator import itemgetter
+from pprint import pprint
 from random import choice
 
 from aiogram import Dispatcher, Bot
@@ -31,7 +32,10 @@ from database.schemas.games import (
     EndOfGameSchema,
 )
 from database.schemas.results import PersonalResultSchema
-from general.collection_of_roles import get_data_with_roles
+from general.collection_of_roles import (
+    get_data_with_roles,
+    BASES_ROLES,
+)
 from general.exceptions import GameIsOver
 from general.groupings import Groupings
 
@@ -418,7 +422,11 @@ class Game:
         other: list[RolesLiteral] = []
         number_of_players = len(players_ids)
         for key, role in all_roles.items():
-            if key in banned_roles:
+            if (
+                key in banned_roles
+                or key in BASES_ROLES
+                and role.there_may_be_several is False
+            ):
                 continue
             if role.grouping == Groupings.criminals:
                 role_type = criminals
@@ -505,7 +513,6 @@ class Game:
             }
             game_data["players"][str(winner_id)].update(user_data)
             roles.append(winner_id)
-
         await self.record_data_about_betting_results(
             order_of_roles=order_of_roles,
             winners_bets=winners_bets,
@@ -531,12 +538,13 @@ class Game:
                         to_criminals_messages[int(user_id)].extend(
                             users
                         )
+
             if current_role.is_alias:
                 continue
             persons = game_data[current_role.roles_key]
             roles_tasks.append(
                 self.bot.send_photo(
-                    chat_id=persons[0],
+                    chat_id=int(user_id),
                     photo=current_role.photo,
                     caption=f"Твоя роль - "
                     f"{make_pretty(current_role.role)}! "

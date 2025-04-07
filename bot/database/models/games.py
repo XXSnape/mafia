@@ -8,7 +8,7 @@ from database.common.base import BaseModel, IdMixin
 
 class GameModel(IdMixin, BaseModel):
     group_id: Mapped[int] = mapped_column(
-        BigInteger, ForeignKey("groups.id", ondelete="CASCADE")
+        ForeignKey("groups.id", ondelete="CASCADE")
     )
     winning_group: Mapped[str | None] = mapped_column(
         ForeignKey("groupings.name", ondelete="SET NULL"),
