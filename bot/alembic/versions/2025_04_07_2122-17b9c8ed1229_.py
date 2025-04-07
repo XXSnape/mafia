@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 8e776a5e1766
+Revision ID: 17b9c8ed1229
 Revises:
-Create Date: 2025-04-06 15:47:19.306647
+Create Date: 2025-04-07 21:22:35.094356
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "8e776a5e1766"
+revision: str = "17b9c8ed1229"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -29,17 +29,9 @@ def upgrade() -> None:
     op.create_table(
         "users",
         sa.Column(
-            "tg_id",
-            sa.BigInteger(),
-            autoincrement=False,
-            nullable=False,
+            "tg_id", sa.BigInteger(), autoincrement=False, nullable=False
         ),
-        sa.Column(
-            "balance",
-            sa.Integer(),
-            server_default="0",
-            nullable=False,
-        ),
+        sa.Column("balance", sa.Integer(), server_default="0", nullable=False),
         sa.Column(
             "registration_date",
             sa.DateTime(),
@@ -94,7 +86,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("key"),
     )
     op.create_table(
-        "users",
+        "settings",
         sa.Column("user_tg_id", sa.BigInteger(), nullable=False),
         sa.Column("time_for_night", sa.Integer(), nullable=False),
         sa.Column("time_for_day", sa.Integer(), nullable=False),
@@ -109,10 +101,10 @@ def upgrade() -> None:
     op.create_table(
         "groups",
         sa.Column("tg_id", sa.BigInteger(), nullable=False),
-        sa.Column("setting_id", sa.BigInteger(), nullable=True),
+        sa.Column("setting_id", sa.Integer(), nullable=True),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["setting_id"], ["users.id"], ondelete="SET NULL"
+            ["setting_id"], ["settings.id"], ondelete="SET NULL"
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("tg_id"),
@@ -215,7 +207,7 @@ def upgrade() -> None:
     )
     op.create_table(
         "games",
-        sa.Column("group_id", sa.BigInteger(), nullable=False),
+        sa.Column("group_id", sa.Integer(), nullable=False),
         sa.Column("winning_group", sa.String(), nullable=True),
         sa.Column("number_of_nights", sa.Integer(), nullable=True),
         sa.Column("start", sa.DateTime(), nullable=False),
@@ -225,9 +217,7 @@ def upgrade() -> None:
             ["group_id"], ["groups.id"], ondelete="CASCADE"
         ),
         sa.ForeignKeyConstraint(
-            ["winning_group"],
-            ["groupings.name"],
-            ondelete="SET NULL",
+            ["winning_group"], ["groupings.name"], ondelete="SET NULL"
         ),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -274,9 +264,7 @@ def upgrade() -> None:
         ),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.CheckConstraint("money > 0"),
-        sa.ForeignKeyConstraint(
-            ["game_id"], ["games.id"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["game_id"], ["games.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(
             ["role_id"], ["roles.key"], ondelete="CASCADE"
         ),
@@ -329,9 +317,7 @@ def upgrade() -> None:
         sa.Column("money", sa.Integer(), nullable=False),
         sa.Column("id", sa.Integer(), nullable=False),
         sa.CheckConstraint("money >= 0"),
-        sa.ForeignKeyConstraint(
-            ["game_id"], ["games.id"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["game_id"], ["games.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(
             ["role_id"], ["roles.key"], ondelete="SET NULL"
         ),
@@ -351,7 +337,7 @@ def downgrade() -> None:
     op.drop_table("prohibited_roles")
     op.drop_table("orders")
     op.drop_table("groups")
-    op.drop_table("users")
+    op.drop_table("settings")
     op.drop_table("roles")
     op.drop_table("users")
     op.drop_table("groupings")

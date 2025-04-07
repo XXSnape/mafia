@@ -103,7 +103,7 @@ class StatisticsRouter(RouterHelper):
         game_result = await games_dao.get_results(group_id_filter)
         if game_result is None:
             await self.message.answer(
-                "В этой группе еще не было игр!"
+                make_build("В этой группе еще не было игр!")
             )
             return
         number_of_players = (
