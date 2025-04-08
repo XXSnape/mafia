@@ -7,7 +7,7 @@ from aiogram.utils.deep_linking import create_start_link
 from cache.cache_types import LivePlayersIds, RolesLiteral
 from general.collection_of_roles import get_data_with_roles
 from keyboards.inline.builder import generate_inline_kb
-from keyboards.inline.buttons.common import CANCEL_BTN, TO_BOT
+from keyboards.inline.buttons.common import CANCEL_BTN, TO_BOT_BTN
 from keyboards.inline.cb.cb_text import (
     FINISH_REGISTRATION_CB,
 )
@@ -23,7 +23,7 @@ async def get_join_kb(
                 bot, str(game_chat), encode=True
             ),
         ),
-        TO_BOT,
+        TO_BOT_BTN,
     ]
     if len(players_ids) >= 1:  # TODO 4
         buttons.append(

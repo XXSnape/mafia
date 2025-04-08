@@ -7,20 +7,24 @@ from keyboards.inline.cb.cb_text import (
     ACTIONS_FOR_ROLES_CB,
     CANCEL_CB,
     SAVE_CB,
+    HELP_CB,
 )
 
 BACK_BTN = InlineKeyboardButton(
     text="Назад⬅️", callback_data=PLAYER_BACKS_CB
 )
 
-BACK_TO_SELECTING_ACTIONS_FOR_ROLES = InlineKeyboardButton(
+BACK_TO_SELECTING_ACTIONS_FOR_ROLES_BTN = InlineKeyboardButton(
     text="Назад⏪", callback_data=ACTIONS_FOR_ROLES_CB
 )
 CANCEL_BTN = InlineKeyboardButton(
     text="❌Отменить", callback_data=CANCEL_CB
 )
 SAVE_BTN = InlineKeyboardButton(text=TO_SAVE, callback_data=SAVE_CB)
-TO_BOT = InlineKeyboardButton(
+TO_BOT_BTN = InlineKeyboardButton(
     text="Сделать ставку!",
     url=settings.bot.url,
+)
+HELP_BTN = InlineKeyboardButton(
+    text="🆘Помощь", callback_data=HELP_CB
 )

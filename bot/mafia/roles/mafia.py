@@ -62,7 +62,11 @@ class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
 class MafiaAlias(AliasRoleABC, Mafia):
     role = "Мафия"
     role_id = "mafia"
-    photo = "https://i.pinimg.com/736x/a1/10/db/a110db3eaba78bf6423bcea68f330a64.jpg"
+    photo = (
+        "https://steamuserimages-a.akamaihd.net/ugc/253717829589048899/"
+        "949E084C8E9DDEA99B969B9CB7B497D86D35D3F1/?imw=512&amp;imh=332&amp;"
+        "ima=fit&amp;impolicy=Letterbox&amp;imcolor=%23000000&amp;letterbox=true"
+    )
     purpose = (
         "Тебе нужно уничтожить всех горожан и подчиняться дону."
     )

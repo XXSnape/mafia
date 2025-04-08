@@ -56,6 +56,7 @@ async def main() -> None:
         groups_router,
     )
     private_commands = [
+        BotCommand(command="help", description="Помощь"),
         BotCommand(
             command="my_settings",
             description="Персональные настройки игры",

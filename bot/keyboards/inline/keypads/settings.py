@@ -10,7 +10,7 @@ from general.collection_of_roles import (
 )
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import (
-    BACK_TO_SELECTING_ACTIONS_FOR_ROLES,
+    BACK_TO_SELECTING_ACTIONS_FOR_ROLES_BTN,
     CANCEL_BTN,
     SAVE_BTN,
 )
@@ -48,7 +48,7 @@ def adjust_time_kb(current_time: int, time_of_day: TimeOfDay):
                 ).pack(),
             )
         )
-    buttons.append(BACK_TO_SELECTING_ACTIONS_FOR_ROLES)
+    buttons.append(BACK_TO_SELECTING_ACTIONS_FOR_ROLES_BTN)
     return generate_inline_kb(
         data_with_buttons=buttons, leave_1_each=1
     )
@@ -122,7 +122,7 @@ def edit_roles_kb(are_there_roles: bool, to_ban: bool = False):
             )
         )
 
-    buttons.append(BACK_TO_SELECTING_ACTIONS_FOR_ROLES)
+    buttons.append(BACK_TO_SELECTING_ACTIONS_FOR_ROLES_BTN)
 
     return generate_inline_kb(data_with_buttons=buttons)
 
