@@ -1,5 +1,10 @@
 from cache.cache_types import GameCache
+from mafia.roles.descriptions.texts import (
+    KILLING_PLAYER,
+    CAN_KILL_AT_NIGHT,
+)
 from mafia.roles.base.roles import RoleABC
+from mafia.roles.descriptions.description import RoleDescription
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
@@ -27,6 +32,19 @@ class Killer(MurderAfterNightABC, ActiveRoleAtNightABC):
     mail_message = "Реши, кому поможешь этой ночью решить проблемы и убить врага!"
     payment_for_treatment = 0
     payment_for_murder = 13
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill=CAN_KILL_AT_NIGHT,
+            pay_for=[KILLING_PLAYER],
+            limitations=[
+                "Может делать ход только на чётную ночь",
+            ],
+            features=[
+                "Начинает просыпаться каждую ночь после смерти всех мафий"
+            ],
+        )
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.KILLER_ATTACKS

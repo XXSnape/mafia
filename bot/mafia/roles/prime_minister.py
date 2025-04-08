@@ -1,6 +1,11 @@
 from cache.cache_types import GameCache
+from mafia.roles.descriptions.texts import (
+    KILLING_PLAYER,
+    SAVING_PLAYER,
+)
 from mafia.roles.base import RoleABC
 from mafia.roles.base.mixins import ProcedureAfterVotingABC
+from mafia.roles.descriptions.description import RoleDescription
 from utils.roles import get_user_role_and_url
 
 
@@ -14,6 +19,14 @@ class PrimeMinister(ProcedureAfterVotingABC, RoleABC):
     purpose = "Твой голос стоит как 2!"
     payment_for_treatment = 12
     payment_for_murder = 12
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="Днём имеет 2 голоса при подтверждении повешения",
+            pay_for=[KILLING_PLAYER, SAVING_PLAYER],
+            limitations=None,
+        )
 
     def get_money_for_voting(self, voted_role: RoleABC):
         return super().get_money_for_voting(voted_role) * 2

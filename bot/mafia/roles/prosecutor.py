@@ -3,7 +3,9 @@ from contextlib import suppress
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import ChatPermissions
 from cache.cache_types import GameCache
+from mafia.roles.descriptions.texts import CANT_CHOOSE_IN_ROW
 from mafia.roles.base.roles import RoleABC
+from mafia.roles.descriptions.description import RoleDescription
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
@@ -39,6 +41,14 @@ class Prosecutor(
     )
     message_to_user_after_action = "Ты выбрал арестовать {url}"
     payment_for_murder = 12
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="Жертва не сможет говорить днём, голосовать и подтверждать убийство",
+            pay_for=["Арест игрока не союзной группировки"],
+            limitations=[CANT_CHOOSE_IN_ROW],
+        )
 
     @get_processed_user_id_if_exists
     async def procedure_after_night(

@@ -5,7 +5,14 @@ from aiogram.types import InlineKeyboardButton
 from cache.cache_types import ExtraCache, GameCache, UserIdInt
 
 from general.groupings import Groupings
-from general.text import ROLE_IS_KNOWN, ATTEMPT_TO_KILL
+from general.text import (
+    ROLE_IS_KNOWN,
+    ATTEMPT_TO_KILL,
+)
+from mafia.roles.descriptions.texts import (
+    KILLING_PLAYER,
+    CHECKING_PLAYER,
+)
 from keyboards.inline.keypads.mailing import (
     kill_or_check_on_policeman,
 )
@@ -14,6 +21,7 @@ from mafia.roles.base import (
     AliasRoleABC,
 )
 from mafia.roles.base.mixins import ProcedureAfterNightABC
+from mafia.roles.descriptions.description import RoleDescription
 from states.states import UserFsm
 from utils.pretty_text import make_pretty
 from utils.informing import (
@@ -48,6 +56,17 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     notification_message = ATTEMPT_TO_KILL
     payment_for_treatment = 18
     payment_for_murder = 20
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="За 1 ночь может либо проверить роль игрока, либо убить его",
+            pay_for=[KILLING_PLAYER, CHECKING_PLAYER],
+            limitations=[
+                CANT_CHOOSE_YOURSELF,
+                "не может убить в первую ночь",
+            ],
+        )
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.POLICEMAN_CHECKS

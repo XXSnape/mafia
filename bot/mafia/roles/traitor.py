@@ -12,8 +12,15 @@ from mafia.roles.base.mixins import (
 )
 
 from general.groupings import Groupings
-from general.text import ROLE_IS_KNOWN
+from general.text import (
+    ROLE_IS_KNOWN,
+)
+from mafia.roles.descriptions.texts import (
+    CHECKING_PLAYER,
+    CAN_SEE_ALLIES,
+)
 from mafia.roles.base import ActiveRoleAtNightABC
+from mafia.roles.descriptions.description import RoleDescription
 from states.states import UserFsm
 from utils.common import get_criminals_ids
 from utils.informing import send_a_lot_of_messages_safely
@@ -49,6 +56,17 @@ class Traitor(
             data_type=list,
         ),
     ]
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="Может узнать роль игрока и показать её всем союзникам в группировке",
+            pay_for=[CHECKING_PLAYER],
+            features=[
+                "Становится мафией после того, как узнал роли всех игроков",
+                CAN_SEE_ALLIES,
+            ],
+        )
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.TRAITOR_FINDS_OUT

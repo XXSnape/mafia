@@ -1,7 +1,11 @@
 import asyncio
 
 from cache.cache_types import ExtraCache, GameCache
+from mafia.roles.descriptions.texts import (
+    CANT_CHOOSE_IN_ROW,
+)
 from mafia.roles.base.roles import RoleABC
+from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import ProcedureAfterNightABC
 from states.states import UserFsm
@@ -30,6 +34,17 @@ class Journalist(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         ExtraCache(key="tracking", data_type=dict),
     ]
     payment_for_murder = 14
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="Узнает людей, которые приходили к жертве ночью",
+            pay_for=["Количество людей, пришедших к жертве"],
+            limitations=[
+                CANT_CHOOSE_IN_ROW,
+                "Может делать ход только на чётную ночь",
+            ],
+        )
 
     @get_processed_user_id_if_exists
     async def procedure_after_night(

@@ -1,8 +1,12 @@
 from cache.cache_types import GameCache, UserIdInt
 from general.groupings import Groupings
+from mafia.roles.descriptions.texts import (
+    KILLING_PLAYER,
+)
 from mafia.roles import Bodyguard
-from mafia.roles.base import RoleABC, ActiveRoleAtNightABC
+from mafia.roles.base import RoleABC
 from mafia.roles.base.mixins import ProcedureAfterNightABC
+from mafia.roles.descriptions.description import RoleDescription
 
 
 class Punisher(ProcedureAfterNightABC, RoleABC):
@@ -13,7 +17,17 @@ class Punisher(ProcedureAfterNightABC, RoleABC):
     number_in_order_after_night = 4
     payment_for_treatment = 0
     payment_for_murder = 10
-    payment_for_night_spent = 8
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="Если умирает ночью, забирает убийцу с собой",
+            pay_for=[KILLING_PLAYER],
+            features=[
+                "Умирает главарь ролей, а не его союзники. "
+                "Например, умрёт дон, а не мафия, даже если сам дон никого не выбрал"
+            ],
+        )
 
     def __init__(self):
         self.killed = []

@@ -4,8 +4,10 @@ from aiogram.exceptions import TelegramBadRequest
 
 from cache.cache_types import ExtraCache, GameCache
 from general.groupings import Groupings
+from mafia.roles.descriptions.texts import CANT_CHOOSE_IN_ROW
 from mafia.roles.base import ActiveRoleAtNightABC, RoleABC
 from mafia.roles.base.mixins import ProcedureAfterNightABC
+from mafia.roles.descriptions.description import RoleDescription
 from states.states import UserFsm
 from utils.pretty_text import make_build
 from utils.roles import (
@@ -32,6 +34,18 @@ class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     number_in_order_after_night = 0
     payment_for_treatment = 8
     payment_for_murder = 8
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="Отменяет ночные ходы жертвы",
+            pay_for=["Усыпление не союзной роли"],
+            limitations=[CANT_CHOOSE_IN_ROW],
+            features=[
+                "Если жертва может делать ходы ночью после смерти, то она не может быть усыплена",
+                "ход жертвы отменяется полностью, поэтому она может выбрать одного и того же игрока дважды",
+            ],
+        )
 
     def __init__(self):
         self.state_for_waiting_for_action = (

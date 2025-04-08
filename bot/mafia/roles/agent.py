@@ -1,8 +1,10 @@
-import asyncio
-
 from cache.cache_types import ExtraCache, GameCache
+from mafia.roles.descriptions.texts import (
+    CANT_CHOOSE_IN_ROW,
+)
 from mafia.roles.base import ActiveRoleAtNightABC, RoleABC
 from mafia.roles.base.mixins import ProcedureAfterNightABC
+from mafia.roles.descriptions.description import RoleDescription
 from states.states import UserFsm
 from utils.informing import send_a_lot_of_messages_safely
 from utils.roles import (
@@ -22,6 +24,16 @@ class Agent(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     extra_data = [
         ExtraCache(key="tracking", data_type=dict),
     ]
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="Узнает имена тех, к кому приходила ночью его жертва",
+            pay_for=[
+                "Количество игроков, к которому приходила жертва"
+            ],
+            limitations=[CANT_CHOOSE_IN_ROW],
+        )
 
     @get_processed_user_id_if_exists
     async def procedure_after_night(

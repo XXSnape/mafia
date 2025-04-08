@@ -1,10 +1,12 @@
 from random import randint
 
 from cache.cache_types import GameCache
+from mafia.roles.descriptions.texts import PAYMENT_FOR_NIGHTS
 from mafia.roles.base import RoleABC
 from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,
 )
+from mafia.roles.descriptions.description import RoleDescription
 
 
 class LuckyGay(ProcedureAfterNightABC, RoleABC):
@@ -17,6 +19,13 @@ class LuckyGay(ProcedureAfterNightABC, RoleABC):
     number_in_order_after_night = 2
     payment_for_treatment = 6
     payment_for_night_spent = 7
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="Мирный житель, который может с вероятностью 40% выжить после покушения на него ночью",
+            pay_for=[PAYMENT_FOR_NIGHTS],
+        )
 
     async def procedure_after_night(
         self,

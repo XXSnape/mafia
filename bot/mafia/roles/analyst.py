@@ -1,9 +1,11 @@
 from aiogram.types import InlineKeyboardButton
 from cache.cache_types import GameCache
 from general.groupings import Groupings
+from mafia.roles.descriptions.texts import CAN_CHOOSE_YOURSELF
 from keyboards.inline.cb.cb_text import DRAW_CB
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import ProcedureAfterVotingABC
+from mafia.roles.descriptions.description import RoleDescription
 from states.states import UserFsm
 from utils.roles import (
     get_processed_user_id_if_exists,
@@ -30,6 +32,18 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
     )
     payment_for_treatment = 5
     payment_for_murder = 5
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="Делает прогноз на игрока, которого должны повесить днём",
+            pay_for=["Верный прогноз"],
+            features=[
+                "Может выбрать вариант, что никого не повесят",
+                CAN_CHOOSE_YOURSELF,
+            ],
+            wins_if="Сделать 3 правильных прогноза или больше",
+        )
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.ANALYST_ASSUMES

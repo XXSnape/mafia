@@ -1,5 +1,5 @@
 import asyncio
-from abc import ABC
+from abc import ABC, abstractproperty, abstractmethod
 from contextlib import suppress
 from random import shuffle
 from typing import Callable, Optional, Self
@@ -18,7 +18,6 @@ from cache.cache_types import (
     UserGameCache,
     RolesLiteral,
     UserIdInt,
-    NumberOfNight,
 )
 from general.text import MONEY_SYM, NUMBER_OF_NIGHT
 from database.schemas.results import PersonalResultSchema
@@ -26,6 +25,7 @@ from general.groupings import Groupings
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
+from mafia.roles.descriptions.description import RoleDescription
 
 from utils.pretty_text import (
     make_pretty,
@@ -37,10 +37,6 @@ from utils.informing import (
     send_a_lot_of_messages_safely,
     remind_criminals_about_inspections,
 )
-from utils.roles import (
-    get_processed_user_id_if_exists,
-    get_processed_user_id_if_need_to_notify,
-)
 from utils.state import get_state_and_assign
 
 
@@ -50,8 +46,9 @@ class RoleABC(ABC):
     state: FSMContext
     role: str
     role_id: RolesLiteral
-    need_to_process: bool = False
     photo: str
+    role_description: RoleDescription
+    need_to_process: bool = False
     clearing_state_after_death: bool = True
     grouping: Groupings = Groupings.civilians
     there_may_be_several: bool = False
@@ -81,6 +78,11 @@ class RoleABC(ABC):
         self.state = state
         self.temporary_roles = {}
         self.dropped_out: set[UserIdInt] = set()
+
+    @property
+    @abstractmethod
+    def role_description(self) -> RoleDescription:
+        pass
 
     async def boss_is_dead(
         self,
@@ -368,6 +370,12 @@ class AliasRoleABC(ABC):
     def last_interactive_key(cls):
         super_classes = cls.__bases__
         return super_classes[1].last_interactive_key
+
+    @classmethod
+    @property
+    def boss_name(cls):
+        super_classes = cls.__bases__
+        return super_classes[1].role
 
 
 class ActiveRoleAtNightABC(RoleABC):

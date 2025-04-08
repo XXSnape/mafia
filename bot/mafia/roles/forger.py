@@ -1,13 +1,18 @@
-from contextlib import suppress
-
 from cache.cache_types import ExtraCache, GameCache
-from general.text import ROLE_IS_KNOWN
+from general.text import (
+    ROLE_IS_KNOWN,
+)
+from mafia.roles.descriptions.texts import (
+    CAN_CHOOSE_YOURSELF,
+    CAN_SEE_ALLIES,
+)
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,
     MafiaConverterABC,
 )
+from mafia.roles.descriptions.description import RoleDescription
 
 from states.states import UserFsm
 
@@ -38,6 +43,23 @@ class Forger(
     payment_for_treatment = 0
     payment_for_murder = 16
     number_in_order_after_voting = 2
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="Может подменить документы любому игроку на любую роль, которая есть в игре",
+            pay_for=[
+                "Подмену документов игроку, которого проверили"
+            ],
+            limitations=[
+                "Не может подменить документы игроку на роль, которая может эту роль раскрыть",
+            ],
+            features=[
+                "Становится мафией после смерти ролей, которую могут напрямую раскрыть роль",
+                CAN_CHOOSE_YOURSELF,
+                CAN_SEE_ALLIES,
+            ],
+        )
 
     def get_processed_user_id(self, game_data: GameCache):
         if len(game_data["forged_roles"]) == 2:

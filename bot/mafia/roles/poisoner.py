@@ -1,13 +1,18 @@
 from cache.cache_types import GameCache, ExtraCache, UserIdInt
-from general.text import ATTEMPT_TO_KILL
+from general.text import (
+    ATTEMPT_TO_KILL,
+)
+from mafia.roles.descriptions.texts import (
+    KILLING_PLAYER,
+)
 from keyboards.inline.keypads.mailing import kill_or_poison_kb
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,
-    ProcedureAfterVotingABC,
     FinisherOfNight,
 )
 from general.groupings import Groupings
+from mafia.roles.descriptions.description import RoleDescription
 from states.states import UserFsm
 from utils.informing import get_profiles
 from utils.roles import get_user_role_and_url
@@ -32,6 +37,14 @@ class Poisoner(
     payment_for_treatment = 0
     payment_for_murder = 15
     extra_data = [ExtraCache(key="poisoned", need_to_clear=False)]
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="За 1 ночь может либо отравить игрока, либо убить всех отравленных ранее",
+            pay_for=[KILLING_PLAYER],
+            wins_if="Побеждает, если убьет минимум 3х игроков за игру",
+        )
 
     def __init__(self):
         self.state_for_waiting_for_action = (

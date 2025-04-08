@@ -1,5 +1,12 @@
 from cache.cache_types import GameCache
+from mafia.roles.descriptions.texts import (
+    CANT_CHOOSE_IN_ROW,
+    CAN_CHOOSE_YOURSELF,
+    CAN_CHOOSE_YOURSELF_AFTER_2_NIGHTS,
+    SAVING_PLAYER,
+)
 from mafia.roles.base.roles import RoleABC
+from mafia.roles.descriptions.description import RoleDescription
 from general.groupings import Groupings
 from mafia.roles.base import (
     ActiveRoleAtNightABC,
@@ -28,6 +35,18 @@ class Doctor(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     message_to_user_after_action = "Ты выбрал вылечить {url}"
     payment_for_treatment = 15
     payment_for_murder = 18
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="Может спасти игрока от смерти",
+            pay_for=[SAVING_PLAYER],
+            limitations=[
+                CANT_CHOOSE_IN_ROW,
+                CAN_CHOOSE_YOURSELF_AFTER_2_NIGHTS,
+            ],
+            features=[CAN_CHOOSE_YOURSELF],
+        )
 
     @get_processed_user_id_if_exists
     async def procedure_after_night(

@@ -1,4 +1,6 @@
+from mafia.roles.descriptions.texts import PAYMENT_FOR_NIGHTS
 from mafia.roles.base import RoleABC
+from mafia.roles.descriptions.description import RoleDescription
 
 
 class Civilian(RoleABC):
@@ -8,3 +10,10 @@ class Civilian(RoleABC):
     purpose = "Тебе нужно вычислить мафию на голосовании."
     payment_for_night_spent = 12
     there_may_be_several = True
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill=None,
+            pay_for=[PAYMENT_FOR_NIGHTS],
+        )

@@ -1,8 +1,15 @@
 import asyncio
 
 from cache.cache_types import ExtraCache, GameCache
-from general.text import ATTEMPT_TO_KILL
+from general.text import (
+    ATTEMPT_TO_KILL,
+)
+from mafia.roles.descriptions.texts import (
+    KILLING_PLAYER,
+    PAYMENT_FOR_NIGHTS,
+)
 from mafia.roles.base.roles import RoleABC
+from mafia.roles.descriptions.description import RoleDescription
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
@@ -36,6 +43,13 @@ class AngelOfDeath(
     payment_for_night_spent = 7
     clearing_state_after_death = False
     notification_message = ATTEMPT_TO_KILL
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="Может убить любого, если его повесят днём",
+            pay_for=[KILLING_PLAYER, PAYMENT_FOR_NIGHTS],
+        )
 
     async def take_action_after_voting(
         self, game_data: GameCache, removed_user: list[int], **kwargs

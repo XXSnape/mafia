@@ -1,6 +1,14 @@
 from cache.cache_types import GameCache
-from general.text import ATTEMPT_TO_KILL
+from general.text import (
+    ATTEMPT_TO_KILL,
+)
+from mafia.roles.descriptions.texts import (
+    KILLING_PLAYER,
+    CAN_KILL_AT_NIGHT,
+    CAN_SEE_ALLIES,
+)
 from mafia.roles.base.roles import RoleABC
+from mafia.roles.descriptions.description import RoleDescription
 from general.groupings import Groupings
 from mafia.roles.base import (
     ActiveRoleAtNightABC,
@@ -29,6 +37,17 @@ class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
     notification_message = ATTEMPT_TO_KILL
     payment_for_treatment = 0
     payment_for_murder = 20
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill=CAN_KILL_AT_NIGHT,
+            pay_for=[KILLING_PLAYER],
+            features=[
+                "Жертва выбирается решением большинства союзников. В случае неопределенности решение принимает представитель роли.",
+                CAN_SEE_ALLIES,
+            ],
+        )
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.MAFIA_ATTACKS

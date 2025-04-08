@@ -9,6 +9,7 @@ from general.text import ROLE_IS_KNOWN
 from keyboards.inline.keypads.mailing import selection_to_warden_kb
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import ProcedureAfterNightABC
+from mafia.roles.descriptions.description import RoleDescription
 from states.states import UserFsm
 from utils.informing import (
     remind_worden_about_inspections,
@@ -42,6 +43,13 @@ class Warden(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     number_in_order_after_night = 2
     payment_for_treatment = 15
     payment_for_murder = 16
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="Проверяет 2ух игроков на факт принадлежности одной группировки",
+            pay_for=["Проверку игроков"],
+        )
 
     def __init__(self):
         self.state_for_waiting_for_action = (

@@ -1,6 +1,12 @@
 from cache.cache_types import GameCache
+from mafia.roles.descriptions.texts import (
+    CANT_CHOOSE_IN_ROW,
+    CAN_CHOOSE_YOURSELF,
+    CAN_CHOOSE_YOURSELF_AFTER_2_NIGHTS,
+)
 from mafia.roles.base.mixins import ProcedureAfterVotingABC
 from mafia.roles.base.roles import RoleABC
+from mafia.roles.descriptions.description import RoleDescription
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
 from states.states import UserFsm
@@ -12,6 +18,7 @@ class Lawyer(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
     role = "Адвокат"
     role_id = "lawyer"
     mail_message = "Кого защитить на голосовании?"
+    is_self_selecting = True
     do_not_choose_self = 2
     photo = (
         "https://avatars.mds.yandex.net/get-altay/"
@@ -23,6 +30,18 @@ class Lawyer(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
     )
     message_to_user_after_action = "Ты выбрал защитить {url}"
     number_in_order_after_voting = 0
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="Может спасти игрока от повешения",
+            pay_for=["Спасение игрока союзной группировки"],
+            limitations=[
+                CANT_CHOOSE_IN_ROW,
+                CAN_CHOOSE_YOURSELF_AFTER_2_NIGHTS,
+            ],
+            features=[CAN_CHOOSE_YOURSELF],
+        )
 
     @get_processed_role_and_user_if_exists
     async def take_action_after_voting(

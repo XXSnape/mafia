@@ -1,5 +1,10 @@
 from cache.cache_types import GameCache, UserIdInt
+from mafia.roles.descriptions.texts import (
+    CANT_CHOOSE_IN_ROW,
+    SAVING_PLAYER,
+)
 from mafia.roles.base.roles import RoleABC
+from mafia.roles.descriptions.description import RoleDescription
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
@@ -27,6 +32,22 @@ class Bodyguard(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     number_in_order_after_night = 3
     payment_for_treatment = 12
     payment_for_murder = 12
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="Спасает игрока от смерти и умирает сам",
+            pay_for=[SAVING_PLAYER],
+            limitations=[
+                CANT_CHOOSE_IN_ROW,
+                "выплата не происходит, если выбранного игрока лечил кто-то другой",
+            ],
+            features=[
+                "Если вылечат представителя роли, "
+                "а выбор представителя роли падет на игрока, который должен умереть, "
+                "тогда этот игрок не умрет, как и сам представитель роли, которому заплатят, как за спасение"
+            ],
+        )
 
     def __init__(self):
         self.state_for_waiting_for_action = (

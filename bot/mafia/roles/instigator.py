@@ -2,6 +2,7 @@ from cache.cache_types import ExtraCache, GameCache
 from mafia.roles.base.mixins import ProcedureAfterVotingABC
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
+from mafia.roles.descriptions.description import RoleDescription
 from states.states import UserFsm
 from utils.roles import get_user_role_and_url
 
@@ -21,6 +22,18 @@ class Instigator(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
     payment_for_treatment = 7
     payment_for_murder = 11
     extra_data = [ExtraCache(key="deceived")]
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="Может выбрать игрока и того, за кого этот игрок проголосует, если в принципе будет голосовать днём",
+            pay_for=[
+                "Ситуацию, когда выбранный игрок проголосовал не за союзную группировку"
+            ],
+            features=[
+                "Выбранный игрок не узнает о приходе представителя роли"
+            ],
+        )
 
     def __init__(self):
         self.state_for_waiting_for_action = (

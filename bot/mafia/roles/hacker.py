@@ -1,4 +1,6 @@
+from mafia.roles.descriptions.texts import PAYMENT_FOR_NIGHTS
 from mafia.roles.base import RoleABC
+from mafia.roles.descriptions.description import RoleDescription
 
 
 class Hacker(RoleABC):
@@ -9,3 +11,10 @@ class Hacker(RoleABC):
     payment_for_murder = 16
     payment_for_treatment = 15
     payment_for_night_spent = 7
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="Может видеть разговоры мафии и выбор тех, кого они пытаются убить",
+            pay_for=[PAYMENT_FOR_NIGHTS],
+        )

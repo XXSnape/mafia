@@ -1,7 +1,9 @@
 from cache.cache_types import GameCache
+from mafia.roles.descriptions.texts import DONT_PAY_FOR_NIGHTS
 from keyboards.inline.keypads.mailing import send_transformation_kb
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import ProcedureAfterNightABC
+from mafia.roles.descriptions.description import RoleDescription
 from states.states import UserFsm
 
 
@@ -19,8 +21,20 @@ class Werewolf(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     mail_message = "Реши, в кого сегодня превратишься!"
     payment_for_treatment = 11
     payment_for_murder = 12
+    payment_for_night_spent = 0
     number_in_order_after_night = 0
     number_of_night_for_transformation = 2
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill="На 4ую ночь превращается в мафию, маршала или доктора",
+            pay_for=["Достижения в других ролей"],
+            limitations=[
+                "Может превратиться в мафию, если после превращения мафия автоматически не победит",
+                DONT_PAY_FOR_NIGHTS,
+            ],
+        )
 
     async def procedure_after_night(
         self,

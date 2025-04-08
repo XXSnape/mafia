@@ -1,7 +1,12 @@
 from cache.cache_types import GameCache
+from mafia.roles.descriptions.texts import (
+    DONT_PAY_FOR_NIGHTS,
+    PAY_FOR_EARLY_DEATH,
+)
 from mafia.roles.base.mixins import SuicideRoleMixin
 from general.groupings import Groupings
 from mafia.roles.base import RoleABC
+from mafia.roles.descriptions.description import RoleDescription
 from utils.pretty_text import make_build
 
 
@@ -14,6 +19,16 @@ class SuicideBomber(SuicideRoleMixin, RoleABC):
     )
     grouping = Groupings.other
     purpose = "Тебе нужно умереть ночью."
+
+    @property
+    def role_description(self) -> RoleDescription:
+        return RoleDescription(
+            skill=None,
+            pay_for=["Смерть ночью"],
+            limitations=[DONT_PAY_FOR_NIGHTS],
+            features=[PAY_FOR_EARLY_DEATH],
+            wins_if="Побеждает, если умрёт ночью",
+        )
 
     async def report_death(
         self, game_data: GameCache, at_night: bool, user_id: int
