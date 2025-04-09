@@ -2,13 +2,13 @@ from sqlalchemy import select, func, Integer, desc
 
 from database.dao.base import BaseDAO
 from database.models import ResultModel
-from database.schemas.common import UserTgId
+from database.schemas.common import UserTgIdSchema
 
 
 class ResultsDao(BaseDAO[ResultModel]):
     model = ResultModel
 
-    async def get_results(self, user_tg_id: UserTgId):
+    async def get_results(self, user_tg_id: UserTgIdSchema):
         query = (
             select(
                 self.model.role_id,

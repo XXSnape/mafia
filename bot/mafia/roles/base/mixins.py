@@ -1,7 +1,17 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import (
+    TYPE_CHECKING,
+    TypedDict,
+    TypeAlias,
+    Unpack,
+)
 
-from cache.cache_types import GameCache, UserIdStr, UserIdInt
+from cache.cache_types import (
+    GameCache,
+    UserIdStr,
+    UserIdInt,
+    PlayersIds,
+)
 from general.text import ATTEMPT_TO_KILL
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
@@ -11,6 +21,20 @@ from utils.pretty_text import make_pretty
 if TYPE_CHECKING:
     from mafia.roles import RoleABC
 from utils.roles import get_processed_user_id_if_exists, change_role
+
+KillersOf: TypeAlias = dict[UserIdInt, list[ActiveRoleAtNightABC]]
+
+
+class NightResources(TypedDict, total=True):
+    recovered: PlayersIds
+    murdered: PlayersIds
+    victims: set[UserIdInt]
+    killers_of: KillersOf
+
+
+class DailyResources(TypedDict, total=True):
+    is_not_there_removed: bool
+    initial_removed_user_id: int | None
 
 
 class SuicideRoleMixin:
@@ -37,14 +61,16 @@ class ProcedureAfterNightABC(ABC):
     number_in_order_after_night: int = 1
 
     @abstractmethod
-    async def procedure_after_night(self, *args, **kwargs):
+    async def procedure_after_night(
+        self, game_data: GameCache, **kwargs: Unpack[NightResources]
+    ):
         pass
 
     @abstractmethod
     async def accrual_of_overnight_rewards(
         self,
         game_data: GameCache,
-        **kwargs,
+        **kwargs: Unpack[NightResources],
     ):
         pass
 
@@ -55,10 +81,10 @@ class MurderAfterNightABC(ProcedureAfterNightABC):
     @get_processed_user_id_if_exists
     async def procedure_after_night(
         self,
-        murdered: list[int],
+        murdered: PlayersIds,
         processed_user_id: UserIdInt,
-        killers_of: dict[UserIdInt, list[ActiveRoleAtNightABC]],
-        **kwargs,
+        killers_of: KillersOf,
+        **kwargs: Unpack[NightResources],
     ):
         killers_of[processed_user_id].append(self)
         murdered.append(processed_user_id)
@@ -71,7 +97,7 @@ class ProcedureAfterVotingABC(ABC):
     async def take_action_after_voting(
         self,
         game_data: GameCache,
-        **kwargs,
+        **kwargs: Unpack[DailyResources],
     ): ...
 
 

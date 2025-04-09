@@ -4,7 +4,7 @@ from cache.cache_types import OrderOfRolesCache, RolesLiteral
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.schemas.roles import OrderOfRolesSchema
-from database.schemas.common import UserTgId
+from database.schemas.common import UserTgIdSchema
 from general import settings
 from general.collection_of_roles import (
     get_data_with_roles,
@@ -31,7 +31,7 @@ class RoleManager(RouterHelper):
         await self.state.set_data({})
         dao = OrderOfRolesDAO(session=self.session)
         await dao.delete(
-            UserTgId(user_tg_id=self.callback.from_user.id)
+            UserTgIdSchema(user_tg_id=self.callback.from_user.id)
         )
         order_of_roles = [
             OrderOfRolesSchema(
@@ -64,7 +64,7 @@ class RoleManager(RouterHelper):
     async def view_order_of_roles(self):
         dao = OrderOfRolesDAO(session=self.session)
         order_of_roles = await dao.get_roles_ids_of_order_of_roles(
-            UserTgId(user_tg_id=self.callback.from_user.id),
+            UserTgIdSchema(user_tg_id=self.callback.from_user.id),
         )
         text = self.get_current_order_text(order_of_roles)
         await self.state.clear()
@@ -80,7 +80,7 @@ class RoleManager(RouterHelper):
         banned_roles_ids = await ProhibitedRolesDAO(
             session=self.session
         ).get_roles_ids_of_banned_roles(
-            UserTgId(user_tg_id=self.callback.from_user.id)
+            UserTgIdSchema(user_tg_id=self.callback.from_user.id)
         )
 
         all_roles = get_data_with_roles()
@@ -178,7 +178,7 @@ class RoleManager(RouterHelper):
     async def clear_order_of_roles(self):
         dao = OrderOfRolesDAO(session=self.session)
         await dao.delete(
-            UserTgId(user_tg_id=self.callback.from_user.id)
+            UserTgIdSchema(user_tg_id=self.callback.from_user.id)
         )
         await self.callback.answer(
             "✅Порядок ролей сброшен!", show_alert=True

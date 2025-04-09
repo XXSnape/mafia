@@ -26,7 +26,7 @@ from general.text import MONEY_SYM
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.dao.users import UsersDao
-from database.schemas.common import TgId, UserTgId
+from database.schemas.common import TgIdSchema, UserTgIdSchema
 from general.collection_of_roles import (
     get_data_with_roles,
     BASES_ROLES,
@@ -108,7 +108,7 @@ class Registration(RouterHelper):
         user_id = self._get_user_id()
         users_dao = UsersDao(session=self.session)
         return await users_dao.get_user_or_create(
-            TgId(tg_id=user_id)
+            TgIdSchema(tg_id=user_id)
         )
 
     async def checking_for_necessary_permissions_to_start_game(
@@ -500,8 +500,8 @@ class Registration(RouterHelper):
         group_settings_schema = await GroupsDao(
             session=self.session
         ).get_group_settings(
-            group_tg_id=TgId(tg_id=self.message.chat.id),
-            user_tg_id=UserTgId(user_tg_id=owner_id),
+            group_tg_id=TgIdSchema(tg_id=self.message.chat.id),
+            user_tg_id=UserTgIdSchema(user_tg_id=owner_id),
         )
         settings: GameSettingsCache = {
             "creator_user_id": owner_id,

@@ -1,4 +1,4 @@
-from typing import List, TypeVar, Generic, Type
+from typing import List
 from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.future import select
@@ -10,14 +10,10 @@ from sqlalchemy import (
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.common.base import BaseModel as Base
-from database.models import RoleModel
-from database.schemas.common import UserTgId
-
-T = TypeVar("T", bound=Base)
 
 
-class BaseDAO(Generic[T]):
-    model: Type[T] = None
+class BaseDAO[M: Base]:
+    model: type[M] | None = None
 
     def __init__(self, session: AsyncSession):
         self._session = session
@@ -29,7 +25,7 @@ class BaseDAO(Generic[T]):
     def _get_sorting_attrs(self, sort_fields: list[str]):
         return (getattr(self.model, field) for field in sort_fields)
 
-    async def find_one_or_none_by_id(self, data_id: int) -> T | None:
+    async def find_one_or_none_by_id(self, data_id: int) -> M | None:
         try:
             query = select(self.model).filter_by(id=data_id)
             result = await self._session.execute(query)
@@ -43,7 +39,7 @@ class BaseDAO(Generic[T]):
             )
             raise
 
-    async def find_one_or_none(self, filters: BaseModel) -> T | None:
+    async def find_one_or_none(self, filters: BaseModel) -> M | None:
         filter_dict = filters.model_dump(exclude_unset=True)
         logger.info(
             f"Поиск одной записи {self.model.__name__} по фильтрам: {filter_dict}"
@@ -65,7 +61,7 @@ class BaseDAO(Generic[T]):
         self,
         filters: BaseModel | None = None,
         sort_fields: list[str] | None = None,
-    ) -> list[T]:
+    ) -> list[M]:
         filter_dict = (
             filters.model_dump(exclude_unset=True) if filters else {}
         )
@@ -88,7 +84,7 @@ class BaseDAO(Generic[T]):
             )
             raise
 
-    async def add(self, values: BaseModel) -> T:
+    async def add(self, values: BaseModel) -> M:
         values_dict = values.model_dump(exclude_unset=True)
         logger.info(
             f"Добавление записи {self.model.__name__} с параметрами: {values_dict}"
@@ -109,7 +105,7 @@ class BaseDAO(Generic[T]):
         self,
         instances: List[BaseModel],
         exclude: set[str] | None = None,
-    ) -> list[T]:
+    ) -> list[M]:
         values_list = [
             item.model_dump(exclude_unset=True, exclude=exclude)
             for item in instances

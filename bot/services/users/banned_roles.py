@@ -6,7 +6,7 @@ from cache.cache_types import PollBannedRolesCache, RolesLiteral
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.schemas.roles import ProhibitedRoleSchema
-from database.schemas.common import UserTgId
+from database.schemas.common import UserTgIdSchema
 from general.collection_of_roles import (
     get_data_with_roles,
     REQUIRED_ROLES,
@@ -42,7 +42,7 @@ class RoleAttendant(RouterHelper):
         self, roles_ids: list[RolesLiteral]
     ):
         user_id = self.callback.from_user.id
-        user_filter = UserTgId(user_tg_id=user_id)
+        user_filter = UserTgIdSchema(user_tg_id=user_id)
         prohibited_dao = ProhibitedRolesDAO(session=self.session)
         await prohibited_dao.delete(user_filter)
         prohibited_roles = [
@@ -86,7 +86,9 @@ class RoleAttendant(RouterHelper):
     ):
         await self.state.clear()
         dao = ProhibitedRolesDAO(session=self.session)
-        user_filter = UserTgId(user_tg_id=self.callback.from_user.id)
+        user_filter = UserTgIdSchema(
+            user_tg_id=self.callback.from_user.id
+        )
         banned_roles_ids = await dao.get_roles_ids_of_banned_roles(
             user_filter
         )
@@ -115,7 +117,7 @@ class RoleAttendant(RouterHelper):
     async def clear_banned_roles(self):
         dao = ProhibitedRolesDAO(session=self.session)
         await dao.delete(
-            UserTgId(user_tg_id=self.callback.from_user.id)
+            UserTgIdSchema(user_tg_id=self.callback.from_user.id)
         )
         await self.callback.answer(
             "✅Теперь для игры доступны все роли!", show_alert=True

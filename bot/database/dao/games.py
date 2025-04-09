@@ -5,7 +5,7 @@ from sqlalchemy import select, func, Integer, desc
 from database.dao.base import BaseDAO
 from database.dao.groups import GroupsDao
 from database.models import GameModel, ResultModel
-from database.schemas.common import TgId, IdSchema
+from database.schemas.common import TgIdSchema, IdSchema
 from database.schemas.games import BeginningOfGameSchema
 from database.schemas.groups import GroupIdSchema
 
@@ -13,7 +13,9 @@ from database.schemas.groups import GroupIdSchema
 class GamesDao(BaseDAO[GameModel]):
     model = GameModel
 
-    async def create_game(self, tg_id: TgId, start: datetime) -> int:
+    async def create_game(
+        self, tg_id: TgIdSchema, start: datetime
+    ) -> int:
         group = await GroupsDao(
             session=self._session
         ).find_one_or_none(filters=tg_id)

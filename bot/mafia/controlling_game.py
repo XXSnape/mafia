@@ -24,7 +24,6 @@ from keyboards.inline.keypads.to_bot import (
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from states.states import UserFsm
 from utils.pretty_text import (
-    make_pretty,
     make_build,
 )
 from utils.common import get_the_most_frequently_encountered_id

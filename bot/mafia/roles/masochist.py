@@ -33,7 +33,7 @@ class Masochist(SuicideRoleMixin, RoleABC):
     ):
         if at_night is False:
             message = make_build(
-                "Поздравляем! Тебя линчевали на голосовании, как ты и хотел!"
+                "🥳Поздравляем! Тебя линчевали на голосовании, как ты и хотел!"
             )
             await self.bot.send_message(
                 chat_id=user_id, text=message

@@ -6,7 +6,7 @@ from database.dao.base import BaseDAO
 from database.dao.settings import SettingsDao
 from database.models import UserModel
 from database.schemas.bids import UserMoneySchema
-from database.schemas.common import TgId, UserTgId
+from database.schemas.common import TgIdSchema, UserTgIdSchema
 
 
 class UsersDao(BaseDAO[UserModel]):
@@ -35,11 +35,13 @@ class UsersDao(BaseDAO[UserModel]):
         await self._session.execute(update_stmt)
         await self._session.flush()
 
-    async def get_user_or_create(self, tg_id: TgId) -> UserModel:
+    async def get_user_or_create(
+        self, tg_id: TgIdSchema
+    ) -> UserModel:
         user = await self.find_one_or_none(filters=tg_id)
         if user:
             return user
         user = await self.add(tg_id)
         settings_dao = SettingsDao(session=self._session)
-        await settings_dao.add(UserTgId(user_tg_id=user.tg_id))
+        await settings_dao.add(UserTgIdSchema(user_tg_id=user.tg_id))
         return user

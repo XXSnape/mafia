@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache
+from cache.cache_types import GameCache, PlayersIds, UserIdInt
 from mafia.roles.descriptions.texts import (
     CANT_CHOOSE_IN_ROW,
     CAN_CHOOSE_YOURSELF,
@@ -52,8 +52,8 @@ class Doctor(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     async def procedure_after_night(
         self,
         game_data: GameCache,
-        processed_user_id: int,
-        recovered: list[int],
+        processed_user_id: UserIdInt,
+        recovered: PlayersIds,
         **kwargs,
     ):
         recovered.append(processed_user_id)
@@ -62,10 +62,10 @@ class Doctor(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     async def accrual_of_overnight_rewards(
         self,
         game_data: GameCache,
-        murdered: list[int],
+        murdered: PlayersIds,
         processed_role: RoleABC,
         user_url: str,
-        processed_user_id: int,
+        processed_user_id: UserIdInt,
         **kwargs,
     ):
         if processed_user_id not in murdered:

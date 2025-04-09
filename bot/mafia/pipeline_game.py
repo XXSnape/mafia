@@ -21,7 +21,7 @@ from cache.cache_types import (
     RoleAndUserMoney,
     UserIdStr,
 )
-from database.schemas.common import TgId, IdSchema
+from database.schemas.common import TgIdSchema, IdSchema
 from database.schemas.groups import GroupIdSchema
 from general.text import MONEY_SYM
 from database.dao.games import GamesDao
@@ -119,7 +119,8 @@ class Game:
         beginning_dt = datetime.datetime.now()
         self.beginning_game = int(beginning_dt.timestamp())
         self.game_id = await dao.create_game(
-            tg_id=TgId(tg_id=self.group_chat_id), start=beginning_dt
+            tg_id=TgIdSchema(tg_id=self.group_chat_id),
+            start=beginning_dt,
         )
         await self.session.commit()
 
@@ -617,7 +618,8 @@ class Game:
                 aliases_tasks.append(
                     self.bot.send_message(
                         chat_id=persons[0],
-                        text="Твои союзники:\n" + profiles,
+                        text="Твои союзники, с которыми можно общаться прямо в этом чате:\n"
+                        + profiles,
                     )
                 )
                 for user_id in persons[1:]:
@@ -633,7 +635,8 @@ class Game:
                     aliases_tasks.append(
                         self.bot.send_message(
                             chat_id=user_id,
-                            text="Твои союзники!\n\n" + profiles,
+                            text="Твои союзники, с которыми можно общаться прямо в этом чате:\n\n"
+                            + profiles,
                         )
                     )
             if current_role.state_for_waiting_for_action:
@@ -652,7 +655,9 @@ class Game:
             *(
                 self.bot.send_message(
                     chat_id=user_id,
-                    text=make_build("❗️Сокомандники:\n")
+                    text=make_build(
+                        "❗️Сокомандники, с которыми можно общаться прямо в этом чате:\n"
+                    )
                     + get_profiles(
                         players_ids=teammates,
                         players=game_data["players"],

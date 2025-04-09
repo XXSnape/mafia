@@ -1,6 +1,6 @@
 import asyncio
 
-from cache.cache_types import ExtraCache, GameCache
+from cache.cache_types import ExtraCache, GameCache, UserIdInt
 from general.text import (
     ATTEMPT_TO_KILL,
 )
@@ -79,10 +79,10 @@ class AngelOfDeath(
     async def accrual_of_overnight_rewards(
         self,
         game_data: GameCache,
-        victims: set[int],
+        victims: set[UserIdInt],
         processed_role: RoleABC,
         user_url: str,
-        processed_user_id: int,
+        processed_user_id: UserIdInt,
         **kwargs
     ):
         if processed_user_id not in victims:
@@ -107,7 +107,7 @@ class AngelOfDeath(
             await self.bot.send_message(
                 chat_id=user_id,
                 text=make_build(
-                    "Тебя линчевали на голосовании, не забудь отомстить обидчикам!"
+                    "😈Тебя линчевали на голосовании, не забудь отомстить обидчикам!"
                 ),
             )
             return

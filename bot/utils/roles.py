@@ -2,10 +2,11 @@ from collections.abc import Callable
 from functools import wraps
 from typing import TYPE_CHECKING
 
-from cache.cache_types import RolesLiteral, GameCache
+from cache.cache_types import GameCache, UserIdInt
 from utils.pretty_text import make_pretty
 
 if TYPE_CHECKING:
+    from general.collection_of_roles import DataWithRoles
     from mafia.roles import RoleABC
 
 
@@ -28,8 +29,8 @@ def change_role(
 
 def get_user_role_and_url(
     game_data: GameCache,
-    processed_user_id: int,
-    all_roles: dict[str, "RoleABC"],
+    processed_user_id: UserIdInt,
+    all_roles: "DataWithRoles",
 ):
     role_id = game_data["players"][str(processed_user_id)]["role_id"]
     return (

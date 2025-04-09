@@ -5,7 +5,7 @@ from sqlalchemy import select
 from cache.cache_types import RolesLiteral
 from database.dao.base import BaseDAO
 from database.models import OrderModel, RoleModel
-from database.schemas.common import UserTgId
+from database.schemas.common import UserTgIdSchema
 from general.collection_of_roles import BASES_ROLES
 
 
@@ -14,7 +14,7 @@ class OrderOfRolesDAO(BaseDAO[OrderModel]):
 
     async def get_roles_ids_of_order_of_roles(
         self,
-        user_filter: UserTgId,
+        user_filter: UserTgIdSchema,
     ) -> list[RolesLiteral]:
         query = (
             select(RoleModel.key)

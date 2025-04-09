@@ -2,7 +2,12 @@ from typing import override
 
 from aiogram.types import InlineKeyboardButton
 
-from cache.cache_types import ExtraCache, GameCache, UserIdInt
+from cache.cache_types import (
+    ExtraCache,
+    GameCache,
+    UserIdInt,
+    PlayersIds,
+)
 
 from general.groupings import Groupings
 from general.text import (
@@ -20,7 +25,7 @@ from mafia.roles.base import (
     ActiveRoleAtNightABC,
     AliasRoleABC,
 )
-from mafia.roles.base.mixins import ProcedureAfterNightABC
+from mafia.roles.base.mixins import ProcedureAfterNightABC, KillersOf
 from mafia.roles.descriptions.description import RoleDescription
 from states.states import UserFsm
 from utils.pretty_text import make_pretty
@@ -74,7 +79,7 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     async def accrual_of_overnight_rewards(
         self,
         game_data: GameCache,
-        victims: set[int],
+        victims: set[UserIdInt],
         **kwargs,
     ):
         disclosed_roles = game_data["disclosed_roles"]
@@ -120,8 +125,8 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     async def procedure_after_night(
         self,
         game_data: GameCache,
-        murdered: list[int],
-        killers_of: dict[UserIdInt, list[ActiveRoleAtNightABC]],
+        murdered: PlayersIds,
+        killers_of: KillersOf,
         **kwargs,
     ):
 

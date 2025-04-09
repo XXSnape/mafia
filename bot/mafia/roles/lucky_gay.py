@@ -1,6 +1,6 @@
 from random import randint
 
-from cache.cache_types import GameCache
+from cache.cache_types import GameCache, PlayersIds
 from mafia.roles.descriptions.texts import PAYMENT_FOR_NIGHTS
 from mafia.roles.base import RoleABC
 from mafia.roles.base.mixins import (
@@ -30,8 +30,8 @@ class LuckyGay(ProcedureAfterNightABC, RoleABC):
     async def procedure_after_night(
         self,
         game_data: GameCache,
-        recovered: list[int],
-        murdered: list[int],
+        recovered: PlayersIds,
+        murdered: PlayersIds,
         **kwargs,
     ):
         send_to_group = False

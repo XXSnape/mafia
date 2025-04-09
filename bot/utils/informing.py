@@ -29,11 +29,12 @@ from utils.pretty_text import (
 from utils.sorting import sorting_by_number
 
 if TYPE_CHECKING:
+    from general.collection_of_roles import DataWithRoles
     from mafia.roles import RoleABC
 
 
 def get_live_players(
-    game_data: GameCache, all_roles: dict[str, "RoleABC"]
+    game_data: GameCache, all_roles: "DataWithRoles"
 ):
     profiles = get_profiles(
         players_ids=game_data["live_players_ids"],
@@ -50,9 +51,7 @@ def get_live_players(
     )
 
 
-def get_live_roles(
-    game_data: GameCache, all_roles: dict[str, "RoleABC"]
-):
+def get_live_roles(game_data: GameCache, all_roles: "DataWithRoles"):
     gropings: dict[Groupings, list[tuple[str, int]]] = {
         Groupings.civilians: [],
         Groupings.criminals: [],

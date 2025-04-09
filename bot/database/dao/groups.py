@@ -3,7 +3,11 @@ from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.dao.settings import SettingsDao
 from database.models import GroupModel
-from database.schemas.common import TgId, IdSchema, UserTgId
+from database.schemas.common import (
+    TgIdSchema,
+    IdSchema,
+    UserTgIdSchema,
+)
 from database.schemas.groups import GroupSettingsSchema
 from general import settings
 from general.collection_of_roles import BASES_ROLES
@@ -13,7 +17,9 @@ class GroupsDao(BaseDAO[GroupModel]):
     model = GroupModel
 
     async def get_group_settings(
-        self, group_tg_id: TgId, user_tg_id: UserTgId | None = None
+        self,
+        group_tg_id: TgIdSchema,
+        user_tg_id: UserTgIdSchema | None = None,
     ) -> GroupSettingsSchema:
 
         group = await self.find_one_or_none(group_tg_id)
@@ -30,7 +36,7 @@ class GroupsDao(BaseDAO[GroupModel]):
             settings_of_group = await SettingsDao(
                 session=self._session
             ).find_one_or_none(IdSchema(id=group.setting_id))
-            user_tg_id = UserTgId(
+            user_tg_id = UserTgIdSchema(
                 user_tg_id=settings_of_group.user_tg_id
             )
         else:

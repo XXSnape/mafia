@@ -2,7 +2,7 @@ import asyncio
 from abc import ABC, abstractproperty, abstractmethod
 from contextlib import suppress
 from random import shuffle
-from typing import Callable, Optional, Self
+from typing import Callable, Optional, Self, TYPE_CHECKING
 
 from aiogram import Bot, Dispatcher
 from aiogram.exceptions import TelegramBadRequest
@@ -19,6 +19,7 @@ from cache.cache_types import (
     RolesLiteral,
     UserIdInt,
 )
+
 from general.text import MONEY_SYM, NUMBER_OF_NIGHT
 from database.schemas.results import PersonalResultSchema
 from general.groupings import Groupings
@@ -38,6 +39,9 @@ from utils.informing import (
     remind_criminals_about_inspections,
 )
 from utils.state import get_state_and_assign
+
+if TYPE_CHECKING:
+    from general.collection_of_roles import DataWithRoles
 
 
 class RoleABC(ABC):
@@ -70,7 +74,7 @@ class RoleABC(ABC):
         dispatcher: Dispatcher,
         bot: Bot,
         state: FSMContext,
-        all_roles: dict[str, "RoleABC"],
+        all_roles: "DataWithRoles",
     ):
         self.all_roles = all_roles
         self.dispatcher = dispatcher
@@ -315,9 +319,11 @@ class RoleABC(ABC):
         user_id: int,
     ):
         if at_night is True:
-            message = "К сожалению, тебя убили! Отправь напоследок все, что думаешь!"
+            message = "😢🌃К сожалению, тебя убили! Отправь напоследок все, что думаешь!"
         elif at_night is False:
-            message = "К несчастью, тебя линчевали на голосовании!"
+            message = (
+                "😢🌟К несчастью, тебя линчевали на голосовании!"
+            )
         else:
             message = (
                 "😡Ты выбываешь из игры за неактивность! "

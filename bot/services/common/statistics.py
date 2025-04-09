@@ -5,7 +5,7 @@ from database.dao.groups import GroupsDao
 from database.dao.rates import RatesDao
 from database.dao.results import ResultsDao
 from database.dao.users import UsersDao
-from database.schemas.common import TgId, UserTgId
+from database.schemas.common import TgIdSchema, UserTgIdSchema
 from database.schemas.groups import GroupIdSchema
 from general.collection_of_roles import get_data_with_roles
 from general.text import MONEY_SYM
@@ -24,7 +24,7 @@ class StatisticsRouter(RouterHelper):
         await self.message.delete()
         users_dao = UsersDao(session=self.session)
         user = await users_dao.find_one_or_none(
-            TgId(tg_id=self.message.from_user.id)
+            TgIdSchema(tg_id=self.message.from_user.id)
         )
         balance = user.balance
         results_dao = ResultsDao(session=self.session)
@@ -35,7 +35,9 @@ class StatisticsRouter(RouterHelper):
         money_sum = 0
 
         result = await results_dao.get_results(
-            user_tg_id=UserTgId(user_tg_id=self.message.from_user.id)
+            user_tg_id=UserTgIdSchema(
+                user_tg_id=self.message.from_user.id
+            )
         )
         all_roles = get_data_with_roles()
         if not result:
@@ -76,7 +78,9 @@ class StatisticsRouter(RouterHelper):
         rates_result = await RatesDao(
             session=self.session
         ).get_results(
-            user_tg_id=UserTgId(user_tg_id=self.message.from_user.id)
+            user_tg_id=UserTgIdSchema(
+                user_tg_id=self.message.from_user.id
+            )
         )
         if rates_result.count:
             rates_text = (
@@ -95,7 +99,7 @@ class StatisticsRouter(RouterHelper):
         await delete_message(self.message)
         group = await GroupsDao(
             session=self.session
-        ).find_one_or_none(TgId(tg_id=self.message.chat.id))
+        ).find_one_or_none(TgIdSchema(tg_id=self.message.chat.id))
         if group is None:
             return
 

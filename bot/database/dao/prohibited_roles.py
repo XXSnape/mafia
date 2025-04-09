@@ -2,7 +2,7 @@ from sqlalchemy import select
 
 from database.dao.base import BaseDAO
 from database.models import ProhibitedRoleModel, RoleModel
-from database.schemas.common import UserTgId
+from database.schemas.common import UserTgIdSchema
 
 
 class ProhibitedRolesDAO(BaseDAO[ProhibitedRoleModel]):
@@ -10,7 +10,7 @@ class ProhibitedRolesDAO(BaseDAO[ProhibitedRoleModel]):
 
     async def get_roles_ids_of_banned_roles(
         self,
-        user_filter: UserTgId,
+        user_filter: UserTgIdSchema,
     ):
         query = (
             select(RoleModel.key)

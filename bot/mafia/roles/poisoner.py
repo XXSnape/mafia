@@ -1,4 +1,9 @@
-from cache.cache_types import GameCache, ExtraCache, UserIdInt
+from cache.cache_types import (
+    GameCache,
+    ExtraCache,
+    UserIdInt,
+    PlayersIds,
+)
 from general.text import (
     ATTEMPT_TO_KILL,
 )
@@ -11,6 +16,7 @@ from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,
     FinisherOfNight,
+    KillersOf,
 )
 from general.groupings import Groupings
 from mafia.roles.descriptions.description import RoleDescription
@@ -67,8 +73,8 @@ class Poisoner(
     async def procedure_after_night(
         self,
         game_data: GameCache,
-        murdered: list[int],
-        killers_of: dict[UserIdInt, list[ActiveRoleAtNightABC]],
+        murdered: PlayersIds,
+        killers_of: KillersOf,
         **kwargs,
     ):
         poisoned = game_data["poisoned"]
@@ -80,8 +86,8 @@ class Poisoner(
     async def accrual_of_overnight_rewards(
         self,
         game_data: GameCache,
-        victims: set[int],
-        killers_of: dict[UserIdInt, list[ActiveRoleAtNightABC]],
+        victims: set[UserIdInt],
+        killers_of: KillersOf,
         **kwargs,
     ):
         poisoned = game_data["poisoned"]

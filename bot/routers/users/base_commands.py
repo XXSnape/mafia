@@ -2,18 +2,7 @@ from aiogram import Router, F
 from aiogram.filters import CommandStart, StateFilter, Command
 from aiogram.fsm.state import default_state
 from aiogram.types import Message, CallbackQuery
-from sqlalchemy import Grouping
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from database.dao.users import UsersDao
-from database.schemas.common import TgId
-from general import settings
-from general.collection_of_roles import get_data_with_roles
-from general.commands import BotCommands
-from general.groupings import Groupings
-from general.text import ROLES_SELECTION, CONFIGURE_GAME_SECTION
-from keyboards.inline.builder import generate_inline_kb
-from keyboards.inline.buttons.common import HELP_BTN
 from keyboards.inline.callback_factory.help import RoleCbData
 from keyboards.inline.cb.cb_text import (
     VIEW_ROLES_CB,
@@ -24,17 +13,8 @@ from keyboards.inline.cb.cb_text import (
     HOW_TO_SET_UP_GAME_CB,
     HOW_TO_SEE_STATISTICS_CB,
 )
-from keyboards.inline.keypads.help import (
-    help_options_kb,
-    get_roles_kb,
-    go_back_to_options_kb,
-    to_help_kb,
-    ROLES_SELECTION_BTN,
-    HOW_TO_SET_UP_GAME_BTN,
-)
-from mafia.roles import Instigator, Warden
+
 from services.users.base import BaseRouter
-from utils.pretty_text import make_build, make_pretty
 
 router = Router(name=__name__)
 

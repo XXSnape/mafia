@@ -1,5 +1,5 @@
 from aiogram.types import InlineKeyboardButton
-from cache.cache_types import GameCache
+from cache.cache_types import GameCache, UserIdInt
 from general.groupings import Groupings
 from mafia.roles.descriptions.texts import (
     CAN_CHOOSE_YOURSELF,
@@ -98,7 +98,7 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
         self,
         game_data: GameCache,
         removed_user: list[int],
-        processed_user_id: int,
+        processed_user_id: UserIdInt,
         **kwargs,
     ):
         removed_user = removed_user[0]

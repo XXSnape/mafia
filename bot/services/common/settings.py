@@ -8,7 +8,11 @@ from keyboards.inline.callback_factory.settings import (
 from services.base import RouterHelper
 
 from database.dao.groups import GroupsDao
-from database.schemas.common import TgId, IdSchema, UserTgId
+from database.schemas.common import (
+    TgIdSchema,
+    IdSchema,
+    UserTgIdSchema,
+)
 from keyboards.inline.keypads.settings import set_up_group_kb
 from middlewares.db import (
     DatabaseMiddlewareWithoutCommit,
@@ -70,7 +74,7 @@ class SettingsRouter(RouterHelper):
         groups_dao = GroupsDao(session=self.session)
         group_tg_id = self.message.chat.id
         group_schema = await groups_dao.get_group_settings(
-            group_tg_id=TgId(tg_id=group_tg_id)
+            group_tg_id=TgIdSchema(tg_id=group_tg_id)
         )
         is_user_admin = await check_user_for_admin_rights(
             bot=self.message.bot,
@@ -153,7 +157,7 @@ class SettingsRouter(RouterHelper):
         my_setting = await SettingsDao(
             session=self.session
         ).find_one_or_none(
-            UserTgId(user_tg_id=self.callback.from_user.id)
+            UserTgIdSchema(user_tg_id=self.callback.from_user.id)
         )
 
         await groups_dao.update(

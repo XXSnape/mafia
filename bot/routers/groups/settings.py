@@ -1,5 +1,4 @@
-from aiogram import Router, F
-from aiogram.enums import ChatType
+from aiogram import Router
 from aiogram.filters import (
     Command,
     StateFilter,

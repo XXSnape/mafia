@@ -2,7 +2,7 @@ from contextlib import suppress
 
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import ChatPermissions
-from cache.cache_types import GameCache
+from cache.cache_types import GameCache, UserIdInt
 from mafia.roles.descriptions.texts import CANT_CHOOSE_IN_ROW
 from mafia.roles.base.roles import RoleABC
 from mafia.roles.descriptions.description import RoleDescription
@@ -52,7 +52,10 @@ class Prosecutor(
 
     @get_processed_user_id_if_exists
     async def procedure_after_night(
-        self, game_data: GameCache, processed_user_id: int, **kwargs
+        self,
+        game_data: GameCache,
+        processed_user_id: UserIdInt,
+        **kwargs,
     ):
         await ban_user(
             bot=self.bot,
@@ -66,7 +69,7 @@ class Prosecutor(
         game_data: GameCache,
         processed_role: RoleABC,
         user_url: str,
-        processed_user_id: int,
+        processed_user_id: UserIdInt,
         **kwargs,
     ):
         money = (

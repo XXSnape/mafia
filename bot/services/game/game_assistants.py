@@ -92,7 +92,7 @@ async def trace_all_actions(
 
 
 async def inform_aliases(
-    current_role: RoleABC,
+    current_role: ActiveRoleAtNightABC,
     game_data: GameCache,
     callback: CallbackQuery,
     url: str,

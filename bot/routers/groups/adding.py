@@ -4,7 +4,7 @@ from aiogram.types import ChatMemberUpdated, Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.dao.groups import GroupsDao
-from database.schemas.common import TgId
+from database.schemas.common import TgIdSchema
 
 router = Router(name=__name__)
 
@@ -19,7 +19,7 @@ async def adding_to_group(
 ):
     chat_info = await bot.get_chat(event.chat.id)
     group_dao = GroupsDao(session=session_with_commit)
-    await group_dao.add(values=TgId(tg_id=event.chat.id))
+    await group_dao.add(values=TgIdSchema(tg_id=event.chat.id))
     if chat_info.permissions.can_send_messages:
         await event.answer(text=f"Привет! Я Мафия!")
 
@@ -31,6 +31,6 @@ async def group_to_supergroup_migration(
 ):
     group_dao = GroupsDao(session=session_with_commit)
     await group_dao.update(
-        filters=TgId(tg_id=message.chat.id),
-        values=TgId(tg_id=message.migrate_to_chat_id),
+        filters=TgIdSchema(tg_id=message.chat.id),
+        values=TgIdSchema(tg_id=message.migrate_to_chat_id),
     )

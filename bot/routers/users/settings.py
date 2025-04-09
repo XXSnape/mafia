@@ -1,12 +1,10 @@
 from aiogram import F, Router
-from aiogram.enums import ChatType
 from aiogram.types import CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from keyboards.inline.callback_factory.settings import (
     GroupSettingsCbData,
 )
-from middlewares.db import DatabaseMiddlewareWithCommit
 from services.common.settings import SettingsRouter
 
 

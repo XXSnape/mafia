@@ -1,5 +1,5 @@
 from database.dao.settings import SettingsDao
-from database.schemas.common import UserTgId
+from database.schemas.common import UserTgIdSchema
 from database.schemas.settings import TimeOfDaySchema
 from keyboards.inline.callback_factory.settings import (
     TimeOfDay,
@@ -16,7 +16,7 @@ class TimeRouter(RouterHelper):
         setting = await SettingsDao(
             session=self.session
         ).find_one_or_none(
-            UserTgId(user_tg_id=self.callback.from_user.id)
+            UserTgIdSchema(user_tg_id=self.callback.from_user.id)
         )
 
         if self.callback.data == LENGTH_OF_NIGHT_CB:
@@ -48,7 +48,7 @@ class TimeRouter(RouterHelper):
         else:
             value.time_for_night = callback_data.seconds
         await SettingsDao(session=self.session).update(
-            UserTgId(
+            UserTgIdSchema(
                 user_tg_id=self.callback.from_user.id,
             ),
             values=value,

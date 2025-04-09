@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache, UserIdInt
+from cache.cache_types import GameCache, UserIdInt, PlayersIds
 from mafia.roles.descriptions.texts import (
     CANT_CHOOSE_IN_ROW,
     SAVING_PLAYER,
@@ -9,6 +9,7 @@ from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,
+    KillersOf,
 )
 from states.states import UserFsm
 from utils.roles import get_processed_role_and_user_if_exists
@@ -57,9 +58,9 @@ class Bodyguard(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     async def procedure_after_night(
         self,
         game_data: GameCache,
-        recovered: list[int],
-        murdered: list[int],
-        killers_of: dict[UserIdInt, list[ActiveRoleAtNightABC]],
+        recovered: PlayersIds,
+        murdered: PlayersIds,
+        killers_of: KillersOf,
         **kwargs,
     ):
         recovered_id = self.get_processed_user_id(game_data)
@@ -84,11 +85,11 @@ class Bodyguard(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     async def accrual_of_overnight_rewards(
         self,
         game_data: GameCache,
-        recovered: list[int],
-        murdered: list[int],
+        recovered: PlayersIds,
+        murdered: PlayersIds,
         processed_role: RoleABC,
         user_url: str,
-        processed_user_id: int,
+        processed_user_id: UserIdInt,
         **kwargs,
     ):
         if (processed_user_id not in murdered) or (

@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache
+from cache.cache_types import GameCache, UserIdInt
 from mafia.roles.descriptions.texts import (
     CANT_CHOOSE_IN_ROW,
     CAN_CHOOSE_YOURSELF,
@@ -50,7 +50,7 @@ class Lawyer(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
         processed_role: RoleABC,
         user_url: str,
         removed_user: list[int],
-        processed_user_id: int,
+        processed_user_id: UserIdInt,
         **kwargs,
     ):
         if removed_user[0] != processed_user_id:

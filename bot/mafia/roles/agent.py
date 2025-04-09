@@ -1,4 +1,4 @@
-from cache.cache_types import ExtraCache, GameCache
+from cache.cache_types import ExtraCache, GameCache, UserIdInt
 from mafia.roles.descriptions.texts import (
     CANT_CHOOSE_IN_ROW,
 )
@@ -39,7 +39,7 @@ class Agent(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     async def procedure_after_night(
         self,
         game_data: GameCache,
-        processed_user_id: int,
+        processed_user_id: UserIdInt,
         **kwargs,
     ):
         sufferers = [
@@ -68,7 +68,7 @@ class Agent(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         game_data: GameCache,
         processed_role: RoleABC,
         user_url: str,
-        processed_user_id: int,
+        processed_user_id: UserIdInt,
         **kwargs,
     ):
         if self.number_of_visitors == 0:

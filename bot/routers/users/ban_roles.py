@@ -1,5 +1,4 @@
 from aiogram import F, Router
-from aiogram.enums import ChatType
 from aiogram.filters import or_f, and_f
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
@@ -13,10 +12,6 @@ from keyboards.inline.cb.cb_text import (
     CLEAR_SETTINGS_CB,
     CANCEL_CB,
     BAN_EVERYTHING_CB,
-)
-from middlewares.db import (
-    DatabaseMiddlewareWithCommit,
-    DatabaseMiddlewareWithoutCommit,
 )
 from services.users.banned_roles import RoleAttendant
 from states.settings import SettingsFsm

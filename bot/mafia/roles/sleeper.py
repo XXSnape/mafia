@@ -2,7 +2,7 @@ from contextlib import suppress
 
 from aiogram.exceptions import TelegramBadRequest
 
-from cache.cache_types import ExtraCache, GameCache
+from cache.cache_types import ExtraCache, GameCache, UserIdInt
 from general.groupings import Groupings
 from mafia.roles.descriptions.texts import CANT_CHOOSE_IN_ROW
 from mafia.roles.base import ActiveRoleAtNightABC, RoleABC
@@ -55,7 +55,10 @@ class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
 
     @get_processed_user_id_if_exists
     async def procedure_after_night(
-        self, game_data: GameCache, processed_user_id: int, **kwargs
+        self,
+        game_data: GameCache,
+        processed_user_id: UserIdInt,
+        **kwargs
     ):
         user_role = game_data["players"][str(processed_user_id)][
             "role_id"

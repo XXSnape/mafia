@@ -1,11 +1,11 @@
-from cache.cache_types import GameCache, UserIdInt
+from cache.cache_types import GameCache, PlayersIds, UserIdInt
 from general.groupings import Groupings
 from mafia.roles.descriptions.texts import (
     KILLING_PLAYER,
 )
 from mafia.roles import Bodyguard
 from mafia.roles.base import RoleABC
-from mafia.roles.base.mixins import ProcedureAfterNightABC
+from mafia.roles.base.mixins import ProcedureAfterNightABC, KillersOf
 from mafia.roles.descriptions.description import RoleDescription
 
 
@@ -35,9 +35,9 @@ class Punisher(ProcedureAfterNightABC, RoleABC):
     async def procedure_after_night(
         self,
         game_data: GameCache,
-        recovered: list[int],
-        murdered: list[int],
-        killers_of: dict[UserIdInt, list[RoleABC]],
+        recovered: PlayersIds,
+        murdered: PlayersIds,
+        killers_of: KillersOf,
         **kwargs
     ):
         punishers = game_data.get(self.roles_key)
@@ -82,7 +82,7 @@ class Punisher(ProcedureAfterNightABC, RoleABC):
         murdered.extend(list(killed_py_punisher))
 
     async def accrual_of_overnight_rewards(
-        self, game_data: GameCache, victims: set[int], **kwargs
+        self, game_data: GameCache, victims: set[UserIdInt], **kwargs
     ):
         if not self.killed:
             return

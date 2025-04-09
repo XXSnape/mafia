@@ -35,7 +35,7 @@ class PrimeMinister(ProcedureAfterVotingABC, RoleABC):
         self,
         game_data: GameCache,
         is_not_there_removed: bool,
-        initial_removed_user_id: int,
+        initial_removed_user_id: int | None,
         **kwargs,
     ):
         if (

@@ -5,9 +5,9 @@ class IdSchema(BaseModel):
     id: int
 
 
-class TgId(BaseModel):
+class TgIdSchema(BaseModel):
     tg_id: int
 
 
-class UserTgId(BaseModel):
+class UserTgIdSchema(BaseModel):
     user_tg_id: int

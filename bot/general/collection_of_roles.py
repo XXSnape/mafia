@@ -1,12 +1,14 @@
-from typing import overload, Final
+from typing import overload, Final, TypeAlias
 
 from cache.cache_types import RolesLiteral
 from mafia import roles
 from mafia.roles import RoleABC, ActiveRoleAtNightABC
 
+DataWithRoles: TypeAlias = dict[RolesLiteral, RoleABC]
+
 
 @overload
-def get_data_with_roles() -> dict[RolesLiteral, RoleABC]: ...
+def get_data_with_roles() -> DataWithRoles: ...
 
 
 @overload

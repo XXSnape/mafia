@@ -1,5 +1,5 @@
 from database.dao.users import UsersDao
-from database.schemas.common import TgId
+from database.schemas.common import TgIdSchema
 from general import settings
 from general.collection_of_roles import get_data_with_roles
 from general.commands import BotCommands
@@ -24,7 +24,7 @@ from utils.pretty_text import make_build, make_pretty
 class BaseRouter(RouterHelper):
     async def greetings_to_user(self):
         await UsersDao(session=self.session).get_user_or_create(
-            tg_id=TgId(tg_id=self.message.from_user.id)
+            tg_id=TgIdSchema(tg_id=self.message.from_user.id)
         )
         await self.message.answer(
             f"Привет, я бот ведущий в для мафии. Просто добавь меня в чат."

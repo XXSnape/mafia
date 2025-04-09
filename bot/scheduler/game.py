@@ -4,6 +4,7 @@ from datetime import datetime
 from aiogram import Bot, Dispatcher
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
+from apscheduler.jobstores.base import JobLookupError
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -66,8 +67,10 @@ def clearing_tasks_on_schedule(
     need_to_clean_start: bool,
 ):
     if need_to_clean_start is True:
-        scheduler.remove_job(job_id=f"start_{game_chat}")
-    scheduler.remove_job(job_id=f"remind_{game_chat}")
+        with suppress(JobLookupError):
+            scheduler.remove_job(job_id=f"start_{game_chat}")
+    with suppress(JobLookupError):
+        scheduler.remove_job(job_id=f"remind_{game_chat}")
 
 
 async def remind_of_beginning_of_game(bot: Bot, state: FSMContext):
