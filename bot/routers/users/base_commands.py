@@ -56,12 +56,10 @@ async def handle_help_by_command(message: Message):
     await base.handle_help()
 
 
-
 @router.callback_query(F.data == HELP_CB)
 async def handle_help_by_callback(callback: CallbackQuery):
     base = BaseRouter(message=callback.message)
     await base.handle_help()
-
 
 
 @router.callback_query(F.data == VIEW_ROLES_CB)
@@ -70,19 +68,16 @@ async def view_roles(callback: CallbackQuery):
     await base.view_roles()
 
 
-
 @router.callback_query(F.data == HOW_TO_START_GAME_CB)
 async def how_to_start_game(callback: CallbackQuery):
     base = BaseRouter(callback=callback)
     await base.how_to_start_game()
 
 
-
 @router.callback_query(F.data == WHAT_ARE_BIDS_CB)
 async def what_are_bids(callback: CallbackQuery):
     base = BaseRouter(callback=callback)
     await base.what_are_bids()
-
 
 
 @router.callback_query(F.data == HOW_TO_PLAY_CB)
@@ -97,12 +92,10 @@ async def how_to_set_up_game(callback: CallbackQuery):
     await base.how_to_set_up_game()
 
 
-
 @router.callback_query(F.data == HOW_TO_SEE_STATISTICS_CB)
 async def how_to_see_statistics(callback: CallbackQuery):
     base = BaseRouter(callback=callback)
     await base.how_to_see_statistics()
-
 
 
 @router.callback_query(RoleCbData.filter())
