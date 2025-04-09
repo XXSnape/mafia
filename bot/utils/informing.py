@@ -21,7 +21,11 @@ from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
 
-from utils.pretty_text import make_build, make_pretty
+from utils.pretty_text import (
+    make_build,
+    make_pretty,
+    cut_off_old_text,
+)
 from utils.sorting import sorting_by_number
 
 if TYPE_CHECKING:
@@ -282,10 +286,12 @@ async def send_a_lot_of_messages_safely(
 def remind_worden_about_inspections(game_data: GameCache):
     if not game_data["text_about_checked_for_the_same_groups"]:
         return "Нет информации о совместных группах"
-    return (
-        "По результатам прошлых проверок выяснено:\n\n"
-        + game_data["text_about_checked_for_the_same_groups"]
-    )
+
+    text = game_data["text_about_checked_for_the_same_groups"]
+    if len(text) > 3700:
+        text = cut_off_old_text(text)
+        game_data["text_about_checked_for_the_same_groups"] = text
+    return "По результатам прошлых проверок выяснено:\n\n" + text
 
 
 def remind_criminals_about_inspections(
@@ -311,7 +317,8 @@ def remind_commissioner_about_inspections(
 ) -> str:
     if not game_data["text_about_checks"]:
         return "Роли ещё неизвестны"
-    return (
-        "По результатам прошлых проверок выяснено:\n\n"
-        + game_data["text_about_checks"]
-    )
+    text = game_data["text_about_checks"]
+    if len(text) > 3700:
+        text = cut_off_old_text(text)
+        game_data["text_about_checks"] = text
+    return "По результатам прошлых проверок выяснено:\n\n" + text

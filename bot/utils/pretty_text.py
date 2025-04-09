@@ -26,3 +26,8 @@ def get_minutes_and_seconds_text(
         message += f"{minutes} мин. "
     message += f"{seconds} сек."
     return message
+
+
+def cut_off_old_text(text: str):
+    text = "\n\n".join(text.split("\n\n")[-11:-1:1]) + "\n\n"
+    return text

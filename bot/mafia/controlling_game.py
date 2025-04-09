@@ -388,19 +388,9 @@ class Controller:
 
     async def mailing(self):
         game_data: GameCache = await self.state.get_data()
-        # tasks = []
         active_roles = self.get_roles_if_isinstance(
             ActiveRoleAtNightABC
         )
-        # for role in self.all_roles:
-        #     current_role: RoleABC = self.all_roles[role]
-        #     if (
-        #         isinstance(current_role, ActiveRoleAtNightABC)
-        #         is False
-        #         or current_role.is_alias
-        #     ):
-        #         continue
-        #     tasks.append(current_role.mailing(game_data=game_data))
         await asyncio.gather(
             *(
                 role.mailing(game_data=game_data)

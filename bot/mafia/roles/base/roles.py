@@ -207,7 +207,7 @@ class RoleABC(ABC):
             user_data["money"] = 0
             text = make_build(
                 f"🚫К сожалению, ты проиграл в роли {user_data['initial_role']} (0{MONEY_SYM})!\n\n"
-                f"{nights_lived_text} (0{MONEY_SYM})"
+                f"{nights_lived_text} (0{MONEY_SYM})\n"
             )
             return PersonalResultSchema(
                 user_tg_id=int(user_id),

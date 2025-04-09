@@ -209,7 +209,7 @@ class Game:
         )
         await message.pin()
         await self.controller.mailing()
-        await asyncio.sleep(32)
+        await asyncio.sleep(15)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -226,7 +226,7 @@ class Game:
         )
         await asyncio.sleep(4)
         await self.controller.suggest_vote()
-        await asyncio.sleep(15)
+        await asyncio.sleep(8)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -338,23 +338,32 @@ class Game:
     ):
         achievements = player_data["achievements"]
         result = personal_results[user_id]
+        messages = []
         text = result.text
         if not achievements:
-            achievements_text = make_build(
+            text += make_build(
                 "\nУ тебя нет полезных действий за игру!"
             )
         else:
-            achievements_text = make_build(
-                "\nОтчет о действиях, повлиявших на исход:\n\n● "
-            ) + "\n\n● ".join(
-                achievement.format(
+            text += make_build(
+                "\nОтчет о действиях, повлиявших на исход:"
+            )
+            for achievement, money in achievements:
+                current_text = achievement.format(
                     money=money if result.money != 0 else 0
                 )
-                for achievement, money in achievements
-            )
-        text += achievements_text
+                if len(text) > 3700:
+                    messages.append(text)
+                    text = f"● {current_text}"
+                else:
+                    text += f"\n\n● {current_text}"
         text += make_build(f"\n\nИтого: {result.money}{MONEY_SYM}")
-        await self.bot.send_message(chat_id=int(user_id), text=text)
+        messages.append(text)
+        for message in messages:
+            await self.bot.send_message(
+                chat_id=int(user_id), text=message
+            )
+
         await reset_user_state_if_in_game(
             dispatcher=self.dispatcher,
             user_id=int(user_id),
