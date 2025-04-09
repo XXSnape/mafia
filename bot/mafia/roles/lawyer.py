@@ -34,7 +34,7 @@ class Lawyer(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
     @property
     def role_description(self) -> RoleDescription:
         return RoleDescription(
-            skill="Может спасти игрока от повешения",
+            skill="Спасает игрока от повешения",
             pay_for=["Спасение игрока союзной группировки"],
             limitations=[
                 CANT_CHOOSE_IN_ROW,

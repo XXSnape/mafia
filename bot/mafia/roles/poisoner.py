@@ -42,7 +42,7 @@ class Poisoner(
     def role_description(self) -> RoleDescription:
         return RoleDescription(
             skill="За 1 ночь может либо отравить игрока, либо убить всех отравленных ранее",
-            pay_for=[KILLING_PLAYER],
+            pay_for=["Убийство любого игрока"],
             wins_if="Побеждает, если убьет минимум 3х игроков за игру",
         )
 

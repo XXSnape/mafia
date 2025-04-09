@@ -39,7 +39,7 @@ class Doctor(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     @property
     def role_description(self) -> RoleDescription:
         return RoleDescription(
-            skill="Может спасти игрока от смерти",
+            skill="Спасает игрока от смерти ночью",
             pay_for=[SAVING_PLAYER],
             limitations=[
                 CANT_CHOOSE_IN_ROW,

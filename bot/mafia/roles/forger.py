@@ -15,6 +15,7 @@ from mafia.roles.base.mixins import (
 from mafia.roles.descriptions.description import RoleDescription
 
 from states.states import UserFsm
+from utils.pretty_text import make_pretty
 
 
 class Forger(
@@ -46,6 +47,8 @@ class Forger(
 
     @property
     def role_description(self) -> RoleDescription:
+        from .policeman import Policeman
+
         return RoleDescription(
             skill="Может подменить документы любому игроку на любую роль, которая есть в игре",
             pay_for=[
@@ -55,7 +58,7 @@ class Forger(
                 "Не может подменить документы игроку на роль, которая может эту роль раскрыть",
             ],
             features=[
-                "Становится мафией после смерти ролей, которую могут напрямую раскрыть роль",
+                f"Становится мафией после смерти {make_pretty(Policeman.role)} и его союзников по роли",
                 CAN_CHOOSE_YOURSELF,
                 CAN_SEE_ALLIES,
             ],

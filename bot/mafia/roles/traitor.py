@@ -60,7 +60,7 @@ class Traitor(
     @property
     def role_description(self) -> RoleDescription:
         return RoleDescription(
-            skill="Может узнать роль игрока и показать её всем союзникам в группировке",
+            skill="Узнаёт роль игрока и показывает её всем участникам группировки",
             pay_for=[CHECKING_PLAYER],
             features=[
                 "Становится мафией после того, как узнал роли всех игроков",

@@ -1,10 +1,12 @@
 from cache.cache_types import GameCache
+from general.groupings import Groupings
 from mafia.roles.descriptions.texts import DONT_PAY_FOR_NIGHTS
 from keyboards.inline.keypads.mailing import send_transformation_kb
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import ProcedureAfterNightABC
 from mafia.roles.descriptions.description import RoleDescription
 from states.states import UserFsm
+from utils.pretty_text import make_pretty
 
 
 class Werewolf(ProcedureAfterNightABC, ActiveRoleAtNightABC):
@@ -27,11 +29,19 @@ class Werewolf(ProcedureAfterNightABC, ActiveRoleAtNightABC):
 
     @property
     def role_description(self) -> RoleDescription:
+        from .policeman import Policeman
+        from .doctor import Doctor
+        from .mafia import MafiaAlias
+
         return RoleDescription(
-            skill="На 4ую ночь превращается в мафию, маршала или доктора",
-            pay_for=["Достижения в других ролей"],
+            skill=f"На 4ую ночь превращается в {make_pretty(Policeman.role)} ({Policeman.alias.role})"
+            f", {make_pretty(Doctor.role)} "
+            f"({Doctor.alias.role}) "
+            f"или {make_pretty(MafiaAlias.role)}",
+            pay_for=["Достижения в других ролях"],
             limitations=[
-                "Может превратиться в мафию, если после превращения мафия автоматически не победит",
+                f"Может превратиться в мафию, если после превращения "
+                f"группировка {Groupings.criminals.value.name} автоматически не победит",
                 DONT_PAY_FOR_NIGHTS,
             ],
         )

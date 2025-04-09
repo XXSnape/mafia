@@ -15,6 +15,6 @@ class Hacker(RoleABC):
     @property
     def role_description(self) -> RoleDescription:
         return RoleDescription(
-            skill="Может видеть разговоры мафии и выбор тех, кого они пытаются убить",
+            skill="Видит разговоры мафии и тех, кого они пытаются убить",
             pay_for=[PAYMENT_FOR_NIGHTS],
         )

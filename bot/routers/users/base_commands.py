@@ -78,7 +78,6 @@ async def view_roles(callback: CallbackQuery):
 def join(strings: list[str] | None):
     if strings is None:
         return "Нет"
-    strings = [string.capitalize() for string in strings]
     return "\n● " + "\n● ".join(strings)
 
 
@@ -100,7 +99,7 @@ async def get_details_about_role(
     else:
         text = (
             f"🏆Условие победы: {description.wins_if.capitalize()}\n\n"
-            f"💪Особый навык: {(description.skill or "Нет").capitalize()}\n\n"
+            f"💪Особый навык: {(description.skill or "Нет")}\n\n"
             f"💰Платят за: {join(description.pay_for)}\n\n"
             f"🚫Ограничения: {join(description.limitations)}\n\n"
             f"✨Особенности: {join(description.features)}"
@@ -118,7 +117,7 @@ async def get_details_about_role(
         purpose_of_grouping = (
             f"Сделать так, чтобы "
             f"представителей группы стало больше "
-            f"или равно остальным остальным участникам игры"
+            f"или равно остальным участникам игры"
         )
     elif current_role.grouping == Groupings.civilians:
         purpose_of_grouping = (
