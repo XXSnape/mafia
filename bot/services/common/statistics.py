@@ -21,6 +21,7 @@ from utils.tg import delete_message
 
 class StatisticsRouter(RouterHelper):
     async def get_my_profile(self):
+        await self.message.delete()
         users_dao = UsersDao(session=self.session)
         user = await users_dao.find_one_or_none(
             TgId(tg_id=self.message.from_user.id)

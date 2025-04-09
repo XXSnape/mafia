@@ -4,6 +4,7 @@ from general.text import (
 )
 from mafia.roles.descriptions.texts import (
     KILLING_PLAYER,
+    DONT_PAY_FOR_VOTING,
 )
 from keyboards.inline.keypads.mailing import kill_or_poison_kb
 from mafia.roles.base import ActiveRoleAtNightABC
@@ -43,6 +44,7 @@ class Poisoner(
         return RoleDescription(
             skill="За 1 ночь может либо отравить игрока, либо убить всех отравленных ранее",
             pay_for=["Убийство любого игрока"],
+            limitations=[DONT_PAY_FOR_VOTING],
             wins_if="Побеждает, если убьет минимум 3х игроков за игру",
         )
 

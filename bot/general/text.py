@@ -6,3 +6,5 @@ TO_SAVE = "💾Сохранить"
 REQUIRE_TO_SAVE: str = (
     f"❗️Чтобы сохранить изменения, нажмите «{TO_SAVE}»\n\n"
 )
+ROLES_SELECTION = "Роли🎭"
+CONFIGURE_GAME_SECTION = "Как настроить игру?⚙️"

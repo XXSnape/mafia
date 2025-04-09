@@ -35,7 +35,9 @@ class UserManager(RouterHelper):
         ]
         await self.message.bot.send_message(
             chat_id=game_data["game_chat"],
-            text=f"По слухам {role} {url} перед смертью проглаголил такие слова:\n\n{self.message.text}",
+            text=f"По слухам {role} {url} перед смертью проглаголил такие слова:\n\n{self.message.text}"[
+                :3900
+            ],
         )
         await self.message.answer(
             make_build("Сообщение успешно отправлено!")
@@ -69,7 +71,9 @@ class UserManager(RouterHelper):
         await send_a_lot_of_messages_safely(
             bot=self.message.bot,
             users=aliases,
-            text=f"{role} {url} передает:\n\n{self.message.text}",
+            text=f"{role} {url} передает:\n\n{self.message.text}"[
+                :3900
+            ],
             exclude=[self.message.from_user.id],
         )
         if (
@@ -78,7 +82,9 @@ class UserManager(RouterHelper):
         ):
             await send_a_lot_of_messages_safely(
                 bot=self.message.bot,
-                text=f"{role} ??? передает:\n\n{self.message.text}",
+                text=f"{role} ??? передает:\n\n{self.message.text}"[
+                    :3900
+                ],
                 users=game_data[Hacker.roles_key],
             )
         await self.message.answer(

@@ -63,7 +63,7 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
             skill="За 1 ночь может либо проверить роль игрока, либо убить его",
             pay_for=[KILLING_PLAYER, CHECKING_PLAYER],
             limitations=[
-                "не может убить в первую ночь",
+                "Не может убить в первую ночь",
             ],
         )
 

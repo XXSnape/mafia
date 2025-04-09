@@ -13,6 +13,7 @@ from keyboards.inline.buttons.common import (
     BACK_TO_SELECTING_ACTIONS_FOR_ROLES_BTN,
     CANCEL_BTN,
     SAVE_BTN,
+    HELP_BTN,
 )
 from keyboards.inline.callback_factory.settings import (
     GroupSettingsCbData,
@@ -94,9 +95,7 @@ def select_setting_kb():
             text="Продолжительность дня🌟",
             callback_data=LENGTH_OF_DAY_CB,
         ),
-        InlineKeyboardButton(
-            text="Главное меню✨", callback_data=MENU_CB
-        ),
+        HELP_BTN,
     ]
     return generate_inline_kb(data_with_buttons=buttons)
 

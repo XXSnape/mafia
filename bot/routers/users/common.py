@@ -10,24 +10,9 @@ from keyboards.inline.cb.cb_text import (
 )
 from keyboards.inline.keypads.settings import select_setting_kb
 from states.settings import SettingsFsm
-
+from utils.pretty_text import make_build
 
 router = Router(name=__name__)
-
-
-@router.callback_query(F.data == MENU_CB)
-async def get_menu(callback: CallbackQuery, state: FSMContext):
-    await state.clear()
-    await callback.message.edit_text(
-        "Доступные команды:\n\n/users - настройки"
-    )
-
-
-@router.callback_query(F.data == CANCEL_CB)
-async def cancel_state(callback: CallbackQuery, state: FSMContext):
-    await state.clear()
-    await callback.message.delete()
-    await callback.message.answer("/my_settings - настройки")
 
 
 @router.message(
@@ -42,7 +27,7 @@ async def handle_settings(message: Message, state: FSMContext):
     await state.clear()
     await message.delete()
     await message.answer(
-        "Выбери, что конкретно хочешь настроить",
+        make_build("⚙️Выбери, что конкретно хочешь настроить"),
         reply_markup=select_setting_kb(),
     )
 
@@ -53,6 +38,6 @@ async def back_to_settings(
 ):
     await state.clear()
     await callback.message.edit_text(
-        text="Выбери, что конкретно хочешь настроить",
+        text=make_build("Выбери, что конкретно хочешь настроить"),
         reply_markup=select_setting_kb(),
     )

@@ -1,7 +1,10 @@
 from aiogram.types import InlineKeyboardButton
 from cache.cache_types import GameCache
 from general.groupings import Groupings
-from mafia.roles.descriptions.texts import CAN_CHOOSE_YOURSELF
+from mafia.roles.descriptions.texts import (
+    CAN_CHOOSE_YOURSELF,
+    DONT_PAY_FOR_VOTING,
+)
 from keyboards.inline.cb.cb_text import DRAW_CB
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import ProcedureAfterVotingABC
@@ -42,6 +45,7 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
                 "Может выбрать вариант, что никого не повесят",
                 CAN_CHOOSE_YOURSELF,
             ],
+            limitations=[DONT_PAY_FOR_VOTING],
             wins_if="Сделать 3 правильных прогноза или больше",
         )
 

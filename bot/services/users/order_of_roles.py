@@ -5,6 +5,7 @@ from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.schemas.roles import OrderOfRolesSchema
 from database.schemas.common import UserTgId
+from general import settings
 from general.collection_of_roles import (
     get_data_with_roles,
     BASES_ROLES,
@@ -122,9 +123,12 @@ class RoleManager(RouterHelper):
         if role.there_may_be_several is False:
             order_data[key].remove(self.callback.data)
         order_data["selected"].append(self.callback.data)
-        if len(order_data["selected"]) == 30:  # TODO FROM SETTINGS
+        if (
+            len(order_data["selected"])
+            == settings.mafia.maximum_number_of_players
+        ):
             await self.callback.answer(
-                "Пока можно выбрать только 30 ролей!",
+                f"Пока в игре могут участвовать только {settings.mafia.maximum_number_of_players} человек!",
                 show_alert=True,
             )
             await self._delete_old_order_of_roles_and_add_new(

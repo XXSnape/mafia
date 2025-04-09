@@ -2,6 +2,7 @@ from cache.cache_types import GameCache
 from mafia.roles.descriptions.texts import (
     DONT_PAY_FOR_NIGHTS,
     PAY_FOR_EARLY_DEATH,
+    DONT_PAY_FOR_VOTING,
 )
 from mafia.roles.base.mixins import SuicideRoleMixin
 from general.groupings import Groupings
@@ -22,7 +23,7 @@ class Masochist(SuicideRoleMixin, RoleABC):
         return RoleDescription(
             skill=None,
             pay_for=["Смерть днём"],
-            limitations=[DONT_PAY_FOR_NIGHTS],
+            limitations=[DONT_PAY_FOR_NIGHTS, DONT_PAY_FOR_VOTING],
             features=[PAY_FOR_EARLY_DEATH],
             wins_if="Побеждает, если умрёт днём",
         )

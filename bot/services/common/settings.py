@@ -1,18 +1,11 @@
+from aiogram.exceptions import TelegramAPIError
+
 from database.dao.settings import SettingsDao
 from database.schemas.groups import GroupSettingIdSchema
 from keyboards.inline.callback_factory.settings import (
     GroupSettingsCbData,
 )
 from services.base import RouterHelper
-from aiogram import Router, F
-from aiogram.enums import ChatType
-from aiogram.filters import (
-    Command,
-    StateFilter,
-)
-from aiogram.fsm.state import default_state
-from aiogram.types import Message
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.dao.groups import GroupsDao
 from database.schemas.common import TgId, IdSchema, UserTgId
@@ -56,7 +49,22 @@ def checking_for_ability_to_change_settings(async_func):
     return _wrapper
 
 
+def cant_write_to_user(async_func):
+    async def _wrapper(self: "SettingsRouter"):
+        try:
+            return await async_func(self)
+        except TelegramAPIError:
+            await self.message.answer(
+                make_build(
+                    "❗️Для просмотра настроек сначала напишите боту /start в личные сообщения"
+                )
+            )
+
+    return _wrapper
+
+
 class SettingsRouter(RouterHelper):
+    @cant_write_to_user
     async def get_group_settings(self):
         await delete_message(self.message)
         groups_dao = GroupsDao(session=self.session)

@@ -21,6 +21,7 @@ from cache.cache_types import (
 )
 from database.dao.groups import GroupsDao
 from database.dao.settings import SettingsDao
+from general import settings
 from general.text import MONEY_SYM
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
@@ -351,8 +352,9 @@ class Registration(RouterHelper):
             game_data=game_data, game_chat=game_chat
         )
         if (
-            len(game_data["live_players_ids"]) == 30
-        ):  # TODO FROM SETTINGS
+            len(game_data["live_players_ids"])
+            == settings.mafia.maximum_number_of_players
+        ):
             await self._start_game(
                 game_data=game_data, game_state=game_state
             )

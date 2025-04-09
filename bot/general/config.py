@@ -28,6 +28,7 @@ class BotSettings(BaseSettings):
 class MafiaSettings(BaseSettings):
     time_for_night: int
     time_for_day: int
+    maximum_number_of_players: int
     model_config = SettingsConfigDict(
         case_sensitive=False, env_prefix="mafia_"
     )
