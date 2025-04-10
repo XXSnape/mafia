@@ -1,6 +1,8 @@
+from collections.abc import Callable, Awaitable
 from contextlib import suppress
 from datetime import timedelta, datetime, timezone, UTC
 from pprint import pprint
+from typing import Concatenate
 
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import CommandObject
@@ -63,8 +65,15 @@ from utils.state import (
 )
 
 
-def verification_for_admin_or_creator(async_func):
-    async def _wrapper(self: "Registration"):
+def verification_for_admin_or_creator[R, **P](
+    async_func: Callable[
+        Concatenate["Registration", P],
+        Awaitable[R | None],
+    ],
+):
+    async def wrapper(
+        self: "Registration", *args: P.args, **kwargs: P.kwargs
+    ) -> R | None:
         await self.message.delete()
         game_data: GameCache = await self.state.get_data()
         user_id = self.message.from_user.id
@@ -78,9 +87,11 @@ def verification_for_admin_or_creator(async_func):
             and game_data["settings"]["creator_user_id"] != user_id
         ):
             return
-        return await async_func(self, game_data=game_data)
+        return await async_func(
+            self, *args, game_data=game_data, **kwargs
+        )
 
-    return _wrapper
+    return wrapper
 
 
 class Registration(RouterHelper):
@@ -503,7 +514,7 @@ class Registration(RouterHelper):
             group_tg_id=TgIdSchema(tg_id=self.message.chat.id),
             user_tg_id=UserTgIdSchema(user_tg_id=owner_id),
         )
-        settings: GameSettingsCache = {
+        game_settings: GameSettingsCache = {
             "creator_user_id": owner_id,
             "creator_full_name": self.message.from_user.full_name,
             "order_of_roles": group_settings_schema.order_of_roles,
@@ -511,10 +522,10 @@ class Registration(RouterHelper):
             "time_for_night": group_settings_schema.time_for_night,
             "time_for_day": group_settings_schema.time_for_day,
         }
-        pprint(settings)
+        pprint(game_settings)
         game_data: GameCache = {
             "game_chat": self.message.chat.id,
-            "settings": settings,
+            "settings": game_settings,
             "pros": [],
             "cons": [],
             "start_message_id": message_id,
@@ -530,6 +541,8 @@ class Registration(RouterHelper):
             "end_of_registration": end_of_registration,
             "wait_for": [],
             "number_of_night": 0,
+            "cant_vote": [],
+            "cant_talk": [],
         }
         await self.state.set_data(game_data)
         await self.state.set_state(GameFsm.REGISTRATION)

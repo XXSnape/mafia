@@ -10,11 +10,8 @@ from keyboards.inline.callback_factory.recognize_user import (
 )
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from services.base import RouterHelper
-from mafia.roles import Prosecutor, PrimeMinister
+from mafia.roles import PrimeMinister
 from utils.tg import delete_message, ban_user
-
-
-# from utils.utils import add_voice
 
 
 class GroupManager(RouterHelper):
@@ -38,9 +35,7 @@ class GroupManager(RouterHelper):
         if (
             self.message.from_user.id
             not in game_data["live_players_ids"]
-        ) or self.message.from_user.id == Prosecutor().get_processed_user_id(
-            game_data
-        ):
+        ) or self.message.from_user.id in game_data["cant_talk"]:
             await delete_message(message=self.message)
             await ban_user(
                 bot=self.message.bot,
@@ -65,12 +60,9 @@ class GroupManager(RouterHelper):
                 "Теперь твой судья - демократия!", show_alert=True
             )
             return
-        if (
-            self.callback.from_user.id
-            == Prosecutor().get_processed_user_id(game_data)
-        ):
+        if self.callback.from_user.id in game_data["cant_vote"]:
             await self.callback.answer(
-                "Ты арестован и не можешь голосовать!",
+                "Ты временно не можешь голосовать!",
                 show_alert=True,
             )
             return

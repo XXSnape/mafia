@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 from aiogram.types import InlineKeyboardButton
 
-from cache.cache_types import GameCache, ExtraCache
+from cache.cache_types import GameCache, ExtraCache, UserIdInt
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
@@ -77,7 +77,7 @@ class Traitor(
         game_data: GameCache,
         processed_role: "RoleABC",
         user_url: str,
-        processed_user_id: int,
+        processed_user_id: UserIdInt,
         **kwargs,
     ):
 
@@ -120,7 +120,7 @@ class Traitor(
         game_data: GameCache,
         processed_role: "RoleABC",
         user_url: str,
-        processed_user_id: int,
+        processed_user_id: UserIdInt,
         **kwargs,
     ):
         self.add_money_to_all_allies(

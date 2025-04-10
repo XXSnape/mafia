@@ -4,7 +4,6 @@ from typing import Any, Awaitable, Callable, Dict
 from aiogram import BaseMiddleware
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import CallbackQuery, TelegramObject, Message
-from aiogram.utils.chat_action import ChatActionSender
 from loguru import logger
 
 from utils.pretty_text import make_build
@@ -31,10 +30,10 @@ class HandleCallbackErrorMiddleware(BaseMiddleware):
             return await handler(callback, data)
         except Exception as e:
             await callback.answer(
-                "Что - то пошло не так...", show_alert=True
+                "Попробуй еще раз...", show_alert=True
             )
             await delete_message(callback.message)
-            logger.error("Произошла ошибка в callback {}", e)
+            logger.exception("Произошла ошибка в callback")
 
 
 class HandleMessageErrorMiddleware(BaseMiddleware):
@@ -58,6 +57,6 @@ class HandleMessageErrorMiddleware(BaseMiddleware):
         except Exception as e:
             with suppress(TelegramBadRequest):
                 await message.answer(
-                    make_build("Что - то пошло не так...")
+                    make_build("Попробуй еще раз...")
                 )
-            logger.error("Произошла ошибка в message {}", e)
+            logger.exception("Произошла ошибка в message")

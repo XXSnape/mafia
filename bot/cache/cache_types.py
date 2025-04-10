@@ -9,10 +9,8 @@ class ExtraCache:
     data_type: type = list
 
 
-Url: TypeAlias = str
 PlayersIds: TypeAlias = list[int | str]
 UserIdStr: TypeAlias = str
-RoleName: TypeAlias = str
 UserIdInt: TypeAlias = int
 Message: TypeAlias = str
 RolesLiteral = Literal[
@@ -46,7 +44,6 @@ RolesLiteral = Literal[
     "poisoner",
 ]
 
-Money: TypeAlias = int
 Achievements: TypeAlias = list[list[str | int]]
 Poisoned: TypeAlias = list[list[int] | int]
 
@@ -63,18 +60,15 @@ class PollBannedRolesCache(TypedDict, total=False):
 
 class UserGameCache(TypedDict, total=False):
     full_name: str
-    url: Url
+    url: str
     number: int
-    role: NotRequired[RoleName]
-    pretty_role: NotRequired[str]
+    pretty_role: str
     initial_role: str
     role_id: RolesLiteral
     initial_role_id: RolesLiteral
     roles_key: str
     number_died_at_night: int
-    user_id: int
-    money: Money
-    is_winner: bool
+    money: int
     achievements: Achievements
 
 
@@ -152,3 +146,5 @@ class GameCache(TypedDict, total=False):
     start_of_registration: int
     end_of_registration: int
     angels_died: PlayersIds
+    cant_vote: PlayersIds
+    cant_talk: PlayersIds

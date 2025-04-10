@@ -52,10 +52,15 @@ class Punisher(ProcedureAfterNightABC, RoleABC):
             if not killers:
                 continue
             killer_id = killers[0]
-
-            treated_by_bodyguard = Bodyguard().get_processed_user_id(
-                game_data
+            bodyguard: Bodyguard | None = self.all_roles.get(
+                Bodyguard.role_id, None
             )
+            treated_by_bodyguard = None
+            if bodyguard:
+                treated_by_bodyguard = (
+                    Bodyguard().get_processed_user_id(game_data)
+                )
+
             killed_py_punisher.add(killer_id)
             self.killed.append([killer_id, current_role])
             if (

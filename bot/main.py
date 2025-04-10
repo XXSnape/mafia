@@ -5,7 +5,6 @@ from aiogram import Dispatcher
 from aiogram.fsm.strategy import FSMStrategy
 from aiogram.types import (
     BotCommand,
-    BotCommandScopeDefault,
     BotCommandScopeAllPrivateChats,
     BotCommandScopeAllGroupChats,
 )
@@ -22,10 +21,6 @@ from routers.game.groups import router as game_groups_router
 from routers.users import router as users_router
 from routers.groups import router as groups_router
 
-
-# from routers.groups.adding import router as adding_router
-# from routers.users.start import router as start_router
-# from routers.groups.settings import router as groups_settings_router
 
 from redis.asyncio import Redis
 

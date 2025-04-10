@@ -12,7 +12,6 @@ from mafia.roles.descriptions.description import RoleDescription
 from states.states import UserFsm
 from utils.roles import (
     get_processed_user_id_if_exists,
-    get_processed_user_id_if_need_to_notify,
 )
 
 

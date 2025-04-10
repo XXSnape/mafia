@@ -1,9 +1,10 @@
 import asyncio
+import functools
 from abc import ABC
 from collections import defaultdict
-from collections.abc import Callable
+from collections.abc import Callable, Awaitable
 from operator import attrgetter
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Concatenate
 
 from aiogram import Dispatcher, Bot
 from aiogram.fsm.context import FSMContext
@@ -52,9 +53,13 @@ if TYPE_CHECKING:
     from mafia.pipeline_game import Game
 
 
-def check_end_of_game(async_func: Callable):
-    async def wrapper(self: "Game"):
-        result = await async_func(self)
+def check_end_of_game[R, **P](
+    async_func: Callable[Concatenate["Game", P], Awaitable[R]],
+):
+    async def wrapper(
+        self: "Game", *args: P.args, **kwargs: P.kwargs
+    ) -> R:
+        result = await async_func(self, *args, **kwargs)
         state = self.state
         game_data: GameCache = await state.get_data()
         players_count = len(game_data["live_players_ids"])
@@ -73,12 +78,7 @@ def check_end_of_game(async_func: Callable):
                 criminals_count += len(
                     game_data[current_role.roles_key]
                 )
-        if (
-            # criminals_count
-            # >= players_count - criminals_count
-            criminals_count
-            == players_count
-        ):  # TODO >=
+        if criminals_count >= players_count - criminals_count:
             raise GameIsOver(winner=Groupings.criminals)
         return result
 
@@ -148,6 +148,8 @@ class Controller:
         game_data["cons"].clear()
         game_data["vote_for"].clear()
         game_data["messages_after_night"].clear()
+        game_data["cant_talk"].clear()
+        game_data["cant_vote"].clear()
         await self.state.set_data(game_data)
 
     def get_roles_if_isinstance[P: ABC](
@@ -408,23 +410,18 @@ class Controller:
         )
         await message.pin()
         game_data: GameCache = await self.state.get_data()
-        live_players = game_data["live_players_ids"]
-        players = game_data["players"]
-        banned_user = None
-        prosecutor = self.all_roles.get(Prosecutor.role_id)
-        if prosecutor:
-            banned_user = prosecutor.get_processed_user_id(game_data)
+        live_players_ids = game_data["live_players_ids"]
         await asyncio.gather(
             *(
                 send_request_to_vote(
                     game_data=game_data,
                     user_id=user_id,
-                    players_ids=live_players,
-                    players=players,
+                    players_ids=live_players_ids,
+                    players=game_data["players"],
                     bot=self.bot,
                 )
-                for user_id in live_players
-                if user_id != banned_user
+                for user_id in live_players_ids
+                if user_id not in game_data["cant_vote"]
             ),
             return_exceptions=True,
         )

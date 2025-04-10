@@ -1,4 +1,4 @@
-from cache.cache_types import ExtraCache, GameCache
+from cache.cache_types import ExtraCache, GameCache, UserIdInt
 from general.text import (
     ROLE_IS_KNOWN,
 )
@@ -107,7 +107,7 @@ class Forger(
             ] = forged_role_id
 
     async def accrual_of_overnight_rewards(
-        self, game_data: GameCache, victims: set[int], **kwargs
+        self, game_data: GameCache, victims: set[UserIdInt], **kwargs
     ):
         from .policeman import Policeman
         from .warden import Warden

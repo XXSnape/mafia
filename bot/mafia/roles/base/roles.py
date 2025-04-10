@@ -178,7 +178,7 @@ class RoleABC(ABC):
         nights_lived = user_data.get(
             "number_died_at_night", count_of_nights
         )
-        nights_lived_text = f"Дней и ночей прожито: {nights_lived} из {count_of_nights}"
+        nights_lived_text = f"⏳Дней и ночей прожито: {nights_lived} из {count_of_nights}"
         if int(user_id) in self.dropped_out:
             money_for_victory, money_for_nights = 0, 0
         else:

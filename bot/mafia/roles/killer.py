@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache
+from cache.cache_types import GameCache, UserIdInt
 from mafia.roles.descriptions.texts import (
     KILLING_PLAYER,
     CAN_KILL_AT_NIGHT,
@@ -53,10 +53,10 @@ class Killer(MurderAfterNightABC, ActiveRoleAtNightABC):
     async def accrual_of_overnight_rewards(
         self,
         game_data: GameCache,
-        victims: set[int],
+        victims: set[UserIdInt],
         processed_role: RoleABC,
         user_url: str,
-        processed_user_id: int,
+        processed_user_id: UserIdInt,
         **kwargs
     ):
         if processed_user_id not in victims:

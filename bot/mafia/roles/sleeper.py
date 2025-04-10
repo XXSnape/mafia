@@ -85,7 +85,7 @@ class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         game_data: GameCache,
         processed_role: RoleABC,
         user_url: str,
-        processed_user_id: int,
+        processed_user_id: UserIdInt,
         **kwargs
     ):
         if self.was_euthanized is False:

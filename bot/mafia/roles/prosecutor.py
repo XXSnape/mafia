@@ -57,6 +57,8 @@ class Prosecutor(
         processed_user_id: UserIdInt,
         **kwargs,
     ):
+        game_data["cant_talk"].append(processed_user_id)
+        game_data["cant_vote"].append(processed_user_id)
         await ban_user(
             bot=self.bot,
             chat_id=game_data["game_chat"],
@@ -89,7 +91,7 @@ class Prosecutor(
     async def take_action_after_voting(
         self,
         game_data: GameCache,
-        processed_user_id: int,
+        processed_user_id: UserIdInt,
         **kwargs,
     ):
         with suppress(TelegramBadRequest):

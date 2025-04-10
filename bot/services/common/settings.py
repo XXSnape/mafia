@@ -1,3 +1,6 @@
+from collections.abc import Callable, Awaitable
+from typing import Concatenate
+
 from aiogram.exceptions import TelegramAPIError
 
 from database.dao.settings import SettingsDao
@@ -23,10 +26,18 @@ from utils.pretty_text import make_build
 from utils.tg import check_user_for_admin_rights, delete_message
 
 
-def checking_for_ability_to_change_settings(async_func):
-    async def _wrapper(
-        self: "SettingsRouter", callback_data: GroupSettingsCbData
-    ):
+def checking_for_ability_to_change_settings[R, **P](
+    async_func: Callable[
+        Concatenate["SettingsRouter", GroupSettingsCbData, P],
+        Awaitable[R | None],
+    ],
+):
+    async def wrapper(
+        self: "SettingsRouter",
+        callback_data: GroupSettingsCbData,
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> R | None:
         groups_dao = GroupsDao(session=self.session)
         group = await groups_dao.find_one_or_none(
             IdSchema(id=callback_data.group_id)
@@ -41,22 +52,31 @@ def checking_for_ability_to_change_settings(async_func):
                 "🚫Ты больше не админ в этой группе", show_alert=True
             )
             await delete_message(self.callback.message)
-            return
+            return None
         group_info = await self.callback.bot.get_chat(group.tg_id)
         return await async_func(
             self,
+            *args,
             callback_data=callback_data,
             groups_dao=groups_dao,
             title=f"«{group_info.title}»",
+            **kwargs,
         )
 
-    return _wrapper
+    return wrapper
 
 
-def cant_write_to_user(async_func):
-    async def _wrapper(self: "SettingsRouter"):
+def cant_write_to_user[R, **P](
+    async_func: Callable[
+        Concatenate["SettingsRouter", P],
+        Awaitable[R | None],
+    ],
+):
+    async def wrapper(
+        self: "SettingsRouter", *args: P.args, **kwargs: P.kwargs
+    ) -> R | None:
         try:
-            return await async_func(self)
+            return await async_func(self, *args, **kwargs)
         except TelegramAPIError:
             await self.message.answer(
                 make_build(
@@ -64,7 +84,7 @@ def cant_write_to_user(async_func):
                 )
             )
 
-    return _wrapper
+    return wrapper
 
 
 class SettingsRouter(RouterHelper):

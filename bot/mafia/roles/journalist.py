@@ -1,6 +1,6 @@
 import asyncio
 
-from cache.cache_types import ExtraCache, GameCache
+from cache.cache_types import ExtraCache, GameCache, UserIdInt
 from mafia.roles.descriptions.texts import (
     CANT_CHOOSE_IN_ROW,
 )
@@ -48,7 +48,10 @@ class Journalist(ProcedureAfterNightABC, ActiveRoleAtNightABC):
 
     @get_processed_user_id_if_exists
     async def procedure_after_night(
-        self, game_data: GameCache, processed_user_id: int, **kwargs
+        self,
+        game_data: GameCache,
+        processed_user_id: UserIdInt,
+        **kwargs,
     ):
         interacting = [
             game_data["players"][str(user_id)]["url"]

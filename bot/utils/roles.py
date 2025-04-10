@@ -1,6 +1,6 @@
-from collections.abc import Callable
+from collections.abc import Callable, Awaitable
 from functools import wraps
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Concatenate
 
 from cache.cache_types import GameCache, UserIdInt
 from utils.pretty_text import make_pretty
@@ -39,13 +39,19 @@ def get_user_role_and_url(
     )
 
 
-def get_processed_role_and_user_if_exists(async_func: Callable):
+def get_processed_role_and_user_if_exists[R, **P](
+    async_func: Callable[
+        Concatenate["RoleABC", P], Awaitable[R | None]
+    ],
+):
     @wraps(async_func)
-    async def wrapper(role: "RoleABC", **kwargs):
+    async def wrapper(
+        role: "RoleABC", **kwargs: P.kwargs
+    ) -> R | None:
         game_data: GameCache = kwargs["game_data"]
         processed_user_id = role.get_processed_user_id(game_data)
         if processed_user_id is None:
-            return
+            return None
         processed_role, user_url = get_user_role_and_url(
             game_data=game_data,
             processed_user_id=processed_user_id,
@@ -62,28 +68,20 @@ def get_processed_role_and_user_if_exists(async_func: Callable):
     return wrapper
 
 
-def get_processed_user_id_if_exists(async_func: Callable):
+def get_processed_user_id_if_exists[R, **P](
+    async_func: Callable[
+        Concatenate["RoleABC", P], Awaitable[R | None]
+    ],
+):
     @wraps(async_func)
-    async def wrapper(role: "RoleABC", **kwargs):
+    async def wrapper(
+        role: "RoleABC", **kwargs: P.kwargs
+    ) -> R | None:
         game_data: GameCache = kwargs["game_data"]
         processed_user_id = role.get_processed_user_id(game_data)
         if processed_user_id is None:
-            return
+            return None
         return await async_func(
-            role, **kwargs, processed_user_id=processed_user_id
-        )
-
-    return wrapper
-
-
-def get_processed_user_id_if_need_to_notify(sync_func: Callable):
-    @wraps(sync_func)
-    def wrapper(role: "RoleABC", **kwargs):
-        game_data: GameCache = kwargs["game_data"]
-        processed_user_id = role.get_processed_user_id(game_data)
-        if not processed_user_id:
-            return
-        return sync_func(
             role, **kwargs, processed_user_id=processed_user_id
         )
 

@@ -211,6 +211,7 @@ class Game:
         await message.pin()
         await self.controller.mailing()
         await asyncio.sleep(15)
+        # await asyncio.sleep(game_data["settings"]["time_for_night"])
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -225,9 +226,10 @@ class Game:
             caption=f"{make_build('Пришло время провести следственные мероприятия жителям города!')}\n\n"
             f"{players_after_night}",
         )
+        # await asyncio.sleep(game_data["settings"]["time_for_day"])
         await asyncio.sleep(4)
         await self.controller.suggest_vote()
-        await asyncio.sleep(8)
+        await asyncio.sleep(12)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -343,11 +345,11 @@ class Game:
         text = result.text
         if not achievements:
             text += make_build(
-                "\nУ тебя нет полезных действий за игру!"
+                "\nℹ️У тебя нет полезных действий за игру!"
             )
         else:
             text += make_build(
-                "\nОтчет о действиях, повлиявших на исход:"
+                "\nℹ️Отчет о действиях, повлиявших на исход:"
             )
             for achievement, money in achievements:
                 current_text = achievement.format(
