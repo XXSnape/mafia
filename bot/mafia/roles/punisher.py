@@ -1,4 +1,5 @@
 from cache.cache_types import GameCache, PlayersIds, UserIdInt
+from general import settings
 from general.groupings import Groupings
 from mafia.roles.descriptions.texts import (
     KILLING_PLAYER,
@@ -97,7 +98,10 @@ class Punisher(ProcedureAfterNightABC, RoleABC):
                     money = (
                         current_role.payment_for_murder
                         * 2
-                        * (len(game_data["players"]) // 4)
+                        * (
+                            len(game_data["players"])
+                            // settings.mafia.minimum_number_of_players
+                        )
                     )
                 else:
                     money = 0

@@ -2,7 +2,8 @@ from typing import TYPE_CHECKING
 
 from aiogram.types import InlineKeyboardButton
 
-from cache.cache_types import GameCache, ExtraCache, UserIdInt
+from cache.cache_types import GameCache, UserIdInt
+from cache.extra import ExtraCache
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )

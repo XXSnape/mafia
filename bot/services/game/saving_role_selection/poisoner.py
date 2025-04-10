@@ -1,4 +1,3 @@
-from general.text import ATTEMPT_TO_KILL
 from keyboards.inline.buttons.common import BACK_BTN
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,

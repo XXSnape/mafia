@@ -4,7 +4,7 @@ from operator import attrgetter
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
 
-from cache.cache_types import Poisoned, GameCache, UsersInGame
+from cache.cache_types import GameCache, UsersInGame
 from keyboards.inline.buttons.common import BACK_BTN
 
 from keyboards.inline.builder import generate_inline_kb
@@ -24,7 +24,6 @@ from utils.common import get_criminals_ids
 
 def send_transformation_kb(game_data: GameCache):
     from mafia.roles import (
-        Mafia,
         MafiaAlias,
         Policeman,
         Doctor,

@@ -10,6 +10,7 @@ from faststream.rabbit import RabbitBroker
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from cache.cache_types import GameCache
+from general import settings
 from mafia.pipeline_game import Game
 from utils.state import clear_game_data
 from utils.pretty_text import (
@@ -32,7 +33,10 @@ async def start_game(
         game_chat=game_data["game_chat"],
         need_to_clean_start=False,
     )
-    if len(game_data["live_players_ids"]) < 4:
+    if (
+        len(game_data["live_players_ids"])
+        < settings.mafia.minimum_number_of_players
+    ):
         await clear_game_data(
             game_data=game_data,
             bot=bot,
@@ -44,7 +48,8 @@ async def start_game(
             await bot.send_message(
                 chat_id=game_data["game_chat"],
                 text=make_build(
-                    "Недостаточно игроков для начала игры! Нужно минимум 4. Игра отменяется."
+                    f"Недостаточно игроков для начала игры! Нужно минимум "
+                    f"{settings.mafia.minimum_number_of_players}. Игра отменяется."
                 ),
             ),
         return

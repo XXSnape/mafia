@@ -1,4 +1,4 @@
-from general.text import ROLE_IS_KNOWN, NUMBER_OF_NIGHT
+from general.text import NUMBER_OF_NIGHT
 from keyboards.inline.buttons.common import BACK_BTN
 from keyboards.inline.callback_factory.recognize_user import (
     police_kill_cb_data,

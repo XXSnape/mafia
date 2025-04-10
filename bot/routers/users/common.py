@@ -4,8 +4,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery, Message
 from keyboards.inline.cb.cb_text import (
-    CANCEL_CB,
-    MENU_CB,
     ACTIONS_FOR_ROLES_CB,
 )
 from keyboards.inline.keypads.settings import select_setting_kb

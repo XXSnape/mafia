@@ -52,7 +52,11 @@ class RoleManager(RouterHelper):
         result = "ℹ️Текущий порядок ролей:\n\n"
         if not selected_roles:
             selected_roles = BASES_ROLES
-        if to_save and len(selected_roles) > 4:
+        if (
+            to_save
+            and len(selected_roles)
+            > settings.mafia.minimum_number_of_players
+        ):
             result = REQUIRE_TO_SAVE + result
         for index, role in enumerate(selected_roles, 1):
             result += (

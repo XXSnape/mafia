@@ -9,12 +9,10 @@ from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_state_data_and_user_id,
     get_game_state_and_data,
-    take_action_and_save_data,
     trace_all_actions,
 )
 from mafia.roles import Instigator
 from states.states import UserFsm
-from utils.tg import delete_message
 
 
 class InstigatorSaver(RouterHelper):
@@ -88,6 +86,7 @@ class InstigatorSaver(RouterHelper):
             game_data=game_data,
             user_id=deceived_user[0],
             current_role=Instigator(),
-            message_to_user=f"Днём {subject_url} проголосует за {object_url}, если попытается голосовать",
+            message_to_user=f"Днём {subject_url} проголосует за "
+            f"{object_url}, если попытается голосовать",
         )
         await game_state.set_data(game_data)

@@ -1,4 +1,5 @@
 from cache.cache_types import GameCache, UserIdInt, PlayersIds
+from general import settings
 from mafia.roles.descriptions.texts import (
     CANT_CHOOSE_IN_ROW,
     SAVING_PLAYER,
@@ -103,7 +104,10 @@ class Bodyguard(ProcedureAfterNightABC, ActiveRoleAtNightABC):
             money = (
                 processed_role.payment_for_treatment
                 * 5
-                * (len(game_data["players"]) // 4)
+                * (
+                    len(game_data["players"])
+                    // settings.mafia.minimum_number_of_players
+                )
             )
         self.add_money_to_all_allies(
             game_data=game_data,

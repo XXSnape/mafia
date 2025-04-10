@@ -1,10 +1,10 @@
 from aiogram.types import InlineKeyboardButton
 
 from cache.cache_types import (
-    ExtraCache,
     GameCache,
-    DisclosedRoles,
+    PlayersIds,
 )
+from cache.extra import ExtraCache
 from general.text import ROLE_IS_KNOWN
 from keyboards.inline.keypads.mailing import selection_to_warden_kb
 from mafia.roles.base import ActiveRoleAtNightABC
@@ -60,7 +60,7 @@ class Warden(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     def _get_user_roles_and_url(
         self,
         game_data: GameCache,
-        checked_users: DisclosedRoles,
+        checked_users: PlayersIds,
         use_temporary_roles: bool = True,
     ):
 

@@ -1,4 +1,5 @@
-from cache.cache_types import ExtraCache, GameCache, UserIdInt
+from cache.cache_types import GameCache, UserIdInt
+from cache.extra import ExtraCache
 from general.text import (
     ROLE_IS_KNOWN,
 )
@@ -24,13 +25,17 @@ class Forger(
     role = "Румпельштильцхен"
     role_id = "forger"
     grouping = Groupings.criminals
-    purpose = "Ты должен обманывать местную полицию и подделывать документы на свое усмотрение во имя мафии"
+    purpose = (
+        "Ты должен обманывать местную полицию и "
+        "подделывать документы на свое усмотрение во имя мафии"
+    )
     message_to_group_after_action = (
         "Говорят, в лесах завелись персонажи из Шрека, "
         "подговорённые мафией, дискоординирующие государственную армию!"
     )
     photo = (
-        "https://sun9-64.userapi.com/impg/R8WBtzZkQKycXDW5YCvKXUJB03XJnboRa0LDHw/yo9Ng0yPqa0.jpg?"
+        "https://sun9-64.userapi.com/impg/R8WBtzZkQKycXD"
+        "W5YCvKXUJB03XJnboRa0LDHw/yo9Ng0yPqa0.jpg?"
         "size=604x302&quality=95&sign"
         "=0fb255f26d2fd1775b2db1c2001f7a0b&type=album"
     )

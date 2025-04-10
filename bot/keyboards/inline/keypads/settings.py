@@ -3,9 +3,9 @@ from operator import attrgetter
 from aiogram.types import InlineKeyboardButton
 
 from cache.cache_types import OrderOfRolesCache, RolesLiteral
+from general import settings
 from general.collection_of_roles import (
     get_data_with_roles,
-    BASES_ROLES,
     REQUIRED_ROLES,
 )
 from keyboards.inline.builder import generate_inline_kb
@@ -25,7 +25,6 @@ from keyboards.inline.cb.cb_text import (
     EDIT_SETTINGS_CB,
     CLEAR_SETTINGS_CB,
     VIEW_ORDER_OF_ROLES_CB,
-    MENU_CB,
     DELETE_LATEST_ROLE_IN_ORDER_CB,
     BAN_EVERYTHING_CB,
     LENGTH_OF_NIGHT_CB,
@@ -177,7 +176,10 @@ def get_next_role_kb(
             )
         )
     buttons.sort(key=attrgetter("text"))
-    if len(order_data["selected"]) > 4:
+    if (
+        len(order_data["selected"])
+        > settings.mafia.minimum_number_of_players
+    ):
         buttons.extend(
             [
                 InlineKeyboardButton(

@@ -1,4 +1,5 @@
-from cache.cache_types import ExtraCache, GameCache
+from cache.cache_types import GameCache
+from cache.extra import ExtraCache
 from mafia.roles.base.mixins import ProcedureAfterVotingABC
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC

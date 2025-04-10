@@ -1,13 +1,11 @@
-from typing import override
-
 from aiogram.types import InlineKeyboardButton
 
 from cache.cache_types import (
-    ExtraCache,
     GameCache,
     UserIdInt,
     PlayersIds,
 )
+from cache.extra import ExtraCache
 
 from general.groupings import Groupings
 from general.text import (
@@ -94,7 +92,7 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
                 money=10,
                 user_url=user_url,
                 processed_role=processed_role,
-                beginning_message=f"Проверка",
+                beginning_message="Проверка",
             )
             return
 

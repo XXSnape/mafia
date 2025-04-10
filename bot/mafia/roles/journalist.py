@@ -1,6 +1,5 @@
-import asyncio
-
-from cache.cache_types import ExtraCache, GameCache, UserIdInt
+from cache.cache_types import GameCache, UserIdInt
+from cache.extra import ExtraCache
 from mafia.roles.descriptions.texts import (
     CANT_CHOOSE_IN_ROW,
 )

@@ -11,7 +11,6 @@ from keyboards.inline.cb.cb_text import (
     FINISH_REGISTRATION_CB,
 )
 from middlewares.db import (
-    DatabaseMiddlewareWithoutCommit,
     DatabaseMiddlewareWithCommit,
 )
 from services.game.registartion import (

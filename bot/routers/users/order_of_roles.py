@@ -1,5 +1,4 @@
 from aiogram import F, Router
-from aiogram.enums import ChatType
 from aiogram.filters import or_f, and_f
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
@@ -14,10 +13,7 @@ from keyboards.inline.cb.cb_text import (
     CANCEL_CB,
     DELETE_LATEST_ROLE_IN_ORDER_CB,
 )
-from middlewares.db import (
-    DatabaseMiddlewareWithCommit,
-    DatabaseMiddlewareWithoutCommit,
-)
+
 
 from services.users.order_of_roles import RoleManager
 from states.settings import SettingsFsm

@@ -12,7 +12,6 @@ from general.collection_of_roles import (
     REQUIRED_ROLES,
 )
 from general.text import REQUIRE_TO_SAVE
-from keyboards.inline.buttons.common import SAVE_BTN
 from keyboards.inline.keypads.settings import (
     edit_roles_kb,
     suggest_banning_roles_kb,
@@ -20,7 +19,7 @@ from keyboards.inline.keypads.settings import (
 from services.base import RouterHelper
 from states.settings import SettingsFsm
 from utils.tg import delete_message
-from utils.pretty_text import make_build, make_pretty
+from utils.pretty_text import make_build
 
 
 class RoleAttendant(RouterHelper):

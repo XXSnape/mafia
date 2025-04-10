@@ -3,7 +3,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.filters import CommandStart, CommandObject
 from aiogram.types import Message, CallbackQuery
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from click import command
 from faststream.rabbit import RabbitBroker
 from sqlalchemy.ext.asyncio import AsyncSession
 

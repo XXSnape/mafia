@@ -1,5 +1,6 @@
 from aiogram.types import InlineKeyboardButton
 from cache.cache_types import GameCache, UserIdInt
+from general import settings
 from general.groupings import Groupings
 from mafia.roles.descriptions.texts import (
     CAN_CHOOSE_YOURSELF,
@@ -86,7 +87,10 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
         if self.number_of_predictions >= 3:
             payment = (
                 15
-                * (len(game_data["players"]) // 4)
+                * (
+                    len(game_data["players"])
+                    // settings.mafia.minimum_number_of_players
+                )
                 * self.number_of_predictions
             )
             return payment, 0

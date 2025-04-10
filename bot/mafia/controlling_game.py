@@ -1,5 +1,4 @@
 import asyncio
-import functools
 from abc import ABC
 from collections import defaultdict
 from collections.abc import Callable, Awaitable
@@ -15,7 +14,6 @@ from cache.cache_types import (
     UserGameCache,
     LastInteraction,
 )
-from general.collection_of_roles import get_data_with_roles
 from general.exceptions import GameIsOver
 from general.groupings import Groupings
 
@@ -37,7 +35,7 @@ from utils.informing import (
 )
 from utils.state import get_state_and_assign, reset_user_state
 
-from mafia.roles import Mafia, Killer, Prosecutor, Forger, Traitor
+from mafia.roles import Mafia, Killer
 from mafia.roles.base import (
     AliasRoleABC,
     RoleABC,

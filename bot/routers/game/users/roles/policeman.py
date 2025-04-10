@@ -1,5 +1,3 @@
-import asyncio
-
 from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery

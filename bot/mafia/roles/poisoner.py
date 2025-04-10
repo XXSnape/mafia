@@ -1,14 +1,14 @@
 from cache.cache_types import (
     GameCache,
-    ExtraCache,
     UserIdInt,
     PlayersIds,
 )
+from cache.extra import ExtraCache
+from general import settings
 from general.text import (
     ATTEMPT_TO_KILL,
 )
 from mafia.roles.descriptions.texts import (
-    KILLING_PLAYER,
     DONT_PAY_FOR_VOTING,
 )
 from keyboards.inline.keypads.mailing import kill_or_poison_kb
@@ -65,7 +65,12 @@ class Poisoner(
     ):
         if self.victims >= 3:
             return (
-                self.victims * 20 * (len(game_data["players"]) // 4),
+                self.victims
+                * 20
+                * (
+                    len(game_data["players"])
+                    // settings.mafia.minimum_number_of_players
+                ),
                 0,
             )
         return 0, 0

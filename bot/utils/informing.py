@@ -8,9 +8,8 @@ from aiogram import Bot
 from cache.cache_types import (
     GameCache,
     UserIdInt,
-    PlayersIds,
     UsersInGame,
-    LivePlayersIds,
+    PlayersIds,
 )
 from general.text import MONEY_SYM, NUMBER_OF_NIGHT
 from general.groupings import Groupings
@@ -44,7 +43,8 @@ def get_live_players(
         game_data=game_data, all_roles=all_roles
     )
     return (
-        f"{make_build(f'💗Живые игроки ({len(game_data["live_players_ids"])}):')}\n"
+        f"{make_build(f'💗Живые игроки '
+                      f'({len(game_data["live_players_ids"])}):')}\n"
         f"{profiles}\n\n"
         f"{make_build('Состав группировок:')}\n"
         f"{live_roles}\n\n"
@@ -121,7 +121,7 @@ def get_profiles(
 
 
 def get_profiles_during_registration(
-    live_players_ids: LivePlayersIds, players: UsersInGame
+    live_players_ids: PlayersIds, players: UsersInGame
 ) -> str:
     profiles = get_profiles(live_players_ids, players)
     return make_build(
@@ -167,7 +167,8 @@ def get_results_of_voting(
 ):
     if not removed_user_id:
         return make_build(
-            "Доброта или банальная несогласованность? Посмотрим, воспользуются ли преступники таким подарком."
+            "Доброта или банальная несогласованность? "
+            "Посмотрим, воспользуются ли преступники таким подарком."
         )
 
     user_url = game_data["players"][str(removed_user_id)]["url"]
@@ -200,7 +201,8 @@ async def notify_aliases_about_transformation(
                 caption=NUMBER_OF_NIGHT.format(
                     game_data["number_of_night"]
                 )
-                + f"{initial_role} {url} превратился в {make_pretty(new_role.role)}\n"
+                + f"{initial_role} {url} превратился в "
+                f"{make_pretty(new_role.role)}\n"
                 f"Текущие союзники:\n{profiles}",
             )
             for player_id in game_data[new_role.roles_key]
@@ -250,7 +252,7 @@ async def send_request_to_vote(
     bot: Bot,
     game_data: GameCache,
     user_id: int,
-    players_ids: LivePlayersIds,
+    players_ids: PlayersIds,
     players: UsersInGame,
 ):
     sent_message = await bot.send_message(

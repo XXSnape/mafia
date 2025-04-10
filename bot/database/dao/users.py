@@ -1,5 +1,3 @@
-from typing import Optional
-
 from sqlalchemy import update
 
 from database.dao.base import BaseDAO

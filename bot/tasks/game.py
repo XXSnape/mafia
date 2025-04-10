@@ -30,9 +30,15 @@ async def analyze_betting_results(
     for bet in bids:
         role = roles_data[bet.role_id].role
         if bet.is_winner is True:
-            message = f"✅Твоя ставка {bet.money}{MONEY_SYM} на {make_pretty(role)} зашла!"
+            message = (
+                f"✅Твоя ставка {bet.money}{MONEY_SYM} на "
+                f"{make_pretty(role)} зашла!"
+            )
         else:
-            message = f"🚫Твоя ставка {bet.money}{MONEY_SYM} на {make_pretty(role)} не зашла!"
+            message = (
+                f"🚫Твоя ставка {bet.money}{MONEY_SYM} на "
+                f"{make_pretty(role)} не зашла!"
+            )
         messages.append((bet.user_tg_id, make_build(message)))
         schemas.append(bet)
     rates_dao = RatesDao(session=session)
@@ -60,7 +66,8 @@ async def report_role_outside_game(bids: list[BidForRoleSchema]):
             bet.user_tg_id,
             make_build(
                 f"🚫Твоя ставка {bet.money}{MONEY_SYM} на "
-                f"{make_pretty(roles_data[bet.role_id].role)} не зашла! Роли нет в игре!"
+                f"{make_pretty(roles_data[bet.role_id].role)} "
+                f"не зашла! Роли нет в игре!"
             ),
         )
         for bet in bids
@@ -115,7 +122,8 @@ async def refund_money_for_bets(
             bot.send_message(
                 chat_id=bet.user_tg_id,
                 text=make_build(
-                    f"Возвращены {bet.money}{MONEY_SYM} за ставку на {make_pretty(current_role.role)}"
+                    f"Возвращены {bet.money}{MONEY_SYM} "
+                    f"за ставку на {make_pretty(current_role.role)}"
                 ),
             )
         )

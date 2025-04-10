@@ -66,6 +66,7 @@ class ForgerSaver(RouterHelper):
             game_data=game_data,
             user_id=user_id,
             current_role=Forger(),
-            message_to_user=f"Ты выбрал подменить документы {url} на {pretty_role}",
+            message_to_user=f"Ты выбрал подменить документы "
+            f"{url} на {pretty_role}",
         )
         await game_state.set_data(game_data)

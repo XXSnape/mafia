@@ -22,16 +22,13 @@ from cache.cache_types import (
     RolesAndUsersMoney,
 )
 from database.dao.groups import GroupsDao
-from database.dao.settings import SettingsDao
 from general import settings
 from general.text import MONEY_SYM
-from database.dao.order import OrderOfRolesDAO
-from database.dao.prohibited_roles import ProhibitedRolesDAO
+
 from database.dao.users import UsersDao
 from database.schemas.common import TgIdSchema, UserTgIdSchema
 from general.collection_of_roles import (
     get_data_with_roles,
-    BASES_ROLES,
 )
 from keyboards.inline.keypads.join import (
     get_join_kb,
@@ -86,7 +83,7 @@ def verification_for_admin_or_creator[R, **P](
             is_admin is False
             and game_data["settings"]["creator_user_id"] != user_id
         ):
-            return
+            return None
         return await async_func(
             self, *args, game_data=game_data, **kwargs
         )
@@ -211,7 +208,10 @@ class Registration(RouterHelper):
     async def extend_registration(self, game_data: GameCache):
         now = int(datetime.now(UTC).timestamp())
         start_of_registration = game_data["start_of_registration"]
-        if now - start_of_registration > 60:  # TODO 60 * 5
+        if (
+            now - start_of_registration
+            > 60 * settings.mafia.maximum_registration_time
+        ):
             await self.message.answer(
                 make_build("Больше нельзя ждать!")
             )
@@ -261,7 +261,7 @@ class Registration(RouterHelper):
             to_user_markup = await offer_to_place_bet(
                 banned_roles=game_data["settings"]["banned_roles"]
             )
-            offer_for_role = f"Если хочешь, можешь сделать ставку на разрешенную роль:\n\n"
+            offer_for_role = "Если хочешь, можешь сделать ставку на разрешенную роль:\n\n"
 
         text = make_build(
             (
@@ -494,7 +494,9 @@ class Registration(RouterHelper):
         await bot.edit_message_text(
             chat_id=user_id,
             text=make_build(
-                f"✅Ты успешно поставил {self.message.text}{MONEY_SYM} на роль {make_pretty(role.role)}!\n\n"
+                f"✅Ты успешно поставил {self.message.text}{MONEY_SYM} "
+                f"на роль {make_pretty(role.role)}!\n\n"
+                f"Чтобы изменить сумму, просто введи ее\n\n"
                 f"Твой текущий баланс: {balance}{MONEY_SYM}"
             ),
             reply_markup=cancel_bet(),

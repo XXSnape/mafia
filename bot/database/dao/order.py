@@ -1,5 +1,3 @@
-from collections.abc import Iterable
-
 from sqlalchemy import select
 
 from cache.cache_types import RolesLiteral

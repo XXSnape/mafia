@@ -2,7 +2,8 @@ from contextlib import suppress
 
 from aiogram.exceptions import TelegramBadRequest
 
-from cache.cache_types import ExtraCache, GameCache, UserIdInt
+from cache.cache_types import GameCache, UserIdInt
+from cache.extra import ExtraCache
 from general.groupings import Groupings
 from mafia.roles.descriptions.texts import CANT_CHOOSE_IN_ROW
 from mafia.roles.base import ActiveRoleAtNightABC, RoleABC

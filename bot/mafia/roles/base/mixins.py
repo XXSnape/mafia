@@ -12,6 +12,7 @@ from cache.cache_types import (
     UserIdInt,
     PlayersIds,
 )
+from general import settings
 from general.text import ATTEMPT_TO_KILL
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
@@ -49,7 +50,10 @@ class SuicideRoleMixin:
         user_id: UserIdStr,
     ):
         if int(user_id) in self._winners:
-            payment = 30 * (len(game_data["players"]) // 4)
+            payment = 30 * (
+                len(game_data["players"])
+                // settings.mafia.minimum_number_of_players
+            )
             payment -= 5 * nights_lived
             if payment < 5:
                 payment = 5

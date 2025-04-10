@@ -2,7 +2,6 @@ import asyncio
 import datetime
 from collections import defaultdict
 from operator import itemgetter
-from pprint import pprint
 from random import choice
 
 from aiogram import Dispatcher, Bot
@@ -17,12 +16,10 @@ from cache.cache_types import (
     GameCache,
     UserGameCache,
     RolesLiteral,
-    UserIdInt,
     RoleAndUserMoney,
     UserIdStr,
 )
 from database.schemas.common import TgIdSchema, IdSchema
-from database.schemas.groups import GroupIdSchema
 from general.text import MONEY_SYM
 from database.dao.games import GamesDao
 from database.schemas.bids import (
@@ -30,7 +27,6 @@ from database.schemas.bids import (
     ResultBidForRoleSchema,
 )
 from database.schemas.games import (
-    BeginningOfGameSchema,
     EndOfGameSchema,
 )
 from database.schemas.results import PersonalResultSchema
@@ -48,7 +44,6 @@ from states.states import GameFsm
 from utils.sorting import sorting_by_rate, sorting_by_money
 from utils.tg import delete_messages_from_to_delete
 from utils.state import (
-    reset_user_state,
     get_state_and_assign,
     reset_user_state_if_in_game,
 )

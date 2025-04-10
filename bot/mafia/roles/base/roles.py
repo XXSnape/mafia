@@ -11,7 +11,6 @@ from aiogram.fsm.state import State
 from aiogram.types import InlineKeyboardButton
 
 from cache.cache_types import (
-    ExtraCache,
     GameCache,
     PlayersIds,
     LastInteraction,
@@ -19,6 +18,8 @@ from cache.cache_types import (
     RolesLiteral,
     UserIdInt,
 )
+from cache.extra import ExtraCache
+from general import settings
 
 from general.text import MONEY_SYM, NUMBER_OF_NIGHT
 from database.schemas.results import PersonalResultSchema
@@ -163,7 +164,8 @@ class RoleABC(ABC):
         if winning_group != self.grouping:
             return 0, 0
         return self.grouping.value.payment * (
-            len(game_data["players"]) // 4
+            len(game_data["players"])
+            // settings.mafia.minimum_number_of_players
         ), (self.payment_for_night_spent * nights_lived)
 
     def earn_money_for_winning(

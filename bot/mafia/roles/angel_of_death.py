@@ -1,6 +1,7 @@
 import asyncio
 
-from cache.cache_types import ExtraCache, GameCache, UserIdInt
+from cache.cache_types import GameCache, UserIdInt
+from cache.extra import ExtraCache
 from general.text import (
     ATTEMPT_TO_KILL,
 )

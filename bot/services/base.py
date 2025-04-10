@@ -7,10 +7,6 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.dao.prohibited_roles import ProhibitedRolesDAO
-from database.schemas.common import UserTgIdSchema
-from utils.pretty_text import make_build
-
 
 @dataclass
 class RouterHelper:

@@ -17,9 +17,7 @@ from database.schemas.common import (
     UserTgIdSchema,
 )
 from keyboards.inline.keypads.settings import set_up_group_kb
-from middlewares.db import (
-    DatabaseMiddlewareWithoutCommit,
-)
+
 from services.users.banned_roles import RoleAttendant
 from services.users.order_of_roles import RoleManager
 from utils.pretty_text import make_build

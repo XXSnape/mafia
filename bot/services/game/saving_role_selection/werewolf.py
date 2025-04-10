@@ -7,11 +7,8 @@ from services.base import RouterHelper
 from services.game.game_assistants import get_game_state_and_data
 from mafia.roles import (
     Mafia,
-    MafiaAlias,
     Doctor,
-    DoctorAliasABC,
     Policeman,
-    PolicemanAliasABC,
     Werewolf,
 )
 from utils.common import get_criminals_ids
@@ -70,7 +67,8 @@ class WerewolfSaver(RouterHelper):
         await self.callback.bot.send_photo(
             chat_id=game_data["game_chat"],
             photo=new_role.photo,
-            caption=f"{make_pretty(Werewolf.role)} принял решение превратиться в {make_pretty(new_role.role)}. "
+            caption=f"{make_pretty(Werewolf.role)} принял "
+            f"решение превратиться в {make_pretty(new_role.role)}. "
             f"Уже со следующего дня изменения в миропорядке вступят в силу.",
         )
         if are_there_many_senders:
