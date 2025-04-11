@@ -48,7 +48,6 @@ class Forger(
     notification_message = ROLE_IS_KNOWN
     payment_for_treatment = 0
     payment_for_murder = 16
-    number_in_order_after_voting = 2
 
     @property
     def role_description(self) -> RoleDescription:

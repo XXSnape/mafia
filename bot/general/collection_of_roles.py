@@ -58,9 +58,9 @@ def get_data_with_roles(
 
 BASES_ROLES: Final[tuple[RolesLiteral, ...]] = (
     roles.Mafia.role_id,
-    roles.Prosecutor.role_id,
-    roles.Sleeper.role_id,
-    roles.Punisher.role_id,
+    # roles.Prosecutor.role_id,
+    # roles.Sleeper.role_id,
+    # roles.Punisher.role_id,
 )
 
 REQUIRED_ROLES: Final[tuple[RolesLiteral, ...]] = BASES_ROLES + (

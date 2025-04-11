@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache
+from cache.cache_types import GameCache, UserIdInt
 from mafia.roles.descriptions.texts import (
     KILLING_PLAYER,
     SAVING_PLAYER,
@@ -6,6 +6,7 @@ from mafia.roles.descriptions.texts import (
 from mafia.roles.base import RoleABC
 from mafia.roles.base.mixins import ProcedureAfterVotingABC
 from mafia.roles.descriptions.description import RoleDescription
+from utils.pretty_text import make_build
 from utils.roles import get_user_role_and_url
 
 
@@ -25,7 +26,9 @@ class PrimeMinister(ProcedureAfterVotingABC, RoleABC):
         return RoleDescription(
             skill="Днём имеет 2 голоса при подтверждении повешения",
             pay_for=[KILLING_PLAYER, SAVING_PLAYER],
-            limitations=None,
+            features=[
+                "Не может быть повешен на дневном голосовании"
+            ],
         )
 
     def get_money_for_voting(self, voted_role: RoleABC):
@@ -35,9 +38,20 @@ class PrimeMinister(ProcedureAfterVotingABC, RoleABC):
         self,
         game_data: GameCache,
         is_not_there_removed: bool,
-        initial_removed_user_id: int | None,
+        initial_removed_user_id: UserIdInt | None,
+        removed_user: list[int],
         **kwargs,
     ):
+        if removed_user[0] in game_data[self.roles_key]:
+            await self.bot.send_message(
+                chat_id=game_data["game_chat"],
+                text=make_build(
+                    "🤨Крайне странно вешать лидеров мнений.\n"
+                    "Жители это осознали и разошлись..."
+                ),
+            )
+            removed_user[:] = [0]
+            return
         if (
             is_not_there_removed is False
             or not game_data[self.roles_key]

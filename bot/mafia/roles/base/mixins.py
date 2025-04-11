@@ -36,6 +36,7 @@ class NightResources(TypedDict, total=True):
 class DailyResources(TypedDict, total=True):
     is_not_there_removed: bool
     initial_removed_user_id: int | None
+    removed_user: list[int]
 
 
 class SuicideRoleMixin:
