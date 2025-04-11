@@ -4,7 +4,11 @@ from general import settings
 from general.collection_of_roles import get_data_with_roles
 from general.commands import BotCommands
 from general.groupings import Groupings
-from general.text import ROLES_SELECTION, CONFIGURE_GAME_SECTION
+from general.text import (
+    ROLES_SELECTION,
+    CONFIGURE_GAME_SECTION,
+    REQUIRED_PERMISSIONS,
+)
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import HELP_BTN
 from keyboards.inline.callback_factory.help import RoleCbData
@@ -26,16 +30,14 @@ class BaseRouter(RouterHelper):
         await UsersDao(session=self.session).get_user_or_create(
             tg_id=TgIdSchema(tg_id=self.message.from_user.id)
         )
-        await self.message.answer(
-            f"Привет, я бот ведущий в для мафии. Просто добавь меня в чат."
-        )
+        await self.handle_help()
 
     async def handle_help(self):
         await self.message.delete()
         text = (
             f"🤖Что за бот?\n\n"
             "🎩Это бот-ведущий для игры в Мафию с большим количеством ролей, "
-            "предлагающий удобный интерфейс для взаимодействия и общения игроков во время игры."
+            "предлагающий удобный интерфейс для взаимодействия и общения игроков во время игры!"
         )
         await self.message.answer(
             make_build(text), reply_markup=help_options_kb()
@@ -63,8 +65,7 @@ class BaseRouter(RouterHelper):
             "Так как игроков нужно информировать, "
             "временно блокировать выбывших и неиграющих или даже "
             f"живых (подробнее в разделе «{ROLES_SELECTION}»), напоминать о важных моментах, "
-            "боту нужно дать права на возможность писать сообщения, удалять чужие, "
-            "блокировать участников чата, закреплять сообщения. "
+            f"боту нужно выдать следующие права:\n\n{REQUIRED_PERMISSIONS}\n\n"
             "Без этого нельзя будет запустить процесс регистрации.\n\n"
             f"©️Если с правами все корректно, нужно ввести команду /{BotCommands.registration.name},"
             " чтобы начать регистрацию. По умолчанию она длится 2 минуты, "

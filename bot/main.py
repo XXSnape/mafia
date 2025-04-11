@@ -9,6 +9,8 @@ from aiogram.types import (
     BotCommandScopeAllGroupChats,
 )
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+from general.commands import BotCommands
 from general.config import bot, broker
 from general.log import configure_logging
 from middlewares.errors import (
@@ -51,32 +53,39 @@ async def main() -> None:
         groups_router,
     )
     private_commands = [
-        BotCommand(command="help", description="Помощь"),
         BotCommand(
-            command="my_settings",
-            description="Персональные настройки игры",
+            command=BotCommands.help.name,
+            description=BotCommands.help,
         ),
         BotCommand(
-            command="profile",
-            description="Данные обо мне",
+            command=BotCommands.my_settings.name,
+            description=BotCommands.my_settings,
+        ),
+        BotCommand(
+            command=BotCommands.profile.name,
+            description=BotCommands.profile,
         ),
     ]
     group_commands = [
         BotCommand(
-            command="registration", description="Запустить бота"
+            command=BotCommands.registration.name,
+            description=BotCommands.registration,
         ),
         BotCommand(
-            command="extend", description="Продлить регистрацию"
+            command=BotCommands.extend.name,
+            description=BotCommands.extend,
         ),
         BotCommand(
-            command="revoke", description="Отменить регистрацию"
+            command=BotCommands.revoke.name,
+            description=BotCommands.revoke,
         ),
         BotCommand(
-            command="settings",
-            description="Общие настройки игры",
+            command=BotCommands.settings.name,
+            description=BotCommands.settings,
         ),
         BotCommand(
-            command="statistics", description="Статистика группы"
+            command=BotCommands.statistics.name,
+            description=BotCommands.statistics,
         ),
     ]
     await bot.set_my_commands(

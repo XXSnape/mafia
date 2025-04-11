@@ -5,7 +5,10 @@ from aiogram.types import InlineKeyboardButton
 from general.collection_of_roles import get_data_with_roles
 from general.text import ROLES_SELECTION, CONFIGURE_GAME_SECTION
 from keyboards.inline.builder import generate_inline_kb
-from keyboards.inline.buttons.common import HELP_BTN
+from keyboards.inline.buttons.common import (
+    HELP_BTN,
+    ADD_BOT_TO_GROUP,
+)
 from keyboards.inline.callback_factory.help import RoleCbData
 from keyboards.inline.cb.cb_text import (
     VIEW_ROLES_CB,
@@ -50,12 +53,15 @@ def help_options_kb():
             callback_data=HOW_TO_SEE_STATISTICS_CB,
         ),
         ROLES_SELECTION_BTN,
+        ADD_BOT_TO_GROUP,
     ]
     return generate_inline_kb(data_with_buttons=buttons)
 
 
 def to_help_kb():
-    return generate_inline_kb(data_with_buttons=[HELP_BTN])
+    return generate_inline_kb(
+        data_with_buttons=[ADD_BOT_TO_GROUP, HELP_BTN]
+    )
 
 
 def go_back_to_options_kb():

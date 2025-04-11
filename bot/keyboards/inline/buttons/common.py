@@ -28,3 +28,9 @@ TO_BOT_BTN = InlineKeyboardButton(
 HELP_BTN = InlineKeyboardButton(
     text="🆘Помощь", callback_data=HELP_CB
 )
+ADD_BOT_TO_GROUP = InlineKeyboardButton(
+    text="Добавить в группу👥",
+    url=f"https://{settings.bot.url}?startgroup&admin=post_messages+"
+    f"delete_messages+"
+    f"restrict_members+pin_messages",
+)

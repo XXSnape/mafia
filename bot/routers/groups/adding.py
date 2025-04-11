@@ -1,10 +1,13 @@
 from aiogram import Router, Bot, F
-from aiogram.filters import ChatMemberUpdatedFilter, JOIN_TRANSITION
+from aiogram.filters import (
+    ChatMemberUpdatedFilter,
+    JOIN_TRANSITION,
+    CommandStart,
+)
 from aiogram.types import ChatMemberUpdated, Message
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from database.dao.groups import GroupsDao
-from database.schemas.common import TgIdSchema
+from services.groups.adding import AddingRouter
+from utils.tg import delete_message
 
 router = Router(name=__name__)
 
@@ -17,11 +20,13 @@ async def adding_to_group(
     bot: Bot,
     session_with_commit: AsyncSession,
 ):
-    chat_info = await bot.get_chat(event.chat.id)
-    group_dao = GroupsDao(session=session_with_commit)
-    await group_dao.add(values=TgIdSchema(tg_id=event.chat.id))
-    if chat_info.permissions.can_send_messages:
-        await event.answer(text=f"Привет! Я Мафия!")
+    adding = AddingRouter(session=session_with_commit)
+    await adding.adding_to_group(event=event, bot=bot)
+
+
+@router.message(CommandStart())
+async def delete_start(message: Message):
+    await delete_message(message)
 
 
 @router.message(F.migrate_to_chat_id)
@@ -29,8 +34,7 @@ async def group_to_supergroup_migration(
     message: Message,
     session_with_commit: AsyncSession,
 ):
-    group_dao = GroupsDao(session=session_with_commit)
-    await group_dao.update(
-        filters=TgIdSchema(tg_id=message.chat.id),
-        values=TgIdSchema(tg_id=message.migrate_to_chat_id),
+    adding = AddingRouter(
+        message=message, session=session_with_commit
     )
+    await adding.group_to_supergroup_migration()
