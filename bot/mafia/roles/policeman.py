@@ -183,7 +183,7 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         )
 
 
-class PolicemanAliasABC(AliasRoleABC, Policeman):
+class PolicemanAlias(AliasRoleABC, Policeman):
     role = "Генерал"
     role_id = "general"
     photo = "https://img.clipart-library.com/2/clip-monsters-vs-aliens/clip-monsters-vs-aliens-21.gif"

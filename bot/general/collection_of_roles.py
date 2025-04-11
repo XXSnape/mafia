@@ -46,8 +46,8 @@ def get_data_with_roles(
         roles.AngelOfDeath(),
         roles.Prosecutor(),
         roles.LuckyGay(),
-        roles.DoctorAliasABC(),
-        roles.PolicemanAliasABC(),
+        roles.DoctorAlias(),
+        roles.PolicemanAlias(),
         roles.Warden(),
     ]
     all_roles = {role.role_id: role for role in roles_data}
@@ -58,6 +58,10 @@ def get_data_with_roles(
 
 BASES_ROLES: Final[tuple[RolesLiteral, ...]] = (
     roles.Mafia.role_id,
+    roles.Doctor.role_id,
+    roles.DoctorAlias.role_id,
+    roles.Policeman.role_id,
+    roles.PolicemanAlias.role_id,
     # roles.Prosecutor.role_id,
     # roles.Sleeper.role_id,
     # roles.Punisher.role_id,

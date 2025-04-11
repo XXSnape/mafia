@@ -33,6 +33,7 @@ from database.schemas.results import PersonalResultSchema
 from general.collection_of_roles import (
     get_data_with_roles,
     BASES_ROLES,
+    DataWithRoles,
 )
 from general.exceptions import GameIsOver
 from general.groupings import Groupings
@@ -75,7 +76,7 @@ class Game:
         self.dispatcher = dispatcher
         self.bot = bot
         self.group_chat_id = group_chat_id
-        self.all_roles = {}
+        self.all_roles: DataWithRoles = {}
         self.controller = Controller(
             bot=self.bot,
             group_chat_id=self.group_chat_id,
@@ -137,8 +138,8 @@ class Game:
             await self.create_game_in_db()
             await self.state.set_state(GameFsm.STARTED)
             game_data = await self.select_roles()
-            await self.familiarize_players(game_data)
             self.init_existing_roles(game_data)
+            await self.familiarize_players(game_data)
             await self.bot.send_message(
                 chat_id=self.group_chat_id,
                 text=make_build("Игра начинается!"),
@@ -151,10 +152,10 @@ class Game:
                     await self.give_out_rewards(e=e)
                     return
         except Exception as e:
-            await self.crash_game(e=e)
+            logger.exception("Произошла ошибка во время игры")
+            await self.crash_game()
 
-    async def crash_game(self, e: Exception):
-        logger.error("Произошла ошибка во время игры {}", e)
+    async def crash_game(self):
         game_data: GameCache = await self.state.get_data()
         await delete_messages_from_to_delete(
             bot=self.bot,
@@ -579,90 +580,17 @@ class Game:
     async def familiarize_players(self, game_data: GameCache):
         roles_tasks = []
         aliases_tasks = []
-        to_criminals_messages = defaultdict(list)
-        for user_id, player_data in game_data["players"].items():
-            player_data: UserGameCache
-            current_role = get_data_with_roles(
-                player_data["role_id"]
-            )
-            if current_role.grouping == Groupings.criminals:
-                roles = [Mafia, Forger, Traitor]
-                for role in roles:
-                    if role.roles_key != current_role.roles_key:
-                        users = game_data.get(role.roles_key, [])
-                        to_criminals_messages[int(user_id)].extend(
-                            users
-                        )
-
+        other_tasks = []
+        for role in self.all_roles:
+            current_role = self.all_roles[role]
             if current_role.is_alias:
                 continue
-            persons = game_data[current_role.roles_key]
-            roles_tasks.append(
-                self.bot.send_photo(
-                    chat_id=int(user_id),
-                    photo=current_role.photo,
-                    caption=f"Твоя роль - "
-                    f"{make_pretty(current_role.role)}! "
-                    f"{current_role.purpose}",
-                )
+            roles, aliases, other = (
+                current_role.introducing_users_to_roles(game_data)
             )
-            if current_role.alias and len(persons) > 1:
-                profiles = get_profiles(
-                    players_ids=persons,
-                    players=game_data["players"],
-                    role=True,
-                )
-                aliases_tasks.append(
-                    self.bot.send_message(
-                        chat_id=persons[0],
-                        text="Твои союзники, с которыми можно общаться прямо в этом чате:\n"
-                        + profiles,
-                    )
-                )
-                for user_id in persons[1:]:
-                    roles_tasks.append(
-                        self.bot.send_photo(
-                            chat_id=user_id,
-                            photo=current_role.alias.photo,
-                            caption=f"Твоя роль - "
-                            f"{make_pretty(current_role.alias.role)}!"
-                            f" {current_role.alias.purpose}",
-                        )
-                    )
-                    aliases_tasks.append(
-                        self.bot.send_message(
-                            chat_id=user_id,
-                            text="Твои союзники, с которыми можно общаться прямо в этом чате:\n\n"
-                            + profiles,
-                        )
-                    )
-            if current_role.state_for_waiting_for_action:
-                for person_id in persons:
-                    roles_tasks.append(
-                        get_state_and_assign(
-                            dispatcher=self.dispatcher,
-                            chat_id=person_id,
-                            bot_id=self.bot.id,
-                            new_state=current_role.state_for_waiting_for_action,
-                        )
-                    )
+            roles_tasks.extend(roles)
+            aliases_tasks.extend(aliases)
+            other_tasks.extend(other)
         await asyncio.gather(*roles_tasks, return_exceptions=True)
         await asyncio.gather(*aliases_tasks, return_exceptions=True)
-        await asyncio.gather(
-            *(
-                self.bot.send_message(
-                    chat_id=user_id,
-                    text=make_build(
-                        "❗️Сокомандники, с которыми можно общаться прямо в этом чате:\n"
-                    )
-                    + get_profiles(
-                        players_ids=teammates,
-                        players=game_data["players"],
-                        role=True,
-                    ),
-                )
-                for user_id, teammates in to_criminals_messages.items()
-                if teammates
-            ),
-            return_exceptions=True,
-        )
+        await asyncio.gather(*other_tasks, return_exceptions=True)

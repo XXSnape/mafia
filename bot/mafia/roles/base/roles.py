@@ -33,7 +33,10 @@ from utils.pretty_text import (
     make_pretty,
     make_build,
 )
-from utils.common import get_the_most_frequently_encountered_id
+from utils.common import (
+    get_the_most_frequently_encountered_id,
+    get_criminals_ids,
+)
 from utils.informing import (
     get_profiles,
     send_a_lot_of_messages_safely,
@@ -88,6 +91,74 @@ class RoleABC(ABC):
     @abstractmethod
     def role_description(self) -> RoleDescription:
         pass
+
+    def introducing_users_to_roles(self, game_data: GameCache):
+        roles_tasks = []
+        aliases_tasks = []
+        other_tasks = []
+        persons = game_data[self.roles_key]
+        for number, user_id in enumerate(persons):
+            photo = self.photo
+            role_name = self.role
+            purpose = self.purpose
+            if number != 0 and self.alias:
+                photo = self.alias.photo
+                role_name = self.alias.role
+                purpose = self.alias.purpose
+            roles_tasks.append(
+                self.bot.send_photo(
+                    chat_id=user_id,
+                    photo=photo,
+                    caption=f"Твоя роль - "
+                    f"{make_pretty(role_name)}! "
+                    f"{purpose}",
+                )
+            )
+            if len(game_data[self.roles_key]) > 1 and self.alias:
+                profiles = get_profiles(
+                    players_ids=persons,
+                    players=game_data["players"],
+                    role=True,
+                )
+                aliases_tasks.append(
+                    self.bot.send_message(
+                        chat_id=user_id,
+                        text=make_build(
+                            "❗️Твои союзники, с которыми можно общаться прямо в этом чате:\n"
+                        )
+                        + profiles,
+                    )
+                )
+            if self.state_for_waiting_for_action:
+                roles_tasks.append(
+                    get_state_and_assign(
+                        dispatcher=self.dispatcher,
+                        chat_id=user_id,
+                        bot_id=self.bot.id,
+                        new_state=self.state_for_waiting_for_action,
+                    )
+                )
+            if self.grouping == Groupings.criminals:
+                teammates = [
+                    user_id
+                    for user_id in get_criminals_ids(game_data)
+                    if user_id not in persons
+                ]
+                if teammates:
+                    other_tasks.append(
+                        self.bot.send_message(
+                            chat_id=user_id,
+                            text=make_build(
+                                "❗️Сокомандники, с которыми можно общаться прямо в этом чате:\n"
+                                + get_profiles(
+                                    players_ids=teammates,
+                                    players=game_data["players"],
+                                    role=True,
+                                )
+                            ),
+                        )
+                    )
+        return roles_tasks, aliases_tasks, other_tasks
 
     async def boss_is_dead(
         self,

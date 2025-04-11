@@ -86,7 +86,7 @@ class Doctor(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         self.state_for_waiting_for_action = UserFsm.DOCTOR_TREATS
 
 
-class DoctorAliasABC(AliasRoleABC, Doctor):
+class DoctorAlias(AliasRoleABC, Doctor):
     role = "Медсестра"
     role_id = "nurse"
     photo = "https://cdn.culture.ru/images/e2464a8d-222e-54b1-9016-86f63e902959"
