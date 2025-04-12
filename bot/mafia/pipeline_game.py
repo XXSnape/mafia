@@ -6,6 +6,8 @@ from random import choice
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from faststream.rabbit import RabbitBroker
+
 from cache.cache_types import (
     GameCache,
     RoleAndUserMoney,
@@ -23,7 +25,6 @@ from database.schemas.games import (
     EndOfGameSchema,
 )
 from database.schemas.results import PersonalResultSchema
-from faststream.rabbit import RabbitBroker
 from general.collection_of_roles import (
     BASES_ROLES,
     DataWithRoles,

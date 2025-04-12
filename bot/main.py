@@ -10,6 +10,8 @@ from aiogram.types import (
     BotCommandScopeAllPrivateChats,
 )
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+from database.dao.init_db import fill_database_with_roles
 from general.commands import BotCommands
 from general.config import bot, broker
 from general.log import configure_logging
@@ -31,9 +33,10 @@ async def main() -> None:
     :return: None
     """
     configure_logging()
+    await fill_database_with_roles()
     scheduler = AsyncIOScheduler()
-    scheduler.configure(timezone="Europe/Moscow")
-    redis = Redis(host="localhost")
+    scheduler.configure()
+    redis = Redis(host="redis")
     storage = RedisStorage(redis=redis, json_loads=orjson.loads)
     dp = Dispatcher(
         fsm_strategy=FSMStrategy.CHAT,

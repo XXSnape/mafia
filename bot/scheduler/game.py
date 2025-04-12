@@ -6,8 +6,9 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from apscheduler.jobstores.base import JobLookupError
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from cache.cache_types import GameCache
 from faststream.rabbit import RabbitBroker
+
+from cache.cache_types import GameCache
 from general import settings
 from mafia.pipeline_game import Game
 from sqlalchemy.ext.asyncio import AsyncSession

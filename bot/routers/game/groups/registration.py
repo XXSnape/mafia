@@ -5,6 +5,7 @@ from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery, Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
+
 from keyboards.inline.cb.cb_text import (
     FINISH_REGISTRATION_CB,
 )

@@ -10,10 +10,11 @@ sqlalchemy = {extras = ["asyncio"], version = "^2.0.40"}
 redis = "^5.2.1"
 asyncpg = "^0.30.0"
 alembic = "^1.15.2"
-faststream = {extras = ["rabbit"], version = "^0.5.39"}
+faststream = {extras = ["cli"], version = "^0.5.39"}
 loguru = "^0.7.3"
 orjson = "^3.10.16"
 apscheduler = "^3.11.0"
+aio-pika = "^9.5.5"
 
 [tool.poetry.group.lint.dependencies]
 black = "^25.1.0"

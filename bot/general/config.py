@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from dotenv import load_dotenv
@@ -7,13 +5,12 @@ from faststream.rabbit import RabbitBroker
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
-BASE_DIR = Path(__file__).parent.parent
 
 
 class RabbitSettings(BaseSettings):
     @property
     def url(self):
-        return "amqp://guest:guest@localhost:5672/"
+        return "amqp://guest:guest@rabbitmq:5672/"
 
 
 class BotSettings(BaseSettings):
@@ -30,6 +27,7 @@ class MafiaSettings(BaseSettings):
     maximum_number_of_players: int
     minimum_number_of_players: int
     maximum_registration_time: int
+    init_db: bool
     model_config = SettingsConfigDict(
         case_sensitive=False, env_prefix="mafia_"
     )
