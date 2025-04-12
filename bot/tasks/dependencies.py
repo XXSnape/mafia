@@ -1,10 +1,9 @@
 from collections.abc import AsyncGenerator
 from typing import Annotated, TypeAlias
 
+from database.common.sessions import async_session_maker
 from fast_depends import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from database.common.sessions import async_session_maker
 
 
 async def get_session_with_commit() -> (

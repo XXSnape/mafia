@@ -1,9 +1,8 @@
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, BigInteger
-from sqlalchemy.orm import Mapped, mapped_column
-
 from database.common.base import BaseModel, IdMixin
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class GameModel(IdMixin, BaseModel):

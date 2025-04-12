@@ -1,6 +1,5 @@
-from pydantic import BaseModel
-
 from cache.cache_types import RolesLiteral
+from pydantic import BaseModel
 
 
 class UserMoneySchema(BaseModel):

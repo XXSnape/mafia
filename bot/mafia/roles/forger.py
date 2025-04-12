@@ -1,20 +1,19 @@
 from cache.cache_types import GameCache, UserIdInt
 from cache.extra import ExtraCache
+from general.groupings import Groupings
 from general.text import (
     ROLE_IS_KNOWN,
 )
+from mafia.roles.base import ActiveRoleAtNightABC
+from mafia.roles.base.mixins import (
+    MafiaConverterABC,
+    ProcedureAfterNightABC,
+)
+from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CAN_CHOOSE_YOURSELF,
     CAN_SEE_ALLIES,
 )
-from general.groupings import Groupings
-from mafia.roles.base import ActiveRoleAtNightABC
-from mafia.roles.base.mixins import (
-    ProcedureAfterNightABC,
-    MafiaConverterABC,
-)
-from mafia.roles.descriptions.description import RoleDescription
-
 from states.states import UserFsm
 from utils.pretty_text import make_pretty
 

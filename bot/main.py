@@ -1,30 +1,27 @@
 import asyncio
-import orjson
 
+import orjson
 from aiogram import Dispatcher
+from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.fsm.strategy import FSMStrategy
 from aiogram.types import (
     BotCommand,
-    BotCommandScopeAllPrivateChats,
     BotCommandScopeAllGroupChats,
+    BotCommandScopeAllPrivateChats,
 )
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
 from general.commands import BotCommands
 from general.config import bot, broker
 from general.log import configure_logging
 from middlewares.errors import (
-    HandleMessageErrorMiddleware,
     HandleCallbackErrorMiddleware,
+    HandleMessageErrorMiddleware,
 )
-from routers.game.users import router as game_users_router
-from aiogram.fsm.storage.redis import RedisStorage
-from routers.game.groups import router as game_groups_router
-from routers.users import router as users_router
-from routers.groups import router as groups_router
-
-
 from redis.asyncio import Redis
+from routers.game.groups import router as game_groups_router
+from routers.game.users import router as game_users_router
+from routers.groups import router as groups_router
+from routers.users import router as users_router
 
 
 async def main() -> None:

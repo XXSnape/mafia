@@ -1,13 +1,13 @@
 from cache.cache_types import GameCache
-from mafia.roles.descriptions.texts import (
-    DONT_PAY_FOR_NIGHTS,
-    PAY_FOR_EARLY_DEATH,
-    DONT_PAY_FOR_VOTING,
-)
-from mafia.roles.base.mixins import SuicideRoleMixin
 from general.groupings import Groupings
 from mafia.roles.base import RoleABC
+from mafia.roles.base.mixins import SuicideRoleMixin
 from mafia.roles.descriptions.description import RoleDescription
+from mafia.roles.descriptions.texts import (
+    DONT_PAY_FOR_NIGHTS,
+    DONT_PAY_FOR_VOTING,
+    PAY_FOR_EARLY_DEATH,
+)
 from utils.pretty_text import make_build
 
 

@@ -3,16 +3,16 @@ from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from keyboards.inline.keypads.mailing import (
-    send_selection_to_players_kb,
     kill_or_poison_kb,
+    send_selection_to_players_kb,
 )
+from mafia.roles import Poisoner
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_state_and_data,
-    take_action_and_save_data,
     send_messages_and_remove_from_expected,
+    take_action_and_save_data,
 )
-from mafia.roles import Poisoner
 from states.states import UserFsm
 
 

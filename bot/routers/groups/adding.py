@@ -1,12 +1,12 @@
-from aiogram import Router, Bot, F
+from aiogram import Bot, F, Router
 from aiogram.filters import (
-    ChatMemberUpdatedFilter,
     JOIN_TRANSITION,
+    ChatMemberUpdatedFilter,
     CommandStart,
 )
 from aiogram.types import ChatMemberUpdated, Message
-from sqlalchemy.ext.asyncio import AsyncSession
 from services.groups.adding import AddingRouter
+from sqlalchemy.ext.asyncio import AsyncSession
 from utils.tg import delete_message
 
 router = Router(name=__name__)

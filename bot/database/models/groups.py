@@ -1,7 +1,6 @@
+from database.common.base import BaseModel, IdMixin
 from sqlalchemy import BigInteger, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
-
-from database.common.base import BaseModel, IdMixin
 
 
 class GroupModel(IdMixin, BaseModel):

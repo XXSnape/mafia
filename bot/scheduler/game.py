@@ -1,22 +1,21 @@
+import datetime
 from contextlib import suppress
-from datetime import datetime
 
 from aiogram import Bot, Dispatcher
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from apscheduler.jobstores.base import JobLookupError
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from faststream.rabbit import RabbitBroker
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from cache.cache_types import GameCache
+from faststream.rabbit import RabbitBroker
 from general import settings
 from mafia.pipeline_game import Game
-from utils.state import clear_game_data
+from sqlalchemy.ext.asyncio import AsyncSession
 from utils.pretty_text import (
-    make_build,
     get_minutes_and_seconds_text,
+    make_build,
 )
+from utils.state import clear_game_data
 
 
 async def start_game(
@@ -80,7 +79,7 @@ def clearing_tasks_on_schedule(
 
 async def remind_of_beginning_of_game(bot: Bot, state: FSMContext):
     game_data: GameCache = await state.get_data()
-    now = int(datetime.utcnow().timestamp())
+    now = int(datetime.datetime.now(datetime.UTC).timestamp())
     end_of_registration = game_data["end_of_registration"]
     message = get_minutes_and_seconds_text(
         start=now, end=end_of_registration

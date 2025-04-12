@@ -1,6 +1,6 @@
 from collections import Counter
 
-from cache.cache_types import PlayersIds, GameCache
+from cache.cache_types import GameCache, PlayersIds
 
 
 def get_the_most_frequently_encountered_id(ids: PlayersIds):
@@ -15,7 +15,7 @@ def get_the_most_frequently_encountered_id(ids: PlayersIds):
 
 
 def get_criminals_ids(game_data: GameCache) -> PlayersIds:
-    from mafia.roles import Mafia, Forger, Traitor
+    from mafia.roles import Forger, Mafia, Traitor
 
     return (
         game_data.get(Mafia.roles_key, [])

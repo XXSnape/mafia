@@ -5,9 +5,7 @@ from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
     UserVoteIndexCbData,
 )
-
 from services.game.processing_user_actions import UserManager
-
 
 router = Router(name=__name__)
 

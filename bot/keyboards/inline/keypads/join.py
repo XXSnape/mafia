@@ -3,7 +3,6 @@ from operator import attrgetter
 from aiogram import Bot
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.deep_linking import create_start_link
-
 from cache.cache_types import PlayersIds, RolesLiteral
 from general import settings
 from general.collection_of_roles import get_data_with_roles

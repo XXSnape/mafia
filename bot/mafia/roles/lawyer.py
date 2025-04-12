@@ -1,14 +1,14 @@
 from cache.cache_types import GameCache, UserIdInt
-from mafia.roles.descriptions.texts import (
-    CANT_CHOOSE_IN_ROW,
-    CAN_CHOOSE_YOURSELF,
-    CAN_CHOOSE_YOURSELF_AFTER_2_NIGHTS,
-)
+from general.groupings import Groupings
+from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import ProcedureAfterVotingABC
 from mafia.roles.base.roles import RoleABC
 from mafia.roles.descriptions.description import RoleDescription
-from general.groupings import Groupings
-from mafia.roles.base import ActiveRoleAtNightABC
+from mafia.roles.descriptions.texts import (
+    CAN_CHOOSE_YOURSELF,
+    CAN_CHOOSE_YOURSELF_AFTER_2_NIGHTS,
+    CANT_CHOOSE_IN_ROW,
+)
 from states.states import UserFsm
 from utils.pretty_text import make_build
 from utils.roles import get_processed_role_and_user_if_exists

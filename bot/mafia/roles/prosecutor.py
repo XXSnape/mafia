@@ -3,19 +3,19 @@ from contextlib import suppress
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import ChatPermissions
 from cache.cache_types import GameCache, UserIdInt
-from mafia.roles.descriptions.texts import CANT_CHOOSE_IN_ROW
-from mafia.roles.base.roles import RoleABC
-from mafia.roles.descriptions.description import RoleDescription
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,
     ProcedureAfterVotingABC,
 )
+from mafia.roles.base.roles import RoleABC
+from mafia.roles.descriptions.description import RoleDescription
+from mafia.roles.descriptions.texts import CANT_CHOOSE_IN_ROW
 from states.states import UserFsm
 from utils.roles import (
-    get_processed_user_id_if_exists,
     get_processed_role_and_user_if_exists,
+    get_processed_user_id_if_exists,
 )
 from utils.tg import ban_user
 

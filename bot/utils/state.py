@@ -1,13 +1,12 @@
 import asyncio
 from contextlib import suppress
 
-from aiogram import Dispatcher, Bot
+from aiogram import Bot, Dispatcher
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.fsm.storage.base import StorageKey
-
-from cache.cache_types import UserIdInt, GameCache, UserCache
+from cache.cache_types import GameCache, UserCache, UserIdInt
 from utils.tg import delete_messages_from_to_delete
 
 

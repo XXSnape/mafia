@@ -6,10 +6,10 @@ from aiogram import Bot
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.types import (
-    Message,
-    ChatMemberOwner,
     ChatMemberAdministrator,
+    ChatMemberOwner,
     ChatPermissions,
+    Message,
 )
 
 

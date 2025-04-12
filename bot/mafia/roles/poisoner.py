@@ -1,25 +1,25 @@
 from cache.cache_types import (
     GameCache,
-    UserIdInt,
     PlayersIds,
+    UserIdInt,
 )
 from cache.extra import ExtraCache
 from general import settings
+from general.groupings import Groupings
 from general.text import (
     ATTEMPT_TO_KILL,
-)
-from mafia.roles.descriptions.texts import (
-    DONT_PAY_FOR_VOTING,
 )
 from keyboards.inline.keypads.mailing import kill_or_poison_kb
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
-    ProcedureAfterNightABC,
     FinisherOfNight,
     KillersOf,
+    ProcedureAfterNightABC,
 )
-from general.groupings import Groupings
 from mafia.roles.descriptions.description import RoleDescription
+from mafia.roles.descriptions.texts import (
+    DONT_PAY_FOR_VOTING,
+)
 from states.states import UserFsm
 from utils.informing import get_profiles
 from utils.roles import get_user_role_and_url

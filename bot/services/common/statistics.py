@@ -11,10 +11,10 @@ from general.collection_of_roles import get_data_with_roles
 from general.text import MONEY_SYM
 from services.base import RouterHelper
 from utils.pretty_text import (
-    make_pretty,
-    make_build,
     get_minutes_and_seconds_text,
     get_profile_link,
+    make_build,
+    make_pretty,
 )
 from utils.tg import delete_message
 

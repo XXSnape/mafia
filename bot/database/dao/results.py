@@ -1,8 +1,7 @@
-from sqlalchemy import select, func, Integer, desc
-
 from database.dao.base import BaseDAO
 from database.models import ResultModel
 from database.schemas.common import UserTgIdSchema
+from sqlalchemy import Integer, desc, func, select
 
 
 class ResultsDao(BaseDAO[ResultModel]):

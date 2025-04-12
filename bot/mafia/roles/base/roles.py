@@ -1,46 +1,43 @@
 import asyncio
-from abc import ABC, abstractproperty, abstractmethod
+from abc import ABC, abstractmethod, abstractproperty
 from contextlib import suppress
 from random import shuffle
-from typing import Callable, Optional, Self, TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable, Optional, Self
 
 from aiogram import Bot, Dispatcher
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.types import InlineKeyboardButton
-
 from cache.cache_types import (
     GameCache,
-    PlayersIds,
     LastInteraction,
-    UserGameCache,
+    PlayersIds,
     RolesLiteral,
+    UserGameCache,
     UserIdInt,
 )
 from cache.extra import ExtraCache
-from general import settings
-
-from general.text import MONEY_SYM, NUMBER_OF_NIGHT
 from database.schemas.results import PersonalResultSchema
+from general import settings
 from general.groupings import Groupings
+from general.text import MONEY_SYM, NUMBER_OF_NIGHT
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
 from mafia.roles.descriptions.description import RoleDescription
-
-from utils.pretty_text import (
-    make_pretty,
-    make_build,
-)
 from utils.common import (
-    get_the_most_frequently_encountered_id,
     get_criminals_ids,
+    get_the_most_frequently_encountered_id,
 )
 from utils.informing import (
     get_profiles,
-    send_a_lot_of_messages_safely,
     remind_criminals_about_inspections,
+    send_a_lot_of_messages_safely,
+)
+from utils.pretty_text import (
+    make_build,
+    make_pretty,
 )
 from utils.state import get_state_and_assign
 

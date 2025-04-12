@@ -1,14 +1,13 @@
 from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from keyboards.inline.cb.cb_text import (
-    POLICEMAN_KILLS_CB,
-    POISONER_POISONS_CB,
     PLAYER_BACKS_CB,
+    POISONER_POISONS_CB,
+    POLICEMAN_KILLS_CB,
 )
 from services.game.saving_role_selection.poisoner import (
     PoisonerSaver,

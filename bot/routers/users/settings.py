@@ -1,12 +1,10 @@
 from aiogram import F, Router
 from aiogram.types import CallbackQuery
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from keyboards.inline.callback_factory.settings import (
     GroupSettingsCbData,
 )
 from services.common.settings import SettingsRouter
-
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = Router(name=__name__)
 

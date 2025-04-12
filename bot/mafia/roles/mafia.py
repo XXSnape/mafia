@@ -1,21 +1,21 @@
 from cache.cache_types import GameCache, UserIdInt
+from general.groupings import Groupings
 from general.text import (
     ATTEMPT_TO_KILL,
 )
-from mafia.roles.descriptions.texts import (
-    KILLING_PLAYER,
-    CAN_KILL_AT_NIGHT,
-    CAN_SEE_ALLIES,
-)
-from mafia.roles.base.roles import RoleABC
-from mafia.roles.descriptions.description import RoleDescription
-from general.groupings import Groupings
 from mafia.roles.base import (
     ActiveRoleAtNightABC,
     AliasRoleABC,
 )
 from mafia.roles.base.mixins import (
     MurderAfterNightABC,
+)
+from mafia.roles.base.roles import RoleABC
+from mafia.roles.descriptions.description import RoleDescription
+from mafia.roles.descriptions.texts import (
+    CAN_KILL_AT_NIGHT,
+    CAN_SEE_ALLIES,
+    KILLING_PLAYER,
 )
 from states.states import UserFsm
 from utils.roles import get_processed_role_and_user_if_exists

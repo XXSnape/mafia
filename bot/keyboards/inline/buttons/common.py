@@ -1,13 +1,12 @@
 from aiogram.types import InlineKeyboardButton
-
 from general import settings
 from general.text import TO_SAVE
 from keyboards.inline.cb.cb_text import (
-    PLAYER_BACKS_CB,
     ACTIONS_FOR_ROLES_CB,
     CANCEL_CB,
-    SAVE_CB,
     HELP_CB,
+    PLAYER_BACKS_CB,
+    SAVE_CB,
 )
 
 BACK_BTN = InlineKeyboardButton(

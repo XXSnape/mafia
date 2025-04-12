@@ -1,22 +1,21 @@
-from faststream import FastStream
 import asyncio
 
 from database.dao.games import GamesDao
+from database.dao.rates import RatesDao
 from database.dao.results import ResultsDao
+from database.dao.users import UsersDao
+from database.schemas.bids import (
+    BidForRoleSchema,
+    ResultBidForRoleSchema,
+)
 from database.schemas.common import IdSchema
 from database.schemas.games import EndOfGameSchema
 from database.schemas.results import PersonalResultSchema
-from tasks.dependencies import SessionWithCommitDep
-
-from general.text import MONEY_SYM
-from database.dao.rates import RatesDao
-from database.dao.users import UsersDao
-from database.schemas.bids import (
-    ResultBidForRoleSchema,
-    BidForRoleSchema,
-)
+from faststream import FastStream
 from general.collection_of_roles import get_data_with_roles
-from general.config import broker, bot
+from general.config import bot, broker
+from general.text import MONEY_SYM
+from tasks.dependencies import SessionWithCommitDep
 from utils.pretty_text import make_build, make_pretty
 
 

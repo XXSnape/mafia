@@ -2,26 +2,26 @@ import asyncio
 
 from cache.cache_types import GameCache, UserIdInt
 from cache.extra import ExtraCache
+from general.groupings import Groupings
 from general.text import (
     ATTEMPT_TO_KILL,
 )
+from mafia.roles.base import ActiveRoleAtNightABC
+from mafia.roles.base.mixins import (
+    FinisherOfNight,
+    MurderAfterNightABC,
+    ProcedureAfterVotingABC,
+)
+from mafia.roles.base.roles import RoleABC
+from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     KILLING_PLAYER,
     PAYMENT_FOR_NIGHTS,
 )
-from mafia.roles.base.roles import RoleABC
-from mafia.roles.descriptions.description import RoleDescription
-from general.groupings import Groupings
-from mafia.roles.base import ActiveRoleAtNightABC
-from mafia.roles.base.mixins import (
-    MurderAfterNightABC,
-    ProcedureAfterVotingABC,
-    FinisherOfNight,
-)
 from states.states import UserFsm
 from utils.pretty_text import make_build
-from utils.state import reset_user_state
 from utils.roles import get_processed_role_and_user_if_exists
+from utils.state import reset_user_state
 
 
 class AngelOfDeath(

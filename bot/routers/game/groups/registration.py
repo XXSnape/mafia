@@ -5,8 +5,6 @@ from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery, Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from keyboards.inline.cb.cb_text import (
     FINISH_REGISTRATION_CB,
 )
@@ -16,6 +14,7 @@ from middlewares.db import (
 from services.game.registartion import (
     Registration,
 )
+from sqlalchemy.ext.asyncio import AsyncSession
 from states.states import GameFsm
 
 router = Router(name=__name__)

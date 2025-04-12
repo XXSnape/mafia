@@ -1,6 +1,6 @@
-from collections.abc import Callable, Awaitable
+from collections.abc import Awaitable, Callable
 from contextlib import suppress
-from datetime import timedelta, datetime, timezone, UTC
+from datetime import UTC, datetime, timedelta, timezone
 from pprint import pprint
 from typing import Concatenate
 
@@ -8,57 +8,54 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import CommandObject
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ChatMemberAdministrator
-
 from aiogram.utils.payload import decode_payload
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
-
 from cache.cache_types import (
     GameCache,
+    GameSettingsCache,
+    RolesAndUsersMoney,
+    RolesLiteral,
     UserCache,
     UserGameCache,
-    GameSettingsCache,
-    RolesLiteral,
-    RolesAndUsersMoney,
 )
 from database.dao.groups import GroupsDao
-from general import settings
-from general.text import MONEY_SYM
-
 from database.dao.users import UsersDao
 from database.schemas.common import TgIdSchema, UserTgIdSchema
+from general import settings
 from general.collection_of_roles import (
     get_data_with_roles,
 )
+from general.text import MONEY_SYM
 from keyboards.inline.keypads.join import (
+    cancel_bet,
     get_join_kb,
     offer_to_place_bet,
-    cancel_bet,
+)
+from mafia.pipeline_game import Game
+from scheduler.game import (
+    clearing_tasks_on_schedule,
+    remind_of_beginning_of_game,
+    start_game,
 )
 from services.base import RouterHelper
 from services.game.game_assistants import get_game_state_and_data
-from mafia.pipeline_game import Game
 from services.users.order_of_roles import RoleManager
 from states.states import GameFsm
-from scheduler.game import (
-    start_game,
-    clearing_tasks_on_schedule,
-    remind_of_beginning_of_game,
+from utils.informing import get_profiles_during_registration
+from utils.pretty_text import (
+    get_minutes_and_seconds_text,
+    get_profile_link,
+    make_build,
+    make_pretty,
+)
+from utils.state import (
+    clear_game_data,
+    get_state_and_assign,
 )
 from utils.tg import (
     check_user_for_admin_rights,
     delete_message,
-)
-from utils.pretty_text import (
-    get_profile_link,
-    make_build,
-    get_minutes_and_seconds_text,
-    make_pretty,
-)
-from utils.informing import get_profiles_during_registration
-from utils.state import (
-    get_state_and_assign,
-    clear_game_data,
 )
 
 
@@ -159,7 +156,7 @@ class Registration(RouterHelper):
             ),
             reply_markup=markup,
         )
-        start_of_registration_dt = datetime.utcnow()
+        start_of_registration_dt = datetime.now(UTC)
         end_of_registration = int(
             (
                 start_of_registration_dt + timedelta(seconds=60 * 2)

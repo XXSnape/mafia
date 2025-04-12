@@ -1,5 +1,3 @@
-import asyncio
-
 from general.collection_of_roles import get_data_with_roles
 from general.groupings import Groupings
 from keyboards.inline.callback_factory.recognize_user import (
@@ -8,16 +6,16 @@ from keyboards.inline.callback_factory.recognize_user import (
 from keyboards.inline.keypads.to_bot import (
     participate_in_social_life,
 )
+from mafia.roles import Hacker
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_state_and_data,
     get_game_state_data_and_user_id,
 )
-from mafia.roles import Hacker, Mafia
 from utils.common import get_criminals_ids
 from utils.informing import send_a_lot_of_messages_safely
-from utils.tg import delete_message
 from utils.pretty_text import make_build
+from utils.tg import delete_message
 
 
 class UserManager(RouterHelper):

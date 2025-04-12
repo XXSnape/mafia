@@ -3,30 +3,28 @@ from operator import attrgetter
 
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
-
 from cache.cache_types import GameCache, UsersInGame
-from keyboards.inline.buttons.common import BACK_BTN
-
 from keyboards.inline.builder import generate_inline_kb
+from keyboards.inline.buttons.common import BACK_BTN
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from keyboards.inline.cb.cb_text import (
+    POISONER_POISONS_CB,
     POLICEMAN_CHECKS_CB,
     POLICEMAN_KILLS_CB,
     WEREWOLF_TO_DOCTOR_CB,
     WEREWOLF_TO_MAFIA_CB,
     WEREWOLF_TO_POLICEMAN_CB,
-    POISONER_POISONS_CB,
 )
 from utils.common import get_criminals_ids
 
 
 def send_transformation_kb(game_data: GameCache):
     from mafia.roles import (
+        Doctor,
         MafiaAlias,
         Policeman,
-        Doctor,
     )
 
     buttons = [

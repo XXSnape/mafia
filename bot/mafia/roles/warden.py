@@ -1,5 +1,4 @@
 from aiogram.types import InlineKeyboardButton
-
 from cache.cache_types import (
     GameCache,
     PlayersIds,

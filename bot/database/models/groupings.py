@@ -1,6 +1,5 @@
-from sqlalchemy.orm import Mapped, mapped_column
-
 from database.common.base import BaseModel
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class GroupingModel(BaseModel):

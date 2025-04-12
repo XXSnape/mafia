@@ -1,27 +1,27 @@
 from keyboards.inline.cb.cb_text import (
-    WEREWOLF_TO_MAFIA_CB,
     WEREWOLF_TO_DOCTOR_CB,
+    WEREWOLF_TO_MAFIA_CB,
     WEREWOLF_TO_POLICEMAN_CB,
 )
-from services.base import RouterHelper
-from services.game.game_assistants import get_game_state_and_data
 from mafia.roles import (
-    Mafia,
     Doctor,
+    Mafia,
     Policeman,
     Werewolf,
 )
+from services.base import RouterHelper
+from services.game.game_assistants import get_game_state_and_data
 from utils.common import get_criminals_ids
-from utils.tg import delete_message
-from utils.pretty_text import make_pretty
 from utils.informing import (
+    get_profiles,
     notify_aliases_about_transformation,
     remind_commissioner_about_inspections,
-    get_profiles,
-    send_a_lot_of_messages_safely,
     remind_criminals_about_inspections,
+    send_a_lot_of_messages_safely,
 )
+from utils.pretty_text import make_pretty
 from utils.roles import change_role
+from utils.tg import delete_message
 
 
 class WerewolfSaver(RouterHelper):

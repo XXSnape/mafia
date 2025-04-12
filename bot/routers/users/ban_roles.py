@@ -1,19 +1,18 @@
 from aiogram import F, Router
-from aiogram.filters import or_f, and_f
+from aiogram.filters import and_f, or_f
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from general.collection_of_roles import get_data_with_roles
 from keyboards.inline.cb.cb_text import (
-    VIEW_BANNED_ROLES_CB,
-    SAVE_CB,
-    EDIT_SETTINGS_CB,
-    CLEAR_SETTINGS_CB,
-    CANCEL_CB,
     BAN_EVERYTHING_CB,
+    CANCEL_CB,
+    CLEAR_SETTINGS_CB,
+    EDIT_SETTINGS_CB,
+    SAVE_CB,
+    VIEW_BANNED_ROLES_CB,
 )
 from services.users.banned_roles import RoleAttendant
+from sqlalchemy.ext.asyncio import AsyncSession
 from states.settings import SettingsFsm
 
 router = Router(name=__name__)

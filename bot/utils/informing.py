@@ -1,29 +1,27 @@
 import asyncio
 from collections import defaultdict
-from collections.abc import Iterable, Callable
+from collections.abc import Callable, Iterable
 from typing import TYPE_CHECKING
 
 from aiogram import Bot
-
 from cache.cache_types import (
     GameCache,
+    PlayersIds,
     UserIdInt,
     UsersInGame,
-    PlayersIds,
 )
-from general.text import MONEY_SYM, NUMBER_OF_NIGHT
 from general.groupings import Groupings
+from general.text import MONEY_SYM, NUMBER_OF_NIGHT
 from keyboards.inline.callback_factory.recognize_user import (
     UserVoteIndexCbData,
 )
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
-
 from utils.pretty_text import (
+    cut_off_old_text,
     make_build,
     make_pretty,
-    cut_off_old_text,
 )
 from utils.sorting import sorting_by_number
 
@@ -125,7 +123,8 @@ def get_profiles_during_registration(
 ) -> str:
     profiles = get_profiles(live_players_ids, players)
     return make_build(
-        f"❤️Скорее присоединяйся к игре!\n\nУчастники:\n{profiles}"
+        f"❤️Скорее присоединяйся к игре!\n\n"
+        f"👥Участники:\n{profiles}"
     )
 
 

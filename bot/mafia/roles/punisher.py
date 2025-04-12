@@ -1,13 +1,13 @@
 from cache.cache_types import GameCache, PlayersIds, UserIdInt
 from general import settings
 from general.groupings import Groupings
+from mafia.roles import Bodyguard
+from mafia.roles.base import RoleABC
+from mafia.roles.base.mixins import KillersOf, ProcedureAfterNightABC
+from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     KILLING_PLAYER,
 )
-from mafia.roles import Bodyguard
-from mafia.roles.base import RoleABC
-from mafia.roles.base.mixins import ProcedureAfterNightABC, KillersOf
-from mafia.roles.descriptions.description import RoleDescription
 
 
 class Punisher(ProcedureAfterNightABC, RoleABC):

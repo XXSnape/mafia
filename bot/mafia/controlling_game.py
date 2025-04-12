@@ -1,30 +1,36 @@
 import asyncio
 from abc import ABC
 from collections import defaultdict
-from collections.abc import Callable, Awaitable
+from collections.abc import Awaitable, Callable
 from operator import attrgetter
 from typing import TYPE_CHECKING, Concatenate
 
-from aiogram import Dispatcher, Bot
+from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
-from loguru import logger
-
 from cache.cache_types import (
     GameCache,
-    UserGameCache,
     LastInteraction,
+    UserGameCache,
 )
 from general.exceptions import GameIsOver
 from general.groupings import Groupings
-
 from keyboards.inline.keypads.to_bot import (
     participate_in_social_life,
 )
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
-from states.states import UserFsm
-from utils.pretty_text import (
-    make_build,
+from loguru import logger
+from mafia.roles import Killer, Mafia
+from mafia.roles.base import (
+    ActiveRoleAtNightABC,
+    AliasRoleABC,
+    RoleABC,
 )
+from mafia.roles.base.mixins import (
+    FinisherOfNight,
+    ProcedureAfterNightABC,
+    ProcedureAfterVotingABC,
+)
+from states.states import UserFsm
 from utils.common import get_the_most_frequently_encountered_id
 from utils.informing import (
     get_profiles,
@@ -33,19 +39,10 @@ from utils.informing import (
     send_messages_after_night,
     send_request_to_vote,
 )
+from utils.pretty_text import (
+    make_build,
+)
 from utils.state import get_state_and_assign, reset_user_state
-
-from mafia.roles import Mafia, Killer
-from mafia.roles.base import (
-    AliasRoleABC,
-    RoleABC,
-    ActiveRoleAtNightABC,
-)
-from mafia.roles.base.mixins import (
-    ProcedureAfterNightABC,
-    FinisherOfNight,
-    ProcedureAfterVotingABC,
-)
 
 if TYPE_CHECKING:
     from mafia.pipeline_game import Game

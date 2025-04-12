@@ -1,11 +1,11 @@
 from cache.cache_types import GameCache, UserIdInt
+from mafia.roles.base import RoleABC
+from mafia.roles.base.mixins import ProcedureAfterVotingABC
+from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     KILLING_PLAYER,
     SAVING_PLAYER,
 )
-from mafia.roles.base import RoleABC
-from mafia.roles.base.mixins import ProcedureAfterVotingABC
-from mafia.roles.descriptions.description import RoleDescription
 from utils.pretty_text import make_build
 from utils.roles import get_user_role_and_url
 

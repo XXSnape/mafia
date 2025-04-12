@@ -1,20 +1,14 @@
 from aiogram.types import InlineKeyboardButton
-
 from cache.cache_types import (
     GameCache,
-    UserIdInt,
     PlayersIds,
+    UserIdInt,
 )
 from cache.extra import ExtraCache
-
 from general.groupings import Groupings
 from general.text import (
-    ROLE_IS_KNOWN,
     ATTEMPT_TO_KILL,
-)
-from mafia.roles.descriptions.texts import (
-    KILLING_PLAYER,
-    CHECKING_PLAYER,
+    ROLE_IS_KNOWN,
 )
 from keyboards.inline.keypads.mailing import (
     kill_or_check_on_policeman,
@@ -23,14 +17,18 @@ from mafia.roles.base import (
     ActiveRoleAtNightABC,
     AliasRoleABC,
 )
-from mafia.roles.base.mixins import ProcedureAfterNightABC, KillersOf
+from mafia.roles.base.mixins import KillersOf, ProcedureAfterNightABC
 from mafia.roles.descriptions.description import RoleDescription
+from mafia.roles.descriptions.texts import (
+    CHECKING_PLAYER,
+    KILLING_PLAYER,
+)
 from states.states import UserFsm
-from utils.pretty_text import make_pretty
 from utils.informing import (
     remind_commissioner_about_inspections,
     send_a_lot_of_messages_safely,
 )
+from utils.pretty_text import make_pretty
 from utils.roles import (
     get_user_role_and_url,
 )

@@ -1,10 +1,10 @@
-from aiogram import Router, F
+from aiogram import F, Router
 from aiogram.enums import ChatType
-
 from middlewares.db import (
     DatabaseMiddlewareWithCommit,
     DatabaseMiddlewareWithoutCommit,
 )
+
 from .adding import router as adding_router
 from .settings import router as settings_router
 from .statistics import router as statistics_router

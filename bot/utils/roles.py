@@ -1,4 +1,4 @@
-from collections.abc import Callable, Awaitable
+from collections.abc import Awaitable, Callable
 from functools import wraps
 from typing import TYPE_CHECKING, Concatenate
 

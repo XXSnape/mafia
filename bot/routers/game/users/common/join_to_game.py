@@ -1,17 +1,16 @@
-from aiogram import Router, Dispatcher, F
+from aiogram import Dispatcher, F, Router
+from aiogram.filters import CommandObject, CommandStart
 from aiogram.fsm.context import FSMContext
-from aiogram.filters import CommandStart, CommandObject
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import CallbackQuery, Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from keyboards.inline.cb.cb_text import CANCEL_CB
 from middlewares.db import (
     DatabaseMiddlewareWithCommit,
     DatabaseMiddlewareWithoutCommit,
 )
 from services.game.registartion import Registration
+from sqlalchemy.ext.asyncio import AsyncSession
 from states.states import GameFsm
 
 router = Router(name=__name__)

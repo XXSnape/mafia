@@ -1,8 +1,8 @@
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
-from sqlalchemy.ext.asyncio import AsyncSession
 from services.common.statistics import StatisticsRouter
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = Router(name=__name__)
 

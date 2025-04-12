@@ -4,7 +4,6 @@ from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from dotenv import load_dotenv
 from faststream.rabbit import RabbitBroker
-from pydantic.v1 import PositiveInt
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()

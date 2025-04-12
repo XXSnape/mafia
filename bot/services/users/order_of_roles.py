@@ -3,12 +3,12 @@ from collections.abc import Iterable
 from cache.cache_types import OrderOfRolesCache, RolesLiteral
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
-from database.schemas.roles import OrderOfRolesSchema
 from database.schemas.common import UserTgIdSchema
+from database.schemas.roles import OrderOfRolesSchema
 from general import settings
 from general.collection_of_roles import (
-    get_data_with_roles,
     BASES_ROLES,
+    get_data_with_roles,
 )
 from general.groupings import Groupings
 from general.text import REQUIRE_TO_SAVE
@@ -16,8 +16,7 @@ from keyboards.inline.keypads.settings import (
     edit_roles_kb,
     get_next_role_kb,
 )
-from mafia.roles import Doctor, Policeman, Mafia
-
+from mafia.roles import Doctor, Mafia, Policeman
 from services.base import RouterHelper
 from states.settings import SettingsFsm
 from utils.pretty_text import make_build

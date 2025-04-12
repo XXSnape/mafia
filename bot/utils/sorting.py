@@ -1,10 +1,9 @@
 from collections.abc import MutableSequence
 
-
 from cache.cache_types import (
     RolesLiteral,
-    UserIdStr,
     UserIdInt,
+    UserIdStr,
     UsersInGame,
 )
 

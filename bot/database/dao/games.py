@@ -1,13 +1,12 @@
 from datetime import datetime
 
-from sqlalchemy import select, func, Integer, desc
-
 from database.dao.base import BaseDAO
 from database.dao.groups import GroupsDao
 from database.models import GameModel, ResultModel
 from database.schemas.common import TgIdSchema
 from database.schemas.games import BeginningOfGameSchema
 from database.schemas.groups import GroupIdSchema
+from sqlalchemy import Integer, desc, func, select
 
 
 class GamesDao(BaseDAO[GameModel]):

@@ -1,6 +1,6 @@
-from mafia.roles.descriptions.texts import PAYMENT_FOR_NIGHTS
 from mafia.roles.base import RoleABC
 from mafia.roles.descriptions.description import RoleDescription
+from mafia.roles.descriptions.texts import PAYMENT_FOR_NIGHTS
 
 
 class Hacker(RoleABC):

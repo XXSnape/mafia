@@ -1,15 +1,16 @@
 from typing import List
+
+from database.common.base import BaseModel as Base
+from loguru import logger
 from pydantic import BaseModel
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.future import select
+from sqlalchemy import delete as sqlalchemy_delete
 from sqlalchemy import (
-    update as sqlalchemy_update,
-    delete as sqlalchemy_delete,
     func,
 )
-from loguru import logger
+from sqlalchemy import update as sqlalchemy_update
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
-from database.common.base import BaseModel as Base
+from sqlalchemy.future import select
 
 
 class BaseDAO[M: Base]:
@@ -30,7 +31,10 @@ class BaseDAO[M: Base]:
             query = select(self.model).filter_by(id=data_id)
             result = await self._session.execute(query)
             record = result.scalar_one_or_none()
-            log_message = f"Запись {self.model.__name__} с ID {data_id} {'найдена' if record else 'не найдена'}."
+            log_message = (
+                f"Запись {self.model.__name__} с "
+                f"ID {data_id} {'найдена' if record else 'не найдена'}."
+            )
             logger.info(log_message)
             return record
         except SQLAlchemyError as e:

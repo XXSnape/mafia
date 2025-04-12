@@ -1,4 +1,4 @@
-from aiogram import Dispatcher, Router, F
+from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from keyboards.inline.callback_factory.recognize_user import (

@@ -5,13 +5,13 @@ from keyboards.inline.callback_factory.recognize_user import (
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
+from mafia.roles import Instigator
 from services.base import RouterHelper
 from services.game.game_assistants import (
-    get_game_state_data_and_user_id,
     get_game_state_and_data,
+    get_game_state_data_and_user_id,
     trace_all_actions,
 )
-from mafia.roles import Instigator
 from states.states import UserFsm
 
 

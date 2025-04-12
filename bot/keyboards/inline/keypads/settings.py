@@ -1,19 +1,18 @@
 from operator import attrgetter
 
 from aiogram.types import InlineKeyboardButton
-
 from cache.cache_types import OrderOfRolesCache, RolesLiteral
 from general import settings
 from general.collection_of_roles import (
-    get_data_with_roles,
     REQUIRED_ROLES,
+    get_data_with_roles,
 )
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import (
     BACK_TO_SELECTING_ACTIONS_FOR_ROLES_BTN,
     CANCEL_BTN,
-    SAVE_BTN,
     HELP_BTN,
+    SAVE_BTN,
 )
 from keyboards.inline.callback_factory.settings import (
     GroupSettingsCbData,
@@ -21,14 +20,14 @@ from keyboards.inline.callback_factory.settings import (
     TimeOfDayCbData,
 )
 from keyboards.inline.cb.cb_text import (
-    VIEW_BANNED_ROLES_CB,
-    EDIT_SETTINGS_CB,
-    CLEAR_SETTINGS_CB,
-    VIEW_ORDER_OF_ROLES_CB,
-    DELETE_LATEST_ROLE_IN_ORDER_CB,
     BAN_EVERYTHING_CB,
-    LENGTH_OF_NIGHT_CB,
+    CLEAR_SETTINGS_CB,
+    DELETE_LATEST_ROLE_IN_ORDER_CB,
+    EDIT_SETTINGS_CB,
     LENGTH_OF_DAY_CB,
+    LENGTH_OF_NIGHT_CB,
+    VIEW_BANNED_ROLES_CB,
+    VIEW_ORDER_OF_ROLES_CB,
 )
 from mafia.roles import MafiaAlias
 from utils.sorting import sorting_roles_by_name

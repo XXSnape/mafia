@@ -1,27 +1,28 @@
 from abc import ABC, abstractmethod
 from typing import (
     TYPE_CHECKING,
-    TypedDict,
     TypeAlias,
+    TypedDict,
     Unpack,
 )
 
 from cache.cache_types import (
     GameCache,
-    UserIdStr,
-    UserIdInt,
     PlayersIds,
+    UserIdInt,
+    UserIdStr,
 )
 from general import settings
-from general.text import ATTEMPT_TO_KILL
 from general.groupings import Groupings
+from general.text import ATTEMPT_TO_KILL
 from mafia.roles.base import ActiveRoleAtNightABC
 from utils.informing import notify_aliases_about_transformation
 from utils.pretty_text import make_pretty
 
 if TYPE_CHECKING:
     from mafia.roles import RoleABC
-from utils.roles import get_processed_user_id_if_exists, change_role
+
+from utils.roles import change_role, get_processed_user_id_if_exists
 
 KillersOf: TypeAlias = dict[UserIdInt, list[ActiveRoleAtNightABC]]
 

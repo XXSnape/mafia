@@ -5,8 +5,8 @@ from aiogram.filters import (
 )
 from aiogram.fsm.state import default_state
 from aiogram.types import Message
-from sqlalchemy.ext.asyncio import AsyncSession
 from services.common.settings import SettingsRouter
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = Router(name=__name__)
 

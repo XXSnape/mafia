@@ -5,22 +5,22 @@ from general.collection_of_roles import get_data_with_roles
 from general.commands import BotCommands
 from general.groupings import Groupings
 from general.text import (
-    ROLES_SELECTION,
     CONFIGURE_GAME_SECTION,
     REQUIRED_PERMISSIONS,
+    ROLES_SELECTION,
 )
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import HELP_BTN
 from keyboards.inline.callback_factory.help import RoleCbData
 from keyboards.inline.keypads.help import (
-    help_options_kb,
-    get_roles_kb,
-    to_help_kb,
     HOW_TO_SET_UP_GAME_BTN,
     ROLES_SELECTION_BTN,
+    get_roles_kb,
     go_back_to_options_kb,
+    help_options_kb,
+    to_help_kb,
 )
-from mafia.roles import Warden, Instigator
+from mafia.roles import Instigator, Warden
 from services.base import RouterHelper
 from utils.pretty_text import make_build, make_pretty
 
@@ -264,7 +264,7 @@ class BaseRouter(RouterHelper):
             Groupings.killer,
         ):
             purpose_of_grouping = (
-                f"Сделать так, чтобы "
+                "Сделать так, чтобы "
                 f"представителей группы стало больше "
                 f"или равно остальным участникам игры"
             )

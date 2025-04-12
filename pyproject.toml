@@ -1,5 +1,24 @@
 [tool.poetry]
 package-mode = false
 
+[tool.poetry.dependencies]
+python = "^3.12"
+aiogram = "^3.19.0"
+pydantic-settings = "^2.8.1"
+pydantic = "2.10.6"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.40"}
+redis = "^5.2.1"
+asyncpg = "^0.30.0"
+alembic = "^1.15.2"
+faststream = {extras = ["rabbit"], version = "^0.5.39"}
+loguru = "^0.7.3"
+orjson = "^3.10.16"
+apscheduler = "^3.11.0"
+
+[tool.poetry.group.lint.dependencies]
+black = "^25.1.0"
+isort = "^6.0.1"
+flake8 = "^7.2.0"
+
 [tool.black]
 line-length = 69

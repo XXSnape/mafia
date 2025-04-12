@@ -2,16 +2,15 @@ from contextlib import suppress
 from datetime import timedelta
 
 from aiogram.exceptions import TelegramBadRequest
-
 from cache.cache_types import GameCache, PlayersIds
 from keyboards.inline.callback_factory.recognize_user import (
     AimedUserCbData,
     ProsAndCons,
 )
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
-from services.base import RouterHelper
 from mafia.roles import PrimeMinister
-from utils.tg import delete_message, ban_user
+from services.base import RouterHelper
+from utils.tg import ban_user, delete_message
 
 
 class GroupManager(RouterHelper):

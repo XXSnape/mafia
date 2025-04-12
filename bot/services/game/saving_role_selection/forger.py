@@ -3,13 +3,13 @@ from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from keyboards.inline.keypads.mailing import choose_fake_role_kb
+from mafia.roles import Forger
 from services.base import RouterHelper
 from services.game.game_assistants import (
-    get_game_state_data_and_user_id,
     get_game_state_and_data,
+    get_game_state_data_and_user_id,
     trace_all_actions,
 )
-from mafia.roles import Forger
 from utils.pretty_text import make_pretty
 
 

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import (
-    declared_attr,
     DeclarativeBase,
     Mapped,
+    declared_attr,
     mapped_column,
 )
 

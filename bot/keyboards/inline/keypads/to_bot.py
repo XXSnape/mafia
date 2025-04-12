@@ -1,7 +1,6 @@
 from functools import partial
 
 from aiogram.types import InlineKeyboardButton
-
 from general import settings
 from keyboards.inline.builder import generate_inline_kb
 

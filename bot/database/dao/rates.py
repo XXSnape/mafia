@@ -1,8 +1,7 @@
-from sqlalchemy import select, func, case, Integer
-
 from database.dao.base import BaseDAO
 from database.models import RateModel
 from database.schemas.common import UserTgIdSchema
+from sqlalchemy import Integer, case, func, select
 
 
 class RatesDao(BaseDAO[RateModel]):

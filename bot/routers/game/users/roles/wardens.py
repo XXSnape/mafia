@@ -1,4 +1,4 @@
-from aiogram import Dispatcher, Router, F
+from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from services.game.saving_role_selection.warden import WardenSaver

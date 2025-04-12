@@ -1,15 +1,14 @@
 from contextlib import suppress
 
 from aiogram.exceptions import TelegramBadRequest
-
 from cache.cache_types import PollBannedRolesCache, RolesLiteral
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
-from database.schemas.roles import ProhibitedRoleSchema
 from database.schemas.common import UserTgIdSchema
+from database.schemas.roles import ProhibitedRoleSchema
 from general.collection_of_roles import (
-    get_data_with_roles,
     REQUIRED_ROLES,
+    get_data_with_roles,
 )
 from general.text import REQUIRE_TO_SAVE
 from keyboards.inline.keypads.settings import (
@@ -18,8 +17,8 @@ from keyboards.inline.keypads.settings import (
 )
 from services.base import RouterHelper
 from states.settings import SettingsFsm
-from utils.tg import delete_message
 from utils.pretty_text import make_build
+from utils.tg import delete_message
 
 
 class RoleAttendant(RouterHelper):

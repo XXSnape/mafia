@@ -1,23 +1,20 @@
-from collections.abc import Callable, Awaitable
+from collections.abc import Awaitable, Callable
 from typing import Concatenate
 
 from aiogram.exceptions import TelegramAPIError
-
+from database.dao.groups import GroupsDao
 from database.dao.settings import SettingsDao
+from database.schemas.common import (
+    IdSchema,
+    TgIdSchema,
+    UserTgIdSchema,
+)
 from database.schemas.groups import GroupSettingIdSchema
 from keyboards.inline.callback_factory.settings import (
     GroupSettingsCbData,
 )
-from services.base import RouterHelper
-
-from database.dao.groups import GroupsDao
-from database.schemas.common import (
-    TgIdSchema,
-    IdSchema,
-    UserTgIdSchema,
-)
 from keyboards.inline.keypads.settings import set_up_group_kb
-
+from services.base import RouterHelper
 from services.users.banned_roles import RoleAttendant
 from services.users.order_of_roles import RoleManager
 from utils.pretty_text import make_build

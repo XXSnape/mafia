@@ -1,63 +1,58 @@
 import asyncio
 import datetime
-from collections import defaultdict
 from operator import itemgetter
 from random import choice
 
-from aiogram import Dispatcher, Bot
+from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
-
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from faststream.rabbit import RabbitBroker
-from loguru import logger
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from cache.cache_types import (
     GameCache,
-    UserGameCache,
-    RolesLiteral,
     RoleAndUserMoney,
+    RolesLiteral,
+    UserGameCache,
     UserIdStr,
 )
-from database.schemas.common import TgIdSchema, IdSchema
-from general.text import MONEY_SYM
 from database.dao.games import GamesDao
 from database.schemas.bids import (
     BidForRoleSchema,
     ResultBidForRoleSchema,
 )
+from database.schemas.common import IdSchema, TgIdSchema
 from database.schemas.games import (
     EndOfGameSchema,
 )
 from database.schemas.results import PersonalResultSchema
+from faststream.rabbit import RabbitBroker
 from general.collection_of_roles import (
-    get_data_with_roles,
     BASES_ROLES,
     DataWithRoles,
+    get_data_with_roles,
 )
 from general.exceptions import GameIsOver
 from general.groupings import Groupings
-
+from general.text import MONEY_SYM
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
+from loguru import logger
 from mafia.controlling_game import Controller
-from mafia.roles import RoleABC, Mafia, Forger, Traitor
+from mafia.roles import RoleABC
+from sqlalchemy.ext.asyncio import AsyncSession
 from states.states import GameFsm
-from utils.sorting import sorting_by_rate, sorting_by_money
-from utils.tg import delete_messages_from_to_delete
-from utils.state import (
-    get_state_and_assign,
-    reset_user_state_if_in_game,
-)
-from utils.pretty_text import (
-    make_pretty,
-    make_build,
-    get_minutes_and_seconds_text,
-)
 from utils.informing import (
     get_live_players,
     get_profiles,
     send_a_lot_of_messages_safely,
 )
+from utils.pretty_text import (
+    get_minutes_and_seconds_text,
+    make_build,
+    make_pretty,
+)
+from utils.sorting import sorting_by_money, sorting_by_rate
+from utils.state import (
+    reset_user_state_if_in_game,
+)
+from utils.tg import delete_messages_from_to_delete
 
 
 class Game:

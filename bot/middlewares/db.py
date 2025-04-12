@@ -1,7 +1,7 @@
-from typing import Callable, Dict, Any, Awaitable
-from aiogram import BaseMiddleware
-from aiogram.types import Message, CallbackQuery
+from typing import Any, Awaitable, Callable, Dict
 
+from aiogram import BaseMiddleware
+from aiogram.types import CallbackQuery, Message
 from database.common.sessions import async_session_maker
 
 

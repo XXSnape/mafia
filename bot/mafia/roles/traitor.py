@@ -1,27 +1,25 @@
 from typing import TYPE_CHECKING
 
 from aiogram.types import InlineKeyboardButton
-
 from cache.cache_types import GameCache, UserIdInt
 from cache.extra import ExtraCache
-from keyboards.inline.keypads.mailing import (
-    send_selection_to_players_kb,
-)
-from mafia.roles.base.mixins import (
-    ProcedureAfterNightABC,
-    MafiaConverterABC,
-)
-
 from general.groupings import Groupings
 from general.text import (
     ROLE_IS_KNOWN,
 )
-from mafia.roles.descriptions.texts import (
-    CHECKING_PLAYER,
-    CAN_SEE_ALLIES,
+from keyboards.inline.keypads.mailing import (
+    send_selection_to_players_kb,
 )
 from mafia.roles.base import ActiveRoleAtNightABC
+from mafia.roles.base.mixins import (
+    MafiaConverterABC,
+    ProcedureAfterNightABC,
+)
 from mafia.roles.descriptions.description import RoleDescription
+from mafia.roles.descriptions.texts import (
+    CAN_SEE_ALLIES,
+    CHECKING_PLAYER,
+)
 from states.states import UserFsm
 from utils.common import get_criminals_ids
 from utils.informing import send_a_lot_of_messages_safely

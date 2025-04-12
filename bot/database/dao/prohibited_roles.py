@@ -1,8 +1,7 @@
-from sqlalchemy import select
-
 from database.dao.base import BaseDAO
 from database.models import ProhibitedRoleModel, RoleModel
 from database.schemas.common import UserTgIdSchema
+from sqlalchemy import select
 
 
 class ProhibitedRolesDAO(BaseDAO[ProhibitedRoleModel]):

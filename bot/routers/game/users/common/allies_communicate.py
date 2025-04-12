@@ -5,7 +5,6 @@ from aiogram.types import Message
 from services.game.processing_user_actions import UserManager
 from states.states import UserFsm
 
-
 router = Router(name=__name__)
 
 

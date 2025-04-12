@@ -1,10 +1,9 @@
-from sqlalchemy import select
-
 from cache.cache_types import RolesLiteral
 from database.dao.base import BaseDAO
 from database.models import OrderModel, RoleModel
 from database.schemas.common import UserTgIdSchema
 from general.collection_of_roles import BASES_ROLES
+from sqlalchemy import select
 
 
 class OrderOfRolesDAO(BaseDAO[OrderModel]):

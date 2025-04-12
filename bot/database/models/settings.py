@@ -1,8 +1,7 @@
-from sqlalchemy import ForeignKey, BigInteger, CheckConstraint
-from sqlalchemy.orm import mapped_column, Mapped
-
 from database.common.base import BaseModel, IdMixin
 from general import settings
+from sqlalchemy import BigInteger, CheckConstraint, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class SettingModel(IdMixin, BaseModel):

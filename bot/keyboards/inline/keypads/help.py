@@ -1,22 +1,21 @@
 from operator import attrgetter
 
 from aiogram.types import InlineKeyboardButton
-
 from general.collection_of_roles import get_data_with_roles
-from general.text import ROLES_SELECTION, CONFIGURE_GAME_SECTION
+from general.text import CONFIGURE_GAME_SECTION, ROLES_SELECTION
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import (
-    HELP_BTN,
     ADD_BOT_TO_GROUP,
+    HELP_BTN,
 )
 from keyboards.inline.callback_factory.help import RoleCbData
 from keyboards.inline.cb.cb_text import (
-    VIEW_ROLES_CB,
-    HOW_TO_START_GAME_CB,
-    WHAT_ARE_BIDS_CB,
     HOW_TO_PLAY_CB,
-    HOW_TO_SET_UP_GAME_CB,
     HOW_TO_SEE_STATISTICS_CB,
+    HOW_TO_SET_UP_GAME_CB,
+    HOW_TO_START_GAME_CB,
+    VIEW_ROLES_CB,
+    WHAT_ARE_BIDS_CB,
 )
 
 

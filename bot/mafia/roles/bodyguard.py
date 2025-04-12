@@ -1,16 +1,16 @@
-from cache.cache_types import GameCache, UserIdInt, PlayersIds
+from cache.cache_types import GameCache, PlayersIds, UserIdInt
 from general import settings
-from mafia.roles.descriptions.texts import (
-    CANT_CHOOSE_IN_ROW,
-    SAVING_PLAYER,
-)
-from mafia.roles.base.roles import RoleABC
-from mafia.roles.descriptions.description import RoleDescription
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
-    ProcedureAfterNightABC,
     KillersOf,
+    ProcedureAfterNightABC,
+)
+from mafia.roles.base.roles import RoleABC
+from mafia.roles.descriptions.description import RoleDescription
+from mafia.roles.descriptions.texts import (
+    CANT_CHOOSE_IN_ROW,
+    SAVING_PLAYER,
 )
 from states.states import UserFsm
 from utils.roles import get_processed_role_and_user_if_exists

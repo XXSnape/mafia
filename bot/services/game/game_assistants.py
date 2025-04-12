@@ -3,19 +3,17 @@ from contextlib import suppress
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
-
 from cache.cache_types import GameCache, UserCache, UserIdInt
-from general.text import NUMBER_OF_NIGHT
 from general.collection_of_roles import get_data_with_roles
+from general.text import NUMBER_OF_NIGHT
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
-from mafia.roles import Hacker, Mafia
-from mafia.roles import RoleABC, ActiveRoleAtNightABC
+from mafia.roles import ActiveRoleAtNightABC, Hacker, Mafia
 from utils.informing import send_a_lot_of_messages_safely
 from utils.pretty_text import make_build
-from utils.tg import delete_message
 from utils.state import get_state_and_assign
+from utils.tg import delete_message
 
 
 async def send_messages_and_remove_from_expected(

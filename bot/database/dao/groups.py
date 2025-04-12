@@ -4,8 +4,8 @@ from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.dao.settings import SettingsDao
 from database.models import GroupModel
 from database.schemas.common import (
-    TgIdSchema,
     IdSchema,
+    TgIdSchema,
     UserTgIdSchema,
 )
 from database.schemas.groups import GroupSettingsSchema

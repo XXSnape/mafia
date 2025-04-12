@@ -1,10 +1,10 @@
 from cache.cache_types import GameCache
 from general.groupings import Groupings
-from mafia.roles.descriptions.texts import DONT_PAY_FOR_NIGHTS
 from keyboards.inline.keypads.mailing import send_transformation_kb
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import ProcedureAfterNightABC
 from mafia.roles.descriptions.description import RoleDescription
+from mafia.roles.descriptions.texts import DONT_PAY_FOR_NIGHTS
 from states.states import UserFsm
 from utils.pretty_text import make_pretty
 
@@ -30,9 +30,9 @@ class Werewolf(ProcedureAfterNightABC, ActiveRoleAtNightABC):
 
     @property
     def role_description(self) -> RoleDescription:
-        from .policeman import Policeman
         from .doctor import Doctor
         from .mafia import MafiaAlias
+        from .policeman import Policeman
 
         return RoleDescription(
             skill=f"На 4ую ночь превращается в {make_pretty(Policeman.role)} ({Policeman.alias.role})"

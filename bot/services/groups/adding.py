@@ -1,6 +1,5 @@
 from aiogram import Bot
 from aiogram.types import ChatMemberUpdated
-
 from database.dao.groups import GroupsDao
 from database.schemas.common import TgIdSchema
 from general.commands import BotCommands

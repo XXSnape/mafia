@@ -1,10 +1,9 @@
-from sqlalchemy import update
-
 from database.dao.base import BaseDAO
 from database.dao.settings import SettingsDao
 from database.models import UserModel
 from database.schemas.bids import UserMoneySchema
 from database.schemas.common import TgIdSchema, UserTgIdSchema
+from sqlalchemy import update
 
 
 class UsersDao(BaseDAO[UserModel]):

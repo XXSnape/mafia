@@ -1,20 +1,19 @@
-from aiogram import Router, F
-from aiogram.filters import CommandStart, StateFilter, Command
+from aiogram import F, Router
+from aiogram.filters import Command, CommandStart, StateFilter
 from aiogram.fsm.state import default_state
-from aiogram.types import Message, CallbackQuery
-from sqlalchemy.ext.asyncio import AsyncSession
+from aiogram.types import CallbackQuery, Message
 from keyboards.inline.callback_factory.help import RoleCbData
 from keyboards.inline.cb.cb_text import (
-    VIEW_ROLES_CB,
     HELP_CB,
-    HOW_TO_START_GAME_CB,
-    WHAT_ARE_BIDS_CB,
     HOW_TO_PLAY_CB,
-    HOW_TO_SET_UP_GAME_CB,
     HOW_TO_SEE_STATISTICS_CB,
+    HOW_TO_SET_UP_GAME_CB,
+    HOW_TO_START_GAME_CB,
+    VIEW_ROLES_CB,
+    WHAT_ARE_BIDS_CB,
 )
-
 from services.users.base import BaseRouter
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = Router(name=__name__)
 

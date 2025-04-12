@@ -1,10 +1,8 @@
 from datetime import datetime
 
-from sqlalchemy import func, BigInteger, CheckConstraint
-from sqlalchemy.orm import Mapped, mapped_column
-
-
 from database.common.base import BaseModel
+from sqlalchemy import BigInteger, CheckConstraint, func
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class UserModel(BaseModel):
