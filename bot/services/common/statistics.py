@@ -88,12 +88,10 @@ class StatisticsRouter(RouterHelper):
                 f"🎲Сделано ставок: {rates_result.count}\n"
                 f"🎱Выиграно ставок: {rates_result.is_winner_count} "
                 f"({int(rates_result.is_winner_count / rates_result.count * 100)}%)\n"
-                f"⛔Потрачено на ставки: {rates_result.money}{MONEY_SYM}"
+                f"⛔Потрачено на ставки: {rates_result.money}{MONEY_SYM}\n\n"
             )
             result_text += rates_text
-        result_text += (
-            f"\n\n💲Всего заработано: {money_sum}{MONEY_SYM}"
-        )
+        result_text += f"💲Всего заработано: {money_sum}{MONEY_SYM}"
         await self.message.answer(make_build(result_text))
 
     async def get_group_statistics(self):

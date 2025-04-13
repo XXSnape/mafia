@@ -3,8 +3,10 @@ services:
     image: redis:7.4-alpine
     ports:
       - 6379:6379
+    volumes:
+      - ./redis_data:/data
+
   postgres:
-    container_name: postgres
     image: postgres:14.8-alpine3.18
     ports:
       - 5432:5432
@@ -12,12 +14,15 @@ services:
       - ./db/:/var/lib/postgresql/data
     env_file:
       - .env
+
   rabbitmq:
     image: rabbitmq:alpine
     ports:
       - 5672:5672
     volumes:
       - ./rabbitmq_data:/data
+    env_file:
+      - .env
 
   bot:
     build: .
@@ -26,11 +31,13 @@ services:
       - redis
       - postgres
       - rabbitmq
+
     command: sh -c "
       alembic upgrade head &&
       cd bot &&
       python main.py
       "
+    restart: on-failure
 
   faststream:
     build: .
@@ -40,4 +47,5 @@ services:
       cd bot &&
       faststream run tasks.game:app
       "
+    restart: on-failure
 

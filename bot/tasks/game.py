@@ -1,7 +1,5 @@
 import asyncio
 
-from faststream import FastStream
-
 from database.dao.games import GamesDao
 from database.dao.rates import RatesDao
 from database.dao.results import ResultsDao
@@ -13,6 +11,7 @@ from database.schemas.bids import (
 from database.schemas.common import IdSchema
 from database.schemas.games import EndOfGameSchema
 from database.schemas.results import PersonalResultSchema
+from faststream import FastStream
 from general.collection_of_roles import get_data_with_roles
 from general.config import bot, broker
 from general.text import MONEY_SYM

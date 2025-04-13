@@ -9,7 +9,7 @@ from mafia.roles.base.mixins import ProcedureAfterNightABC
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import CANT_CHOOSE_IN_ROW
 from states.states import UserFsm
-from utils.pretty_text import make_build
+from utils.pretty_text import make_build, make_pretty
 from utils.roles import (
     get_processed_role_and_user_if_exists,
     get_processed_user_id_if_exists,
@@ -37,13 +37,19 @@ class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
 
     @property
     def role_description(self) -> RoleDescription:
+        from .angel_of_death import AngelOfDeath
+
         return RoleDescription(
             skill="Отменяет ночные ходы жертвы",
             pay_for=["Усыпление не союзной роли"],
-            limitations=[CANT_CHOOSE_IN_ROW],
+            limitations=[
+                CANT_CHOOSE_IN_ROW,
+                "Если жертва может делать ходы ночью после смерти, "
+                f"то она не может быть усыплена ({make_pretty(AngelOfDeath.role)})",
+            ],
             features=[
-                "Если жертва может делать ходы ночью после смерти, то она не может быть усыплена",
-                "ход жертвы отменяется полностью, поэтому она может выбрать одного и того же игрока дважды",
+                "Ход жертвы отменяется полностью, поэтому она "
+                "может выбрать одного и того же игрока дважды",
             ],
         )
 
@@ -58,7 +64,7 @@ class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         self,
         game_data: GameCache,
         processed_user_id: UserIdInt,
-        **kwargs
+        **kwargs,
     ):
         user_role = game_data["players"][str(processed_user_id)][
             "role_id"
@@ -86,7 +92,7 @@ class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         processed_role: RoleABC,
         user_url: str,
         processed_user_id: UserIdInt,
-        **kwargs
+        **kwargs,
     ):
         if self.was_euthanized is False:
             return

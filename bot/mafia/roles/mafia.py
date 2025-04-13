@@ -24,10 +24,7 @@ from utils.roles import get_processed_role_and_user_if_exists
 class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
     role = "Дон. Высшее звание в преступных группировках"
     role_id = "don"
-    photo = (
-        "https://avatars.mds.yandex.net/i?id="
-        "a7b2f1eed9cca869784091017f8a66ff_l-7677819-images-thumbs&n=13"
-    )
+    photo = "https://proza.ru/pics/2021/02/21/523.jpg"
     grouping = Groupings.criminals
     purpose = "Тебе нужно руководить преступниками и убивать мирных."
     message_to_group_after_action = "Мафия выбрала жертву!"

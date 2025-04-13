@@ -131,7 +131,8 @@ class RoleManager(RouterHelper):
             == settings.mafia.maximum_number_of_players
         ):
             await self.callback.answer(
-                f"Пока в игре могут участвовать только {settings.mafia.maximum_number_of_players} человек!",
+                f"Пока в игре могут участвовать "
+                f"только {settings.mafia.maximum_number_of_players} человек!",
                 show_alert=True,
             )
             await self._delete_old_order_of_roles_and_add_new(

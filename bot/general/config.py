@@ -8,9 +8,30 @@ load_dotenv()
 
 
 class RabbitSettings(BaseSettings):
+    default_user: str
+    default_pass: str
+    host: str
+    port: int
+
+    model_config = SettingsConfigDict(
+        case_sensitive=False, env_prefix="rabbitmq_"
+    )
+
     @property
     def url(self):
-        return "amqp://guest:guest@rabbitmq:5672/"
+        return (
+            f"amqp://{self.default_user}:"
+            f"{self.default_pass}@{self.host}:{self.port}/"
+        )
+
+
+class RedisSettings(BaseSettings):
+    host: str
+    port: int
+
+    model_config = SettingsConfigDict(
+        case_sensitive=False, env_prefix="redis_"
+    )
 
 
 class BotSettings(BaseSettings):
@@ -70,6 +91,7 @@ class Settings(BaseSettings):
     db: DBSettings = DBSettings()
     bot: BotSettings = BotSettings()
     mafia: MafiaSettings = MafiaSettings()
+    redis: RedisSettings = RedisSettings()
     model_config = SettingsConfigDict(
         case_sensitive=False,
     )

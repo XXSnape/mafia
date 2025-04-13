@@ -18,7 +18,11 @@ class Agent(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Агент 008"
     role_id = "agent"
     mail_message = "За кем следить этой ночью?"
-    photo = "https://avatars.mds.yandex.net/i?id=7b6e30fff5c795d560c07b69e7e9542f044fcaf9e04d4a31-5845211-images-thumbs&n=13"
+    photo = (
+        "https://avatars.mds.yandex.net/i?"
+        "id=7b6e30fff5c795d560c07b69e7e9542f044fcaf9e04d"
+        "4a31-5845211-images-thumbs&n=13"
+    )
     purpose = "Ты можешь следить за кем-нибудь ночью"
     message_to_group_after_action = "Спецслужбы выходят на разведу"
     message_to_user_after_action = "Ты выбрал следить за {url}"

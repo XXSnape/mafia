@@ -1,5 +1,5 @@
 import asyncio
-from abc import ABC, abstractmethod, abstractproperty
+from abc import ABC, abstractmethod
 from contextlib import suppress
 from random import shuffle
 from typing import TYPE_CHECKING, Callable, Optional, Self

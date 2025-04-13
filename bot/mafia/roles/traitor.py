@@ -81,7 +81,10 @@ class Traitor(
     ):
 
         game_data["mafias_are_shown"].append(processed_user_id)
-        text = f"❗️{make_pretty(self.role)} проверил и узнал, что {user_url} - {make_pretty(processed_role.role)}!"
+        text = (
+            f"❗️{make_pretty(self.role)} проверил и узнал, "
+            f"что {user_url} - {make_pretty(processed_role.role)}!"
+        )
         await send_a_lot_of_messages_safely(
             bot=self.bot,
             users=get_criminals_ids(game_data),
