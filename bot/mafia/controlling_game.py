@@ -424,7 +424,6 @@ class Controller:
 
     @check_end_of_game
     async def removing_inactive_players(self):
-        return
         game_data: GameCache = await self.state.get_data()
         wait_for = game_data["wait_for"]
         potentially_deleted = set()

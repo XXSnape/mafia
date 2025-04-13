@@ -33,7 +33,7 @@ class UserManager(RouterHelper):
         ]
         await self.message.bot.send_message(
             chat_id=game_data["game_chat"],
-            text=f"По слухам {role} {url} перед смертью "
+            text=f"По слухам, {role} {url} перед смертью "
             f"проглаголил такие слова:\n\n{self.message.text}"[
                 :3900
             ],

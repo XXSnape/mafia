@@ -51,17 +51,17 @@ class RoleManager(RouterHelper):
         result = "ℹ️Текущий порядок ролей:\n\n"
         if not selected_roles:
             selected_roles = BASES_ROLES
-        if (
-            to_save
-            and len(selected_roles)
-            > settings.mafia.minimum_number_of_players
-        ):
-            result = REQUIRE_TO_SAVE + result
         for index, role in enumerate(selected_roles, 1):
             result += (
                 f"{index}) {all_roles[role].role}"
                 f"{all_roles[role].grouping.value.name[-1]}\n"
             )
+        if (
+            to_save
+            and len(selected_roles)
+            > settings.mafia.minimum_number_of_players
+        ):
+            result += f"\n\n{REQUIRE_TO_SAVE}"
         return make_build(result)
 
     async def view_order_of_roles(self):
@@ -74,7 +74,9 @@ class RoleManager(RouterHelper):
         await self.state.set_state(SettingsFsm.ORDER_OF_ROLES)
         await self.callback.message.edit_text(
             text=make_build(text),
-            reply_markup=edit_roles_kb(bool(order_of_roles)),
+            reply_markup=edit_roles_kb(
+                order_of_roles != list(BASES_ROLES)
+            ),
         )
 
     async def start_editing_order(self):

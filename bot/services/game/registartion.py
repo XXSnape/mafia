@@ -521,7 +521,6 @@ class Registration(RouterHelper):
             "time_for_night": group_settings_schema.time_for_night,
             "time_for_day": group_settings_schema.time_for_day,
         }
-        pprint(game_settings)
         game_data: GameCache = {
             "game_chat": self.message.chat.id,
             "settings": game_settings,

@@ -97,13 +97,15 @@ class SettingsRouter(RouterHelper):
             user_id=self.message.from_user.id,
         )
         chat_info = await self.message.bot.get_chat(group_tg_id)
-        group_name = f"Настройки группы «{chat_info.title}»\n\n"
+        group_name = make_build(
+            f"🔧Настройки группы «{chat_info.title}»\n\n"
+        )
         if group_schema.is_there_settings is False:
             await self.message.bot.send_message(
                 chat_id=self.message.from_user.id,
-                text=group_name
-                + make_build(
-                    "В данной группе применяются настройки любого желающего,"
+                text=make_build(
+                    group_name
+                    + "👥В данной группе применяются настройки любого желающего,"
                     " если он начнёт регистрацию!"
                 ),
             )

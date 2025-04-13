@@ -136,11 +136,3 @@ async def refund_money_for_bets(
 
 
 app = FastStream(broker)
-
-# async def main():
-#     app = FastStream(broker)
-#     await app.run()
-#
-#
-# if __name__ == "__main__":
-#     asyncio.run(main())

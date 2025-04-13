@@ -120,6 +120,7 @@ class StatisticsRouter(RouterHelper):
             message="",
         )
         text = (
+            "📈Статистика группы\n\n"
             f"🎮Количество игр: {game_result.number_of_games}\n"
             f"👤Среднее количество игроков за игру: {number_of_players}\n"
             f"💤Среднее количество ночей: {game_result.nights_lived_count}\n"
@@ -149,7 +150,7 @@ class StatisticsRouter(RouterHelper):
             ),
             return_exceptions=True,
         )
-        users_text = "\n📊Рейтинг игроков:\n\n"
+        users_text = "\n📊Топ 15 игроков:\n\n"
         for num, (user_info, user_data) in enumerate(
             zip(users_info, users_result), 1
         ):

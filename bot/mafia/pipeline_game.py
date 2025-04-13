@@ -201,8 +201,7 @@ class Game:
         )
         await message.pin()
         await self.controller.mailing()
-        await asyncio.sleep(15)
-        # await asyncio.sleep(game_data["settings"]["time_for_night"])
+        await asyncio.sleep(game_data["settings"]["time_for_night"])
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -217,17 +216,16 @@ class Game:
             caption=f"{make_build('Пришло время провести следственные мероприятия жителям города!')}\n\n"
             f"{players_after_night}",
         )
-        # await asyncio.sleep(game_data["settings"]["time_for_day"])
-        await asyncio.sleep(4)
+        await asyncio.sleep(game_data["settings"]["time_for_day"])
         await self.controller.suggest_vote()
-        await asyncio.sleep(12)
+        await asyncio.sleep(30)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
         )
         result = await self.controller.confirm_final_aim()
         if result:
-            await asyncio.sleep(12)
+            await asyncio.sleep(45)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -466,7 +464,6 @@ class Game:
         game_data: GameCache = await self.state.get_data()
         banned_roles = game_data["settings"]["banned_roles"]
         order_of_roles = game_data["settings"]["order_of_roles"]
-        print("initial", order_of_roles)
         players_ids = game_data["live_players_ids"][:]
         all_roles = get_data_with_roles()
         criminals: list[RolesLiteral] = []
@@ -495,10 +492,9 @@ class Game:
             if role not in order_of_roles
         )
         while len(order_of_roles) < number_of_players:
-            if (
-                len(order_of_roles) % 4 == 0
-                and len(order_of_roles) != 4
-            ):
+            if (len(order_of_roles) + 1) % 4 == 0 and len(
+                order_of_roles
+            ) != 4:
                 role_type = criminals
             else:
                 role_type = other
@@ -519,7 +515,6 @@ class Game:
                 role_type.remove(role)
         winners = set()
         order_of_roles[:] = order_of_roles[:number_of_players]
-        print("order", order_of_roles)
         for role_id, (winner_id, money) in role_and_winner.items():
             if role_id not in order_of_roles:
                 not_winners.append(winner_id)
