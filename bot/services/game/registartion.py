@@ -1,7 +1,6 @@
 from collections.abc import Awaitable, Callable
 from contextlib import suppress
 from datetime import UTC, datetime, timedelta, timezone
-from pprint import pprint
 from typing import Concatenate
 
 from aiogram.exceptions import TelegramBadRequest
@@ -481,6 +480,7 @@ class Registration(RouterHelper):
             state=self.state,
             dispatcher=self.dispatcher,
         )
+        self._delete_bet(user_data=user_data, game_data=game_data)
         bids: RolesAndUsersMoney = game_data["bids"]
         bids.setdefault(user_data["coveted_role"], []).append(
             [user_id, rate]
@@ -488,17 +488,18 @@ class Registration(RouterHelper):
         role = get_data_with_roles(user_data["coveted_role"])
         await self.state.set_data(user_data)
         await game_state.set_data(game_data)
-        await bot.edit_message_text(
-            chat_id=user_id,
-            text=make_build(
-                f"✅Ты успешно поставил {self.message.text}{MONEY_SYM} "
-                f"на роль {make_pretty(role.role)}!\n\n"
-                f"Чтобы изменить сумму, просто введи ее\n\n"
-                f"Твой текущий баланс: {balance}{MONEY_SYM}"
-            ),
-            reply_markup=cancel_bet(),
-            message_id=user_data["message_with_offer_id"],
-        )
+        with suppress(TelegramBadRequest):
+            await bot.edit_message_text(
+                chat_id=user_id,
+                text=make_build(
+                    f"✅Ты успешно поставил {self.message.text}{MONEY_SYM} "
+                    f"на роль {make_pretty(role.role)}!\n\n"
+                    f"Чтобы изменить сумму, просто введи ее\n\n"
+                    f"Твой текущий баланс: {balance}{MONEY_SYM}"
+                ),
+                reply_markup=cancel_bet(),
+                message_id=user_data["message_with_offer_id"],
+            )
 
     async def _init_game(
         self,

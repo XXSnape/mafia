@@ -106,8 +106,6 @@ class Traitor(
         game_data: GameCache,
         extra_buttons: tuple[InlineKeyboardButton, ...] = (),
     ):
-        print(game_data["live_players_ids"])
-        print("data", get_criminals_ids(game_data))
         return send_selection_to_players_kb(
             players_ids=game_data["live_players_ids"],
             players=game_data["players"],

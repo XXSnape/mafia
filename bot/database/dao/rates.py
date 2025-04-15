@@ -26,6 +26,5 @@ class RatesDao(BaseDAO[RateModel]):
                 func.sum(func.cast(self.model.is_winner, Integer)), 0
             ).label("is_winner_count"),
         ).filter_by(**user_tg_id.model_dump())
-        print(query)
         result = await self._session.execute(query)
         return result.one_or_none()

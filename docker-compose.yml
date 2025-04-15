@@ -1,10 +1,10 @@
 services:
-#  redis:
-#    image: redis:7.4-alpine
-#    ports:
-#      - 6379:6379
-#    volumes:
-#      - ./redis_data:/data
+  redis:
+    image: redis:7.4-alpine
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis_data:/data
 
   postgres:
     image: postgres:14.8-alpine3.18
@@ -23,29 +23,29 @@ services:
       - ./rabbitmq_data:/data
     env_file:
       - .env
-#
-#  bot:
-#    build: .
-#    depends_on:
-#      - faststream
-#      - redis
-#      - postgres
-#      - rabbitmq
-#
-#    command: sh -c "
-#      alembic upgrade head &&
-#      cd bot &&
-#      python main.py
-#      "
-#    restart: on-failure
-#
-#  faststream:
-#    build: .
-#    depends_on:
-#      - rabbitmq
-#    command: sh -c "
-#      cd bot &&
-#      faststream run tasks.game:app
-#      "
-#    restart: on-failure
+
+  bot:
+    build: .
+    depends_on:
+      - faststream
+      - redis
+      - postgres
+      - rabbitmq
+
+    command: sh -c "
+      alembic upgrade head &&
+      cd bot &&
+      python main.py
+      "
+    restart: on-failure
+
+  faststream:
+    build: .
+    depends_on:
+      - rabbitmq
+    command: sh -c "
+      cd bot &&
+      faststream run tasks.game:app
+      "
+    restart: on-failure
 

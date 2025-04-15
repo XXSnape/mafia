@@ -26,7 +26,7 @@ class Werewolf(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     payment_for_murder = 12
     payment_for_night_spent = 0
     number_in_order_after_night = 0
-    number_of_night_for_transformation = 2
+    number_of_night_for_transformation = 4
 
     @property
     def role_description(self) -> RoleDescription:
@@ -89,5 +89,5 @@ class Werewolf(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         if (
             game_data["number_of_night"]
             == self.number_of_night_for_transformation
-        ):  # TODO 4
+        ):
             return True
