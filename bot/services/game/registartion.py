@@ -25,7 +25,7 @@ from general import settings
 from general.collection_of_roles import (
     get_data_with_roles,
 )
-from general.text import MONEY_SYM
+from general.text import MONEY_SYM, REQUIRED_PERMISSIONS
 from keyboards.inline.keypads.join import (
     cancel_bet,
     get_join_kb,
@@ -138,8 +138,7 @@ class Registration(RouterHelper):
         ):
             await self.message.answer(
                 make_build(
-                    "Чтобы начать игру, дайте боту возможность писать в группу, "
-                    "удалять чужие сообщения, банить пользователей, закреплять сообщения."
+                    f"❗️Чтобы начать игру, выдайте боту следующие права:\n\n{REQUIRED_PERMISSIONS}"
                 )
             )
             return
