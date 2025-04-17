@@ -194,8 +194,8 @@ docker compose up
 ```
 ### Данные в .env_template
 
-#### BOT_TOKEN - токен от [BotFather](https://t.me/BotFather)
-#### BOT_URL - url бота
+#### BOT_TOKEN - Токен от [BotFather](https://t.me/BotFather)
+#### BOT_URL - URL бота
 #### DB_HOST - Хост базы данных
 #### DB_PORT - Порт базы данных
 #### POSTGRES_USER - Логин пользователя 
