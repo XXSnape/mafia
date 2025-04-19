@@ -202,16 +202,17 @@ class Registration(RouterHelper):
     @verification_for_admin_or_creator
     async def extend_registration(self, game_data: GameCache):
         now = int(datetime.now(UTC).timestamp())
+        intended_time = game_data["end_of_registration"] + 30
         start_of_registration = game_data["start_of_registration"]
         if (
-            now - start_of_registration
+            intended_time - start_of_registration
             > 60 * settings.mafia.maximum_registration_time
         ):
             await self.message.answer(
                 make_build("Больше нельзя ждать!")
             )
             return
-        end_of_registration = game_data["end_of_registration"] + 30
+        end_of_registration = intended_time
         await self.state.update_data(
             {"end_of_registration": end_of_registration}
         )
