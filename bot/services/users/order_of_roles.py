@@ -69,7 +69,9 @@ class RoleManager(RouterHelper):
         order_of_roles = await dao.get_roles_ids_of_order_of_roles(
             UserTgIdSchema(user_tg_id=self.callback.from_user.id),
         )
-        text = self.get_current_order_text(order_of_roles)
+        text = self.get_current_order_text(
+            order_of_roles, to_save=False
+        )
         await self.state.clear()
         await self.state.set_state(SettingsFsm.ORDER_OF_ROLES)
         await self.callback.message.edit_text(

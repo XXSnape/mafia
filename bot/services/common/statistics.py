@@ -41,7 +41,7 @@ class StatisticsRouter(RouterHelper):
         )
         all_roles = get_data_with_roles()
         if not result:
-            detailed_statistics = ""
+            detailed_statistics = "\n\n"
         else:
             detailed_statistics = "\n\nℹ️Подробная статистика:\n\n"
             for num, row in enumerate(result, 1):
