@@ -178,7 +178,6 @@ class Registration(RouterHelper):
             func=start_game,
             trigger=DateTrigger(
                 run_date=datetime.fromtimestamp(end_of_registration),
-                timezone=timezone.utc,
             ),
             id=f"start_{self.message.chat.id}",
             kwargs={
@@ -220,7 +219,6 @@ class Registration(RouterHelper):
             job_id=f"start_{self.message.chat.id}",
             trigger=DateTrigger(
                 run_date=datetime.fromtimestamp(end_of_registration),
-                timezone=timezone.utc,
             ),
         )
         time_to_start = get_minutes_and_seconds_text(
