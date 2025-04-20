@@ -10,6 +10,8 @@ from aiogram.types import ChatMemberAdministrator
 from aiogram.utils.payload import decode_payload
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
+from loguru import logger
+
 from cache.cache_types import (
     GameCache,
     GameSettingsCache,
@@ -448,9 +450,18 @@ class Registration(RouterHelper):
             bot_id=self.message.bot.id,
         )
         game_data: GameCache = await game_state.get_data()
-        game_data["live_players_ids"].remove(user_id)
-        del game_data["players"][str(user_id)]
         self._delete_bet(user_data=user_data, game_data=game_data)
+        try:
+            game_data["live_players_ids"].remove(user_id)
+            del game_data["players"][str(user_id)]
+        except (ValueError, KeyError):
+            logger.exception("Ошибка при выходе из игры")
+            await self.message.answer(
+                "❗️Ты не можешь зайти или выйти из игры!\n"
+                "😁Шутка! Попробуй снова"
+            )
+            await self.state.clear()
+
         await game_state.set_data(game_data)
         await self._change_message_in_group(
             game_data=game_data, game_chat=user_data["game_chat"]

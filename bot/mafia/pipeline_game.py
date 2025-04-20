@@ -505,9 +505,7 @@ class Game:
             if role not in order_of_roles
         )
         while len(order_of_roles) < number_of_players:
-            if (len(order_of_roles) + 1) % 4 == 0 and len(
-                order_of_roles
-            ) != 4:
+            if (len(order_of_roles) + 1) % 4 == 0:
                 role_type = criminals
             else:
                 role_type = other

@@ -24,7 +24,7 @@ class Agent(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         "4a31-5845211-images-thumbs&n=13"
     )
     purpose = "Ты можешь следить за кем-нибудь ночью"
-    message_to_group_after_action = "Спецслужбы выходят на разведу"
+    message_to_group_after_action = "Спецслужбы выходят на разведку"
     message_to_user_after_action = "Ты выбрал следить за {url}"
     extra_data = [
         ExtraCache(key="tracking", data_type=dict),
@@ -33,7 +33,8 @@ class Agent(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     @property
     def role_description(self) -> RoleDescription:
         return RoleDescription(
-            skill="Узнает имена тех, к кому приходила ночью его жертва",
+            skill="Узнает имена тех, к кому приходила ночью его жертва. "
+            "Иными словами, узнает жертв своей жертвы",
             pay_for=[
                 "Количество игроков, к которому приходила жертва"
             ],

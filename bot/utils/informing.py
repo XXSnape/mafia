@@ -44,7 +44,7 @@ def get_live_players(
         f"{make_build(f'💗Живые игроки '
                       f'({len(game_data["live_players_ids"])}):')}\n"
         f"{profiles}\n\n"
-        f"{make_build('Состав группировок:')}\n"
+        f"{make_build('👥Состав группировок:')}\n"
         f"{live_roles}\n\n"
     )
 

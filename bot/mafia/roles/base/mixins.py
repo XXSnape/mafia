@@ -52,7 +52,7 @@ class SuicideRoleMixin:
         user_id: UserIdStr,
     ):
         if int(user_id) in self._winners:
-            payment = 30 * (
+            payment = 55 * (
                 len(game_data["players"])
                 // settings.mafia.minimum_number_of_players
             )

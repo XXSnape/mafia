@@ -116,7 +116,10 @@ class UserManager(RouterHelper):
         await delete_message(self.callback.message)
         await game_state.set_data(game_data)
         await self.callback.message.answer(
-            make_build(f"Ты выбрал голосовать за {voted_url}")
+            make_build(
+                f"🌟День {game_data['number_of_night']}\n\n"
+                f"Ты выбрал голосовать за повешение {voted_url}"
+            )
         )
         await self.callback.bot.send_message(
             chat_id=game_data["game_chat"],
