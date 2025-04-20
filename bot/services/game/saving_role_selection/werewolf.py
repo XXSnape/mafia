@@ -26,6 +26,7 @@ from utils.tg import delete_message
 
 class WerewolfSaver(RouterHelper):
     async def werewolf_turns_into(self):
+        await delete_message(self.callback.message)
         data = {
             WEREWOLF_TO_MAFIA_CB: [Mafia(), Mafia.alias],
             WEREWOLF_TO_DOCTOR_CB: [Doctor(), Doctor.alias],
@@ -43,7 +44,6 @@ class WerewolfSaver(RouterHelper):
         user_id = self.callback.from_user.id
         current_roles = data[self.callback.data]
         roles_key = current_roles[0].roles_key
-        await delete_message(self.callback.message)
         are_there_many_senders = False
         if len(game_data[roles_key]) == 0:
             new_role = current_roles[0]

@@ -12,6 +12,8 @@ from aiogram.types import (
     Message,
 )
 
+from cache.cache_types import PlayersIds
+
 
 async def delete_message(message: Message):
     with suppress(TelegramBadRequest, AttributeError):
@@ -69,3 +71,21 @@ async def ban_user(
             permissions=ChatPermissions(can_send_messages=False),
             until_date=until_date,
         )
+
+
+async def unban_users(bot: Bot, chat_id: int, users: PlayersIds):
+    await asyncio.gather(
+        *(
+            bot.restrict_chat_member(
+                chat_id=chat_id,
+                user_id=user_id,
+                permissions=ChatPermissions(
+                    can_send_messages=True,
+                    can_send_other_messages=True,
+                    can_send_polls=True,
+                ),
+            )
+            for user_id in users
+        ),
+        return_exceptions=True
+    )

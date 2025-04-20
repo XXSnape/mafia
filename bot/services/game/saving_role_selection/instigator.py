@@ -13,6 +13,7 @@ from services.game.game_assistants import (
     trace_all_actions,
 )
 from states.states import UserFsm
+from utils.tg import delete_message
 
 
 class InstigatorSaver(RouterHelper):
@@ -65,6 +66,7 @@ class InstigatorSaver(RouterHelper):
     async def instigator_chooses_object(
         self, callback_data: UserActionIndexCbData
     ):
+        await delete_message(self.callback.message)
         game_state, game_data, user_id = (
             await get_game_state_data_and_user_id(
                 callback=self.callback,

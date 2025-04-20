@@ -17,7 +17,7 @@ from utils.roles import (
     get_processed_role_and_user_if_exists,
     get_processed_user_id_if_exists,
 )
-from utils.tg import ban_user
+from utils.tg import ban_user, unban_users
 
 
 class Prosecutor(
@@ -94,16 +94,11 @@ class Prosecutor(
         processed_user_id: UserIdInt,
         **kwargs,
     ):
-        with suppress(TelegramBadRequest):
-            await self.bot.restrict_chat_member(
-                chat_id=game_data["game_chat"],
-                user_id=processed_user_id,
-                permissions=ChatPermissions(
-                    can_send_messages=True,
-                    can_send_other_messages=True,
-                    can_send_polls=True,
-                ),
-            )
+        await unban_users(
+            bot=self.bot,
+            chat_id=game_data["game_chat"],
+            users=[processed_user_id],
+        )
 
     def __init__(self):
         self.state_for_waiting_for_action = (

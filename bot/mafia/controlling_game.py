@@ -320,6 +320,7 @@ class Controller:
         )
         if aim_id is None:
             return False
+        await asyncio.sleep(2)
         url = game_data["players"][str(aim_id)]["url"]
         sent_survey = await self.bot.send_message(
             chat_id=self.group_chat_id,
@@ -397,13 +398,12 @@ class Controller:
         await self.state.set_data(game_data)
 
     async def suggest_vote(self):
-        message = await self.bot.send_photo(
+        await self.bot.send_photo(
             chat_id=self.group_chat_id,
             photo="https://studychinese.ru/content/dictionary/pictures/25/12774.jpg",
             caption="Кого обвиним во всем и повесим?",
             reply_markup=participate_in_social_life(),
         )
-        await message.pin()
         game_data: GameCache = await self.state.get_data()
         live_players_ids = game_data["live_players_ids"]
         await asyncio.gather(

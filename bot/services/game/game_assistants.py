@@ -49,7 +49,6 @@ async def send_messages_and_remove_from_expected(
             current_role.message_to_user_after_action.format(url=url)
         )
     if message_to_user_after_action is not None:
-        await delete_message(callback.message)
         await callback.message.answer(
             make_build(
                 NUMBER_OF_NIGHT.format(game_data["number_of_night"])
@@ -166,7 +165,7 @@ async def inform_players_and_trace_actions(
     message_to_group = False
     if (
         current_role.message_to_group_after_action
-        and not game_data[current_role.processed_users_key]
+        and len(game_data[current_role.processed_users_key]) == 1
     ):
         message_to_group = True
 
@@ -185,6 +184,7 @@ async def take_action_and_save_data(
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
+    await delete_message(callback.message)
     game_state, game_data, user_id = (
         await get_game_state_data_and_user_id(
             callback=callback,
@@ -197,7 +197,14 @@ async def take_action_and_save_data(
         "role_id"
     ]
     current_role: ActiveRoleAtNightABC = get_data_with_roles(role_id)
-
+    if current_role.processed_users_key:
+        game_data[current_role.processed_users_key].append(user_id)
+        if (
+            current_role.is_alias
+            or current_role.alias
+            and current_role.alias.is_mass_mailing_list
+        ):
+            await game_state.set_data(game_data)
     await inform_players_and_trace_actions(
         callback=callback,
         game_data=game_data,
@@ -211,9 +218,6 @@ async def take_action_and_save_data(
         ].setdefault(str(user_id), [])
         if current_night not in nights:
             nights.append(current_night)
-
-    if current_role.processed_users_key:
-        game_data[current_role.processed_users_key].append(user_id)
     if (
         current_role.processed_by_boss
         and callback.from_user.id

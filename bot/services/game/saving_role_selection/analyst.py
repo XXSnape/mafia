@@ -4,10 +4,12 @@ from services.game.game_assistants import (
     get_game_state_and_data,
     send_messages_and_remove_from_expected,
 )
+from utils.tg import delete_message
 
 
 class AnalystSaver(RouterHelper):
     async def analyst_assumes_draw(self):
+        await delete_message(self.callback.message)
         game_state, game_data = await get_game_state_and_data(
             tg_obj=self.callback,
             state=self.state,

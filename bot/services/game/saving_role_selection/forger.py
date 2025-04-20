@@ -11,6 +11,7 @@ from services.game.game_assistants import (
     trace_all_actions,
 )
 from utils.pretty_text import make_pretty
+from utils.tg import delete_message
 
 
 class ForgerSaver(RouterHelper):
@@ -50,6 +51,7 @@ class ForgerSaver(RouterHelper):
         )
 
     async def forges_selects_documents(self):
+        await delete_message(self.callback.message)
         game_state, game_data = await get_game_state_and_data(
             tg_obj=self.callback,
             state=self.state,

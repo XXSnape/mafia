@@ -83,6 +83,7 @@ class PolicemanSaver(RouterHelper):
     async def policeman_chose_to_check(
         self, callback_data: PoliceActionIndexCbData
     ):
+        await delete_message(self.callback.message)
         game_state, game_data, checked_user_id = (
             await get_game_state_data_and_user_id(
                 callback=self.callback,
@@ -93,7 +94,6 @@ class PolicemanSaver(RouterHelper):
         )
         url = game_data["players"][str(checked_user_id)]["url"]
         game_data["disclosed_roles"].append(checked_user_id)
-        await delete_message(self.callback.message)
         await trace_all_actions(
             callback=self.callback,
             game_data=game_data,

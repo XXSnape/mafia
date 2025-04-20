@@ -52,7 +52,7 @@ from utils.sorting import sorting_by_money, sorting_by_rate
 from utils.state import (
     reset_user_state_if_in_game,
 )
-from utils.tg import delete_messages_from_to_delete
+from utils.tg import delete_messages_from_to_delete, unban_users
 
 
 class Game:
@@ -173,6 +173,11 @@ class Game:
             users=list(game_data["players"].keys())
             + [self.group_chat_id],
         )
+        await unban_users(
+            bot=self.bot,
+            chat_id=self.group_chat_id,
+            users=game_data["cant_talk"],
+        )
         await self.state.clear()
         if self.game_id:
             dao = GamesDao(session=self.session)
@@ -193,19 +198,21 @@ class Game:
         night_starts_text = make_build(
             f"Наступает ночь {game_data['number_of_night']}"
         )
-        message = await self.bot.send_photo(
+        await self.bot.send_photo(
             chat_id=self.group_chat_id,
             photo="https://i.pinimg.com/originals/f0/43/ed/f043edcac9690fdec845925508006459.jpg",
             caption=f"{night_starts_text}.\n\n{players}",
             reply_markup=get_to_bot_kb("Действовать!"),
         )
-        await message.pin()
         await self.controller.mailing()
-        await asyncio.sleep(game_data["settings"]["time_for_night"])
+        await asyncio.sleep(
+            game_data["settings"]["time_for_night"] - 3
+        )
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
         )
+        await asyncio.sleep(3)
         game_data = await self.controller.sum_up_after_night()
         players_after_night = get_live_players(
             game_data=game_data, all_roles=self.all_roles
@@ -218,7 +225,7 @@ class Game:
         )
         await asyncio.sleep(game_data["settings"]["time_for_day"])
         await self.controller.suggest_vote()
-        await asyncio.sleep(30)
+        await asyncio.sleep(35)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -233,6 +240,7 @@ class Game:
         await self.controller.sum_up_after_voting()
         await self.controller.removing_inactive_players()
         await self.controller.end_night()
+        await asyncio.sleep(3)
 
     async def give_out_rewards(self, e: GameIsOver):
         game_data: GameCache = await self.state.get_data()
@@ -319,6 +327,11 @@ class Game:
                 ].items()
             ),
             return_exceptions=True,
+        )
+        await unban_users(
+            bot=self.bot,
+            chat_id=self.group_chat_id,
+            users=game_data["cant_talk"],
         )
         await self.state.clear()
 
