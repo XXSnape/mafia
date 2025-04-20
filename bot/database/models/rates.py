@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 class RateModel(IdMixin, BaseModel):
     __table_args__ = (CheckConstraint("money > 0"),)
-    money: Mapped[int]
+    money: Mapped[int] = mapped_column(BigInteger)
     is_winner: Mapped[bool]
     game_id: Mapped[int] = mapped_column(
         ForeignKey("games.id", ondelete="CASCADE")

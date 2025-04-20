@@ -1,6 +1,6 @@
 from collections.abc import Awaitable, Callable
 from contextlib import suppress
-from datetime import UTC, datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Concatenate
 
 from aiogram.exceptions import TelegramBadRequest
@@ -10,8 +10,6 @@ from aiogram.types import ChatMemberAdministrator
 from aiogram.utils.payload import decode_payload
 from apscheduler.triggers.date import DateTrigger
 from apscheduler.triggers.interval import IntervalTrigger
-from loguru import logger
-
 from cache.cache_types import (
     GameCache,
     GameSettingsCache,
@@ -33,6 +31,7 @@ from keyboards.inline.keypads.join import (
     get_join_kb,
     offer_to_place_bet,
 )
+from loguru import logger
 from mafia.pipeline_game import Game
 from scheduler.game import (
     clearing_tasks_on_schedule,

@@ -1,7 +1,3 @@
-from contextlib import suppress
-
-from aiogram.exceptions import TelegramBadRequest
-from aiogram.types import ChatPermissions
 from cache.cache_types import GameCache, UserIdInt
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
