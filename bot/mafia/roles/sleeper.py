@@ -8,7 +8,7 @@ from mafia.roles.base import ActiveRoleAtNightABC, RoleABC
 from mafia.roles.base.mixins import ProcedureAfterNightABC
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import CANT_CHOOSE_IN_ROW
-from states.states import UserFsm
+from states.game import UserFsm
 from utils.pretty_text import make_build, make_pretty
 from utils.roles import (
     get_processed_role_and_user_if_exists,

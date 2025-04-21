@@ -8,7 +8,7 @@ from mafia.roles.base.mixins import (
 from mafia.roles.base.roles import RoleABC
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import CANT_CHOOSE_IN_ROW
-from states.states import UserFsm
+from states.game import UserFsm
 from utils.roles import (
     get_processed_role_and_user_if_exists,
     get_processed_user_id_if_exists,

@@ -5,7 +5,7 @@ from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import ProcedureAfterNightABC
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import DONT_PAY_FOR_NIGHTS
-from states.states import UserFsm
+from states.game import UserFsm
 from utils.pretty_text import make_pretty
 
 

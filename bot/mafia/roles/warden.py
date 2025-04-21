@@ -9,7 +9,7 @@ from keyboards.inline.keypads.mailing import selection_to_warden_kb
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import ProcedureAfterNightABC
 from mafia.roles.descriptions.description import RoleDescription
-from states.states import UserFsm
+from states.game import UserFsm
 from utils.informing import (
     remind_worden_about_inspections,
     send_a_lot_of_messages_safely,

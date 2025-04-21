@@ -3,7 +3,7 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from services.game.processing_actions_in_group import GroupManager
-from states.states import GameFsm
+from states.game import GameFsm
 
 router = Router(name=__name__)
 

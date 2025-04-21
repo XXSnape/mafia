@@ -42,7 +42,7 @@ from scheduler.game import (
 from services.base import RouterHelper
 from services.game.game_assistants import get_game_state_and_data
 from services.users.order_of_roles import RoleManager
-from states.states import GameFsm
+from states.game import GameFsm
 from utils.informing import get_profiles_during_registration
 from utils.pretty_text import (
     get_minutes_and_seconds_text,

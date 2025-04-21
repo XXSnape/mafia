@@ -20,7 +20,7 @@ from mafia.roles.descriptions.texts import (
     CAN_SEE_ALLIES,
     CHECKING_PLAYER,
 )
-from states.states import UserFsm
+from states.game import UserFsm
 from utils.common import get_criminals_ids
 from utils.informing import send_a_lot_of_messages_safely
 from utils.pretty_text import make_pretty

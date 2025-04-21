@@ -10,7 +10,7 @@ from mafia.roles.descriptions.texts import (
     CAN_CHOOSE_YOURSELF,
     DONT_PAY_FOR_VOTING,
 )
-from states.states import UserFsm
+from states.game import UserFsm
 from utils.roles import (
     get_processed_user_id_if_exists,
 )

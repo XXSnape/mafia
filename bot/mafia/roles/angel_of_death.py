@@ -18,7 +18,7 @@ from mafia.roles.descriptions.texts import (
     KILLING_PLAYER,
     PAYMENT_FOR_NIGHTS,
 )
-from states.states import UserFsm
+from states.game import UserFsm
 from utils.pretty_text import make_build
 from utils.roles import get_processed_role_and_user_if_exists
 from utils.state import reset_user_state

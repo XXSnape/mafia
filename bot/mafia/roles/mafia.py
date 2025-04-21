@@ -17,7 +17,7 @@ from mafia.roles.descriptions.texts import (
     CAN_SEE_ALLIES,
     KILLING_PLAYER,
 )
-from states.states import UserFsm
+from states.game import UserFsm
 from utils.roles import get_processed_role_and_user_if_exists
 
 

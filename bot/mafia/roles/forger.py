@@ -14,7 +14,7 @@ from mafia.roles.descriptions.texts import (
     CAN_CHOOSE_YOURSELF,
     CAN_SEE_ALLIES,
 )
-from states.states import UserFsm
+from states.game import UserFsm
 from utils.pretty_text import make_pretty
 
 

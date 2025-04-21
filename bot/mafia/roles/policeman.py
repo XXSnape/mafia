@@ -23,7 +23,7 @@ from mafia.roles.descriptions.texts import (
     CHECKING_PLAYER,
     KILLING_PLAYER,
 )
-from states.states import UserFsm
+from states.game import UserFsm
 from utils.informing import (
     remind_commissioner_about_inspections,
     send_a_lot_of_messages_safely,

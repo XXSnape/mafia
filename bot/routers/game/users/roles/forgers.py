@@ -6,7 +6,7 @@ from keyboards.inline.callback_factory.recognize_user import (
 )
 from keyboards.inline.cb.cb_text import PLAYER_BACKS_CB
 from services.game.saving_role_selection.forger import ForgerSaver
-from states.states import UserFsm
+from states.game import UserFsm
 
 router = Router(name=__name__)
 

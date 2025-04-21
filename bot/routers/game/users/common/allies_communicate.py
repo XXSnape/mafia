@@ -3,7 +3,7 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from services.game.processing_user_actions import UserManager
-from states.states import UserFsm
+from states.game import UserFsm
 
 router = Router(name=__name__)
 

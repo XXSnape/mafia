@@ -30,7 +30,7 @@ from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,
     ProcedureAfterVotingABC,
 )
-from states.states import UserFsm
+from states.game import UserFsm
 from utils.common import get_the_most_frequently_encountered_id
 from utils.informing import (
     get_profiles,

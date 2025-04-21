@@ -12,7 +12,7 @@ from services.game.game_assistants import (
     get_game_state_data_and_user_id,
     trace_all_actions,
 )
-from states.states import UserFsm
+from states.game import UserFsm
 from utils.tg import delete_message
 
 

@@ -8,7 +8,7 @@ from keyboards.inline.callback_factory.recognize_user import (
 from services.game.game_assistants import (
     take_action_and_save_data,
 )
-from states.states import UserFsm
+from states.game import UserFsm
 
 router = Router(name=__name__)
 

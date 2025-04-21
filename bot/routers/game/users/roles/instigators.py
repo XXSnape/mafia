@@ -8,7 +8,7 @@ from keyboards.inline.cb.cb_text import PLAYER_BACKS_CB
 from services.game.saving_role_selection.instigator import (
     InstigatorSaver,
 )
-from states.states import UserFsm
+from states.game import UserFsm
 
 router = Router(name=__name__)
 

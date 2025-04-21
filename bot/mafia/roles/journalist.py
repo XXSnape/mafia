@@ -7,7 +7,7 @@ from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CANT_CHOOSE_IN_ROW,
 )
-from states.states import UserFsm
+from states.game import UserFsm
 from utils.informing import send_a_lot_of_messages_safely
 from utils.roles import (
     get_processed_role_and_user_if_exists,

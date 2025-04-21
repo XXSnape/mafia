@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from keyboards.inline.cb.cb_text import DRAW_CB
 from services.game.saving_role_selection.analyst import AnalystSaver
-from states.states import UserFsm
+from states.game import UserFsm
 
 router = Router(name=__name__)
 

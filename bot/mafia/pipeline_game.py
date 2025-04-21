@@ -37,7 +37,7 @@ from loguru import logger
 from mafia.controlling_game import Controller
 from mafia.roles import RoleABC
 from sqlalchemy.ext.asyncio import AsyncSession
-from states.states import GameFsm
+from states.game import GameFsm
 from utils.informing import (
     get_live_players,
     get_profiles,

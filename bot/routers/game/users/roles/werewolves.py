@@ -9,7 +9,7 @@ from keyboards.inline.cb.cb_text import (
 from services.game.saving_role_selection.werewolf import (
     WerewolfSaver,
 )
-from states.states import UserFsm
+from states.game import UserFsm
 
 router = Router(name=__name__)
 

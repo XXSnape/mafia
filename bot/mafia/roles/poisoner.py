@@ -20,7 +20,7 @@ from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     DONT_PAY_FOR_VOTING,
 )
-from states.states import UserFsm
+from states.game import UserFsm
 from utils.informing import get_profiles
 from utils.roles import get_user_role_and_url
 

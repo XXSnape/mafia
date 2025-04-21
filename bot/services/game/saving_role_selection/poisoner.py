@@ -13,7 +13,7 @@ from services.game.game_assistants import (
     send_messages_and_remove_from_expected,
     take_action_and_save_data,
 )
-from states.states import UserFsm
+from states.game import UserFsm
 
 
 class PoisonerSaver(RouterHelper):

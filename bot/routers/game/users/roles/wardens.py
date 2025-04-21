@@ -2,7 +2,7 @@ from aiogram import Dispatcher, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from services.game.saving_role_selection.warden import WardenSaver
-from states.states import UserFsm
+from states.game import UserFsm
 
 router = Router(name=__name__)
 

@@ -13,7 +13,7 @@ from middlewares.db import (
 )
 from services.game.registartion import Registration
 from sqlalchemy.ext.asyncio import AsyncSession
-from states.states import GameFsm
+from states.game import GameFsm
 
 router = Router(name=__name__)
 router.message.middleware(DatabaseMiddlewareWithCommit())
