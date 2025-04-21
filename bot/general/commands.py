@@ -5,6 +5,7 @@ class BotCommands(StrEnum):
     registration = "Начать регистрацию"
     extend = "Продлить регистрацию на 30 секунд"
     revoke = "Отменить регистрацию"
+    leave = "Выйти из игры"
     my_settings = "Персональные настройки игры"
     settings = "Настройки игры"
     profile = "Посмотреть свой профиль"

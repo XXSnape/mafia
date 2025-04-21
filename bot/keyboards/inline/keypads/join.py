@@ -18,7 +18,7 @@ async def get_join_kb(
 ):
     buttons = [
         InlineKeyboardButton(
-            text="Присоединиться или выйти",
+            text="Присоединиться",
             url=await create_start_link(
                 bot, str(game_chat), encode=True
             ),

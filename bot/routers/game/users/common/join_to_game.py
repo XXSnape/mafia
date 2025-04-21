@@ -4,6 +4,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
+
+from general.collection_of_roles import get_data_with_roles
 from keyboards.inline.cb.cb_text import CANCEL_CB
 from middlewares.db import (
     DatabaseMiddlewareWithCommit,
@@ -17,21 +19,6 @@ router = Router(name=__name__)
 router.message.middleware(DatabaseMiddlewareWithCommit())
 router.message.middleware(DatabaseMiddlewareWithoutCommit())
 router.callback_query.middleware(DatabaseMiddlewareWithoutCommit())
-
-
-@router.message(
-    GameFsm.WAIT_FOR_STARTING_GAME, CommandStart(deep_link=True)
-)
-async def leave_game(
-    message: Message,
-    command: CommandObject,
-    state: FSMContext,
-    dispatcher: Dispatcher,
-):
-    registration = Registration(
-        message=message, state=state, dispatcher=dispatcher
-    )
-    await registration.leave_game(command=command)
 
 
 @router.message(
@@ -75,7 +62,10 @@ async def cancel_bet(
     await registration.cancel_bet()
 
 
-@router.callback_query(GameFsm.WAIT_FOR_STARTING_GAME)
+@router.callback_query(
+    GameFsm.WAIT_FOR_STARTING_GAME,
+    F.data.in_(get_data_with_roles().keys()),
+)
 async def request_money(
     callback: CallbackQuery,
     state: FSMContext,
@@ -89,7 +79,9 @@ async def request_money(
     await registration.request_money()
 
 
-@router.message(F.text.regexp(r"[1-9]\d*"))
+@router.message(
+    GameFsm.WAIT_FOR_STARTING_GAME, F.text.regexp(r"[1-9]\d*")
+)
 async def set_bet(
     message: Message,
     state: FSMContext,

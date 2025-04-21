@@ -84,6 +84,10 @@ async def main() -> None:
             description=BotCommands.revoke,
         ),
         BotCommand(
+            command=BotCommands.leave.name,
+            description=BotCommands.leave,
+        ),
+        BotCommand(
             command=BotCommands.settings.name,
             description=BotCommands.settings,
         ),

@@ -1,6 +1,7 @@
 from collections.abc import Awaitable, Callable
 from contextlib import suppress
 from datetime import UTC, datetime, timedelta
+from pprint import pprint
 from typing import Concatenate
 
 from aiogram.exceptions import TelegramBadRequest
@@ -304,18 +305,21 @@ class Registration(RouterHelper):
 
     async def join_to_game(self, command: CommandObject):
         await self.message.delete()
-        current_data: UserCache = await self.state.get_data()
+        current_user_data: UserCache = await self.state.get_data()
         args = command.args
         game_chat = int(decode_payload(args))
-        if "game_chat" in current_data:
-            if current_data["game_chat"] != game_chat:
+        if "game_chat" in current_user_data:
+            if current_user_data["game_chat"] != game_chat:
                 await self.message.answer(
-                    "Сначала заверши предыдущую игру"
+                    make_build("Сначала заверши предыдущую игру")
                 )
+            await self.message.answer(
+                make_build(
+                    "🙂Ты уже в игре, сделай ставку на сообщении выше"
+                )
+            )
             return
         bot = self._get_bot()
-        args = command.args
-        game_chat = int(decode_payload(args))
         game_state = await get_state_and_assign(
             dispatcher=self.dispatcher,
             chat_id=game_chat,
@@ -323,9 +327,11 @@ class Registration(RouterHelper):
         )
         current_game_state = await game_state.get_state()
         if current_game_state != GameFsm.REGISTRATION.state:
-            await self.message.answer("Игра не может быть запущена!")
+            await self.message.answer(
+                make_build("Начни регистрацию в группе!")
+            )
             return
-        user_id = self._get_user_id()
+        user_id = self.message.from_user.id
         full_name = self.message.from_user.full_name
         game_data: GameCache = await game_state.get_data()
         balance = (await self._get_user_or_create()).balance
@@ -348,11 +354,11 @@ class Registration(RouterHelper):
             "message_with_offer_id": sent_message.message_id,
             "balance": balance,
         }
-        await self.state.set_data(user_data)
-        await self.state.set_state(GameFsm.WAIT_FOR_STARTING_GAME)
         game_data["to_delete"].append(
             [user_id, sent_message.message_id]
         )
+        await self.state.set_data(user_data)
+        await self.state.set_state(GameFsm.WAIT_FOR_STARTING_GAME)
         await game_state.set_data(game_data)
         await self._change_message_in_group(
             game_data=game_data, game_chat=game_chat
@@ -428,50 +434,48 @@ class Registration(RouterHelper):
             dispatcher=self.dispatcher,
         )
         self._delete_bet(user_data=user_data, game_data=game_data)
+        balance = user_data["balance"]
         del user_data["coveted_role"]
         await self.state.set_data(user_data)
         await game_state.set_data(game_data)
-        balance = user_data["balance"]
         await self._offer_bet(balance=balance, game_data=game_data)
 
-    async def leave_game(self, command: CommandObject):
+    async def leave_game(self):
         await self.message.delete()
-        user_data: UserCache = await self.state.get_data()
-        args = command.args
-        game_chat = int(decode_payload(args))
-        if user_data["game_chat"] != game_chat:
-            return
-        user_id = self._get_user_id()
-        bot = self._get_bot()
-        game_state = await get_state_and_assign(
+        user_id = self.message.from_user.id
+        user_state = await get_state_and_assign(
             dispatcher=self.dispatcher,
-            chat_id=user_data["game_chat"],
+            chat_id=user_id,
             bot_id=self.message.bot.id,
         )
-        game_data: GameCache = await game_state.get_data()
+        user_data: UserCache = await user_state.get_data()
+        current_user_state = await user_state.get_state()
+        if (
+            current_user_state
+            != GameFsm.WAIT_FOR_STARTING_GAME.state
+            or user_data.get("game_chat") != self.message.chat.id
+        ):
+            return
+        game_data = await self.state.get_data()
         self._delete_bet(user_data=user_data, game_data=game_data)
         try:
             game_data["live_players_ids"].remove(user_id)
             del game_data["players"][str(user_id)]
         except (ValueError, KeyError):
-            logger.exception("Ошибка при выходе из игры")
-            await self.message.answer(
-                "❗️Ты не можешь зайти или выйти из игры!\n"
-                "😁Шутка! Попробуй снова"
+            logger.exception(
+                "Ошибка при выходе из игры у пользователя {} {}",
+                user_id,
+                self.message.from_user.full_name,
             )
-            await self.state.clear()
-
-        await game_state.set_data(game_data)
-        await self._change_message_in_group(
-            game_data=game_data, game_chat=user_data["game_chat"]
-        )
-        await bot.delete_message(
+            await user_state.clear()
+        await self.state.set_data(game_data)
+        await self.message.bot.delete_message(
             chat_id=user_id,
             message_id=user_data["message_with_offer_id"],
         )
-        await self.state.clear()
-        await self.message.answer(
-            make_build("Ты успешно вышел из игры!")
+        await user_state.clear()
+        await self._change_message_in_group(
+            game_data=game_data, game_chat=self.message.chat.id
         )
 
     async def set_bet(self):

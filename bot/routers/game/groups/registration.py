@@ -88,3 +88,15 @@ async def finish_registration(
         session=session_with_commit,
     )
     await registration.finish_registration()
+
+
+@router.message(GameFsm.REGISTRATION, Command("leave"))
+async def leave_game(
+    message: Message,
+    state: FSMContext,
+    dispatcher: Dispatcher,
+):
+    registration = Registration(
+        message=message, state=state, dispatcher=dispatcher
+    )
+    await registration.leave_game()

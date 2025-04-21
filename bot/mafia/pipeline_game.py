@@ -341,6 +341,12 @@ class Game:
         player_data: UserGameCache,
         personal_results: dict[UserIdStr, PersonalResultSchema],
     ):
+        await reset_user_state_if_in_game(
+            dispatcher=self.dispatcher,
+            user_id=int(user_id),
+            bot_id=self.bot.id,
+            group_id=self.group_chat_id,
+        )
         achievements = player_data["achievements"]
         result = personal_results[user_id]
         messages = []
@@ -368,13 +374,6 @@ class Game:
             await self.bot.send_message(
                 chat_id=int(user_id), text=message
             )
-
-        await reset_user_state_if_in_game(
-            dispatcher=self.dispatcher,
-            user_id=int(user_id),
-            bot_id=self.bot.id,
-            group_id=self.group_chat_id,
-        )
 
     @staticmethod
     def initialization_by_role(game_data: GameCache, role: RoleABC):
