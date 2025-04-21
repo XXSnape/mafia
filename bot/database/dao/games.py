@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from database.dao.base import BaseDAO
 from database.dao.groups import GroupsDao
@@ -118,12 +118,12 @@ class GamesDao(BaseDAO[GameModel]):
                 self.model.group_id == group_id_filter.group_id,
                 self.model.end.is_not(None),
                 self.model.winning_group.is_not(None),
+                datetime.now() - self.model.end < timedelta(days=30),
             )
             .group_by(ResultModel.user_tg_id)
             .having(
                 func.count(ResultModel.user_tg_id) >= 3,
             )
-            .order_by(desc("number_of_games"), desc("efficiency"))
             .limit(15)
         )
         result = await self._session.execute(query)

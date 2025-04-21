@@ -17,6 +17,7 @@ from utils.pretty_text import (
     make_pretty,
 )
 from utils.tg import delete_message
+from operator import attrgetter
 
 
 class StatisticsRouter(RouterHelper):
@@ -94,6 +95,35 @@ class StatisticsRouter(RouterHelper):
         result_text += f"💲Всего заработано: {money_sum}{MONEY_SYM}"
         await self.message.answer(make_build(result_text))
 
+    @staticmethod
+    def sorting_by_efficiency(rows):
+        for left_point in range(len(rows) - 1):
+            for right_point in range(left_point + 1, len(rows)):
+                left_item = rows[left_point]
+                right_item = rows[right_point]
+                if (
+                    abs(
+                        left_item.number_of_games
+                        - right_item.number_of_games
+                    )
+                    <= 3
+                ):
+                    maximum = max(
+                        left_item,
+                        right_item,
+                        key=attrgetter("efficiency"),
+                    )
+                else:
+                    maximum = max(
+                        left_item,
+                        right_item,
+                        key=attrgetter("number_of_games"),
+                    )
+                items = [right_item, left_item]
+                items.remove(maximum)
+                rows[left_point] = maximum
+                rows[right_point] = items[0]
+
     async def get_group_statistics(self):
         await delete_message(self.message)
         group = await GroupsDao(
@@ -140,6 +170,7 @@ class StatisticsRouter(RouterHelper):
                 group_id_filter
             )
         )
+        self.sorting_by_efficiency(users_result)
         users_info = await asyncio.gather(
             *(
                 self.message.bot.get_chat_member(
@@ -150,7 +181,7 @@ class StatisticsRouter(RouterHelper):
             ),
             return_exceptions=True,
         )
-        users_text = "\n📊Топ 15 игроков:\n\n"
+        users_text = "\n📊Топ 15 игроков за последний месяц:\n\n"
         for num, (user_info, user_data) in enumerate(
             zip(users_info, users_result), 1
         ):
