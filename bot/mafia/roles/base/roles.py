@@ -83,6 +83,7 @@ class RoleABC(ABC):
         self.state = state
         self.temporary_roles = {}
         self.dropped_out: set[UserIdInt] = set()
+        self.killed_in_afternoon: set[UserIdInt] = set()
 
     @property
     @abstractmethod
@@ -229,7 +230,9 @@ class RoleABC(ABC):
         nights_lived: int,
         user_id: str,
     ):
-        if winning_group != self.grouping:
+        if (winning_group != self.grouping) or int(
+            user_id
+        ) in self.killed_in_afternoon:
             return 0, 0
         return self.grouping.value.payment * (
             len(game_data["players"])
@@ -394,6 +397,8 @@ class RoleABC(ABC):
             message = (
                 "😢🌟К несчастью, тебя линчевали на голосовании!"
             )
+            if self.grouping == Groupings.civilians:
+                self.killed_in_afternoon.add(user_id)
         else:
             message = (
                 "😡Ты выбываешь из игры за неактивность! "
