@@ -222,6 +222,7 @@ class Game:
             photo="https://i.pinimg.com/originals/b1/80/98/b18098074864e4b1bf5cc8412ced6421.jpg",
             caption=f"{make_build('Пришло время провести следственные мероприятия жителям города!')}\n\n"
             f"{players_after_night}",
+            reply_markup=get_to_bot_kb("Пища для размышлений тут"),
         )
         await asyncio.sleep(game_data["settings"]["time_for_day"])
         await self.controller.suggest_vote()
@@ -270,7 +271,9 @@ class Game:
             initial_role=True,
             money_need=True,
             role=True,
-            if_there_are_no_players="Де-факто нет победителей!",
+            if_there_are_no_players=make_build(
+                "\n😲Де-факто нет победителей!"
+            ),
             sorting_factory=sorting_by_money,
         )
         losers_text = make_build(

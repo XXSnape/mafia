@@ -29,7 +29,7 @@ async def forger_fakes(
 @router.callback_query(
     UserFsm.FORGER_FAKES, F.data == PLAYER_BACKS_CB
 )
-async def forges_cancels_selection(
+async def forger_cancels_selection(
     callback: CallbackQuery,
     state: FSMContext,
     dispatcher: Dispatcher,
@@ -37,11 +37,11 @@ async def forges_cancels_selection(
     saver = ForgerSaver(
         callback=callback, state=state, dispatcher=dispatcher
     )
-    await saver.forges_cancels_selection()
+    await saver.forger_cancels_selection()
 
 
 @router.callback_query(UserFsm.FORGER_FAKES, F.data)
-async def forges_selects_documents(
+async def forger_selects_documents(
     callback: CallbackQuery,
     state: FSMContext,
     dispatcher: Dispatcher,
@@ -49,4 +49,4 @@ async def forges_selects_documents(
     saver = ForgerSaver(
         callback=callback, state=state, dispatcher=dispatcher
     )
-    await saver.forges_selects_documents()
+    await saver.forger_selects_documents()

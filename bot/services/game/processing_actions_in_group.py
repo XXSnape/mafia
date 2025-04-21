@@ -92,4 +92,7 @@ class GroupManager(RouterHelper):
                 )
             )
         await self.state.set_data(game_data)
-        await self.callback.answer()
+        await self.callback.answer(
+            text="😐Мы обязательно учтем твое мнение",
+            show_alert=True,
+        )

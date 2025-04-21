@@ -34,7 +34,7 @@ class ForgerSaver(RouterHelper):
             text=f"Выбери для {url} новую роль", reply_markup=markup
         )
 
-    async def forges_cancels_selection(self):
+    async def forger_cancels_selection(self):
         game_state, game_data = await get_game_state_and_data(
             tg_obj=self.callback,
             state=self.state,
@@ -50,7 +50,7 @@ class ForgerSaver(RouterHelper):
             reply_markup=markup,
         )
 
-    async def forges_selects_documents(self):
+    async def forger_selects_documents(self):
         await delete_message(self.callback.message)
         game_state, game_data = await get_game_state_and_data(
             tg_obj=self.callback,

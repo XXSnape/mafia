@@ -225,11 +225,7 @@ class Controller:
                 game_data=game_data,
                 user_id=user_id,
             )
-        await self.remove_user_from_game(
-            game_data=game_data,
-            user_id=removed_user_id,
-            at_night=False,
-        )
+        await asyncio.sleep(1)
         await self.bot.send_message(
             chat_id=self.group_chat_id,
             text=result_text
@@ -237,6 +233,11 @@ class Controller:
                 f"❗️❗️❗️Сегодня народ принял тяжелое решение и повесил "
                 f'{user_info["url"]} с ролью {user_info["pretty_role"]}!'
             ),
+        )
+        await self.remove_user_from_game(
+            game_data=game_data,
+            user_id=removed_user_id,
+            at_night=False,
         )
         await self.state.set_data(game_data)
 

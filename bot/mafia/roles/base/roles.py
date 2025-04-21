@@ -188,6 +188,20 @@ class RoleABC(ABC):
             f"Новый {role} - {new_boss_url}\n\n"
             f"Текущие союзники:\n{profiles}",
         )
+        if self.grouping == Groupings.criminals:
+            message = (
+                "😈Вы думали, на этом все закончится?\n\n"
+                "Оу нет! Мои верные союзники уже заняли пост главы криминала!"
+            )
+        else:
+            message = (
+                f"😎Встречайте нового {make_pretty(self.role)}!"
+            )
+        await self.bot.send_photo(
+            chat_id=game_data["game_chat"],
+            photo=self.photo,
+            caption=make_build(message),
+        )
 
     @classmethod
     @property
