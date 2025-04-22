@@ -301,6 +301,7 @@ class Controller:
         )
         await asyncio.gather(*tasks, return_exceptions=True)
         await self.state.set_data(game_data)
+        await asyncio.sleep(1)
         return game_data
 
     async def confirm_final_aim(

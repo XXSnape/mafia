@@ -80,7 +80,7 @@ async def request_money(
 
 
 @router.message(
-    GameFsm.WAIT_FOR_STARTING_GAME, F.text.regexp(r"[1-9]\d*")
+    GameFsm.WAIT_FOR_STARTING_GAME, F.text.regexp(r"^[1-9]\d*$")
 )
 async def set_bet(
     message: Message,

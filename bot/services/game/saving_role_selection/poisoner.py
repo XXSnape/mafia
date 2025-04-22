@@ -14,10 +14,12 @@ from services.game.game_assistants import (
     take_action_and_save_data,
 )
 from states.game import UserFsm
+from utils.tg import delete_message
 
 
 class PoisonerSaver(RouterHelper):
     async def poisoner_chose_to_kill(self):
+        await delete_message(self.callback.message)
         game_state, game_data = await get_game_state_and_data(
             tg_obj=self.callback,
             state=self.state,

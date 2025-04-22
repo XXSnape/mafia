@@ -8,6 +8,7 @@ from services.game.game_assistants import (
     send_messages_and_remove_from_expected,
     trace_all_actions,
 )
+from utils.tg import delete_message
 
 
 class WardenSaver(RouterHelper):
@@ -45,7 +46,7 @@ class WardenSaver(RouterHelper):
                 game_data=game_data,
             )
             return
-
+        await delete_message(self.callback.message)
         checked.append(processed_user_id)
         user1_id: int = checked[0]
         user2_id: int = checked[1]
