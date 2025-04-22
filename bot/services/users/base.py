@@ -250,8 +250,11 @@ class BaseRouter(RouterHelper):
             else:
                 text += "Не может влиять на выбор ночью"
         else:
+            wins_if = description.wins_if
+            if current_role.grouping == Groupings.civilians:
+                wins_if += " и не быть повешенным днём"
             text = (
-                f"🏆Условие победы: {description.wins_if.capitalize()}\n\n"
+                f"🏆Условие победы: {wins_if.capitalize()}\n\n"
                 f"💪Особый навык: {(description.skill or "Нет")}\n\n"
                 f"💰Платят за: {self.join(description.pay_for)}\n\n"
                 f"🚫Ограничения: {self.join(description.limitations)}\n\n"

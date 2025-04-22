@@ -1,7 +1,6 @@
 from collections.abc import Awaitable, Callable
 from contextlib import suppress
 from datetime import UTC, datetime, timedelta
-from pprint import pprint
 from typing import Concatenate
 
 from aiogram.exceptions import TelegramBadRequest
@@ -313,6 +312,7 @@ class Registration(RouterHelper):
                 await self.message.answer(
                     make_build("Сначала заверши предыдущую игру")
                 )
+                return
             await self.message.answer(
                 make_build(
                     "🙂Ты уже в игре, сделай ставку на сообщении выше!"

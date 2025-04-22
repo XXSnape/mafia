@@ -133,7 +133,7 @@ def get_results_of_goal_identification(game_data: GameCache):
         return len(voting_data[1])
 
     result = make_build(
-        f"❗️Результаты голосования дня {game_data['number_of_night']}:"
+        f"📊Результаты голосования дня {game_data['number_of_night']}:"
     )
 
     vote_for = game_data["vote_for"]
@@ -166,7 +166,7 @@ def get_results_of_voting(
 ):
     if not removed_user_id:
         return make_build(
-            "Доброта или банальная несогласованность? "
+            "🤯Доброта или банальная несогласованность? "
             "Посмотрим, воспользуются ли преступники таким подарком."
         )
 

@@ -50,18 +50,18 @@ class GroupManager(RouterHelper):
             not in game_data["live_players_ids"]
         ):
             await self.callback.answer(
-                "Ты не в игре!", show_alert=True
+                "🚫Ты не в игре!", show_alert=True
             )
             return
 
         if callback_data.user_id == self.callback.from_user.id:
             await self.callback.answer(
-                "Теперь твой судья - демократия!", show_alert=True
+                "🚫Теперь твой судья - демократия!", show_alert=True
             )
             return
         if self.callback.from_user.id in game_data["cant_vote"]:
             await self.callback.answer(
-                "Ты временно не можешь голосовать!",
+                "🚫Ты временно не можешь голосовать!",
                 show_alert=True,
             )
             return
@@ -93,6 +93,6 @@ class GroupManager(RouterHelper):
             )
         await self.state.set_data(game_data)
         await self.callback.answer(
-            text="😐Мы обязательно учтем твое мнение",
+            text="✅Мы обязательно учтём твое мнение",
             show_alert=True,
         )

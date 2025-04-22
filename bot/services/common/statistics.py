@@ -1,4 +1,5 @@
 import asyncio
+from operator import attrgetter
 
 from database.dao.games import GamesDao
 from database.dao.groups import GroupsDao
@@ -17,7 +18,6 @@ from utils.pretty_text import (
     make_pretty,
 )
 from utils.tg import delete_message
-from operator import attrgetter
 
 
 class StatisticsRouter(RouterHelper):
@@ -108,21 +108,12 @@ class StatisticsRouter(RouterHelper):
                     )
                     <= 3
                 ):
-                    maximum = max(
-                        left_item,
-                        right_item,
-                        key=attrgetter("efficiency"),
-                    )
+                    key = attrgetter("efficiency", "number_of_games")
                 else:
-                    maximum = max(
-                        left_item,
-                        right_item,
-                        key=attrgetter("number_of_games"),
-                    )
-                items = [right_item, left_item]
-                items.remove(maximum)
-                rows[left_point] = maximum
-                rows[right_point] = items[0]
+                    key = attrgetter("number_of_games")
+                rows[left_point], rows[right_point] = sorted(
+                    [right_item, left_item], key=key, reverse=True
+                )
 
     async def get_group_statistics(self):
         await delete_message(self.message)

@@ -38,7 +38,7 @@ class Bodyguard(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     @property
     def role_description(self) -> RoleDescription:
         return RoleDescription(
-            skill="Спасает игрока от смерти и умирает сам",
+            skill="Спасает игрока от смерти ночью и умирает сам",
             pay_for=[SAVING_PLAYER],
             limitations=[
                 CANT_CHOOSE_IN_ROW,

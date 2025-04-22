@@ -4,7 +4,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
-
 from general.collection_of_roles import get_data_with_roles
 from keyboards.inline.cb.cb_text import CANCEL_CB
 from middlewares.db import (

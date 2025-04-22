@@ -220,7 +220,7 @@ class Game:
         await self.bot.send_photo(
             chat_id=self.group_chat_id,
             photo="https://i.pinimg.com/originals/b1/80/98/b18098074864e4b1bf5cc8412ced6421.jpg",
-            caption=f"{make_build('Пришло время провести следственные мероприятия жителям города!')}\n\n"
+            caption=f"{make_build('💬Пришло время провести следственные мероприятия жителям города!')}\n\n"
             f"{players_after_night}",
             reply_markup=get_to_bot_kb("Пища для размышлений тут"),
         )
@@ -289,7 +289,7 @@ class Game:
         message = get_minutes_and_seconds_text(
             start=self.beginning_game,
             end=int(end_of_game.timestamp()),
-            message="⏰ Игра длилась ",
+            message="⏰Игра длилась ",
         )
         await self.bot.send_message(
             chat_id=self.group_chat_id,
