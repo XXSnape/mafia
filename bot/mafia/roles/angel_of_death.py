@@ -41,6 +41,9 @@ class AngelOfDeath(
     grouping = Groupings.civilians
     extra_data = [ExtraCache(key="angels_died", need_to_clear=False)]
     message_to_user_after_action = "Ты выбрал отомстить {url}"
+    message_to_group_after_action = (
+        "Месть - это блюдо, которое подаётся ночью..."
+    )
     payment_for_night_spent = 7
     clearing_state_after_death = False
     notification_message = ATTEMPT_TO_KILL
