@@ -10,21 +10,23 @@ from mafia.roles import Hacker
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_state_and_data,
-    get_game_data_and_user_id,
+    get_game_data_and_user_id, get_game_state_by_user_state,
 )
 from utils.common import get_criminals_ids
 from utils.informing import send_a_lot_of_messages_safely
 from utils.pretty_text import make_build
+from utils.state import lock_state
 from utils.tg import delete_message
 
 
 class UserManager(RouterHelper):
     async def send_latest_message(self):
-        game_state, game_data = await get_game_state_and_data(
+        game_state = await get_game_state_by_user_state(
             tg_obj=self.message,
-            state=self.state,
+            user_state=self.state,
             dispatcher=self.dispatcher,
         )
+        game_data = await game_state.get_data()
         role = game_data["players"][str(self.message.from_user.id)][
             "pretty_role"
         ]
@@ -44,11 +46,12 @@ class UserManager(RouterHelper):
         await self.state.clear()
 
     async def allies_communicate(self):
-        game_state, game_data = await get_game_state_and_data(
+        game_state = await get_game_state_by_user_state(
             tg_obj=self.message,
-            state=self.state,
+            user_state=self.state,
             dispatcher=self.dispatcher,
         )
+        game_data = await game_state.get_data()
         url = game_data["players"][str(self.message.from_user.id)][
             "url"
         ]
@@ -91,30 +94,32 @@ class UserManager(RouterHelper):
         )
 
     async def vote_for(self, callback_data: UserActionIndexCbData):
-        game_state, game_data, voted_user_id = (
-            await get_game_data_and_user_id(
-                callback=self.callback,
-                callback_data=callback_data,
-                game_state=self.state,
-                dispatcher=self.dispatcher,
+        await delete_message(self.callback.message)
+        game_state = await get_game_state_by_user_state(
+            tg_obj=self.message,
+            user_state=self.state,
+            dispatcher=self.dispatcher,
+        )
+        async with lock_state(game_state):
+            game_data, voted_user_id = await get_game_data_and_user_id(
+                game_state=game_state,
+                callback_data=callback_data
             )
-        )
-        deceived_user = game_data.get("deceived", [])
-        if (
-            len(deceived_user) == 2
-            and self.callback.from_user.id == deceived_user[0]
-            and deceived_user[1] in game_data["live_players_ids"]
-        ):
-            voted_user_id = deceived_user[1]
-        game_data["vote_for"].append(
-            [self.callback.from_user.id, voted_user_id]
-        )
+            deceived_user = game_data.get("deceived", [])
+            if (
+                len(deceived_user) == 2
+                and self.callback.from_user.id == deceived_user[0]
+                and deceived_user[1] in game_data["live_players_ids"]
+            ):
+                voted_user_id = deceived_user[1]
+            game_data["vote_for"].append(
+                [self.callback.from_user.id, voted_user_id]
+            )
+            await game_state.set_data(game_data)
         voting_url = game_data["players"][
             str(self.callback.from_user.id)
         ]["url"]
         voted_url = game_data["players"][str(voted_user_id)]["url"]
-        await delete_message(self.callback.message)
-        await game_state.set_data(game_data)
         await self.callback.message.answer(
             make_build(
                 f"🌟День {game_data['number_of_night']}\n\n"

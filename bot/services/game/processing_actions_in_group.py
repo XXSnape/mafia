@@ -10,6 +10,7 @@ from keyboards.inline.callback_factory.recognize_user import (
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from mafia.roles import PrimeMinister
 from services.base import RouterHelper
+from utils.state import lock_state
 from utils.tg import ban_user, delete_message
 
 
@@ -44,45 +45,47 @@ class GroupManager(RouterHelper):
             )
 
     async def confirm_vote(self, callback_data: AimedUserCbData):
-        game_data: GameCache = await self.state.get_data()
-        if (
-            self.callback.from_user.id
-            not in game_data["live_players_ids"]
-        ):
-            await self.callback.answer(
-                "🚫Ты не в игре!", show_alert=True
-            )
-            return
+        async with lock_state(self.state):
+            game_data: GameCache = await self.state.get_data()
+            if (
+                self.callback.from_user.id
+                not in game_data["live_players_ids"]
+            ):
+                await self.callback.answer(
+                    "🚫Ты не в игре!", show_alert=True
+                )
+                return
 
-        if callback_data.user_id == self.callback.from_user.id:
-            await self.callback.answer(
-                "🚫Теперь твой судья - демократия!", show_alert=True
-            )
-            return
-        if self.callback.from_user.id in game_data["cant_vote"]:
-            await self.callback.answer(
-                "🚫Ты временно не можешь голосовать!",
-                show_alert=True,
-            )
-            return
-        if callback_data.action == ProsAndCons.pros:
-            self._add_voice(
-                user_id=self.callback.from_user.id,
-                add_to=game_data["pros"],
-                delete_from=game_data["cons"],
-                prime_ministers=game_data.get(
-                    PrimeMinister.roles_key, []
-                ),
-            )
-        elif callback_data.action == ProsAndCons.cons:
-            self._add_voice(
-                user_id=self.callback.from_user.id,
-                add_to=game_data["cons"],
-                delete_from=game_data["pros"],
-                prime_ministers=game_data.get(
-                    PrimeMinister.roles_key, []
-                ),
-            )
+            if callback_data.user_id == self.callback.from_user.id:
+                await self.callback.answer(
+                    "🚫Теперь твой судья - демократия!", show_alert=True
+                )
+                return
+            if self.callback.from_user.id in game_data["cant_vote"]:
+                await self.callback.answer(
+                    "🚫Ты временно не можешь голосовать!",
+                    show_alert=True,
+                )
+                return
+            if callback_data.action == ProsAndCons.pros:
+                self._add_voice(
+                    user_id=self.callback.from_user.id,
+                    add_to=game_data["pros"],
+                    delete_from=game_data["cons"],
+                    prime_ministers=game_data.get(
+                        PrimeMinister.roles_key, []
+                    ),
+                )
+            elif callback_data.action == ProsAndCons.cons:
+                self._add_voice(
+                    user_id=self.callback.from_user.id,
+                    add_to=game_data["cons"],
+                    delete_from=game_data["pros"],
+                    prime_ministers=game_data.get(
+                        PrimeMinister.roles_key, []
+                    ),
+                )
+            await self.state.set_data(game_data)
         with suppress(TelegramBadRequest, AttributeError):
             await self.callback.message.edit_reply_markup(
                 reply_markup=get_vote_for_aim_kb(
@@ -91,7 +94,6 @@ class GroupManager(RouterHelper):
                     cons=game_data["cons"],
                 )
             )
-        await self.state.set_data(game_data)
         await self.callback.answer(
             text="✅Мы обязательно учтём твое мнение",
             show_alert=True,
