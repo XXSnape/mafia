@@ -170,7 +170,9 @@ class Game:
         )
         await send_a_lot_of_messages_safely(
             bot=self.bot,
-            text=make_build("❌Извините, игра аварийно завершилась!"),
+            text=make_build(
+                "❌Извините, игра аварийно завершилась!"
+            ),
             users=list(game_data["players"].keys())
             + [self.group_chat_id],
         )
