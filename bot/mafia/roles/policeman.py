@@ -43,7 +43,8 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     message_to_group_after_action = (
         "В город введены войска! Идет перестрелка!"
     )
-    message_to_user_after_action = "Ты выбрал убить {url}"
+    message_to_user_after_action = "Ты выбрал расстрелять {url}"
+    words_to_aliases_and_teammates = "Расстрелять"
     mail_message = "Какие меры примешь для ликвидации мафии?"
     extra_data = [
         ExtraCache(key="disclosed_roles"),
@@ -61,10 +62,10 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     @property
     def role_description(self) -> RoleDescription:
         return RoleDescription(
-            skill="За 1 ночь может либо проверить роль игрока, либо убить его",
+            skill="За 1 ночь может либо проверить роль игрока, либо расстрелять его",
             pay_for=[KILLING_PLAYER, CHECKING_PLAYER],
             limitations=[
-                "Не может убить в первую ночь",
+                "Не может расстрелять в первую ночь",
             ],
         )
 

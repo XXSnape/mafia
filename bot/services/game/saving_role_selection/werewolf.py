@@ -10,7 +10,7 @@ from mafia.roles import (
     Werewolf,
 )
 from services.base import RouterHelper
-from services.game.game_assistants import get_game_state_and_data
+from services.game.game_assistants import  get_game_state_by_user_state
 from utils.common import get_criminals_ids
 from utils.informing import (
     get_profiles,
@@ -21,6 +21,7 @@ from utils.informing import (
 )
 from utils.pretty_text import make_pretty
 from utils.roles import change_role
+from utils.state import lock_state
 from utils.tg import delete_message
 
 
@@ -35,31 +36,32 @@ class WerewolfSaver(RouterHelper):
                 Policeman.alias,
             ],
         }
-        game_state, game_data = await get_game_state_and_data(
-            tg_obj=self.callback,
-            state=self.state,
-            dispatcher=self.dispatcher,
-        )
-
         user_id = self.callback.from_user.id
         current_roles = data[self.callback.data]
         roles_key = current_roles[0].roles_key
         are_there_many_senders = False
-        if len(game_data[roles_key]) == 0:
-            new_role = current_roles[0]
-        else:
-            new_role = current_roles[1]
-            are_there_many_senders = True
-        change_role(
-            game_data=game_data,
-            previous_role=Werewolf(),
-            new_role=new_role,
-            user_id=user_id,
+        game_state = await get_game_state_by_user_state(
+            tg_obj=self.callback,
+            user_state=self.state,
+            dispatcher=self.dispatcher,
         )
-        await game_state.set_data(game_data)
-        await self.state.set_state(
-            new_role.state_for_waiting_for_action
-        )
+        async with lock_state(game_state):
+            game_data = await game_state.get_data()
+            if len(game_data[roles_key]) == 0:
+                new_role = current_roles[0]
+            else:
+                new_role = current_roles[1]
+                are_there_many_senders = True
+            change_role(
+                game_data=game_data,
+                previous_role=Werewolf(),
+                new_role=new_role,
+                user_id=user_id,
+            )
+            await self.state.set_state(
+                new_role.state_for_waiting_for_action
+            )
+            await game_state.set_data(game_data)
         await self.callback.message.answer_photo(
             photo=new_role.photo,
             caption=f"Твоя новая роль - {make_pretty(new_role.role)}!",

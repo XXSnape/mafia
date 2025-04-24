@@ -1,3 +1,4 @@
+from cache.cache_types import GameCache
 from general.text import NUMBER_OF_NIGHT
 from keyboards.inline.buttons.common import BACK_BTN
 from keyboards.inline.callback_factory.recognize_user import (
@@ -16,22 +17,23 @@ from keyboards.inline.keypads.mailing import (
 from mafia.roles import Policeman
 from services.base import RouterHelper
 from services.game.game_assistants import (
-    get_game_state_and_data,
-    get_game_state_data_and_user_id,
+    get_game_data_and_user_id,
     take_action_and_save_data,
-    trace_all_actions,
+    trace_all_actions, get_game_state_by_user_state, send_messages_to_user_and_group,
 )
 from utils.informing import send_a_lot_of_messages_safely
+from utils.state import lock_state
 from utils.tg import delete_message
 
 
 class PolicemanSaver(RouterHelper):
     async def policeman_makes_choice(self):
-        _, game_data = await get_game_state_and_data(
+        game_state = await get_game_state_by_user_state(
             tg_obj=self.callback,
-            state=self.state,
+            user_state=self.state,
             dispatcher=self.dispatcher,
         )
+        game_data: GameCache = await game_state.get_data()
         data = {
             POLICEMAN_KILLS_CB: [
                 police_kill_cb_data,
@@ -58,11 +60,12 @@ class PolicemanSaver(RouterHelper):
         )
 
     async def policeman_cancels_selection(self):
-        _, game_data = await get_game_state_and_data(
+        game_state = await get_game_state_by_user_state(
             tg_obj=self.callback,
-            state=self.state,
+            user_state=self.state,
             dispatcher=self.dispatcher,
         )
+        game_data: GameCache = await game_state.get_data()
         await self.callback.message.edit_text(
             text=Policeman.mail_message,
             reply_markup=kill_or_check_on_policeman(
@@ -84,25 +87,23 @@ class PolicemanSaver(RouterHelper):
         self, callback_data: PoliceActionIndexCbData
     ):
         await delete_message(self.callback.message)
-        game_state, game_data, checked_user_id = (
-            await get_game_state_data_and_user_id(
-                callback=self.callback,
-                callback_data=callback_data,
-                state=self.state,
-                dispatcher=self.dispatcher,
+        game_state = await get_game_state_by_user_state(
+            tg_obj=self.callback,
+            user_state=self.state,
+            dispatcher=self.dispatcher,
+        )
+        async with lock_state(game_state):
+            game_data, user_id = get_game_data_and_user_id(
+                game_state=game_state, callback_data=callback_data
             )
-        )
-        url = game_data["players"][str(checked_user_id)]["url"]
-        game_data["disclosed_roles"].append(checked_user_id)
-        await trace_all_actions(
-            callback=self.callback,
-            game_data=game_data,
-            user_id=checked_user_id,
-            current_role=Policeman(),
-            message_to_user=False,
-            message_to_group="Армия насильно заставила кого-то показать документы!",
-        )
-        await game_state.set_data(game_data)
+            game_data["disclosed_roles"] = [user_id]
+            trace_all_actions(
+                callback=self.callback,
+                game_data=game_data,
+                user_id=user_id,
+            )
+            await game_state.set_data(game_data)
+        url = game_data["players"][str(user_id)]["url"]
         text = NUMBER_OF_NIGHT.format(
             game_data["number_of_night"]
         ) + (
@@ -111,6 +112,13 @@ class PolicemanSaver(RouterHelper):
         )
         await send_a_lot_of_messages_safely(
             bot=self.callback.bot,
-            text=text,
             users=game_data[Policeman.roles_key],
+            text=text,
         )
+        await send_messages_to_user_and_group(
+            callback=self.callback,
+            game_data=game_data,
+            message_to_user=False,
+            message_to_group="Армия насильно заставила кого-то показать документы!"
+        )
+

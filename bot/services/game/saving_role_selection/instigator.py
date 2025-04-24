@@ -8,11 +8,13 @@ from keyboards.inline.keypads.mailing import (
 from mafia.roles import Instigator
 from services.base import RouterHelper
 from services.game.game_assistants import (
-    get_game_state_and_data,
-    get_game_state_data_and_user_id,
+    get_game_data_and_user_id,
     trace_all_actions,
+    get_game_state_by_user_state,
+    send_messages_to_user_and_group,
 )
 from states.game import UserFsm
+from utils.state import lock_state
 from utils.tg import delete_message
 
 
@@ -20,41 +22,46 @@ class InstigatorSaver(RouterHelper):
     async def instigator_chooses_subject(
         self, callback_data: UserActionIndexCbData
     ):
-        game_state, game_data, user_id = (
-            await get_game_state_data_and_user_id(
-                callback=self.callback,
-                callback_data=callback_data,
-                state=self.state,
-                dispatcher=self.dispatcher,
-            )
+        game_state = await get_game_state_by_user_state(
+            tg_obj=self.callback,
+            user_state=self.state,
+            dispatcher=self.dispatcher,
         )
+        async with lock_state(game_state):
+            game_data, user_id = get_game_data_and_user_id(
+                game_state=game_state, callback_data=callback_data
+            )
+            game_data["deceived"] = [user_id]
+            await self.state.set_state(
+                UserFsm.INSTIGATOR_CHOOSES_OBJECT
+            )
+            await game_state.set_data(game_data)
         url = game_data["players"][str(user_id)]["url"]
-        game_data["deceived"].append(user_id)
         markup = send_selection_to_players_kb(
             players_ids=game_data["live_players_ids"],
             players=game_data["players"],
             extra_buttons=(BACK_BTN,),
             exclude=user_id,
         )
-        await self.state.set_state(UserFsm.INSTIGATOR_CHOOSES_OBJECT)
-        await game_state.set_data(game_data)
         await self.callback.message.edit_text(
             text=f"За кого должен проголосовать {url}?",
             reply_markup=markup,
         )
 
     async def instigator_cancels_selection(self):
-        game_state, game_data = await get_game_state_and_data(
+        game_state = await get_game_state_by_user_state(
             tg_obj=self.callback,
-            state=self.state,
+            user_state=self.state,
             dispatcher=self.dispatcher,
         )
-        await self.state.set_state(
-            UserFsm.INSTIGATOR_CHOOSES_SUBJECT
-        )
+        async with lock_state(game_state):
+            game_data = await game_state.get_data()
+            game_data["deceived"].clear()
+            await self.state.set_state(
+                UserFsm.INSTIGATOR_CHOOSES_SUBJECT
+            )
+            await game_state.set_data(game_data)
         instigator = Instigator()
-        game_data["deceived"].clear()
-        await game_state.set_data(game_data)
         await self.callback.message.edit_text(
             text=instigator.mail_message,
             reply_markup=instigator.generate_markup(
@@ -67,28 +74,34 @@ class InstigatorSaver(RouterHelper):
         self, callback_data: UserActionIndexCbData
     ):
         await delete_message(self.callback.message)
-        game_state, game_data, user_id = (
-            await get_game_state_data_and_user_id(
-                callback=self.callback,
-                callback_data=callback_data,
-                state=self.state,
-                dispatcher=self.dispatcher,
-            )
+        game_state = await get_game_state_by_user_state(
+            tg_obj=self.callback,
+            user_state=self.state,
+            dispatcher=self.dispatcher,
         )
-        deceived_user = game_data["deceived"]
-        deceived_user.append(user_id)
+        async with lock_state(game_state):
+            game_data, user_id = get_game_data_and_user_id(
+                game_state=game_state, callback_data=callback_data
+            )
+            deceived_user = game_data["deceived"]
+            deceived_user.append(user_id)
+            trace_all_actions(
+                callback=self.callback,
+                game_data=game_data,
+                user_id=user_id,
+            )
+            await game_state.set_data(game_data)
         subject_url = game_data["players"][str(deceived_user[0])][
             "url"
         ]
         object_url = game_data["players"][str(deceived_user[1])][
             "url"
         ]
-        await trace_all_actions(
+        await send_messages_to_user_and_group(
             callback=self.callback,
             game_data=game_data,
-            user_id=deceived_user[0],
-            current_role=Instigator(),
             message_to_user=f"Днём {subject_url} проголосует за "
             f"{object_url}, если попытается голосовать",
+            current_role=Instigator(),
         )
-        await game_state.set_data(game_data)
+

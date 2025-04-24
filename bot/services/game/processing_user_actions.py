@@ -10,7 +10,7 @@ from mafia.roles import Hacker
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_state_and_data,
-    get_game_state_data_and_user_id,
+    get_game_data_and_user_id,
 )
 from utils.common import get_criminals_ids
 from utils.informing import send_a_lot_of_messages_safely
@@ -92,10 +92,10 @@ class UserManager(RouterHelper):
 
     async def vote_for(self, callback_data: UserActionIndexCbData):
         game_state, game_data, voted_user_id = (
-            await get_game_state_data_and_user_id(
+            await get_game_data_and_user_id(
                 callback=self.callback,
                 callback_data=callback_data,
-                state=self.state,
+                game_state=self.state,
                 dispatcher=self.dispatcher,
             )
         )

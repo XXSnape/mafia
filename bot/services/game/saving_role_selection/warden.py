@@ -4,10 +4,10 @@ from keyboards.inline.keypads.mailing import selection_to_warden_kb
 from mafia.roles import Warden
 from services.base import RouterHelper
 from services.game.game_assistants import (
-    get_game_state_and_data,
-    send_messages_and_remove_from_expected,
-    trace_all_actions,
+    send_messages_to_user_and_group,
+    trace_all_actions, get_game_state_by_user_state, remove_from_expected,
 )
+from utils.state import lock_state
 from utils.tg import delete_message
 
 
@@ -25,47 +25,50 @@ class WardenSaver(RouterHelper):
         await game_state.set_data(game_data)
 
     async def supervisor_collects_information(self):
-        game_state, game_data = await get_game_state_and_data(
+        game_state = await get_game_state_by_user_state(
             tg_obj=self.callback,
-            state=self.state,
+            user_state=self.state,
             dispatcher=self.dispatcher,
         )
-        checked = game_data["checked_for_the_same_groups"]
         processed_user_id = int(self.callback.data)
-        if len(checked) == 1 and checked[0] == processed_user_id:
-            checked.clear()
-            await self._generate_markup_after_selection(
-                game_state=game_state,
-                game_data=game_data,
-            )
-            return
-        elif len(checked) == 0:
+        async with lock_state(game_state):
+            game_data = await game_state.get_data()
+            checked = game_data["checked_for_the_same_groups"]
+            if len(checked) == 0:
+                checked[:] = [processed_user_id]
+                await self._generate_markup_after_selection(
+                    game_state=game_state,
+                    game_data=game_data,
+                )
+                return
+            elif len(checked) == 1 and checked[0] == processed_user_id:
+                checked.clear()
+                await self._generate_markup_after_selection(
+                    game_state=game_state,
+                    game_data=game_data,
+                )
+                return
+            await delete_message(self.callback.message)
             checked.append(processed_user_id)
-            await self._generate_markup_after_selection(
-                game_state=game_state,
-                game_data=game_data,
-            )
-            return
-        await delete_message(self.callback.message)
-        checked.append(processed_user_id)
-        user1_id: int = checked[0]
-        user2_id: int = checked[1]
-        for user_id in [user1_id, user2_id]:
-            await trace_all_actions(
-                callback=self.callback,
-                game_data=game_data,
-                user_id=user_id,
-                message_to_group=False,
-                message_to_user=False,
-                current_role=Warden(),
-                need_to_remove_from_expected=False,
-            )
+            user1_id: int = checked[0]
+            user2_id: int = checked[1]
+            for user_id in [user1_id, user2_id]:
+                trace_all_actions(
+                    callback=self.callback,
+                    game_data=game_data,
+                    user_id=user_id,
+                    need_to_remove_from_expected=False,
+                )
+            remove_from_expected(callback=self.callback, game_data=game_data)
+            await game_state.set_data(game_data)
+
         user1_url = game_data["players"][str(user1_id)]["url"]
         user2_url = game_data["players"][str(user2_id)]["url"]
-        await send_messages_and_remove_from_expected(
+        await send_messages_to_user_and_group(
             callback=self.callback,
             game_data=game_data,
-            message_to_user=f"Ты решил проверить на принадлежность одной группировки {user1_url} и {user2_url}",
+            message_to_user=f"Ты решил проверить на принадлежность "
+                            f"одной группировки {user1_url} и {user2_url}",
             current_role=Warden(),
         )
-        await game_state.set_data(game_data)
+

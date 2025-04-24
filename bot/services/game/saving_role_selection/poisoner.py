@@ -1,3 +1,4 @@
+from cache.cache_types import GameCache
 from keyboards.inline.buttons.common import BACK_BTN
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
@@ -9,38 +10,44 @@ from keyboards.inline.keypads.mailing import (
 from mafia.roles import Poisoner
 from services.base import RouterHelper
 from services.game.game_assistants import (
-    get_game_state_and_data,
-    send_messages_and_remove_from_expected,
-    take_action_and_save_data,
+    send_messages_to_user_and_group,
+    take_action_and_save_data, get_game_state_by_user_state, remove_from_expected,
 )
 from states.game import UserFsm
+from utils.state import lock_state
 from utils.tg import delete_message
 
 
 class PoisonerSaver(RouterHelper):
     async def poisoner_chose_to_kill(self):
         await delete_message(self.callback.message)
-        game_state, game_data = await get_game_state_and_data(
+        game_state = await get_game_state_by_user_state(
             tg_obj=self.callback,
-            state=self.state,
+            user_state=self.state,
             dispatcher=self.dispatcher,
         )
-        poisoned = game_data["poisoned"]
-        poisoned[1] = 1
-        await send_messages_and_remove_from_expected(
+        async with lock_state(game_state):
+            game_data = await game_state.get_data()
+            poisoned = game_data["poisoned"]
+            poisoned[1] = 1
+            remove_from_expected(callback=self.callback, game_data=game_data)
+            await game_state.set_data(game_data)
+
+        await send_messages_to_user_and_group(
             callback=self.callback,
             game_data=game_data,
             message_to_user="Ты решил всех убить!",
             message_to_group=False,
         )
-        await game_state.set_data(game_data)
+
 
     async def poisoner_poisons(self):
-        game_state, game_data = await get_game_state_and_data(
+        game_state = await get_game_state_by_user_state(
             tg_obj=self.callback,
-            state=self.state,
+            user_state=self.state,
             dispatcher=self.dispatcher,
         )
+        game_data: GameCache = await game_state.get_data()
         poisoned = game_data["poisoned"]
         exclude = (poisoned[0] if poisoned else []) + [
             self.callback.from_user.id
@@ -57,11 +64,12 @@ class PoisonerSaver(RouterHelper):
         )
 
     async def poisoner_cancels_selection(self):
-        _, game_data = await get_game_state_and_data(
+        game_state = await get_game_state_by_user_state(
             tg_obj=self.callback,
-            state=self.state,
+            user_state=self.state,
             dispatcher=self.dispatcher,
         )
+        game_data: GameCache = await game_state.get_data()
         await self.state.set_state(UserFsm.POISONER_CHOOSES_ACTION)
         await self.callback.message.edit_text(
             text=Poisoner.mail_message,
@@ -71,7 +79,7 @@ class PoisonerSaver(RouterHelper):
     async def poisoner_chose_victim(
         self, callback_data: UserActionIndexCbData
     ):
-        game_state, game_data, user_id = (
+        game_state, user_id = (
             await take_action_and_save_data(
                 callback=self.callback,
                 callback_data=callback_data,
@@ -79,9 +87,12 @@ class PoisonerSaver(RouterHelper):
                 dispatcher=self.dispatcher,
             )
         )
-        poisoned = game_data["poisoned"]
-        if poisoned:
-            poisoned[0].append(user_id)
-        else:
-            poisoned[:] = [[user_id], 0]
-        await game_state.set_data(game_data)
+        async with lock_state(game_state):
+            game_data = await game_state.get_data()
+            poisoned = game_data["poisoned"]
+            if poisoned:
+                poisoned[0].append(user_id)
+            else:
+                poisoned[:] = [[user_id], 0]
+            await game_state.set_data(game_data)
+

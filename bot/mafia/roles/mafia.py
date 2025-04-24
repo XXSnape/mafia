@@ -29,6 +29,7 @@ class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
     purpose = "Тебе нужно руководить преступниками и убивать мирных."
     message_to_group_after_action = "Мафия выбрала жертву!"
     message_to_user_after_action = "Ты выбрал убить {url}"
+    words_to_aliases_and_teammates = "Убить"
     mail_message = "Кого убить этой ночью?"
     need_to_monitor_interaction = False
     notification_message = ATTEMPT_TO_KILL

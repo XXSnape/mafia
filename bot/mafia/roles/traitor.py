@@ -44,6 +44,7 @@ class Traitor(
         "Поддельные ксивы помогают узнавать правду!"
     )
     message_to_user_after_action = "Ты выбрал узнать роль {url}"
+    words_to_aliases_and_teammates = "Узнать роль"
     mail_message = "Кого проверишь для мафии?"
     notification_message = ROLE_IS_KNOWN
     payment_for_treatment = 0

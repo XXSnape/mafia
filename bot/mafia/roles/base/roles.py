@@ -58,8 +58,6 @@ class RoleABC(ABC):
     grouping: Groupings = Groupings.civilians
     there_may_be_several: bool = False
     purpose: str | Callable | None
-    message_to_user_after_action: str | None = None
-    message_to_group_after_action: str | None = None
     is_mass_mailing_list: bool = False
     extra_data: list[ExtraCache] | None = None
     state_for_waiting_for_action: State | None = None
@@ -474,6 +472,9 @@ class AliasRoleABC(ABC):
 
 
 class ActiveRoleAtNightABC(RoleABC):
+    message_to_user_after_action: str | None = None
+    message_to_group_after_action: str | None = None
+    words_to_aliases_and_teammates: str | None = None
     state_for_waiting_for_action: State
     was_deceived: bool
     need_to_process: bool = True

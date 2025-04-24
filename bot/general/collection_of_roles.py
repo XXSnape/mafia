@@ -57,8 +57,8 @@ def get_data_with_roles(
 
 
 BASES_ROLES: Final[tuple[RolesLiteral, ...]] = (
-    roles.Warden.role_id,
     roles.Doctor.role_id,
+    roles.Agent.role_id,
     roles.Policeman.role_id,
     roles.Mafia.role_id,
 )

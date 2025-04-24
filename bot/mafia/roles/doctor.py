@@ -33,6 +33,7 @@ class Doctor(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         "Доктор спешит кому-то на помощь!"
     )
     message_to_user_after_action = "Ты выбрал вылечить {url}"
+    words_to_aliases_and_teammates = "Вылечить"
     payment_for_treatment = 15
     payment_for_murder = 18
 
