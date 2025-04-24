@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 from operator import itemgetter
+from pprint import pprint
 from random import choice
 
 from aiogram import Bot, Dispatcher
@@ -480,6 +481,7 @@ class Game:
         banned_roles = game_data["settings"]["banned_roles"]
         order_of_roles = game_data["settings"]["order_of_roles"]
         players_ids = game_data["live_players_ids"][:]
+        pprint(game_data)
         all_roles = get_data_with_roles()
         criminals: list[RolesLiteral] = []
         other: list[RolesLiteral] = []

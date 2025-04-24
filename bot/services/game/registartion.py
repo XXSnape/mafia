@@ -1,7 +1,8 @@
+import asyncio
 from collections.abc import Awaitable, Callable
 from contextlib import suppress
 from datetime import UTC, datetime, timedelta
-from typing import Concatenate
+from typing import Concatenate, cast
 
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import CommandObject
@@ -39,7 +40,7 @@ from scheduler.game import (
     start_game,
 )
 from services.base import RouterHelper
-from services.game.game_assistants import get_game_state_and_data
+from services.game.game_assistants import get_game_state_and_data, get_game_state_by_user_state
 from services.users.order_of_roles import RoleManager
 from states.game import GameFsm
 from utils.informing import get_profiles_during_registration
@@ -51,7 +52,7 @@ from utils.pretty_text import (
 )
 from utils.state import (
     clear_game_data,
-    get_state_and_assign,
+    get_state_and_assign, lock_state,
 )
 from utils.tg import (
     check_user_for_admin_rights,
@@ -69,21 +70,22 @@ def verification_for_admin_or_creator[R, **P](
         self: "Registration", *args: P.args, **kwargs: P.kwargs
     ) -> R | None:
         await self.message.delete()
-        game_data: GameCache = await self.state.get_data()
-        user_id = self.message.from_user.id
-        is_admin = await check_user_for_admin_rights(
-            bot=self.message.bot,
-            chat_id=self.message.chat.id,
-            user_id=user_id,
-        )
-        if (
-            is_admin is False
-            and game_data["settings"]["creator_user_id"] != user_id
-        ):
-            return None
-        return await async_func(
-            self, *args, game_data=game_data, **kwargs
-        )
+        async with lock_state(self.state):
+            game_data: GameCache = await self.state.get_data()
+            user_id = self.message.from_user.id
+            is_admin = await check_user_for_admin_rights(
+                bot=self.message.bot,
+                chat_id=self.message.chat.id,
+                user_id=user_id,
+            )
+            if (
+                is_admin is False
+                and game_data["settings"]["creator_user_id"] != user_id
+            ):
+                return None
+            return await async_func(
+                self, *args, game_data=game_data, **kwargs
+            )
 
     return wrapper
 
@@ -149,12 +151,6 @@ class Registration(RouterHelper):
             game_chat=self.message.chat.id,
             players_ids=[],
         )
-        sent_message = await self.message.answer(
-            get_profiles_during_registration(
-                live_players_ids=[], players={}
-            ),
-            reply_markup=markup,
-        )
         start_of_registration_dt = datetime.now(UTC)
         end_of_registration = int(
             (
@@ -164,16 +160,23 @@ class Registration(RouterHelper):
         start_of_registration = int(
             start_of_registration_dt.timestamp()
         )
-        await self._init_game(
-            message_id=sent_message.message_id,
-            start_of_registration=start_of_registration,
-            end_of_registration=end_of_registration,
-        )
-        await sent_message.pin()
         time_to_start = get_minutes_and_seconds_text(
             start=start_of_registration,
             end=end_of_registration,
         )
+        async with lock_state(self.state):
+            sent_message = await self.message.answer(
+                get_profiles_during_registration(
+                    live_players_ids=[], players={}
+                ),
+                reply_markup=markup,
+            )
+            await self._init_game(
+                message_id=sent_message.message_id,
+                start_of_registration=start_of_registration,
+                end_of_registration=end_of_registration,
+            )
+        await sent_message.pin()
         await self.message.answer(make_build(time_to_start))
         self.scheduler.add_job(
             func=start_game,
@@ -333,62 +336,64 @@ class Registration(RouterHelper):
             return
         user_id = self.message.from_user.id
         full_name = self.message.from_user.full_name
-        game_data: GameCache = await game_state.get_data()
         balance = (await self._get_user_or_create()).balance
-        user_game_data: UserGameCache = {
-            "full_name": full_name,
-            "url": get_profile_link(
-                user_id=user_id,
-                full_name=full_name,
-            ),
-            "money": 0,
-            "achievements": [],
-        }
-        game_data["live_players_ids"].append(user_id)
-        game_data["players"][str(user_id)] = user_game_data
-        sent_message = await self._offer_bet(
-            game_data=game_data, balance=balance
-        )
-        user_data: UserCache = {
-            "game_chat": game_chat,
-            "message_with_offer_id": sent_message.message_id,
-            "balance": balance,
-        }
-        game_data["to_delete"].append(
-            [user_id, sent_message.message_id]
-        )
-        await self.state.set_data(user_data)
-        await self.state.set_state(GameFsm.WAIT_FOR_STARTING_GAME)
-        await game_state.set_data(game_data)
-        await self._change_message_in_group(
-            game_data=game_data, game_chat=game_chat
-        )
-        if (
-            len(game_data["live_players_ids"])
-            == settings.mafia.maximum_number_of_players
-        ):
-            await self._start_game(
-                game_data=game_data, game_state=game_state
+        async with lock_state(game_state):
+            game_data: GameCache = await game_state.get_data()
+            user_game_data: UserGameCache = {
+                "full_name": full_name,
+                "url": get_profile_link(
+                    user_id=user_id,
+                    full_name=full_name,
+                ),
+                "money": 0,
+                "achievements": [],
+            }
+            game_data["live_players_ids"].append(user_id)
+            game_data["players"][str(user_id)] = user_game_data
+            sent_message = await self._offer_bet(
+                game_data=game_data, balance=balance
             )
+            user_data: UserCache = {
+                "game_chat": game_chat,
+                "message_with_offer_id": sent_message.message_id,
+                "balance": balance,
+            }
+            game_data["to_delete"].append(
+                [user_id, sent_message.message_id]
+            )
+            await self.state.set_data(user_data)
+            await self.state.set_state(GameFsm.WAIT_FOR_STARTING_GAME)
+            await game_state.set_data(game_data)
+            await self._change_message_in_group(
+                game_data=game_data, game_chat=game_chat
+            )
+            if (
+                len(game_data["live_players_ids"])
+                == settings.mafia.maximum_number_of_players
+            ):
+                await self._start_game(
+                    game_data=game_data, game_state=game_state
+                )
 
     async def finish_registration(self):
-        game_data: GameCache = await self.state.get_data()
-        user_id = self._get_user_id()
-        is_admin = await check_user_for_admin_rights(
-            bot=self.callback.bot,
-            chat_id=game_data["game_chat"],
-            user_id=user_id,
-        )
-        if (
-            is_admin is False
-            and game_data["settings"]["creator_user_id"] != user_id
-        ):
-            full_name = game_data["settings"]["creator_full_name"]
-            await self.callback.answer(
-                f"Пожалуйста, попроси {full_name} или администраторов начать игру!",
-                show_alert=True,
+        async with lock_state(self.state):
+            game_data: GameCache = await self.state.get_data()
+            user_id = self._get_user_id()
+            is_admin = await check_user_for_admin_rights(
+                bot=self.callback.bot,
+                chat_id=game_data["game_chat"],
+                user_id=user_id,
             )
-            return
+            if (
+                is_admin is False
+                and game_data["settings"]["creator_user_id"] != user_id
+            ):
+                full_name = game_data["settings"]["creator_full_name"]
+                await self.callback.answer(
+                    f"Пожалуйста, попроси {full_name} или администраторов начать игру!",
+                    show_alert=True,
+                )
+                return
         await self._start_game(
             game_data=game_data, game_state=self.state
         )
@@ -396,7 +401,7 @@ class Registration(RouterHelper):
     async def request_money(self):
         user_data: UserCache = await self.state.get_data()
         balance = user_data["balance"]
-        role_key: RolesLiteral = self.callback.data
+        role_key = cast(RolesLiteral, self.callback.data)
         coveted_role = get_data_with_roles(role_key)
         user_data: UserCache = {"coveted_role": role_key}
         await self.state.update_data(user_data)
@@ -428,16 +433,19 @@ class Registration(RouterHelper):
 
     async def cancel_bet(self):
         user_data: UserCache = await self.state.get_data()
-        game_state, game_data = await get_game_state_and_data(
+        game_state = await get_game_state_by_user_state(
             tg_obj=self.callback,
-            state=self.state,
+            user_state=self.state,
             dispatcher=self.dispatcher,
+            user_data=user_data
         )
-        self._delete_bet(user_data=user_data, game_data=game_data)
-        balance = user_data["balance"]
-        del user_data["coveted_role"]
-        await self.state.set_data(user_data)
-        await game_state.set_data(game_data)
+        async with lock_state(game_state):
+            game_data = await game_state.get_data()
+            self._delete_bet(user_data=user_data, game_data=game_data)
+            balance = user_data["balance"]
+            del user_data["coveted_role"]
+            await self.state.set_data(user_data)
+            await game_state.set_data(game_data)
         await self._offer_bet(balance=balance, game_data=game_data)
 
     async def leave_game(self):
@@ -456,27 +464,28 @@ class Registration(RouterHelper):
             or user_data.get("game_chat") != self.message.chat.id
         ):
             return
-        game_data = await self.state.get_data()
-        self._delete_bet(user_data=user_data, game_data=game_data)
-        try:
-            game_data["live_players_ids"].remove(user_id)
-            del game_data["players"][str(user_id)]
-        except (ValueError, KeyError):
-            logger.exception(
-                "Ошибка при выходе из игры у пользователя {} {}",
-                user_id,
-                self.message.from_user.full_name,
+        async with lock_state(self.state):
+            game_data = await self.state.get_data()
+            self._delete_bet(user_data=user_data, game_data=game_data)
+            try:
+                game_data["live_players_ids"].remove(user_id)
+                del game_data["players"][str(user_id)]
+            except (ValueError, KeyError):
+                logger.exception(
+                    "Ошибка при выходе из игры у пользователя {} {}",
+                    user_id,
+                    self.message.from_user.full_name,
+                )
+                await user_state.clear()
+            await self.state.set_data(game_data)
+            await self.message.bot.delete_message(
+                chat_id=user_id,
+                message_id=user_data["message_with_offer_id"],
             )
             await user_state.clear()
-        await self.state.set_data(game_data)
-        await self.message.bot.delete_message(
-            chat_id=user_id,
-            message_id=user_data["message_with_offer_id"],
-        )
-        await user_state.clear()
-        await self._change_message_in_group(
-            game_data=game_data, game_chat=self.message.chat.id
-        )
+            await self._change_message_in_group(
+                game_data=game_data, game_chat=self.message.chat.id
+            )
 
     async def set_bet(self):
         await self.message.delete()
@@ -487,19 +496,22 @@ class Registration(RouterHelper):
             return
         bot = self._get_bot()
         user_id = self._get_user_id()
-        game_state, game_data = await get_game_state_and_data(
+        game_state = await get_game_state_by_user_state(
             tg_obj=self.message,
-            state=self.state,
+            user_state=self.state,
             dispatcher=self.dispatcher,
+            user_data=user_data
         )
-        self._delete_bet(user_data=user_data, game_data=game_data)
-        bids: RolesAndUsersMoney = game_data["bids"]
-        bids.setdefault(user_data["coveted_role"], []).append(
-            [user_id, rate]
-        )
-        role = get_data_with_roles(user_data["coveted_role"])
-        await self.state.set_data(user_data)
-        await game_state.set_data(game_data)
+        async with lock_state(game_state):
+            game_data = await game_state.get_data()
+            self._delete_bet(user_data=user_data, game_data=game_data)
+            bids: RolesAndUsersMoney = game_data["bids"]
+            bids.setdefault(user_data["coveted_role"], []).append(
+                [user_id, rate]
+            )
+            role = get_data_with_roles(user_data["coveted_role"])
+            await self.state.set_data(user_data)
+            await game_state.set_data(game_data)
         with suppress(TelegramBadRequest):
             await bot.edit_message_text(
                 chat_id=user_id,

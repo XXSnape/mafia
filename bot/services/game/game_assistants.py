@@ -120,6 +120,19 @@ async def inform_aliases(
                 text=f"{pretty_role} ??? выбрал {url}",
             )
 
+async def get_game_state_by_user_state(
+        tg_obj: CallbackQuery | Message,
+        user_state: FSMContext,
+        dispatcher: Dispatcher,
+        user_data: UserCache | None = None,
+):
+    if user_data is None:
+        user_data: UserCache = await user_state.get_data()
+    return await get_state_and_assign(
+        dispatcher=dispatcher,
+        chat_id=user_data["game_chat"],
+        bot_id=tg_obj.bot.id,
+    )
 
 async def get_game_state_and_data(
     tg_obj: CallbackQuery | Message,
