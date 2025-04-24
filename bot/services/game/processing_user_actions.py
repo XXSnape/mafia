@@ -10,7 +10,8 @@ from mafia.roles import Hacker
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_state_and_data,
-    get_game_data_and_user_id, get_game_state_by_user_state,
+    get_game_data_and_user_id,
+    get_game_state_by_user_state,
 )
 from utils.common import get_criminals_ids
 from utils.informing import send_a_lot_of_messages_safely
@@ -101,9 +102,11 @@ class UserManager(RouterHelper):
             dispatcher=self.dispatcher,
         )
         async with lock_state(game_state):
-            game_data, voted_user_id = await get_game_data_and_user_id(
-                game_state=game_state,
-                callback_data=callback_data
+            game_data, voted_user_id = (
+                await get_game_data_and_user_id(
+                    game_state=game_state,
+                    callback_data=callback_data,
+                )
             )
             deceived_user = game_data.get("deceived", [])
             if (
