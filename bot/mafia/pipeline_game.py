@@ -208,13 +208,13 @@ class Game:
         await self.controller.mailing()
         # await asyncio.sleep(
         #     game_data["settings"]["time_for_night"] - 3
-        # )
-        await asyncio.sleep(40)
+        # ) # TODO
+        await asyncio.sleep(30)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
         )
-        await asyncio.sleep(3)
+        # await asyncio.sleep(3)
         game_data = await self.controller.sum_up_after_night()
         players_after_night = get_live_players(
             game_data=game_data, all_roles=self.all_roles
@@ -226,16 +226,16 @@ class Game:
             f"{players_after_night}",
             reply_markup=get_to_bot_kb("Пища для размышлений тут"),
         )
-        await asyncio.sleep(game_data["settings"]["time_for_day"])
+        # await asyncio.sleep(game_data["settings"]["time_for_day"])
         await self.controller.suggest_vote()
-        await asyncio.sleep(35)
+        await asyncio.sleep(12)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
         )
         result = await self.controller.confirm_final_aim()
         if result:
-            await asyncio.sleep(45)
+            await asyncio.sleep(15)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -246,6 +246,7 @@ class Game:
         await asyncio.sleep(3)
 
     async def give_out_rewards(self, e: GameIsOver):
+        await asyncio.sleep(1)
         game_data: GameCache = await self.state.get_data()
         result = make_build(
             f"🚩Игра завершена! Победившая группировка: {e.winner.value.name}\n\n"

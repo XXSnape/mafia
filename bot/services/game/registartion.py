@@ -40,7 +40,10 @@ from scheduler.game import (
     start_game,
 )
 from services.base import RouterHelper
-from services.game.game_assistants import get_game_state_and_data, get_game_state_by_user_state
+from services.game.game_assistants import (
+    get_game_state_and_data,
+    get_game_state_by_user_state,
+)
 from services.users.order_of_roles import RoleManager
 from states.game import GameFsm
 from utils.informing import get_profiles_during_registration
@@ -52,7 +55,8 @@ from utils.pretty_text import (
 )
 from utils.state import (
     clear_game_data,
-    get_state_and_assign, lock_state,
+    get_state_and_assign,
+    lock_state,
 )
 from utils.tg import (
     check_user_for_admin_rights,
@@ -80,7 +84,8 @@ def verification_for_admin_or_creator[R, **P](
             )
             if (
                 is_admin is False
-                and game_data["settings"]["creator_user_id"] != user_id
+                and game_data["settings"]["creator_user_id"]
+                != user_id
             ):
                 return None
             return await async_func(
@@ -145,6 +150,7 @@ class Registration(RouterHelper):
                 )
             )
             return
+        await self.state.set_state(GameFsm.REGISTRATION)
         await delete_message(self.message)
         markup = await get_join_kb(
             bot=self._get_bot(),
@@ -362,7 +368,9 @@ class Registration(RouterHelper):
                 [user_id, sent_message.message_id]
             )
             await self.state.set_data(user_data)
-            await self.state.set_state(GameFsm.WAIT_FOR_STARTING_GAME)
+            await self.state.set_state(
+                GameFsm.WAIT_FOR_STARTING_GAME
+            )
             await game_state.set_data(game_data)
             await self._change_message_in_group(
                 game_data=game_data, game_chat=game_chat
@@ -386,9 +394,12 @@ class Registration(RouterHelper):
             )
             if (
                 is_admin is False
-                and game_data["settings"]["creator_user_id"] != user_id
+                and game_data["settings"]["creator_user_id"]
+                != user_id
             ):
-                full_name = game_data["settings"]["creator_full_name"]
+                full_name = game_data["settings"][
+                    "creator_full_name"
+                ]
                 await self.callback.answer(
                     f"Пожалуйста, попроси {full_name} или администраторов начать игру!",
                     show_alert=True,
@@ -437,11 +448,13 @@ class Registration(RouterHelper):
             tg_obj=self.callback,
             user_state=self.state,
             dispatcher=self.dispatcher,
-            user_data=user_data
+            user_data=user_data,
         )
         async with lock_state(game_state):
             game_data = await game_state.get_data()
-            self._delete_bet(user_data=user_data, game_data=game_data)
+            self._delete_bet(
+                user_data=user_data, game_data=game_data
+            )
             balance = user_data["balance"]
             del user_data["coveted_role"]
             await self.state.set_data(user_data)
@@ -466,7 +479,9 @@ class Registration(RouterHelper):
             return
         async with lock_state(self.state):
             game_data = await self.state.get_data()
-            self._delete_bet(user_data=user_data, game_data=game_data)
+            self._delete_bet(
+                user_data=user_data, game_data=game_data
+            )
             try:
                 game_data["live_players_ids"].remove(user_id)
                 del game_data["players"][str(user_id)]
@@ -500,11 +515,13 @@ class Registration(RouterHelper):
             tg_obj=self.message,
             user_state=self.state,
             dispatcher=self.dispatcher,
-            user_data=user_data
+            user_data=user_data,
         )
         async with lock_state(game_state):
             game_data = await game_state.get_data()
-            self._delete_bet(user_data=user_data, game_data=game_data)
+            self._delete_bet(
+                user_data=user_data, game_data=game_data
+            )
             bids: RolesAndUsersMoney = game_data["bids"]
             bids.setdefault(user_data["coveted_role"], []).append(
                 [user_id, rate]
@@ -568,4 +585,3 @@ class Registration(RouterHelper):
             "cant_talk": [],
         }
         await self.state.set_data(game_data)
-        await self.state.set_state(GameFsm.REGISTRATION)

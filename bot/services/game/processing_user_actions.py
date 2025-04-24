@@ -9,7 +9,6 @@ from keyboards.inline.keypads.to_bot import (
 from mafia.roles import Hacker
 from services.base import RouterHelper
 from services.game.game_assistants import (
-    get_game_state_and_data,
     get_game_data_and_user_id,
     get_game_state_by_user_state,
 )
@@ -97,7 +96,7 @@ class UserManager(RouterHelper):
     async def vote_for(self, callback_data: UserActionIndexCbData):
         await delete_message(self.callback.message)
         game_state = await get_game_state_by_user_state(
-            tg_obj=self.message,
+            tg_obj=self.callback,
             user_state=self.state,
             dispatcher=self.dispatcher,
         )

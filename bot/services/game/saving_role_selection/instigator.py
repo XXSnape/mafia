@@ -28,7 +28,7 @@ class InstigatorSaver(RouterHelper):
             dispatcher=self.dispatcher,
         )
         async with lock_state(game_state):
-            game_data, user_id = get_game_data_and_user_id(
+            game_data, user_id = await get_game_data_and_user_id(
                 game_state=game_state, callback_data=callback_data
             )
             game_data["deceived"] = [user_id]
@@ -80,7 +80,7 @@ class InstigatorSaver(RouterHelper):
             dispatcher=self.dispatcher,
         )
         async with lock_state(game_state):
-            game_data, user_id = get_game_data_and_user_id(
+            game_data, user_id = await get_game_data_and_user_id(
                 game_state=game_state, callback_data=callback_data
             )
             deceived_user = game_data["deceived"]

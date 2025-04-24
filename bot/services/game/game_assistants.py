@@ -1,4 +1,3 @@
-import asyncio
 from contextlib import suppress
 
 from aiogram import Dispatcher
@@ -192,6 +191,7 @@ async def inform_players_after_action(
         game_data=game_data,
         current_role=current_role,
         message_to_group=message_to_group,
+        user_id=user_id,
     )
 
 

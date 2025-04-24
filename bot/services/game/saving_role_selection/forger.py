@@ -31,7 +31,7 @@ class ForgerSaver(RouterHelper):
             dispatcher=self.dispatcher,
         )
         async with lock_state(game_state):
-            game_data, user_id = get_game_data_and_user_id(
+            game_data, user_id = await get_game_data_and_user_id(
                 game_state=game_state, callback_data=callback_data
             )
             url = game_data["players"][str(user_id)]["url"]
