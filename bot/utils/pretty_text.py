@@ -14,7 +14,7 @@ def get_minutes_and_seconds_text(
     start: int | None = None,
     end: int | None = None,
     seconds: int | None = None,
-    message="До начала игры осталось примерно ",
+    message="⏳До начала игры осталось примерно ",
 ) -> str:
     if seconds:
         diff = seconds

@@ -287,7 +287,8 @@ class Controller:
             role = game_data["players"][str(victim_id)][
                 "pretty_role"
             ]
-            text_about_dead += f"🌹Убит {role} - {url}!\n\n"
+            killer = killers_of[victim_id][0].role
+            text_about_dead += f"🌹Убит {role} - {url} (один из виновных — {killer})!\n\n"
         text_about_dead = (
             text_about_dead or "💕Сегодня ночью все выжили!"
         )

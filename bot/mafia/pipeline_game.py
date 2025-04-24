@@ -138,7 +138,7 @@ class Game:
             await self.familiarize_players(game_data)
             await self.bot.send_message(
                 chat_id=self.group_chat_id,
-                text=make_build("Игра начинается!"),
+                text=make_build("🎲Игра начинается!"),
                 reply_markup=get_to_bot_kb(),
             )
             while True:
@@ -170,7 +170,7 @@ class Game:
         )
         await send_a_lot_of_messages_safely(
             bot=self.bot,
-            text=make_build("Извините, игра аварийно завершилась!"),
+            text=make_build("❌Извините, игра аварийно завершилась!"),
             users=list(game_data["players"].keys())
             + [self.group_chat_id],
         )
@@ -197,7 +197,7 @@ class Game:
             game_data=game_data, all_roles=self.all_roles
         )
         night_starts_text = make_build(
-            f"Наступает ночь {game_data['number_of_night']} "
+            f"🌃Наступает ночь {game_data['number_of_night']} "
             f"(продлится {game_data["settings"]["time_for_night"]} секунд)"
         )
         await self.bot.send_photo(
@@ -207,15 +207,14 @@ class Game:
             reply_markup=get_to_bot_kb("Действовать!"),
         )
         await self.controller.mailing()
-        # await asyncio.sleep(
-        #     game_data["settings"]["time_for_night"] - 3
-        # ) # TODO
-        await asyncio.sleep(25)
+        await asyncio.sleep(
+            game_data["settings"]["time_for_night"] - 3
+        )
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
         )
-        # await asyncio.sleep(3)
+        await asyncio.sleep(3)
         game_data = await self.controller.sum_up_after_night()
         players_after_night = get_live_players(
             game_data=game_data, all_roles=self.all_roles
@@ -227,16 +226,17 @@ class Game:
             f"{players_after_night}",
             reply_markup=get_to_bot_kb("Пища для размышлений тут"),
         )
-        # await asyncio.sleep(game_data["settings"]["time_for_day"])
+        await asyncio.sleep(game_data["settings"]["time_for_day"])
         await self.controller.suggest_vote()
-        await asyncio.sleep(12)
+        await asyncio.sleep(35)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
         )
+        await asyncio.sleep(2)
         result = await self.controller.confirm_final_aim()
         if result:
-            await asyncio.sleep(15)
+            await asyncio.sleep(45)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
