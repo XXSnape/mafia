@@ -124,6 +124,7 @@ class GamesDao(BaseDAO[GameModel]):
             .having(
                 func.count(ResultModel.user_tg_id) >= 3,
             )
+            .order_by(desc("number_of_games"))
             .limit(15)
         )
         result = await self._session.execute(query)

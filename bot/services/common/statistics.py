@@ -97,23 +97,23 @@ class StatisticsRouter(RouterHelper):
 
     @staticmethod
     def sorting_by_efficiency(rows):
-        for left_point in range(len(rows) - 1):
-            for right_point in range(left_point + 1, len(rows)):
-                left_item = rows[left_point]
-                right_item = rows[right_point]
+        rows.sort(key=attrgetter("number_of_games"), reverse=True)
+        n = 1
+        is_sorted = False
+        while not is_sorted:
+            is_sorted = True
+            for i in range(len(rows) - n):
                 if (
                     abs(
-                        left_item.number_of_games
-                        - right_item.number_of_games
+                        rows[i].number_of_games
+                        - rows[i + 1].number_of_games
                     )
                     <= 3
+                    and rows[i + 1].efficiency > rows[i].efficiency
                 ):
-                    key = attrgetter("efficiency", "number_of_games")
-                else:
-                    key = attrgetter("number_of_games")
-                rows[left_point], rows[right_point] = sorted(
-                    [right_item, left_item], key=key, reverse=True
-                )
+                    rows[i], rows[i + 1] = rows[i + 1], rows[i]
+                    is_sorted = False
+            n += 1
 
     async def get_group_statistics(self):
         await delete_message(self.message)
