@@ -5,7 +5,9 @@ from mafia.roles import Warden
 from services.base import RouterHelper
 from services.game.game_assistants import (
     send_messages_to_user_and_group,
-    trace_all_actions, get_game_state_by_user_state, remove_from_expected,
+    trace_all_actions,
+    get_game_state_by_user_state,
+    remove_from_expected,
 )
 from utils.state import lock_state
 from utils.tg import delete_message
@@ -41,7 +43,9 @@ class WardenSaver(RouterHelper):
                     game_data=game_data,
                 )
                 return
-            elif len(checked) == 1 and checked[0] == processed_user_id:
+            elif (
+                len(checked) == 1 and checked[0] == processed_user_id
+            ):
                 checked.clear()
                 await self._generate_markup_after_selection(
                     game_state=game_state,
@@ -59,7 +63,9 @@ class WardenSaver(RouterHelper):
                     user_id=user_id,
                     need_to_remove_from_expected=False,
                 )
-            remove_from_expected(callback=self.callback, game_data=game_data)
+            remove_from_expected(
+                callback=self.callback, game_data=game_data
+            )
             await game_state.set_data(game_data)
 
         user1_url = game_data["players"][str(user1_id)]["url"]
@@ -68,7 +74,6 @@ class WardenSaver(RouterHelper):
             callback=self.callback,
             game_data=game_data,
             message_to_user=f"Ты решил проверить на принадлежность "
-                            f"одной группировки {user1_url} и {user2_url}",
+            f"одной группировки {user1_url} и {user2_url}",
             current_role=Warden(),
         )
-

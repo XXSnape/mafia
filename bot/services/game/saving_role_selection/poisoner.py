@@ -11,7 +11,9 @@ from mafia.roles import Poisoner
 from services.base import RouterHelper
 from services.game.game_assistants import (
     send_messages_to_user_and_group,
-    take_action_and_save_data, get_game_state_by_user_state, remove_from_expected,
+    take_action_and_save_data,
+    get_game_state_by_user_state,
+    remove_from_expected,
 )
 from states.game import UserFsm
 from utils.state import lock_state
@@ -30,7 +32,9 @@ class PoisonerSaver(RouterHelper):
             game_data = await game_state.get_data()
             poisoned = game_data["poisoned"]
             poisoned[1] = 1
-            remove_from_expected(callback=self.callback, game_data=game_data)
+            remove_from_expected(
+                callback=self.callback, game_data=game_data
+            )
             await game_state.set_data(game_data)
 
         await send_messages_to_user_and_group(
@@ -39,7 +43,6 @@ class PoisonerSaver(RouterHelper):
             message_to_user="Ты решил всех убить!",
             message_to_group=False,
         )
-
 
     async def poisoner_poisons(self):
         game_state = await get_game_state_by_user_state(
@@ -79,13 +82,11 @@ class PoisonerSaver(RouterHelper):
     async def poisoner_chose_victim(
         self, callback_data: UserActionIndexCbData
     ):
-        game_state, user_id = (
-            await take_action_and_save_data(
-                callback=self.callback,
-                callback_data=callback_data,
-                state=self.state,
-                dispatcher=self.dispatcher,
-            )
+        game_state, user_id = await take_action_and_save_data(
+            callback=self.callback,
+            callback_data=callback_data,
+            state=self.state,
+            dispatcher=self.dispatcher,
         )
         async with lock_state(game_state):
             game_data = await game_state.get_data()
@@ -95,4 +96,3 @@ class PoisonerSaver(RouterHelper):
             else:
                 poisoned[:] = [[user_id], 0]
             await game_state.set_data(game_data)
-

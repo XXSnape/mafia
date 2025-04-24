@@ -104,4 +104,3 @@ class InstigatorSaver(RouterHelper):
             f"{object_url}, если попытается голосовать",
             current_role=Instigator(),
         )
-

@@ -19,7 +19,9 @@ from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_data_and_user_id,
     take_action_and_save_data,
-    trace_all_actions, get_game_state_by_user_state, send_messages_to_user_and_group,
+    trace_all_actions,
+    get_game_state_by_user_state,
+    send_messages_to_user_and_group,
 )
 from utils.informing import send_a_lot_of_messages_safely
 from utils.state import lock_state
@@ -119,6 +121,5 @@ class PolicemanSaver(RouterHelper):
             callback=self.callback,
             game_data=game_data,
             message_to_user=False,
-            message_to_group="Армия насильно заставила кого-то показать документы!"
+            message_to_group="Армия насильно заставила кого-то показать документы!",
         )
-

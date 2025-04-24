@@ -10,7 +10,9 @@ from mafia.roles import (
     Werewolf,
 )
 from services.base import RouterHelper
-from services.game.game_assistants import  get_game_state_by_user_state
+from services.game.game_assistants import (
+    get_game_state_by_user_state,
+)
 from utils.common import get_criminals_ids
 from utils.informing import (
     get_profiles,
