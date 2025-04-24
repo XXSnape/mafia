@@ -3,6 +3,8 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery, Message
+from database.dao.users import UsersDao
+from database.schemas.common import TgIdSchema
 from keyboards.inline.callback_factory.settings import (
     GroupSettingsCbData,
 )
@@ -26,9 +28,16 @@ router = Router(name=__name__)
         SettingsFsm.ORDER_OF_ROLES,
     ),
 )
-async def handle_settings(message: Message, state: FSMContext):
+async def handle_settings(
+    message: Message,
+    state: FSMContext,
+    session_with_commit: AsyncSession,
+):
     await state.clear()
     await message.delete()
+    await UsersDao(session=session_with_commit).get_user_or_create(
+        tg_id=TgIdSchema(tg_id=message.from_user.id)
+    )
     await message.answer(
         make_build("⚙️Выбери, что конкретно хочешь настроить"),
         reply_markup=select_setting_kb(),

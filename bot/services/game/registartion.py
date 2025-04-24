@@ -1,4 +1,3 @@
-import asyncio
 from collections.abc import Awaitable, Callable
 from contextlib import suppress
 from datetime import UTC, datetime, timedelta
@@ -41,7 +40,6 @@ from scheduler.game import (
 )
 from services.base import RouterHelper
 from services.game.game_assistants import (
-    get_game_state_and_data,
     get_game_state_by_user_state,
 )
 from services.users.order_of_roles import RoleManager
@@ -139,7 +137,15 @@ class Registration(RouterHelper):
             ]
         )
 
+    async def add_group_if_not_exists(self):
+        dao = GroupsDao(session=self.session)
+        schema = TgIdSchema(tg_id=self.message.chat.id)
+        group = await dao.find_one_or_none(schema)
+        if group is None:
+            await dao.add(schema)
+
     async def start_registration(self):
+
         if (
             await self.checking_for_necessary_permissions_to_start_game()
             is False
@@ -549,6 +555,7 @@ class Registration(RouterHelper):
         end_of_registration: int,
     ):
         owner_id = self._get_user_id()
+        await self.add_group_if_not_exists()
         group_settings_schema = await GroupsDao(
             session=self.session
         ).get_group_settings(

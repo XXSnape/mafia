@@ -11,9 +11,9 @@ router = Router(name=__name__)
 
 @router.message(Command("statistics"))
 async def get_group_statistics(
-    message: Message, session_without_commit: AsyncSession
+    message: Message, session_with_commit: AsyncSession
 ):
     statistics = StatisticsRouter(
-        message=message, session=session_without_commit
+        message=message, session=session_with_commit
     )
     await statistics.get_group_statistics()

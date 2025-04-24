@@ -13,9 +13,9 @@ router = Router(name=__name__)
 
 @router.message(Command("settings"), StateFilter(default_state))
 async def get_group_settings(
-    message: Message, session_without_commit: AsyncSession
+    message: Message, session_with_commit: AsyncSession
 ):
     settings = SettingsRouter(
-        message=message, session=session_without_commit
+        message=message, session=session_with_commit
     )
     await settings.get_group_settings()

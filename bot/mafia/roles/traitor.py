@@ -5,8 +5,8 @@ from cache.cache_types import GameCache, UserIdInt
 from cache.extra import ExtraCache
 from general.groupings import Groupings
 from general.text import (
-    ROLE_IS_KNOWN,
     NUMBER_OF_NIGHT,
+    ROLE_IS_KNOWN,
 )
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,

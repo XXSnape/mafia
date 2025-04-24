@@ -24,8 +24,8 @@ class StatisticsRouter(RouterHelper):
     async def get_my_profile(self):
         await self.message.delete()
         users_dao = UsersDao(session=self.session)
-        user = await users_dao.find_one_or_none(
-            TgIdSchema(tg_id=self.message.from_user.id)
+        user = await users_dao.get_user_or_create(
+            tg_id=TgIdSchema(tg_id=self.message.from_user.id)
         )
         balance = user.balance
         results_dao = ResultsDao(session=self.session)
@@ -117,12 +117,13 @@ class StatisticsRouter(RouterHelper):
 
     async def get_group_statistics(self):
         await delete_message(self.message)
-        group = await GroupsDao(
-            session=self.session
-        ).find_one_or_none(TgIdSchema(tg_id=self.message.chat.id))
+        groups_dao = GroupsDao(session=self.session)
+        group_schema = TgIdSchema(tg_id=self.message.chat.id)
+        group = await groups_dao.find_one_or_none(
+            TgIdSchema(tg_id=self.message.chat.id)
+        )
         if group is None:
-            return
-
+            group = await groups_dao.add(group_schema)
         group_id_filter = GroupIdSchema(group_id=group.id)
         games_dao = GamesDao(session=self.session)
         game_result = await games_dao.get_results(group_id_filter)

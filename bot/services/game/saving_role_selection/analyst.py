@@ -1,9 +1,9 @@
 from mafia.roles import Analyst
 from services.base import RouterHelper
 from services.game.game_assistants import (
-    send_messages_to_user_and_group,
     get_game_state_by_user_state,
     remove_from_expected,
+    send_messages_to_user_and_group,
 )
 from utils.state import lock_state
 from utils.tg import delete_message

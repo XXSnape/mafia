@@ -9,9 +9,9 @@ from mafia.roles import Instigator
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_data_and_user_id,
-    trace_all_actions,
     get_game_state_by_user_state,
     send_messages_to_user_and_group,
+    trace_all_actions,
 )
 from states.game import UserFsm
 from utils.state import lock_state

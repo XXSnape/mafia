@@ -88,7 +88,9 @@ class SettingsRouter(RouterHelper):
         await delete_message(self.message)
         groups_dao = GroupsDao(session=self.session)
         group_tg_id = self.message.chat.id
-        group_schema = await groups_dao.get_group_settings(
+        group_schema = TgIdSchema(tg_id=group_tg_id)
+        await groups_dao.add(group_schema)
+        group_settings = await groups_dao.get_group_settings(
             group_tg_id=TgIdSchema(tg_id=group_tg_id)
         )
         is_user_admin = await check_user_for_admin_rights(
@@ -100,7 +102,7 @@ class SettingsRouter(RouterHelper):
         group_name = make_build(
             f"🔧Настройки группы «{chat_info.title}»\n\n"
         )
-        if group_schema.is_there_settings is False:
+        if group_settings.is_there_settings is False:
             await self.message.bot.send_message(
                 chat_id=self.message.from_user.id,
                 text=make_build(
@@ -111,15 +113,15 @@ class SettingsRouter(RouterHelper):
             )
         else:
             banned_roles_text = RoleAttendant.get_banned_roles_text(
-                roles_ids=group_schema.banned_roles
+                roles_ids=group_settings.banned_roles
             )
             order_of_roles_text = RoleManager.get_current_order_text(
-                selected_roles=group_schema.order_of_roles,
+                selected_roles=group_settings.order_of_roles,
                 to_save=False,
             )
             other_settings_text = make_build(
-                f"Ночь длится (в секундах): {group_schema.time_for_night}\n"
-                f"День длится (в секундах): {group_schema.time_for_day}\n"
+                f"Ночь длится (в секундах): {group_settings.time_for_night}\n"
+                f"День длится (в секундах): {group_settings.time_for_day}\n"
             )
             await self.message.bot.send_message(
                 chat_id=self.message.from_user.id,
@@ -140,8 +142,8 @@ class SettingsRouter(RouterHelper):
                     f"❗️Ты можешь поменять настройки группы «{chat_info.title}» с помощью кнопок ниже:"
                 ),
                 reply_markup=set_up_group_kb(
-                    group_id=group_schema.id,
-                    is_there_settings=group_schema.is_there_settings,
+                    group_id=group_settings.id,
+                    is_there_settings=group_settings.is_there_settings,
                 ),
             )
 

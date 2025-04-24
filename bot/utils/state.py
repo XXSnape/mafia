@@ -1,5 +1,5 @@
 import asyncio
-from contextlib import suppress, asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from typing import cast
 
 from aiogram import Bot, Dispatcher
@@ -7,8 +7,7 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.fsm.storage.base import StorageKey
-from aiogram.fsm.storage.redis import RedisEventIsolation, RedisStorage
-
+from aiogram.fsm.storage.redis import RedisStorage
 from cache.cache_types import GameCache, UserCache, UserIdInt
 from utils.tg import delete_messages_from_to_delete
 
@@ -31,14 +30,13 @@ async def get_state_and_assign(
         await chat_state.set_state(new_state)
     return chat_state
 
+
 @asynccontextmanager
 async def lock_state(state: FSMContext):
     storage = cast(RedisStorage, state.storage)
     isolation = storage.create_isolation()
     async with isolation.lock(state.key):
         yield None
-    # return storage.create_isolation()
-
 
 
 async def reset_user_state(

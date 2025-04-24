@@ -1,6 +1,6 @@
 from typing import cast
 
-from cache.cache_types import RolesLiteral, GameCache
+from cache.cache_types import GameCache, RolesLiteral
 from general.collection_of_roles import get_data_with_roles
 from general.text import NUMBER_OF_NIGHT
 from keyboards.inline.callback_factory.recognize_user import (
@@ -11,9 +11,9 @@ from mafia.roles import Forger
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_data_and_user_id,
-    trace_all_actions,
     get_game_state_by_user_state,
     send_messages_to_user_and_group,
+    trace_all_actions,
 )
 from utils.common import get_criminals_ids
 from utils.informing import send_a_lot_of_messages_safely
