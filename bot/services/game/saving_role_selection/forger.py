@@ -2,6 +2,7 @@ from typing import cast
 
 from cache.cache_types import RolesLiteral, GameCache
 from general.collection_of_roles import get_data_with_roles
+from general.text import NUMBER_OF_NIGHT
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
@@ -89,7 +90,8 @@ class ForgerSaver(RouterHelper):
         await send_a_lot_of_messages_safely(
             bot=self.callback.bot,
             users=get_criminals_ids(game_data),
-            text=f"{make_pretty(forger.role)} {forger_url} подменил документы "
+            text=NUMBER_OF_NIGHT.format(game_data["number_of_night"])
+            + f"{make_pretty(forger.role)} {forger_url} подменил документы "
             f"{user_url} на {pretty_user_role}",
         )
         await send_messages_to_user_and_group(

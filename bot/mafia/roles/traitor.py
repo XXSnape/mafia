@@ -6,6 +6,7 @@ from cache.extra import ExtraCache
 from general.groupings import Groupings
 from general.text import (
     ROLE_IS_KNOWN,
+    NUMBER_OF_NIGHT,
 )
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
@@ -82,7 +83,9 @@ class Traitor(
     ):
 
         game_data["mafias_are_shown"].append(processed_user_id)
-        text = (
+        text = NUMBER_OF_NIGHT.format(
+            game_data["number_of_night"]
+        ) + (
             f"❗️{make_pretty(self.role)} проверил и узнал, "
             f"что {user_url} - {make_pretty(processed_role.role)}!"
         )

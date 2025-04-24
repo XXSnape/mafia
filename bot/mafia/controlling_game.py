@@ -195,6 +195,7 @@ class Controller:
             )
         await self.state.set_data(game_data)
         if removed_user_id is None:
+            await asyncio.sleep(1)
             await self.bot.send_message(
                 chat_id=self.group_chat_id,
                 text=result_text,

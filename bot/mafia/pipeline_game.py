@@ -209,7 +209,7 @@ class Game:
         # await asyncio.sleep(
         #     game_data["settings"]["time_for_night"] - 3
         # ) # TODO
-        await asyncio.sleep(30)
+        await asyncio.sleep(35)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -241,7 +241,7 @@ class Game:
             state=self.state,
         )
         await self.controller.sum_up_after_voting()
-        await self.controller.removing_inactive_players()
+        # await self.controller.removing_inactive_players()
         await self.controller.end_night()
         await asyncio.sleep(3)
 

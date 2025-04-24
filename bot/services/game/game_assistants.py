@@ -95,7 +95,11 @@ async def inform_aliases(
     callback: CallbackQuery,
     url: str,
 ):
-    if current_role.alias or current_role.is_alias:
+    if (
+        current_role.alias
+        or current_role.is_alias
+        or current_role.grouping == Groupings.criminals
+    ):
         current_url = game_data["players"][
             str(callback.from_user.id)
         ]["url"]
