@@ -1,3 +1,6 @@
+from typing import cast
+
+from cache.cache_types import GameCache, UserIdInt
 from general.collection_of_roles import get_data_with_roles
 from general.groupings import Groupings
 from keyboards.inline.callback_factory.recognize_user import (
@@ -93,7 +96,20 @@ class UserManager(RouterHelper):
             make_build("Сообщение успешно отправлено!")
         )
 
-    async def vote_for(self, callback_data: UserActionIndexCbData):
+    def check_for_cheating(
+        self, game_data: GameCache
+    ) -> UserIdInt | None:
+        deceived_user = game_data.get("deceived", [])
+        if (
+            len(deceived_user) == 2
+            and self.callback.from_user.id == deceived_user[0]
+            and deceived_user[1] in game_data["live_players_ids"]
+        ):
+            return deceived_user[1]
+
+    async def vote_for(
+        self, callback_data: UserActionIndexCbData | None
+    ):
         await delete_message(self.callback.message)
         game_state = await get_game_state_by_user_state(
             tg_obj=self.callback,
@@ -101,19 +117,20 @@ class UserManager(RouterHelper):
             dispatcher=self.dispatcher,
         )
         async with lock_state(game_state):
-            game_data, voted_user_id = (
-                await get_game_data_and_user_id(
-                    game_state=game_state,
-                    callback_data=callback_data,
+            if callback_data is None:
+                game_data: GameCache = await game_state.get_data()
+                voted_user_id = self.check_for_cheating(game_data)
+            else:
+                game_data, voted_user_id = (
+                    await get_game_data_and_user_id(
+                        game_state=game_state,
+                        callback_data=callback_data,
+                    )
                 )
-            )
-            deceived_user = game_data.get("deceived", [])
-            if (
-                len(deceived_user) == 2
-                and self.callback.from_user.id == deceived_user[0]
-                and deceived_user[1] in game_data["live_players_ids"]
-            ):
-                voted_user_id = deceived_user[1]
+                voted_user_id = (
+                    self.check_for_cheating(game_data)
+                    or voted_user_id
+                )
             game_data["vote_for"].append(
                 [self.callback.from_user.id, voted_user_id]
             )
@@ -132,6 +149,34 @@ class UserManager(RouterHelper):
             chat_id=game_data["game_chat"],
             text=make_build(
                 f"❗️{voting_url} выступает против {voted_url}!"
+            ),
+            reply_markup=participate_in_social_life(),
+        )
+
+    async def dont_vote_for_anyone(self):
+        await delete_message(self.callback.message)
+        game_state = await get_game_state_by_user_state(
+            tg_obj=self.callback,
+            user_state=self.state,
+            dispatcher=self.dispatcher,
+        )
+        game_data: GameCache = await game_state.get_data()
+        if self.check_for_cheating(game_data):
+            await self.vote_for(callback_data=None)
+            return
+        url = game_data["players"][str(self.callback.from_user.id)]['url']
+        await self.callback.message.answer(
+            make_build(
+                f"🌟День {game_data['number_of_night']}\n\n"
+                f"Ты решил ни за кого не голосовать"
+            )
+        )
+        await self.callback.bot.send_message(
+            chat_id=game_data["game_chat"],
+            text=make_build(
+                f"🦄{url} ходит с розовыми очками в мире единорогов, "
+                f"эльфов и великодушных гномов!\n\n"
+                f"Не приведет ли наивность к новым жертвам?"
             ),
             reply_markup=participate_in_social_life(),
         )

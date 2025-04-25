@@ -4,6 +4,8 @@ from collections.abc import Callable, Iterable
 from typing import TYPE_CHECKING
 
 from aiogram import Bot
+from aiogram.types import InlineKeyboardButton
+
 from cache.cache_types import (
     GameCache,
     PlayersIds,
@@ -15,6 +17,7 @@ from general.text import MONEY_SYM, NUMBER_OF_NIGHT
 from keyboards.inline.callback_factory.recognize_user import (
     UserVoteIndexCbData,
 )
+from keyboards.inline.cb.cb_text import DONT_VOTE_FOR_ANYONE_CB
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
@@ -262,6 +265,7 @@ async def send_request_to_vote(
             players=players,
             exclude=user_id,
             user_index_cb=UserVoteIndexCbData,
+            extra_buttons=(InlineKeyboardButton(text='🚫Скип', callback_data=DONT_VOTE_FOR_ANYONE_CB),)
         ),
     )
     game_data["to_delete"].append([user_id, sent_message.message_id])
