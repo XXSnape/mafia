@@ -97,7 +97,6 @@ class StatisticsRouter(RouterHelper):
 
     @staticmethod
     def sorting_by_efficiency(rows):
-        rows.sort(key=attrgetter("number_of_games"), reverse=True)
         n = 1
         is_sorted = False
         while not is_sorted:
