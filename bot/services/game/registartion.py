@@ -261,7 +261,7 @@ class Registration(RouterHelper):
             need_to_clean_start=True,
         )
         await self.message.answer(
-            make_build("🚫Игра успешно отменена!")
+            make_build("⚠️Игра успешно отменена!")
         )
 
     async def _offer_bet(self, game_data: GameCache, balance: int):
