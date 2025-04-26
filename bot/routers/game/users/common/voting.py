@@ -1,6 +1,9 @@
 from aiogram import Dispatcher, Router, F
+from aiogram.exceptions import TelegramRetryAfter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
+from loguru import logger
+
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
     UserVoteIndexCbData,
@@ -21,15 +24,22 @@ async def vote_for(
     user_manager = UserManager(
         callback=callback, state=state, dispatcher=dispatcher
     )
-    await user_manager.vote_for(callback_data=callback_data)
+    try:
+        await user_manager.vote_for(callback_data=callback_data)
+    except TelegramRetryAfter:
+        logger.exception("Ошибка при отправке сообщения")
+
 
 @router.callback_query(F.data == DONT_VOTE_FOR_ANYONE_CB)
 async def dont_vote_for_anyone(
-        callback: CallbackQuery,
-        state: FSMContext,
-        dispatcher: Dispatcher,
+    callback: CallbackQuery,
+    state: FSMContext,
+    dispatcher: Dispatcher,
 ):
     user_manager = UserManager(
         callback=callback, state=state, dispatcher=dispatcher
     )
-    await user_manager.dont_vote_for_anyone()
+    try:
+        await user_manager.dont_vote_for_anyone()
+    except TelegramRetryAfter:
+        logger.exception("Ошибка при отправке сообщения")

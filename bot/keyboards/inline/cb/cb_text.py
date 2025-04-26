@@ -1,5 +1,5 @@
 JOIN_CB = "join"
-DONT_VOTE_FOR_ANYONE_CB = 'dont_vote_for_anyone'
+DONT_VOTE_FOR_ANYONE_CB = "dont_vote_for_anyone"
 FINISH_REGISTRATION_CB = "finish_registration"
 DRAW_CB = "draw"
 POLICEMAN_KILLS_CB = "policeman_kills"

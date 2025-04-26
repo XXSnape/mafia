@@ -13,7 +13,7 @@ from cache.cache_types import (
     UsersInGame,
 )
 from general.groupings import Groupings
-from general.text import MONEY_SYM, NUMBER_OF_NIGHT
+from general.text import MONEY_SYM, NUMBER_OF_NIGHT, SKIP
 from keyboards.inline.callback_factory.recognize_user import (
     UserVoteIndexCbData,
 )
@@ -81,7 +81,9 @@ def get_live_roles(game_data: GameCache, all_roles: "DataWithRoles"):
     for grouping, roles in gropings.items():
         if not roles:
             continue
-        grouping_roles = "\n● ".join(sorted(role for role, _ in roles))
+        grouping_roles = "\n● ".join(
+            sorted(role for role, _ in roles)
+        )
         total = sum(count for _, count in roles)
         total_text = make_build(f"- {total}:")
         result += f"\n{grouping.value.name} {total_text}\n● {grouping_roles}\n"
@@ -148,12 +150,14 @@ def get_results_of_goal_identification(game_data: GameCache):
 
     voting_result = ""
     refused_result = ""
-    if game_data['refused_to_vote']:
-        refused_result = (f"\n\n❤️Искренние ценители человеческой жизни "
-                          f"({len(game_data['refused_to_vote'])}):")
-        for user_id in game_data['refused_to_vote']:
-            url = game_data['players'][str(user_id)]['url']
-            refused_result += f'\n● {url}'
+    if game_data["refused_to_vote"]:
+        refused_result = (
+            f"\n\n❤️Искренние ценители человеческой жизни "
+            f"({len(game_data['refused_to_vote'])}):"
+        )
+        for user_id in game_data["refused_to_vote"]:
+            url = game_data["players"][str(user_id)]["url"]
+            refused_result += f"\n● {url}"
 
     if not voting:
         voting_result = make_build(
@@ -266,15 +270,21 @@ async def send_request_to_vote(
     players_ids: PlayersIds,
     players: UsersInGame,
 ):
+    game_data["waiting_for_action_at_day"].append(user_id)
     sent_message = await bot.send_message(
         chat_id=user_id,
-        text="Проголосуй за того, кто не нравится!",
+        text=f"Проголосуй за того, кто не нравится "
+        f"или нажми на последнюю кнопку «{SKIP}»!",
         reply_markup=send_selection_to_players_kb(
             players_ids=players_ids,
             players=players,
             exclude=user_id,
             user_index_cb=UserVoteIndexCbData,
-            extra_buttons=(InlineKeyboardButton(text='🚫Скип', callback_data=DONT_VOTE_FOR_ANYONE_CB),)
+            extra_buttons=(
+                InlineKeyboardButton(
+                    text=SKIP, callback_data=DONT_VOTE_FOR_ANYONE_CB
+                ),
+            ),
         ),
     )
     game_data["to_delete"].append([user_id, sent_message.message_id])

@@ -2,6 +2,7 @@ ROLE_IS_KNOWN = "Кто - то взаимодействовал с твоими 
 NUMBER_OF_NIGHT = "Ночь {}\n\n"
 ATTEMPT_TO_KILL = "На тебя было совершено покушение!"
 MONEY_SYM = "💵"
+SKIP = "🚫Скип"
 TO_SAVE = "💾Сохранить"
 REQUIRE_TO_SAVE: str = (
     f"❗️Чтобы сохранить изменения, нажми «{TO_SAVE}»\n\n"

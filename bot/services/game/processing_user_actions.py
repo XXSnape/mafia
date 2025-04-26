@@ -1,3 +1,4 @@
+from contextlib import suppress
 from typing import cast
 
 from cache.cache_types import GameCache, UserIdInt
@@ -47,6 +48,13 @@ class UserManager(RouterHelper):
             make_build("Сообщение успешно отправлено!")
         )
         await self.state.clear()
+
+    @staticmethod
+    def delete_user_from_waiting_for_action_at_day(
+        game_data: GameCache, user_id: int
+    ):
+        with suppress(ValueError):
+            game_data["waiting_for_action_at_day"].remove(user_id)
 
     async def allies_communicate(self):
         game_state = await get_game_state_by_user_state(
@@ -131,6 +139,10 @@ class UserManager(RouterHelper):
                     self.check_for_cheating(game_data)
                     or voted_user_id
                 )
+            self.delete_user_from_waiting_for_action_at_day(
+                game_data=game_data,
+                user_id=self.callback.from_user.id,
+            )
             game_data["vote_for"].append(
                 [self.callback.from_user.id, voted_user_id]
             )
@@ -166,12 +178,20 @@ class UserManager(RouterHelper):
             if self.check_for_cheating(game_data) is True:
                 is_deceived = True
             else:
-                game_data['refused_to_vote'].append(self.callback.from_user.id)
+                self.delete_user_from_waiting_for_action_at_day(
+                    game_data=game_data,
+                    user_id=self.callback.from_user.id,
+                )
+                game_data["refused_to_vote"].append(
+                    self.callback.from_user.id
+                )
                 await game_state.set_data(game_data)
         if is_deceived:
             await self.vote_for(callback_data=None)
             return
-        url = game_data["players"][str(self.callback.from_user.id)]['url']
+        url = game_data["players"][str(self.callback.from_user.id)][
+            "url"
+        ]
         await self.callback.message.answer(
             make_build(
                 f"🌟День {game_data['number_of_night']}\n\n"

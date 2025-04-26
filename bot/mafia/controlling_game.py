@@ -10,7 +10,9 @@ from aiogram.fsm.context import FSMContext
 from cache.cache_types import (
     GameCache,
     LastInteraction,
-    UserGameCache, UserIdInt,
+    UserGameCache,
+    UserIdInt,
+    PlayersIds,
 )
 from general.exceptions import GameIsOver
 from general.groupings import Groupings
@@ -143,7 +145,7 @@ class Controller:
         game_data["pros"].clear()
         game_data["cons"].clear()
         game_data["vote_for"].clear()
-        game_data['refused_to_vote'].clear()
+        game_data["refused_to_vote"].clear()
         game_data["messages_after_night"].clear()
         game_data["cant_talk"].clear()
         game_data["cant_vote"].clear()
@@ -315,7 +317,8 @@ class Controller:
             game_data=game_data
         )
         self.aim_id = get_the_most_frequently_encountered_id(
-            [voted for _, voted in vote_for], counterweight=len(game_data['refused_to_vote'])
+            [voted for _, voted in vote_for],
+            counterweight=len(game_data["refused_to_vote"]),
         )
         await self.state.set_data(game_data)
         await self.bot.send_message(
@@ -426,25 +429,59 @@ class Controller:
         )
         await self.state.set_data(game_data)
 
-    @check_end_of_game
-    async def removing_inactive_players(self):
-        game_data: GameCache = await self.state.get_data()
-        wait_for = game_data["wait_for"]
+    @staticmethod
+    def add_user_to_potentially_deleted(
+        waiting_for: PlayersIds,
+        live_players_ids: PlayersIds,
+        inactive_users: PlayersIds,
+    ):
         potentially_deleted = set()
-        inactive_users = []
-        for user_id in wait_for:
-            if user_id not in game_data["live_players_ids"]:
+        for user_id in waiting_for:
+            if user_id not in live_players_ids:
                 continue
             if user_id in potentially_deleted:
                 inactive_users.append(user_id)
             else:
                 potentially_deleted.add(user_id)
+
+    @staticmethod
+    def delete_inactive_users_from_data(
+        waiting_for: PlayersIds,
+        live_players_ids: PlayersIds,
+        inactive_users: PlayersIds,
+    ):
+        waiting_for[:] = list(
+            user_id
+            for user_id in set(waiting_for) - set(inactive_users)
+            if user_id in live_players_ids
+        )
+
+    @check_end_of_game
+    async def removing_inactive_players(self):
+        game_data: GameCache = await self.state.get_data()
+        live_players_ids = game_data["live_players_ids"]
+        inactive_users = []
+        self.add_user_to_potentially_deleted(
+            waiting_for=game_data["waiting_for_action_at_night"],
+            live_players_ids=live_players_ids,
+            inactive_users=inactive_users,
+        )
+        self.add_user_to_potentially_deleted(
+            waiting_for=game_data["waiting_for_action_at_day"],
+            live_players_ids=live_players_ids,
+            inactive_users=inactive_users,
+        )
         if not inactive_users:
             return
-        wait_for[:] = list(
-            user_id
-            for user_id in set(wait_for) - set(inactive_users)
-            if user_id in game_data["live_players_ids"]
+        self.delete_inactive_users_from_data(
+            waiting_for=game_data["waiting_for_action_at_night"],
+            live_players_ids=live_players_ids,
+            inactive_users=inactive_users,
+        )
+        self.delete_inactive_users_from_data(
+            waiting_for=game_data["waiting_for_action_at_day"],
+            live_players_ids=live_players_ids,
+            inactive_users=inactive_users,
         )
         profiles = get_profiles(
             players_ids=inactive_users,

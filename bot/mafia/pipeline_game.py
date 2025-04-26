@@ -235,10 +235,10 @@ class Game:
             bot=self.bot,
             state=self.state,
         )
-        await asyncio.sleep(2)
+        await asyncio.sleep(3)
         result = await self.controller.confirm_final_aim()
         if result:
-            await asyncio.sleep(45)
+            await asyncio.sleep(38)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,

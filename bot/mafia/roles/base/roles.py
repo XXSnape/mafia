@@ -551,7 +551,7 @@ class ActiveRoleAtNightABC(RoleABC):
             player_id=player_id,
             game_data=game_data,
         )
-        game_data["wait_for"].append(player_id)
+        game_data["waiting_for_action_at_night"].append(player_id)
         with suppress(TelegramBadRequest):
             sent_survey = await self.bot.send_message(
                 chat_id=player_id,

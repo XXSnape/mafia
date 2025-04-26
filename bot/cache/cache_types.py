@@ -92,7 +92,8 @@ class GameCache(TypedDict, total=False):
     bids: RolesAndUsersMoney
     game_chat: int
     start_message_id: int
-    wait_for: PlayersIds
+    waiting_for_action_at_night: PlayersIds
+    waiting_for_action_at_day: PlayersIds
     messages_after_night: list[list[UserIdInt | str]]
     disclosed_roles: PlayersIds
     forged_roles: list[UserIdInt | RolesLiteral]
@@ -118,4 +119,3 @@ class GameCache(TypedDict, total=False):
     angels_died: PlayersIds
     cant_vote: PlayersIds
     cant_talk: PlayersIds
-

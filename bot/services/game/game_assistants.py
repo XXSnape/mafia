@@ -25,7 +25,9 @@ def remove_from_expected(
 ):
     if need_to_remove_from_expected:
         with suppress(ValueError):
-            game_data["wait_for"].remove(callback.from_user.id)
+            game_data["waiting_for_action_at_night"].remove(
+                callback.from_user.id
+            )
 
 
 async def send_messages_to_user_and_group(
