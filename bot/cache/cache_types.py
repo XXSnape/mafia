@@ -102,6 +102,7 @@ class GameCache(TypedDict, total=False):
     poisoned: list[list[UserIdInt] | int]
     pros: PlayersIds
     cons: PlayersIds
+    refused_to_vote: PlayersIds
     live_players_ids: PlayersIds
     players: UsersInGame
     tracking: dict[UserIdStr, InteractionData]
@@ -117,3 +118,4 @@ class GameCache(TypedDict, total=False):
     angels_died: PlayersIds
     cant_vote: PlayersIds
     cant_talk: PlayersIds
+

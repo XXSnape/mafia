@@ -3,13 +3,17 @@ from collections import Counter
 from cache.cache_types import GameCache, PlayersIds
 
 
-def get_the_most_frequently_encountered_id(ids: PlayersIds):
+def get_the_most_frequently_encountered_id(ids: PlayersIds, counterweight: int | None = None):
     if not ids:
         return None
     if len(set(ids)) == 1:
+        if counterweight and counterweight >= len(ids):
+            return None
         return ids[0]
     most_common = Counter(ids).most_common()
     if most_common[0][1] == most_common[1][1]:
+        return None
+    if counterweight and counterweight >= most_common[0][1]:
         return None
     return most_common[0][0]
 

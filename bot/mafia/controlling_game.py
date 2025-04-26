@@ -10,7 +10,7 @@ from aiogram.fsm.context import FSMContext
 from cache.cache_types import (
     GameCache,
     LastInteraction,
-    UserGameCache,
+    UserGameCache, UserIdInt,
 )
 from general.exceptions import GameIsOver
 from general.groupings import Groupings
@@ -94,6 +94,7 @@ class Controller:
         self.bot = bot
         self.group_chat_id = group_chat_id
         self.all_roles = {}
+        self.aim_id: UserIdInt | None = None
 
     async def end_night(self):
         game_data: GameCache = await self.state.get_data()
@@ -142,6 +143,7 @@ class Controller:
         game_data["pros"].clear()
         game_data["cons"].clear()
         game_data["vote_for"].clear()
+        game_data['refused_to_vote'].clear()
         game_data["messages_after_night"].clear()
         game_data["cant_talk"].clear()
         game_data["cant_vote"].clear()
@@ -164,9 +166,7 @@ class Controller:
         game_data: GameCache = await self.state.get_data()
         pros = game_data["pros"]
         cons = game_data["cons"]
-        removed_user_id = get_the_most_frequently_encountered_id(
-            [voted for _, voted in game_data["vote_for"]]
-        )
+        removed_user_id = self.aim_id
         result_text = get_results_of_voting(
             game_data=game_data, removed_user_id=removed_user_id
         )
@@ -311,26 +311,26 @@ class Controller:
     ) -> bool:
         game_data: GameCache = await self.state.get_data()
         vote_for = game_data["vote_for"]
-        aim_id = get_the_most_frequently_encountered_id(
-            [voted for _, voted in vote_for]
-        )
         text = get_results_of_goal_identification(
             game_data=game_data
+        )
+        self.aim_id = get_the_most_frequently_encountered_id(
+            [voted for _, voted in vote_for], counterweight=len(game_data['refused_to_vote'])
         )
         await self.state.set_data(game_data)
         await self.bot.send_message(
             chat_id=self.group_chat_id,
             text=text,
         )
-        if aim_id is None:
+        if self.aim_id is None:
             return False
         await asyncio.sleep(2)
-        url = game_data["players"][str(aim_id)]["url"]
+        url = game_data["players"][str(self.aim_id)]["url"]
         sent_survey = await self.bot.send_message(
             chat_id=self.group_chat_id,
             text=make_build(f"На кону судьба {url}!"),
             reply_markup=get_vote_for_aim_kb(
-                user_id=aim_id,
+                user_id=self.aim_id,
                 pros=game_data["pros"],
                 cons=game_data["cons"],
             ),

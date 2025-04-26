@@ -160,8 +160,15 @@ class UserManager(RouterHelper):
             user_state=self.state,
             dispatcher=self.dispatcher,
         )
-        game_data: GameCache = await game_state.get_data()
-        if self.check_for_cheating(game_data):
+        is_deceived: bool = False
+        async with lock_state(game_state):
+            game_data: GameCache = await game_state.get_data()
+            if self.check_for_cheating(game_data) is True:
+                is_deceived = True
+            else:
+                game_data['refused_to_vote'].append(self.callback.from_user.id)
+                await game_state.set_data(game_data)
+        if is_deceived:
             await self.vote_for(callback_data=None)
             return
         url = game_data["players"][str(self.callback.from_user.id)]['url']
@@ -175,7 +182,7 @@ class UserManager(RouterHelper):
             chat_id=game_data["game_chat"],
             text=make_build(
                 f"🦄{url} ходит с розовыми очками в мире единорогов, "
-                f"эльфов и великодушных гномов!\n\n"
+                f"эльфов и великодушных гномов, поэтому всех прощает!\n\n"
                 f"Не приведет ли наивность к новым жертвам?"
             ),
             reply_markup=participate_in_social_life(),

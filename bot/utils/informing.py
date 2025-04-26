@@ -146,22 +146,31 @@ def get_results_of_goal_identification(game_data: GameCache):
             game_data["players"][str(voting_id)]["url"]
         )
 
-    result_voting = ""
+    voting_result = ""
+    refused_result = ""
+    if game_data['refused_to_vote']:
+        refused_result = (f"\n\n❤️Искренние ценители человеческой жизни "
+                          f"({len(game_data['refused_to_vote'])}):")
+        for user_id in game_data['refused_to_vote']:
+            url = game_data['players'][str(user_id)]['url']
+            refused_result += f'\n● {url}'
+
     if not voting:
-        result_voting = make_build(
+        voting_result = make_build(
             "\n\n😯Сегодня нет потенциальных жертв!"
         )
-        return result + result_voting
+        return result + refused_result + voting_result
     for voted, voting_people in sorted(
         voting.items(), key=sorting_by_voting, reverse=True
     ):
-        result_voting += (
+        voting_result += (
             f"\n\n📝Голосовавшие за {voted} ({len(voting_people)}):\n● "
             + "\n● ".join(
                 voting_person for voting_person in voting_people
             )
         )
-    return result + result_voting
+
+    return result + voting_result + refused_result
 
 
 def get_results_of_voting(

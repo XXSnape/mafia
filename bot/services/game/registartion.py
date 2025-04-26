@@ -581,6 +581,7 @@ class Registration(RouterHelper):
             "messages_after_night": [],
             "to_delete": [],
             "vote_for": [],
+            'refused_to_vote': [],
             "tracking": {},
             "text_about_checks": "",
             "bids": {},
