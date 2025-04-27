@@ -31,7 +31,8 @@ from keyboards.inline.buttons.common import get_join_to_game_btn
 from keyboards.inline.keypads.join import (
     cancel_bet,
     join_to_game_kb,
-    offer_to_place_bet, remind_about_joining_kb,
+    offer_to_place_bet,
+    remind_about_joining_kb,
 )
 from loguru import logger
 from mafia.pipeline_game import Game
@@ -44,6 +45,7 @@ from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_state_by_user_state,
 )
+from services.users.different_settings import DifferentSettings
 from services.users.order_of_roles import RoleManager
 from states.game import GameFsm
 from utils.informing import get_profiles_during_registration
@@ -195,7 +197,9 @@ class Registration(RouterHelper):
             bot=self._get_bot(),
             game_chat=self.message.chat.id,
         )
-        await self.message.answer(make_build(time_to_start), reply_markup=kb)
+        await self.message.answer(
+            make_build(time_to_start), reply_markup=kb
+        )
         self.scheduler.add_job(
             func=start_game,
             trigger=DateTrigger(
@@ -334,11 +338,7 @@ class Registration(RouterHelper):
                     make_build("Сначала заверши предыдущую игру")
                 )
                 return
-            await self.message.answer(
-                make_build(
-                    "🙂Ты уже в игре!"
-                )
-            )
+            await self.message.answer(make_build("🙂Ты уже в игре!"))
             return
         bot = self._get_bot()
         game_state = await get_state_and_assign(
@@ -571,11 +571,13 @@ class Registration(RouterHelper):
         game_settings: GameSettingsCache = {
             "creator_user_id": owner_id,
             "creator_full_name": self.message.from_user.full_name,
-            "order_of_roles": group_settings_schema.order_of_roles,
-            "banned_roles": group_settings_schema.banned_roles,
-            "time_for_night": group_settings_schema.time_for_night,
-            "time_for_day": group_settings_schema.time_for_day,
+            **group_settings_schema.model_dump(),
         }
+        game_settings["is_fog_of_war_on"] = (
+            DifferentSettings.is_anonymous_mode_enabled(
+                game_settings
+            )
+        )
         game_data: GameCache = {
             "game_chat": self.message.chat.id,
             "settings": game_settings,
@@ -598,5 +600,6 @@ class Registration(RouterHelper):
             "number_of_night": 0,
             "cant_vote": [],
             "cant_talk": [],
+            "show_in_fog_of_war": [],
         }
         await self.state.set_data(game_data)

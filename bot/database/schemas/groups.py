@@ -1,8 +1,10 @@
 from cache.cache_types import RolesLiteral
 from pydantic import BaseModel
 
+from database.schemas.settings import DifferentSettingsSchema
 
-class GroupSettingsSchema(BaseModel):
+
+class GroupSettingsSchema(DifferentSettingsSchema):
     id: int
     banned_roles: list[RolesLiteral]
     order_of_roles: list[RolesLiteral]

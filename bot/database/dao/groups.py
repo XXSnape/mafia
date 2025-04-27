@@ -9,6 +9,7 @@ from database.schemas.common import (
     UserTgIdSchema,
 )
 from database.schemas.groups import GroupSettingsSchema
+from database.schemas.settings import DifferentSettingsSchema
 from general import settings
 from general.collection_of_roles import BASES_ROLES
 
@@ -63,4 +64,7 @@ class GroupsDao(BaseDAO[GroupModel]):
             time_for_night=time_for_night,
             time_for_day=time_for_day,
             is_there_settings=True,
+            **DifferentSettingsSchema.model_validate(
+                settings_of_group, from_attributes=True
+            ).model_dump()
         )

@@ -95,7 +95,7 @@ class InteractionData(TypedDict):
     interacting: PlayersIds
 
 
-class GameSettingsCache(TypedDict):
+class GameSettingsCache(TypedDict, total=False):
     creator_user_id: int
     creator_full_name: str
     order_of_roles: list[RolesLiteral]
@@ -109,6 +109,10 @@ class GameSettingsCache(TypedDict):
     show_information_in_shared_chat: bool
     show_information_about_guests_at_night: bool
     show_usernames_during_voting: bool
+    can_kill_teammates: bool
+    can_marshal_kill: bool
+    mafia_every_3: bool
+    is_fog_of_war_on: bool
 
 
 class UserCache(TypedDict, total=False):
@@ -150,3 +154,4 @@ class GameCache(TypedDict, total=False):
     angels_died: PlayersIds
     cant_vote: PlayersIds
     cant_talk: PlayersIds
+    show_in_fog_of_war: PlayersIds
