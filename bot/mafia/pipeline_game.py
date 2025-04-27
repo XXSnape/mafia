@@ -525,8 +525,9 @@ class Game:
             for role in role_and_winner.keys()
             if role not in order_of_roles
         )
+        divider = 3 if game_data["settings"]["mafia_every_3"] else 4
         while len(order_of_roles) < number_of_players:
-            if (len(order_of_roles) + 1) % 4 == 0:
+            if (len(order_of_roles) + 1) % divider == 0:
                 role_type = criminals
             else:
                 role_type = other
