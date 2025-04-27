@@ -60,6 +60,9 @@ class DifferentSettingsCache(TypedDict):
     show_information_in_shared_chat: bool
     show_information_about_guests_at_night: bool
     show_usernames_during_voting: bool
+    can_kill_teammates: bool
+    can_marshal_kill: bool
+    mafia_every_3: bool
 
 
 class AllSettingsCache(TypedDict, total=False):

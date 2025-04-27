@@ -45,6 +45,11 @@ SHOW_INFORMATION_ABOUT_GUESTS_AT_NIGHT_CB = (
 )
 SHOW_USERNAMES_DURING_VOTING_CB = "show_usernames_during_voting"
 
+CAN_KILL_TEAMMATES_CB = "can_kill_teammates"
+CAN_MARSHAL_KILL_CB = "can_marshal_kill"
+MAFIA_EVERY_3_CB = "mafia_every_3"
+
+
 HELP_CB = "help"
 HOW_TO_START_GAME_CB = "how_to_start_game"
 WHAT_ARE_BIDS_CB = "what_are_bids"
