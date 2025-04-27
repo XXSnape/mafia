@@ -502,43 +502,57 @@ class ActiveRoleAtNightABC(RoleABC):
                     [processed_user_id, self.notification_message]
                 )
 
-    def cancel_actions(self, game_data: GameCache, user_id: int):
-        suffers = (
+    def _remove_data_from_tracking(self, game_data: GameCache, user_id: int):
+        sufferers = (
             game_data["tracking"]
             .get(str(user_id), {})
             .get("sufferers", [])
         )[:]
-        if not suffers:
-            return False
-        for suffer in suffers:
+        for sufferer in sufferers:
             if (
                 self.processed_users_key
-                and suffer in game_data[self.processed_users_key]
+                and sufferer in game_data[self.processed_users_key]
             ):
-                game_data[self.processed_users_key].remove(suffer)
+                game_data[self.processed_users_key].remove(sufferer)
             with suppress(KeyError, ValueError):
-                game_data["tracking"][str(suffer)][
+                game_data["tracking"][str(sufferer)][
                     "interacting"
                 ].remove(user_id)
             with suppress(KeyError, ValueError):
                 game_data["tracking"][str(user_id)][
                     "sufferers"
-                ].remove(suffer)
+                ].remove(sufferer)
+        return sufferers
 
+    def cancel_actions(self, game_data: GameCache, user_id: int):
         if (
-            self.processed_by_boss
+            self.alias and self.alias.is_mass_mailing_list
             and user_id == game_data[self.roles_key][0]
         ):
             game_data[self.processed_by_boss].clear()
-
+            is_sedated = bool(game_data[self.processed_users_key])
+            sufferers = self._remove_data_from_tracking(game_data=game_data, user_id=user_id)
+            message_to_aliases = (f'{make_pretty(self.role)} '
+                                  f'{game_data['players'][str(user_id)]['url']} '
+                                  f'был усыплён, поэтому вся команда не вышла на работу ночью')
+            for alias_id in game_data[self.roles_key][1:]:
+                self._remove_data_from_tracking(game_data=game_data, user_id=alias_id)
+                game_data['messages_after_night'].append(
+                    [alias_id, message_to_aliases]
+                )
+        else:
+            sufferers = self._remove_data_from_tracking(game_data=game_data, user_id=user_id)
+            is_sedated = bool(sufferers)
+        if not is_sedated:
+            return False
         if self.last_interactive_key:
             data: LastInteraction = game_data[
                 self.last_interactive_key
             ]
             if self.is_alias is False:
-                for suffer in suffers:
-                    suffer_interaction = data[str(suffer)]
-                    suffer_interaction.pop()
+                for sufferer in sufferers:
+                    sufferer_interaction = data[str(sufferer)]
+                    sufferer_interaction.pop()
         return True
 
     async def send_survey(
