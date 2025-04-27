@@ -84,6 +84,7 @@ class Game:
         self.game_id: int | None = None
         self.beginning_game: int | None = None
         self.winners_bets = []
+        self.original_roles_in_fog_of_war: str | None = None
 
     def init_existing_roles(self, game_data: GameCache):
         all_roles = get_data_with_roles()
@@ -195,9 +196,20 @@ class Game:
         game_data: GameCache = await self.state.get_data()
         game_data["number_of_night"] += 1
         await self.state.set_data(game_data)
-        players = get_live_players(
-            game_data=game_data, all_roles=self.all_roles
-        )
+        if (
+            game_data["number_of_night"] == 1
+            and game_data["settings"]["is_fog_of_war_on"]
+        ):
+            players, roles = get_live_players(
+                game_data=game_data, all_roles=self.all_roles
+            )
+            self.original_roles_in_fog_of_war = roles
+        else:
+            players, _ = get_live_players(
+                game_data=game_data,
+                all_roles=self.original_roles_in_fog_of_war
+                or self.all_roles,
+            )
         night_starts_text = make_build(
             f"🌃Наступает ночь {game_data['number_of_night']} "
             f"(продлится {game_data["settings"]["time_for_night"]} секунд)"
@@ -209,17 +221,17 @@ class Game:
             reply_markup=get_to_bot_kb("Действовать!"),
         )
         await self.controller.mailing()
-        await asyncio.sleep(
-            game_data["settings"]["time_for_night"] - 3
-        )
+        await asyncio.sleep(12)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
         )
         await asyncio.sleep(3)
         game_data = await self.controller.sum_up_after_night()
-        players_after_night = get_live_players(
-            game_data=game_data, all_roles=self.all_roles
+        players_after_night, _ = get_live_players(
+            game_data=game_data,
+            all_roles=self.original_roles_in_fog_of_war
+            or self.all_roles,
         )
         await self.bot.send_photo(
             chat_id=self.group_chat_id,
@@ -228,9 +240,9 @@ class Game:
             f"{players_after_night}",
             reply_markup=get_to_bot_kb("Пища для размышлений тут"),
         )
-        await asyncio.sleep(game_data["settings"]["time_for_day"])
+        # await asyncio.sleep(game_data["settings"]["time_for_day"]) # TODO CORRECT
         await self.controller.suggest_vote()
-        await asyncio.sleep(35)
+        await asyncio.sleep(18)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -238,7 +250,7 @@ class Game:
         await asyncio.sleep(3)
         result = await self.controller.confirm_final_aim()
         if result:
-            await asyncio.sleep(38)
+            await asyncio.sleep(10)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,

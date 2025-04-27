@@ -1,7 +1,7 @@
 import asyncio
 from collections import defaultdict
 from collections.abc import Callable, Iterable
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 from aiogram import Bot
 from aiogram.types import InlineKeyboardButton
@@ -34,8 +34,8 @@ if TYPE_CHECKING:
 
 
 def get_live_players(
-    game_data: GameCache, all_roles: "DataWithRoles"
-):
+    game_data: GameCache, all_roles: Union["DataWithRoles", str]
+) -> tuple[str, str]:
     profiles = get_profiles(
         players_ids=game_data["live_players_ids"],
         players=game_data["players"],
@@ -44,15 +44,29 @@ def get_live_players(
         game_data=game_data, all_roles=all_roles
     )
     return (
-        f"{make_build(f'💗Живые игроки '
+        (
+            f"{make_build(f'💗Живые игроки '
                       f'({len(game_data["live_players_ids"])}):')}\n"
-        f"{profiles}\n\n"
-        f"{make_build('👥Состав группировок:')}\n"
-        f"{live_roles}\n\n"
+            f"{profiles}\n\n{live_roles}"
+        ),
+        live_roles,
     )
 
 
-def get_live_roles(game_data: GameCache, all_roles: "DataWithRoles"):
+def get_live_roles(
+    game_data: GameCache, all_roles: Union["DataWithRoles", str]
+):
+    if isinstance(all_roles, str):
+        if not game_data["show_in_fog_of_war"]:
+            return all_roles
+        text = "\n\n💀Выбывшие игроки с известными ролями:\n"
+        for user_id in game_data["show_in_fog_of_war"]:
+            text += (
+                f"\n● {game_data['players'][str(user_id)]['url']} "
+                f"был {game_data['players'][str(user_id)]['pretty_role']}"
+            )
+        return all_roles + make_build(text)
+
     gropings: dict[Groupings, list[tuple[str, int]]] = {
         Groupings.civilians: [],
         Groupings.criminals: [],
@@ -87,7 +101,7 @@ def get_live_roles(game_data: GameCache, all_roles: "DataWithRoles"):
         total = sum(count for _, count in roles)
         total_text = make_build(f"- {total}:")
         result += f"\n{grouping.value.name} {total_text}\n● {grouping_roles}\n"
-    return result
+    return f"{make_build('👥Состав группировок:')}\n" + result
 
 
 def get_profiles(
@@ -120,7 +134,7 @@ def get_profiles(
                 result += f"\n{number}) {url} - {role}"
         else:
             result += f"\n{number}) {url}"
-    return result
+    return make_build(result)
 
 
 def get_profiles_during_registration(
@@ -155,9 +169,12 @@ def get_results_of_goal_identification(game_data: GameCache):
             f"\n\n❤️Искренние ценители человеческой жизни "
             f"({len(game_data['refused_to_vote'])}):"
         )
-        for user_id in game_data["refused_to_vote"]:
-            url = game_data["players"][str(user_id)]["url"]
-            refused_result += f"\n● {url}"
+        if game_data["settings"]["show_usernames_during_voting"]:
+            for user_id in game_data["refused_to_vote"]:
+                url = game_data["players"][str(user_id)]["url"]
+                refused_result += f"\n● {url}"
+        else:
+            refused_result += "\n● ???"
 
     if not voting:
         voting_result = make_build(
@@ -167,11 +184,15 @@ def get_results_of_goal_identification(game_data: GameCache):
     for voted, voting_people in sorted(
         voting.items(), key=sorting_by_voting, reverse=True
     ):
-        voting_result += (
-            f"\n\n📝Голосовавшие за {voted} ({len(voting_people)}):\n● "
-            + "\n● ".join(
+        if game_data["settings"]["show_usernames_during_voting"]:
+            text = "\n● ".join(
                 voting_person for voting_person in voting_people
             )
+        else:
+            text = "???"
+        voting_result += (
+            f"\n\n📝Голосовавшие за {voted} ({len(voting_people)}):\n● "
+            + text
         )
 
     return result + voting_result + refused_result

@@ -373,6 +373,13 @@ class Controller:
                 bot_id=self.bot.id,
                 new_state=UserFsm.WAIT_FOR_LATEST_LETTER,
             )
+            if (
+                game_data["settings"]["is_fog_of_war_on"]
+                and game_data["settings"][
+                    "show_dead_roles_after_night"
+                ]
+            ):
+                game_data["show_in_fog_of_war"].append(user_id)
         elif at_night is None or (
             at_night is False and role.clearing_state_after_death
         ):
@@ -381,6 +388,22 @@ class Controller:
                 user_id=user_id,
                 bot_id=self.bot.id,
             )
+            if game_data["settings"]["is_fog_of_war_on"]:
+                if (
+                    game_data["settings"][
+                        "show_dead_roles_after_hanging"
+                    ]
+                    and at_night is False
+                ):
+                    game_data["show_in_fog_of_war"].append(user_id)
+                elif (
+                    game_data["settings"][
+                        "show_roles_died_due_to_inactivity"
+                    ]
+                    and at_night is None
+                ):
+                    game_data["show_in_fog_of_war"].append(user_id)
+
         game_data["live_players_ids"].remove(user_id)
         game_data["players"][str(user_id)][
             "number_died_at_night"
@@ -443,7 +466,7 @@ class Controller:
         await self.state.set_data(game_data)
 
     @staticmethod
-    def add_user_to_potentially_deleted(
+    def add_user_to_deleted(
         waiting_for: PlayersIds,
         live_players_ids: PlayersIds,
         inactive_users: PlayersIds,
@@ -452,7 +475,10 @@ class Controller:
         for user_id in waiting_for:
             if user_id not in live_players_ids:
                 continue
-            if user_id in potentially_deleted:
+            if (
+                user_id in potentially_deleted
+                and user_id not in inactive_users
+            ):
                 inactive_users.append(user_id)
             else:
                 potentially_deleted.add(user_id)
@@ -474,12 +500,12 @@ class Controller:
         game_data: GameCache = await self.state.get_data()
         live_players_ids = game_data["live_players_ids"]
         inactive_users = []
-        self.add_user_to_potentially_deleted(
+        self.add_user_to_deleted(
             waiting_for=game_data["waiting_for_action_at_night"],
             live_players_ids=live_players_ids,
             inactive_users=inactive_users,
         )
-        self.add_user_to_potentially_deleted(
+        self.add_user_to_deleted(
             waiting_for=game_data["waiting_for_action_at_day"],
             live_players_ids=live_players_ids,
             inactive_users=inactive_users,
