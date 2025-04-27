@@ -135,10 +135,11 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
                 if url is None
                 else f"Неудачный прогноз! Был повешен {url} ({role})"
             )
-        await self.bot.send_message(
-            chat_id=game_data["game_chat"],
-            text=to_group,
-        )
+        if game_data["settings"]["is_fog_of_war_on"] is False:
+            await self.bot.send_message(
+                chat_id=game_data["game_chat"],
+                text=to_group,
+            )
         self.add_money_to_all_allies(
             game_data=game_data,
             money=money,

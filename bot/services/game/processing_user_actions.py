@@ -30,13 +30,20 @@ class UserManager(RouterHelper):
             user_state=self.state,
             dispatcher=self.dispatcher,
         )
-        game_data = await game_state.get_data()
-        role = game_data["players"][str(self.message.from_user.id)][
-            "pretty_role"
-        ]
+        game_data: GameCache = await game_state.get_data()
+        role = (
+            game_data["players"][str(self.message.from_user.id)][
+                "pretty_role"
+            ]
+            if game_data["settings"]["is_fog_of_war_on"] is False
+            or self.message.from_user.id
+            in game_data["show_in_fog_of_war"]
+            else "???"
+        )
         url = game_data["players"][str(self.message.from_user.id)][
             "url"
         ]
+
         await self.message.bot.send_message(
             chat_id=game_data["game_chat"],
             text=f"По слухам, {role} {url} перед смертью "
