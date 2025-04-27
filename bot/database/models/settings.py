@@ -18,3 +18,27 @@ class SettingModel(IdMixin, BaseModel):
     time_for_day: Mapped[int] = mapped_column(
         default=settings.mafia.time_for_day
     )
+    show_dead_roles_after_night: Mapped[bool] = mapped_column(
+        default=True, server_default='1'
+    )
+    show_dead_roles_after_hanging: Mapped[bool] = mapped_column(
+        default=True, server_default='1'
+    )
+    show_roles_died_due_to_inactivity: Mapped[bool] = mapped_column(
+        default=True, server_default='1'
+    )
+    show_killers: Mapped[bool] = mapped_column(
+        default=True, server_default='1'
+    )
+    show_information_in_shared_chat: Mapped[bool] = mapped_column(
+        default=True, server_default='1'
+    )
+    show_information_about_guests_at_night: Mapped[bool] = mapped_column(
+        default=True, server_default='1'
+    )
+    can_kill_teammates: Mapped[bool] = mapped_column(
+        default=True, server_default='1'
+    )
+    can_marshal_kill: Mapped[bool] = mapped_column(
+        default=True, server_default='1'
+    )
