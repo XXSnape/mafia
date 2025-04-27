@@ -52,6 +52,26 @@ class PollBannedRolesCache(TypedDict, total=False):
     banned_roles_ids: list[RolesLiteral]
 
 
+class DifferentSettingsCache(TypedDict):
+    show_dead_roles_after_night: bool
+    show_dead_roles_after_hanging: bool
+    show_roles_died_due_to_inactivity: bool
+    show_killers: bool
+    show_information_in_shared_chat: bool
+    show_information_about_guests_at_night: bool
+    show_usernames_during_voting: bool
+
+
+class AllSettingsCache(TypedDict, total=False):
+    poll_banned_roles: PollBannedRolesCache
+    order_of_roles: OrderOfRolesCache
+    different_settings: DifferentSettingsCache
+
+
+class PersonalSettingsCache(TypedDict, total=False):
+    settings: AllSettingsCache
+
+
 class UserGameCache(TypedDict, total=False):
     full_name: str
     url: str
@@ -69,16 +89,6 @@ class UserGameCache(TypedDict, total=False):
 class InteractionData(TypedDict):
     sufferers: PlayersIds
     interacting: PlayersIds
-
-
-class FogOfWarCache(TypedDict):
-    show_dead_roles_after_night: bool
-    show_dead_roles_after_hanging: bool
-    show_roles_died_due_to_inactivity: bool
-    show_killers: bool
-    show_information_in_shared_chat: bool
-    show_information_about_guests_at_night: bool
-    show_usernames_during_voting: bool
 
 
 class GameSettingsCache(TypedDict):

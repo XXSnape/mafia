@@ -4,13 +4,15 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery
 from general.collection_of_roles import get_data_with_roles
+from keyboards.inline.callback_factory.help import OrderOfRolesCbData
 from keyboards.inline.cb.cb_text import (
     CANCEL_CB,
-    CLEAR_SETTINGS_CB,
     DELETE_LATEST_ROLE_IN_ORDER_CB,
     EDIT_SETTINGS_CB,
-    SAVE_CB,
     VIEW_ORDER_OF_ROLES_CB,
+    CLEAR_ORDER_OF_ROLES_CB,
+    EDIT_ORDER_OF_ROLES_CB,
+    SAVE_ORDER_OF_ROLES_CB,
 )
 from services.users.order_of_roles import RoleManager
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,12 +21,7 @@ from states.settings import SettingsFsm
 router = Router(name=__name__)
 
 
-@router.callback_query(
-    or_f(
-        and_f(default_state, F.data == VIEW_ORDER_OF_ROLES_CB),
-        and_f(SettingsFsm.ORDER_OF_ROLES, F.data == CANCEL_CB),
-    )
-)
+@router.callback_query(F.data == VIEW_ORDER_OF_ROLES_CB)
 async def view_order_of_roles(
     callback: CallbackQuery,
     state: FSMContext,
@@ -38,9 +35,7 @@ async def view_order_of_roles(
     await manager.view_order_of_roles()
 
 
-@router.callback_query(
-    SettingsFsm.ORDER_OF_ROLES, F.data == CLEAR_SETTINGS_CB
-)
+@router.callback_query(F.data == CLEAR_ORDER_OF_ROLES_CB)
 async def clear_order_of_roles(
     callback: CallbackQuery,
     state: FSMContext,
@@ -52,9 +47,7 @@ async def clear_order_of_roles(
     await manager.clear_order_of_roles()
 
 
-@router.callback_query(
-    SettingsFsm.ORDER_OF_ROLES, F.data == EDIT_SETTINGS_CB
-)
+@router.callback_query(F.data == EDIT_ORDER_OF_ROLES_CB)
 async def start_editing_order(
     callback: CallbackQuery,
     state: FSMContext,
@@ -68,23 +61,20 @@ async def start_editing_order(
     await manager.start_editing_order()
 
 
-@router.callback_query(
-    SettingsFsm.ORDER_OF_ROLES,
-    F.data.in_(get_data_with_roles().keys()),
-)
+@router.callback_query(OrderOfRolesCbData.filter())
 async def add_new_role_to_queue(
     callback: CallbackQuery,
     state: FSMContext,
     session_with_commit: AsyncSession,
+    callback_data: OrderOfRolesCbData,
 ):
     manager = RoleManager(
         callback=callback, state=state, session=session_with_commit
     )
-    await manager.add_new_role_to_queue()
+    await manager.add_new_role_to_queue(callback_data=callback_data)
 
 
 @router.callback_query(
-    SettingsFsm.ORDER_OF_ROLES,
     F.data == DELETE_LATEST_ROLE_IN_ORDER_CB,
 )
 async def pop_latest_role_in_order(
@@ -95,7 +85,7 @@ async def pop_latest_role_in_order(
     await manager.pop_latest_role_in_order()
 
 
-@router.callback_query(SettingsFsm.ORDER_OF_ROLES, F.data == SAVE_CB)
+@router.callback_query(F.data == SAVE_ORDER_OF_ROLES_CB)
 async def save_order_of_roles(
     callback: CallbackQuery,
     state: FSMContext,

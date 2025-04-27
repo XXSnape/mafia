@@ -11,9 +11,10 @@ from general.collection_of_roles import (
     get_data_with_roles,
 )
 from general.text import REQUIRE_TO_SAVE
-from keyboards.inline.keypads.settings import (
-    edit_roles_kb,
+from keyboards.inline.callback_factory.help import BannedRolesCbData
+from keyboards.inline.keypads.banned_roles import (
     suggest_banning_roles_kb,
+    edit_banned_roles_kb,
 )
 from services.base import RouterHelper
 from states.settings import SettingsFsm
@@ -22,6 +23,9 @@ from utils.tg import delete_message
 
 
 class RoleAttendant(RouterHelper):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.key = "poll_banned_roles"
 
     @staticmethod
     def get_banned_roles_text(roles_ids: list[RolesLiteral]):
@@ -82,7 +86,7 @@ class RoleAttendant(RouterHelper):
     async def view_banned_roles(
         self, has_order_been_reset: bool = False
     ):
-        await self.state.clear()
+        await self.clear_settings_data()
         dao = ProhibitedRolesDAO(session=self.session)
         user_filter = UserTgIdSchema(
             user_tg_id=self.callback.from_user.id
@@ -94,10 +98,9 @@ class RoleAttendant(RouterHelper):
         poll_data: PollBannedRolesCache = {
             "banned_roles_ids": banned_roles_ids
         }
-        await self.state.set_state(SettingsFsm.BAN_ROLES)
-        await self.state.set_data(poll_data)
-        markup = edit_roles_kb(
-            are_there_roles=bool(banned_roles_ids), to_ban=True
+        await self.set_settings_data(poll_data)
+        markup = edit_banned_roles_kb(
+            are_there_roles=bool(banned_roles_ids)
         )
         if has_order_been_reset:
             await delete_message(self.callback.message)
@@ -123,7 +126,9 @@ class RoleAttendant(RouterHelper):
         await self.view_banned_roles()
 
     async def suggest_roles_to_ban(self):
-        poll_data: PollBannedRolesCache = await self.state.get_data()
+        poll_data: PollBannedRolesCache = (
+            await self.get_settings_data()
+        )
         markup = suggest_banning_roles_kb(
             poll_data["banned_roles_ids"]
         )
@@ -137,15 +142,19 @@ class RoleAttendant(RouterHelper):
             reply_markup=markup,
         )
 
-    async def process_banned_roles(self):
-        poll_data: PollBannedRolesCache = await self.state.get_data()
+    async def process_banned_roles(
+        self, callback_data: BannedRolesCbData
+    ):
+        poll_data: PollBannedRolesCache = (
+            await self.get_settings_data()
+        )
         banned_roles = poll_data["banned_roles_ids"]
-        role_id: RolesLiteral = self.callback.data
+        role_id: RolesLiteral = callback_data.role_id
         if role_id in banned_roles:
             banned_roles.remove(role_id)
         else:
             banned_roles.append(role_id)
-        await self.state.set_data(poll_data)
+        await self.set_settings_data(poll_data)
         markup = suggest_banning_roles_kb(
             poll_data["banned_roles_ids"]
         )
@@ -154,7 +163,9 @@ class RoleAttendant(RouterHelper):
         )
 
     async def save_prohibited_roles(self):
-        poll_data: PollBannedRolesCache = await self.state.get_data()
+        poll_data: PollBannedRolesCache = (
+            await self.get_settings_data()
+        )
         banned_roles = poll_data["banned_roles_ids"]
         has_order_been_reset = await self._save_new_prohibited_roles(
             roles_ids=banned_roles

@@ -3,13 +3,15 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery, Message
+
+from cache.cache_types import PersonalSettingsCache
 from database.dao.users import UsersDao
 from database.schemas.common import TgIdSchema
 from keyboards.inline.callback_factory.settings import (
     GroupSettingsCbData,
 )
 from keyboards.inline.cb.cb_text import (
-    ACTIONS_FOR_ROLES_CB,
+    ACTIONS_ON_SETTINGS_CB,
 )
 from keyboards.inline.keypads.settings import select_setting_kb
 from services.common.settings import SettingsRouter
@@ -22,19 +24,11 @@ router = Router(name=__name__)
 
 @router.message(
     Command("my_settings"),
-    StateFilter(
-        default_state,
-        SettingsFsm.BAN_ROLES,
-        SettingsFsm.ORDER_OF_ROLES,
-        SettingsFsm.FOG_OF_WAR
-    ),
 )
 async def handle_settings(
     message: Message,
-    state: FSMContext,
     session_with_commit: AsyncSession,
 ):
-    await state.clear()
     await message.delete()
     await UsersDao(session=session_with_commit).get_user_or_create(
         tg_id=TgIdSchema(tg_id=message.from_user.id)
@@ -46,18 +40,14 @@ async def handle_settings(
 
 
 @router.callback_query(
-    StateFilter(
-        default_state,
-        SettingsFsm.BAN_ROLES,
-        SettingsFsm.ORDER_OF_ROLES,
-        SettingsFsm.FOG_OF_WAR,
-    ),
-    F.data == ACTIONS_FOR_ROLES_CB,
+    F.data == ACTIONS_ON_SETTINGS_CB,
 )
 async def back_to_settings(
     callback: CallbackQuery, state: FSMContext
 ):
-    await state.clear()
+    data: PersonalSettingsCache = await state.get_data()
+    data["settings"] = {}
+    await state.set_data(data)
     await callback.message.edit_text(
         text=make_build("⚙️Выбери, что конкретно хочешь настроить"),
         reply_markup=select_setting_kb(),

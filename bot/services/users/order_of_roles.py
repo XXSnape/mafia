@@ -12,22 +12,25 @@ from general.collection_of_roles import (
 )
 from general.groupings import Groupings
 from general.text import REQUIRE_TO_SAVE
-from keyboards.inline.keypads.settings import (
-    edit_roles_kb,
+from keyboards.inline.callback_factory.help import OrderOfRolesCbData
+from keyboards.inline.keypads.order_of_roles import (
     get_next_role_kb,
+    edit_order_of_roles_kb,
 )
 from mafia.roles import Doctor, Mafia, Policeman
 from services.base import RouterHelper
-from states.settings import SettingsFsm
 from utils.pretty_text import make_build
 
 
 class RoleManager(RouterHelper):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.key = "order_of_roles"
 
     async def _delete_old_order_of_roles_and_add_new(
         self, roles: list[RolesLiteral]
     ):
-        await self.state.set_data({})
+        await self.clear_settings_data()
         dao = OrderOfRolesDAO(session=self.session)
         await dao.delete(
             UserTgIdSchema(user_tg_id=self.callback.from_user.id)
@@ -72,11 +75,10 @@ class RoleManager(RouterHelper):
         text = self.get_current_order_text(
             order_of_roles, to_save=False
         )
-        await self.state.clear()
-        await self.state.set_state(SettingsFsm.ORDER_OF_ROLES)
+        await self.clear_settings_data()
         await self.callback.message.edit_text(
             text=make_build(text),
-            reply_markup=edit_roles_kb(
+            reply_markup=edit_order_of_roles_kb(
                 order_of_roles != list(BASES_ROLES)
             ),
         )
@@ -89,7 +91,6 @@ class RoleManager(RouterHelper):
         ).get_roles_ids_of_banned_roles(
             UserTgIdSchema(user_tg_id=self.callback.from_user.id)
         )
-
         all_roles = get_data_with_roles()
         for role_id, role in all_roles.items():
             if (
@@ -111,25 +112,28 @@ class RoleManager(RouterHelper):
             "other": other,
             "selected": selected,
         }
-        await self.state.set_state(SettingsFsm.ORDER_OF_ROLES)
-        await self.state.set_data(order_data)
+        await self.set_settings_data(order_data)
         markup = get_next_role_kb(order_data=order_data)
         await self.callback.message.edit_text(
             text=self.get_current_order_text(selected),
             reply_markup=markup,
         )
 
-    async def add_new_role_to_queue(self):
-        order_data: OrderOfRolesCache = await self.state.get_data()
-        role = get_data_with_roles(self.callback.data)
+    async def add_new_role_to_queue(
+        self, callback_data: OrderOfRolesCbData
+    ):
+        order_data: OrderOfRolesCache = (
+            await self.get_settings_data()
+        )
+        role = get_data_with_roles(callback_data.role_id)
         key = (
             "attacking"
             if role.grouping == Groupings.criminals
             else "other"
         )
         if role.there_may_be_several is False:
-            order_data[key].remove(self.callback.data)
-        order_data["selected"].append(self.callback.data)
+            order_data[key].remove(callback_data.role_id)
+        order_data["selected"].append(callback_data.role_id)
         if (
             len(order_data["selected"])
             == settings.mafia.maximum_number_of_players
@@ -145,14 +149,16 @@ class RoleManager(RouterHelper):
             await self.view_order_of_roles()
             return
         markup = get_next_role_kb(order_data=order_data)
-        await self.state.set_data(order_data)
+        await self.set_settings_data(order_data)
         await self.callback.message.edit_text(
             text=self.get_current_order_text(order_data["selected"]),
             reply_markup=markup,
         )
 
     async def pop_latest_role_in_order(self):
-        order_data: OrderOfRolesCache = await self.state.get_data()
+        order_data: OrderOfRolesCache = (
+            await self.get_settings_data()
+        )
         selected = order_data["selected"]
         latest_role_key = selected.pop()
         role = get_data_with_roles(latest_role_key)
@@ -166,14 +172,16 @@ class RoleManager(RouterHelper):
         markup = get_next_role_kb(
             order_data=order_data, automatic_attacking=False
         )
-        await self.state.set_data(order_data)
+        await self.set_settings_data(order_data)
         await self.callback.message.edit_text(
             text=self.get_current_order_text(order_data["selected"]),
             reply_markup=markup,
         )
 
     async def save_order_of_roles(self):
-        order_data: OrderOfRolesCache = await self.state.get_data()
+        order_data: OrderOfRolesCache = (
+            await self.get_settings_data()
+        )
         selected = order_data["selected"]
         await self._delete_old_order_of_roles_and_add_new(
             roles=selected

@@ -1,14 +1,14 @@
 from aiogram.types import InlineKeyboardButton
 
-from cache.cache_types import FogOfWarCache
+from cache.cache_types import DifferentSettingsCache
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import (
-    BACK_TO_SELECTING_ACTIONS_FOR_ROLES_BTN,
+    BACK_TO_SELECTING_ACTIONS_ON_SETTINGS_BTN,
 )
 from keyboards.inline.cb import cb_text
 
 
-def fog_of_war_options_kb(fog_of_war: FogOfWarCache):
+def fog_of_war_options_kb(fog_of_war: DifferentSettingsCache):
     buttons = [
         InlineKeyboardButton(
             text="Показывать роли умерших ночью",
@@ -38,7 +38,7 @@ def fog_of_war_options_kb(fog_of_war: FogOfWarCache):
             text="Писать в личку о ночных гостях",
             callback_data=cb_text.SHOW_INFORMATION_ABOUT_GUESTS_AT_NIGHT_CB,
         ),
-        BACK_TO_SELECTING_ACTIONS_FOR_ROLES_BTN,
+        BACK_TO_SELECTING_ACTIONS_ON_SETTINGS_BTN,
     ]
     for btn in buttons[:-1]:
         if fog_of_war[btn.callback_data]:

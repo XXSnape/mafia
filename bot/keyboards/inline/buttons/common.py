@@ -5,33 +5,32 @@ from aiogram.utils.deep_linking import create_start_link
 from general import settings
 from general.text import TO_SAVE
 from keyboards.inline.cb.cb_text import (
-    ACTIONS_FOR_ROLES_CB,
+    ACTIONS_ON_SETTINGS_CB,
     CANCEL_CB,
     HELP_CB,
     PLAYER_BACKS_CB,
-    SAVE_CB,
 )
+
 
 async def get_join_to_game_btn(bot: Bot, game_chat: int):
     return InlineKeyboardButton(
-            text="Присоединиться",
-            url=await create_start_link(
-                bot, str(game_chat), encode=True
-            ),
-        )
+        text="Присоединиться",
+        url=await create_start_link(
+            bot, str(game_chat), encode=True
+        ),
+    )
 
 
 BACK_BTN = InlineKeyboardButton(
     text="Назад⬅️", callback_data=PLAYER_BACKS_CB
 )
 
-BACK_TO_SELECTING_ACTIONS_FOR_ROLES_BTN = InlineKeyboardButton(
-    text="Назад⏪", callback_data=ACTIONS_FOR_ROLES_CB
+BACK_TO_SELECTING_ACTIONS_ON_SETTINGS_BTN = InlineKeyboardButton(
+    text="Назад⏪", callback_data=ACTIONS_ON_SETTINGS_CB
 )
 CANCEL_BTN = InlineKeyboardButton(
-    text="❌Отменить", callback_data=CANCEL_CB
+    text="❌Отменить", callback_data=ACTIONS_ON_SETTINGS_CB
 )
-SAVE_BTN = InlineKeyboardButton(text=TO_SAVE, callback_data=SAVE_CB)
 TO_BOT_BTN = InlineKeyboardButton(
     text="Сделать ставку!",
     url=settings.bot.url,
