@@ -229,12 +229,17 @@ class Controller:
                 user_id=user_id,
             )
         await asyncio.sleep(1)
+        role = (
+            user_info["pretty_role"]
+            if game_data["settings"]["show_dead_roles_after_hanging"]
+            else "???"
+        )
         await self.bot.send_message(
             chat_id=self.group_chat_id,
             text=result_text
             + make_build(
                 f"❗️❗️❗️Сегодня народ принял тяжелое решение и повесил "
-                f'{user_info["url"]} с ролью {user_info["pretty_role"]}!'
+                f'{user_info["url"]} с ролью {role}!'
             ),
         )
         await self.remove_user_from_game(
@@ -286,10 +291,18 @@ class Controller:
                 )
             )
             url = game_data["players"][str(victim_id)]["url"]
-            role = game_data["players"][str(victim_id)][
-                "pretty_role"
-            ]
-            killer = killers_of[victim_id][0].role
+            role = (
+                game_data["players"][str(victim_id)]["pretty_role"]
+                if game_data["settings"][
+                    "show_dead_roles_after_night"
+                ]
+                else "???"
+            )
+            killer = (
+                killers_of[victim_id][0].role
+                if game_data["settings"]["show_killers"]
+                else "???"
+            )
             text_about_dead += f"🌹Убит {role} - {url} (один из виновных — {killer})!\n\n"
         text_about_dead = (
             text_about_dead or "💕Сегодня ночью все выжили!"

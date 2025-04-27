@@ -147,9 +147,13 @@ class UserManager(RouterHelper):
                 [self.callback.from_user.id, voted_user_id]
             )
             await game_state.set_data(game_data)
-        voting_url = game_data["players"][
-            str(self.callback.from_user.id)
-        ]["url"]
+        voting_url = (
+            game_data["players"][str(self.callback.from_user.id)][
+                "url"
+            ]
+            if game_data["settings"]["show_usernames_during_voting"]
+            else "???"
+        )
         voted_url = game_data["players"][str(voted_user_id)]["url"]
         await self.callback.message.answer(
             make_build(
@@ -189,9 +193,13 @@ class UserManager(RouterHelper):
         if is_deceived:
             await self.vote_for(callback_data=None)
             return
-        url = game_data["players"][str(self.callback.from_user.id)][
-            "url"
-        ]
+        url = (
+            game_data["players"][str(self.callback.from_user.id)][
+                "url"
+            ]
+            if game_data["settings"]["show_usernames_during_voting"]
+            else "???"
+        )
         await self.callback.message.answer(
             make_build(
                 f"🌟День {game_data['number_of_night']}\n\n"
