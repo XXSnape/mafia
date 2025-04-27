@@ -47,7 +47,8 @@ def get_next_role_kb(
     all_roles = get_data_with_roles()
     buttons = []
     leave_1_each = 1
-    if (len(order_data["selected"]) + 1) % 4 == 0:
+    divider = 3 if order_data["criminal_every_3"] else 4
+    if (len(order_data["selected"]) + 1) % divider == 0:
         if automatic_attacking and len(order_data["attacking"]) == 1:
             order_data["selected"].append(MafiaAlias.role_id)
             return get_next_role_kb(order_data)

@@ -46,6 +46,7 @@ class OrderOfRolesCache(TypedDict, total=True):
     attacking: list[RolesLiteral]
     other: list[RolesLiteral]
     selected: list[RolesLiteral]
+    criminal_every_3: bool
 
 
 class PollBannedRolesCache(TypedDict, total=False):

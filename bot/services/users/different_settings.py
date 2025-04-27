@@ -1,10 +1,12 @@
 from cache.cache_types import DifferentSettingsCache
+from database.dao.order import OrderOfRolesDAO
 from database.dao.settings import SettingsDao
 from database.schemas.common import UserTgIdSchema
 from database.schemas.settings import (
     FogOfWarSchema,
     DifferentSettingsSchema,
 )
+from general.collection_of_roles import BASES_ROLES
 from keyboards.inline.keypads.fog_of_war import (
     fog_of_war_options_kb,
     different_options_kb,
@@ -123,6 +125,32 @@ class DifferentSettings(RouterHelper):
         different_data: DifferentSettingsCache = (
             await self.update_settings()
         )
+        await self.callback.message.edit_reply_markup(
+            reply_markup=different_options_kb(
+                different_settings=different_data
+            )
+        )
+
+    async def handle_mafia_every_3(self):
+        different_data: DifferentSettingsCache = (
+            await self.update_settings()
+        )
+        user_schema = UserTgIdSchema(
+            user_tg_id=self.callback.from_user.id
+        )
+        order_of_roles_dao = OrderOfRolesDAO(session=self.session)
+        roles = (
+            await order_of_roles_dao.get_roles_ids_of_order_of_roles(
+                user_schema
+            )
+        )
+        if roles != list(BASES_ROLES):
+            await order_of_roles_dao.delete(user_schema)
+            await self.callback.answer(
+                "❗️❗️❗️ВНИМАНИЕ! ПОРЯДОК РОЛЕЙ СБРОШЕН!\n\n"
+                "Настрой его заново",
+                show_alert=True,
+            )
         await self.callback.message.edit_reply_markup(
             reply_markup=different_options_kb(
                 different_settings=different_data

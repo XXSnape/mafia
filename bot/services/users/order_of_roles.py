@@ -3,6 +3,8 @@ from collections.abc import Iterable
 from cache.cache_types import OrderOfRolesCache, RolesLiteral
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
+from database.dao.settings import SettingsDao
+from database.dao.users import UsersDao
 from database.schemas.common import UserTgIdSchema
 from database.schemas.roles import OrderOfRolesSchema
 from general import settings
@@ -86,11 +88,15 @@ class RoleManager(RouterHelper):
     async def start_editing_order(self):
         attacking = []
         other = []
+        user_schema = UserTgIdSchema(
+            user_tg_id=self.callback.from_user.id
+        )
         banned_roles_ids = await ProhibitedRolesDAO(
             session=self.session
-        ).get_roles_ids_of_banned_roles(
-            UserTgIdSchema(user_tg_id=self.callback.from_user.id)
-        )
+        ).get_roles_ids_of_banned_roles(user_schema)
+        criminal_every_3 = await SettingsDao(
+            session=self.session
+        ).get_every_3_attr(user_schema)
         all_roles = get_data_with_roles()
         for role_id, role in all_roles.items():
             if (
@@ -111,6 +117,7 @@ class RoleManager(RouterHelper):
             "attacking": attacking,
             "other": other,
             "selected": selected,
+            "criminal_every_3": criminal_every_3,
         }
         await self.set_settings_data(order_data)
         markup = get_next_role_kb(order_data=order_data)

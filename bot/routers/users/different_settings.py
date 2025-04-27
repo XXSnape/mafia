@@ -93,7 +93,6 @@ async def show_common_settings_options(
         (
             cb_text.CAN_KILL_TEAMMATES_CB,
             cb_text.CAN_MARSHAL_KILL_CB,
-            cb_text.MAFIA_EVERY_3_CB,
         )
     )
 )
@@ -106,3 +105,15 @@ async def change_different_settings(
         callback=callback, state=state, session=session_with_commit
     )
     await different_settings.change_different_settings()
+
+
+@router.callback_query(F.data == cb_text.MAFIA_EVERY_3_CB)
+async def handle_mafia_every_3(
+    callback: CallbackQuery,
+    state: FSMContext,
+    session_with_commit: AsyncSession,
+):
+    different_settings = DifferentSettings(
+        callback=callback, state=state, session=session_with_commit
+    )
+    await different_settings.handle_mafia_every_3()

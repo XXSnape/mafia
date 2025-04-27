@@ -17,7 +17,6 @@ from keyboards.inline.keypads.banned_roles import (
     edit_banned_roles_kb,
 )
 from services.base import RouterHelper
-from states.settings import SettingsFsm
 from utils.pretty_text import make_build
 from utils.tg import delete_message
 
