@@ -172,9 +172,7 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         game_data: GameCache,
         extra_buttons: tuple[InlineKeyboardButton, ...] = (),
     ):
-        return kill_or_check_on_policeman(
-            number_of_night=game_data["number_of_night"]
-        )
+        return kill_or_check_on_policeman(game_data=game_data)
 
     def get_general_text_before_sending(self, game_data: GameCache):
         return remind_commissioner_about_inspections(

@@ -1,7 +1,12 @@
+from aiogram.types import InlineKeyboardButton
+
 from cache.cache_types import GameCache, UserIdInt
 from general.groupings import Groupings
 from general.text import (
     ATTEMPT_TO_KILL,
+)
+from keyboards.inline.keypads.mailing import (
+    send_selection_to_players_kb,
 )
 from mafia.roles.base import (
     ActiveRoleAtNightABC,
@@ -18,6 +23,7 @@ from mafia.roles.descriptions.texts import (
     KILLING_PLAYER,
 )
 from states.game import UserFsm
+from utils.common import get_criminals_ids
 from utils.roles import get_processed_role_and_user_if_exists
 
 
@@ -49,6 +55,23 @@ class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.MAFIA_ATTACKS
+
+    def generate_markup(
+        self,
+        player_id: int,
+        game_data: GameCache,
+        extra_buttons: tuple[InlineKeyboardButton, ...] = (),
+    ):
+        if game_data["settings"]["can_kill_teammates"]:
+            exclude = [player_id]
+        else:
+            exclude = get_criminals_ids(game_data)
+        return send_selection_to_players_kb(
+            players_ids=game_data["live_players_ids"],
+            players=game_data["players"],
+            exclude=exclude,
+            extra_buttons=extra_buttons,
+        )
 
     @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(

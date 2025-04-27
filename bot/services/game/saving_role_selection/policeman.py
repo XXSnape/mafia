@@ -36,11 +36,14 @@ class PolicemanSaver(RouterHelper):
             dispatcher=self.dispatcher,
         )
         game_data: GameCache = await game_state.get_data()
+        not_to_kill = [self.callback.from_user.id]
+        if game_data["settings"]["can_kill_teammates"] is False:
+            not_to_kill = game_data[Policeman.roles_key]
         data = {
             POLICEMAN_KILLS_CB: [
                 police_kill_cb_data,
                 "Кого будешь убивать?",
-                [self.callback.from_user.id],
+                not_to_kill,
             ],
             POLICEMAN_CHECKS_CB: [
                 police_check_cb_data,
@@ -71,7 +74,7 @@ class PolicemanSaver(RouterHelper):
         await self.callback.message.edit_text(
             text=Policeman.mail_message,
             reply_markup=kill_or_check_on_policeman(
-                number_of_night=game_data["number_of_night"]
+                game_data=game_data
             ),
         )
 

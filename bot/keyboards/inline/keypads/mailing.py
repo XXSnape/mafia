@@ -109,14 +109,17 @@ def kill_or_poison_kb(game_data: GameCache):
     return generate_inline_kb(data_with_buttons=buttons)
 
 
-def kill_or_check_on_policeman(number_of_night: int = 1):
+def kill_or_check_on_policeman(game_data: GameCache):
     buttons = [
         InlineKeyboardButton(
             text="Проверить🔍",
             callback_data=POLICEMAN_CHECKS_CB,
         ),
     ]
-    if number_of_night > 1:
+    if (
+        game_data["number_of_night"] > 1
+        and game_data["settings"]["can_marshal_kill"]
+    ):
         buttons.append(
             InlineKeyboardButton(
                 text="Стрелять🔫",
