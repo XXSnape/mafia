@@ -1,6 +1,7 @@
 from aiogram import F, Router
 from aiogram.filters import and_f, or_f
 from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery
 from general.collection_of_roles import get_data_with_roles
 from keyboards.inline.cb.cb_text import (
@@ -20,7 +21,7 @@ router = Router(name=__name__)
 
 @router.callback_query(
     or_f(
-        F.data == VIEW_BANNED_ROLES_CB,
+        and_f(default_state, F.data == VIEW_BANNED_ROLES_CB),
         and_f(SettingsFsm.BAN_ROLES, F.data == CANCEL_CB),
     )
 )

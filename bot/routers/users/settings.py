@@ -26,6 +26,7 @@ router = Router(name=__name__)
         default_state,
         SettingsFsm.BAN_ROLES,
         SettingsFsm.ORDER_OF_ROLES,
+        SettingsFsm.FOG_OF_WAR
     ),
 )
 async def handle_settings(
@@ -49,6 +50,7 @@ async def handle_settings(
         default_state,
         SettingsFsm.BAN_ROLES,
         SettingsFsm.ORDER_OF_ROLES,
+        SettingsFsm.FOG_OF_WAR,
     ),
     F.data == ACTIONS_FOR_ROLES_CB,
 )

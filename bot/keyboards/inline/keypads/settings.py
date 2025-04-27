@@ -27,7 +27,7 @@ from keyboards.inline.cb.cb_text import (
     LENGTH_OF_DAY_CB,
     LENGTH_OF_NIGHT_CB,
     VIEW_BANNED_ROLES_CB,
-    VIEW_ORDER_OF_ROLES_CB,
+    VIEW_ORDER_OF_ROLES_CB, FOG_OF_WAR_CB,
 )
 from mafia.roles import MafiaAlias
 from utils.sorting import sorting_roles_by_name
@@ -93,6 +93,7 @@ def select_setting_kb():
             text="Продолжительность дня🌟",
             callback_data=LENGTH_OF_DAY_CB,
         ),
+        InlineKeyboardButton(text='Туман войны😶‍🌫️', callback_data=FOG_OF_WAR_CB),
         HELP_BTN,
     ]
     return generate_inline_kb(data_with_buttons=buttons)

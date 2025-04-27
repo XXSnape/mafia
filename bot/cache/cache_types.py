@@ -71,6 +71,15 @@ class InteractionData(TypedDict):
     interacting: PlayersIds
 
 
+class FogOfWarCache(TypedDict):
+    show_dead_roles_after_night: bool
+    show_dead_roles_after_hanging: bool
+    show_roles_died_due_to_inactivity: bool
+    show_killers: bool
+    show_information_in_shared_chat: bool
+    show_information_about_guests_at_night: bool
+
+
 class GameSettingsCache(TypedDict):
     creator_user_id: int
     creator_full_name: str
@@ -78,6 +87,12 @@ class GameSettingsCache(TypedDict):
     banned_roles: list[RolesLiteral]
     time_for_night: int
     time_for_day: int
+    show_dead_roles_after_night: bool
+    show_dead_roles_after_hanging: bool
+    show_roles_died_due_to_inactivity: bool
+    show_killers: bool
+    show_information_in_shared_chat: bool
+    show_information_about_guests_at_night: bool
 
 
 class UserCache(TypedDict, total=False):
