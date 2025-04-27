@@ -133,20 +133,38 @@ def choose_fake_role_kb(game_data: GameCache):
     from general.collection_of_roles import get_data_with_roles
     from mafia.roles import Policeman
 
+    policeman = (
+        Policeman.role_id,
+        Policeman.alias.role_id,
+    )
     all_roles = get_data_with_roles()
     current_roles = set()
-    for user_id in game_data["live_players_ids"]:
-        user_data = game_data["players"][str(user_id)]
-        if user_data["role_id"] not in (
-            Policeman.role_id,
-            Policeman.alias.role_id,
-        ):
-            current_roles.add(
-                (
-                    all_roles[user_data["role_id"]].role,
-                    user_data["role_id"],
+    if game_data["settings"]["is_fog_of_war_on"]:
+        all_roles_in_game = {
+            player_data["role_id"]
+            for player_data in game_data["players"].values()
+        }
+        all_roles_in_game -= {
+            game_data["players"][str(user_id)]["role_id"]
+            for user_id in game_data["show_in_fog_of_war"]
+        }
+        all_roles_in_game |= {
+            game_data["players"][str(user_id)]["role_id"]
+            for user_id in game_data["live_players_ids"]
+        }
+        for role in all_roles_in_game:
+            if role not in policeman:
+                current_roles.add((all_roles[role].role, role))
+    else:
+        for user_id in game_data["live_players_ids"]:
+            user_data = game_data["players"][str(user_id)]
+            if user_data["role_id"] not in policeman:
+                current_roles.add(
+                    (
+                        all_roles[user_data["role_id"]].role,
+                        user_data["role_id"],
+                    )
                 )
-            )
 
     buttons = [
         InlineKeyboardButton(text=role[0], callback_data=role[1])

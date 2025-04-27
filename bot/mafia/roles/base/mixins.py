@@ -146,8 +146,9 @@ class MafiaConverterABC(FinisherOfNight):
             new_role=MafiaAlias(),
             user_id=user_id,
         )
-        await self.bot.send_photo(
-            chat_id=game_data["game_chat"],
-            photo=MafiaAlias.photo,
-            caption=f"{make_pretty(self.role)} превращается в {make_pretty(MafiaAlias.role)}",
-        )
+        if game_data["settings"]["is_fog_of_war_on"] is False:
+            await self.bot.send_photo(
+                chat_id=game_data["game_chat"],
+                photo=MafiaAlias.photo,
+                caption=f"{make_pretty(self.role)} превращается в {make_pretty(MafiaAlias.role)}",
+            )
