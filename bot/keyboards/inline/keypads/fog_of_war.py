@@ -23,6 +23,10 @@ def fog_of_war_options_kb(fog_of_war: FogOfWarCache):
             callback_data=cb_text.SHOW_ROLES_DIED_DUE_TO_INACTIVITY_CB,
         ),
         InlineKeyboardButton(
+            text="Показывать имена во время голосования",
+            callback_data=cb_text.SHOW_USERNAMES_DURING_VOTING_CB,
+        ),
+        InlineKeyboardButton(
             text="Показывать роли ночных убийц",
             callback_data=cb_text.SHOW_KILLERS_CB,
         ),

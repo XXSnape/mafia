@@ -13,3 +13,4 @@ class FogOfWarSchema(BaseModel):
     show_killers: bool
     show_information_in_shared_chat: bool
     show_information_about_guests_at_night: bool
+    show_usernames_during_voting: bool

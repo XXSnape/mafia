@@ -25,14 +25,21 @@ ACTIONS_FOR_ROLES_CB = "actions_for_roles"
 DELETE_LATEST_ROLE_IN_ORDER_CB = "pop_latest"
 VIEW_ROLES_CB = "view_roles"
 
-FOG_OF_WAR_CB = 'fog_of_war'
+FOG_OF_WAR_CB = "fog_of_war"
 
-SHOW_DEAD_ROLES_AFTER_NIGHT_CB = 'show_dead_roles_after_night'
-SHOW_DEAD_ROLES_AFTER_HANGING_CB = 'show_dead_roles_after_hanging'
-SHOW_ROLES_DIED_DUE_TO_INACTIVITY_CB = 'show_roles_died_due_to_inactivity'
-SHOW_KILLERS_CB = 'show_killers'
-SHOW_INFORMATION_IN_SHARED_CHAT_CB = 'show_information_in_shared_chat'
-SHOW_INFORMATION_ABOUT_GUESTS_AT_NIGHT_CB = 'show_information_about_guests_at_night'
+SHOW_DEAD_ROLES_AFTER_NIGHT_CB = "show_dead_roles_after_night"
+SHOW_DEAD_ROLES_AFTER_HANGING_CB = "show_dead_roles_after_hanging"
+SHOW_ROLES_DIED_DUE_TO_INACTIVITY_CB = (
+    "show_roles_died_due_to_inactivity"
+)
+SHOW_KILLERS_CB = "show_killers"
+SHOW_INFORMATION_IN_SHARED_CHAT_CB = (
+    "show_information_in_shared_chat"
+)
+SHOW_INFORMATION_ABOUT_GUESTS_AT_NIGHT_CB = (
+    "show_information_about_guests_at_night"
+)
+SHOW_USERNAMES_DURING_VOTING_CB = "show_usernames_during_voting"
 
 HELP_CB = "help"
 HOW_TO_START_GAME_CB = "how_to_start_game"
