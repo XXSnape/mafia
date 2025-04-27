@@ -7,22 +7,17 @@ from cache.cache_types import PlayersIds, RolesLiteral
 from general import settings
 from general.collection_of_roles import get_data_with_roles
 from keyboards.inline.builder import generate_inline_kb
-from keyboards.inline.buttons.common import CANCEL_BTN, TO_BOT_BTN
+from keyboards.inline.buttons.common import CANCEL_BTN, TO_BOT_BTN, get_join_to_game_btn
 from keyboards.inline.cb.cb_text import (
     FINISH_REGISTRATION_CB,
 )
 
 
-async def get_join_kb(
+async def join_to_game_kb(
     bot: Bot, game_chat: int, players_ids: PlayersIds
 ):
     buttons = [
-        InlineKeyboardButton(
-            text="Присоединиться",
-            url=await create_start_link(
-                bot, str(game_chat), encode=True
-            ),
-        ),
+        await get_join_to_game_btn(bot=bot, game_chat=game_chat),
         TO_BOT_BTN,
     ]
     if len(players_ids) >= settings.mafia.minimum_number_of_players:
@@ -33,6 +28,11 @@ async def get_join_kb(
             )
         )
     return generate_inline_kb(data_with_buttons=buttons)
+
+async def remind_about_joining_kb(bot: Bot, game_chat: int):
+    btn = await get_join_to_game_btn(bot=bot, game_chat=game_chat)
+    return generate_inline_kb(data_with_buttons=[btn])
+
 
 
 async def offer_to_place_bet(banned_roles: list[RolesLiteral]):

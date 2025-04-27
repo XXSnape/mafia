@@ -9,6 +9,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from cache.cache_types import GameCache
 from faststream.rabbit import RabbitBroker
 from general import settings
+from keyboards.inline.keypads.join import remind_about_joining_kb
 from mafia.pipeline_game import Game
 from sqlalchemy.ext.asyncio import AsyncSession
 from utils.pretty_text import (
@@ -84,7 +85,11 @@ async def remind_of_beginning_of_game(bot: Bot, state: FSMContext):
     message = get_minutes_and_seconds_text(
         start=now, end=end_of_registration
     )
+    kb = await remind_about_joining_kb(
+        bot=bot,
+        game_chat=game_data['game_chat'],
+    )
     with suppress(TelegramBadRequest):
         await bot.send_message(
-            chat_id=game_data["game_chat"], text=make_build(message)
+            chat_id=game_data["game_chat"], text=make_build(message), reply_markup=kb
         )

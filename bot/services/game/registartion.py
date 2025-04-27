@@ -26,10 +26,12 @@ from general.collection_of_roles import (
     get_data_with_roles,
 )
 from general.text import MONEY_SYM, REQUIRED_PERMISSIONS
+from keyboards.inline.builder import generate_inline_kb
+from keyboards.inline.buttons.common import get_join_to_game_btn
 from keyboards.inline.keypads.join import (
     cancel_bet,
-    get_join_kb,
-    offer_to_place_bet,
+    join_to_game_kb,
+    offer_to_place_bet, remind_about_joining_kb,
 )
 from loguru import logger
 from mafia.pipeline_game import Game
@@ -158,7 +160,7 @@ class Registration(RouterHelper):
             return
         await self.state.set_state(GameFsm.REGISTRATION)
         await delete_message(self.message)
-        markup = await get_join_kb(
+        markup = await join_to_game_kb(
             bot=self._get_bot(),
             game_chat=self.message.chat.id,
             players_ids=[],
@@ -189,7 +191,11 @@ class Registration(RouterHelper):
                 end_of_registration=end_of_registration,
             )
         await sent_message.pin()
-        await self.message.answer(make_build(time_to_start))
+        kb = await remind_about_joining_kb(
+            bot=self._get_bot(),
+            game_chat=self.message.chat.id,
+        )
+        await self.message.answer(make_build(time_to_start), reply_markup=kb)
         self.scheduler.add_job(
             func=start_game,
             trigger=DateTrigger(
@@ -304,7 +310,7 @@ class Registration(RouterHelper):
         text = get_profiles_during_registration(
             game_data["live_players_ids"], game_data["players"]
         )
-        to_group_markup = await get_join_kb(
+        to_group_markup = await join_to_game_kb(
             bot=bot,
             game_chat=game_chat,
             players_ids=game_data["live_players_ids"],
@@ -330,7 +336,7 @@ class Registration(RouterHelper):
                 return
             await self.message.answer(
                 make_build(
-                    "🙂Ты уже в игре, сделай ставку на сообщении выше!"
+                    "🙂Ты уже в игре!"
                 )
             )
             return

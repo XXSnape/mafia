@@ -1,4 +1,7 @@
+from aiogram import Bot
 from aiogram.types import InlineKeyboardButton
+from aiogram.utils.deep_linking import create_start_link
+
 from general import settings
 from general.text import TO_SAVE
 from keyboards.inline.cb.cb_text import (
@@ -8,6 +11,15 @@ from keyboards.inline.cb.cb_text import (
     PLAYER_BACKS_CB,
     SAVE_CB,
 )
+
+async def get_join_to_game_btn(bot: Bot, game_chat: int):
+    return InlineKeyboardButton(
+            text="Присоединиться",
+            url=await create_start_link(
+                bot, str(game_chat), encode=True
+            ),
+        )
+
 
 BACK_BTN = InlineKeyboardButton(
     text="Назад⬅️", callback_data=PLAYER_BACKS_CB
