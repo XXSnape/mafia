@@ -253,34 +253,56 @@ async def send_messages_after_night(
     messages = game_data["messages_after_night"]
     if not messages:
         return
-    number_of_night = make_build(
+    number_of_night = (
         f"Важнейшие события ночи {game_data['number_of_night']}:\n\n"
     )
     chats_and_messages = defaultdict(list)
     for chat_id, message in messages:
         chats_and_messages[chat_id].append(message)
+
     tasks = []
-    for chat_id, messages in chats_and_messages.items():
-        if chat_id != group_chat_id:
-            tasks.append(
-                bot.send_message(
-                    chat_id=chat_id,
-                    text=number_of_night
-                    + "\n\n".join(
-                        make_build(f"{number}) {message}")
-                        for number, message in enumerate(
-                            sorted(messages, key=len), start=1
-                        )
-                    ),
-                )
-            )
-        else:
-            for message in messages:
+    if (
+        game_data["settings"][
+            "show_information_about_guests_at_night"
+        ]
+        is False
+    ):
+        for chat_id, _ in chats_and_messages.items():
+            if chat_id != group_chat_id:
                 tasks.append(
                     bot.send_message(
-                        chat_id=chat_id, text=make_build(message)
+                        chat_id=chat_id,
+                        text=make_build(
+                            number_of_night
+                            + "К тебе определенно кто-то приходил, но Туман Войны скрыл это..."
+                        ),
                     )
                 )
+    else:
+        for chat_id, messages in chats_and_messages.items():
+            if chat_id != group_chat_id:
+                tasks.append(
+                    bot.send_message(
+                        chat_id=chat_id,
+                        text=make_build(
+                            number_of_night
+                            + "\n\n".join(
+                                f"{number}) {message}"
+                                for number, message in enumerate(
+                                    sorted(messages, key=len),
+                                    start=1,
+                                )
+                            )
+                        ),
+                    )
+                )
+            else:
+                for message in messages:
+                    tasks.append(
+                        bot.send_message(
+                            chat_id=chat_id, text=make_build(message)
+                        )
+                    )
     await asyncio.gather(*tasks, return_exceptions=True)
 
 

@@ -525,7 +525,7 @@ class Controller:
         profiles = get_profiles(
             players_ids=inactive_users,
             players=game_data["players"],
-            role=True,
+            role=game_data["settings"]["is_fog_of_war_on"] is False,
         )
         text = f"{make_build('❗️Игроки выбывают:')}\n{profiles}"
         await self.bot.send_photo(

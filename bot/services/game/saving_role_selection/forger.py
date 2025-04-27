@@ -99,4 +99,8 @@ class ForgerSaver(RouterHelper):
             game_data=game_data,
             message_to_user=False,
             current_role=forger,
+            message_to_group=game_data["settings"][
+                "is_fog_of_war_on"
+            ]
+            is False,
         )

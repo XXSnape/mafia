@@ -103,4 +103,8 @@ class InstigatorSaver(RouterHelper):
             message_to_user=f"Днём {subject_url} проголосует за "
             f"{object_url}, если попытается голосовать",
             current_role=Instigator(),
+            message_to_group=game_data["settings"][
+                "is_fog_of_war_on"
+            ]
+            is False,
         )

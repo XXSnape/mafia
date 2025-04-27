@@ -117,9 +117,13 @@ class PolicemanSaver(RouterHelper):
             users=game_data[Policeman.roles_key],
             text=text,
         )
+        if game_data["settings"]["is_fog_of_war_on"] is False:
+            message_to_group = "Армия насильно заставила кого-то показать документы!"
+        else:
+            message_to_group = False
         await send_messages_to_user_and_group(
             callback=self.callback,
             game_data=game_data,
             message_to_user=False,
-            message_to_group="Армия насильно заставила кого-то показать документы!",
+            message_to_group=message_to_group,
         )

@@ -188,7 +188,8 @@ async def inform_players_after_action(
     )
     message_to_group = False
     if (
-        current_role.message_to_group_after_action
+        game_data["settings"]["is_fog_of_war_on"] is False
+        and current_role.message_to_group_after_action
         and len(game_data[current_role.processed_users_key]) == 1
     ):
         message_to_group = True

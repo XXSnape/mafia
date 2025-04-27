@@ -1,3 +1,4 @@
+from cache.cache_types import GameCache
 from mafia.roles import Analyst
 from services.base import RouterHelper
 from services.game.game_assistants import (
@@ -18,7 +19,7 @@ class AnalystSaver(RouterHelper):
             dispatcher=self.dispatcher,
         )
         async with lock_state(game_state):
-            game_data = await game_state.get_data()
+            game_data: GameCache = await game_state.get_data()
             game_data[Analyst.processed_users_key] = [0]
             remove_from_expected(
                 callback=self.callback, game_data=game_data
@@ -29,4 +30,8 @@ class AnalystSaver(RouterHelper):
             game_data=game_data,
             message_to_user="Ты предположил, что никого не повесят днём",
             current_role=Analyst(),
+            message_to_group=game_data["settings"][
+                "is_fog_of_war_on"
+            ]
+            is False,
         )

@@ -1,3 +1,4 @@
+from cache.cache_types import GameCache
 from keyboards.inline.cb.cb_text import (
     WEREWOLF_TO_DOCTOR_CB,
     WEREWOLF_TO_MAFIA_CB,
@@ -48,7 +49,7 @@ class WerewolfSaver(RouterHelper):
             dispatcher=self.dispatcher,
         )
         async with lock_state(game_state):
-            game_data = await game_state.get_data()
+            game_data: GameCache = await game_state.get_data()
             if len(game_data[roles_key]) == 0:
                 new_role = current_roles[0]
             else:
@@ -68,13 +69,14 @@ class WerewolfSaver(RouterHelper):
             photo=new_role.photo,
             caption=f"Твоя новая роль - {make_pretty(new_role.role)}!",
         )
-        await self.callback.bot.send_photo(
-            chat_id=game_data["game_chat"],
-            photo=new_role.photo,
-            caption=f"{make_pretty(Werewolf.role)} принял "
-            f"решение превратиться в {make_pretty(new_role.role)}. "
-            f"Уже со следующего дня изменения в миропорядке вступят в силу.",
-        )
+        if game_data["settings"]["is_fog_of_war_on"] is False:
+            await self.callback.bot.send_photo(
+                chat_id=game_data["game_chat"],
+                photo=new_role.photo,
+                caption=f"{make_pretty(Werewolf.role)} принял "
+                f"решение превратиться в {make_pretty(new_role.role)}. "
+                f"Уже со следующего дня изменения в миропорядке вступят в силу.",
+            )
         if are_there_many_senders:
             await notify_aliases_about_transformation(
                 game_data=game_data,

@@ -76,4 +76,8 @@ class WardenSaver(RouterHelper):
             message_to_user=f"Ты решил проверить на принадлежность "
             f"одной группировки {user1_url} и {user2_url}",
             current_role=Warden(),
+            message_to_group=game_data["settings"][
+                "is_fog_of_war_on"
+            ]
+            is False,
         )
