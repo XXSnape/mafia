@@ -4,6 +4,7 @@ from cache.cache_types import RolesLiteral
 from general.collection_of_roles import (
     get_data_with_roles,
     REQUIRED_ROLES,
+    BASES_ROLES,
 )
 from general.text import TO_SAVE
 from keyboards.inline.builder import generate_inline_kb
@@ -22,25 +23,28 @@ from keyboards.inline.cb.cb_text import (
 from utils.sorting import sorting_roles_by_name
 
 
-def edit_banned_roles_kb(are_there_roles: bool):
+def edit_banned_roles_kb(banned_roles_ids: list[RolesLiteral]):
     buttons = [
         InlineKeyboardButton(
             text="Редактировать✏️", callback_data=EDIT_BANNED_ROLES_CB
         )
     ]
-    if are_there_roles:
+    if banned_roles_ids:
         buttons.append(
             InlineKeyboardButton(
                 text="Очистить все🗑️",
                 callback_data=CLEAR_BANNED_ROLES_CB,
             )
         )
-    buttons.append(
-        InlineKeyboardButton(
-            text="Забанить все🚫",
-            callback_data=BAN_EVERYTHING_CB,
+    if len(banned_roles_ids) != len(get_data_with_roles()) - len(
+        REQUIRED_ROLES
+    ):
+        buttons.append(
+            InlineKeyboardButton(
+                text="Забанить все🚫",
+                callback_data=BAN_EVERYTHING_CB,
+            )
         )
-    )
     buttons.append(BACK_TO_SELECTING_ACTIONS_ON_SETTINGS_BTN)
     return generate_inline_kb(data_with_buttons=buttons)
 

@@ -14,6 +14,7 @@ from keyboards.inline.cb.cb_text import (
     TIME_FOR_DAY_CB,
     TIME_FOR_VOTING_CB,
     TIME_FOR_CONFIRMATION_CB,
+    DURATION_OF_STAGES_CB,
 )
 from utils.pretty_text import get_minutes_and_seconds_text
 
@@ -36,7 +37,7 @@ def select_stage_of_game_kb():
             text="Продолжительность подтверждения✔️",
             callback_data=TIME_FOR_CONFIRMATION_CB,
         ),
-        CANCEL_BTN,
+        BACK_TO_SELECTING_ACTIONS_ON_SETTINGS_BTN,
     ]
     return generate_inline_kb(data_with_buttons=buttons)
 
@@ -72,7 +73,11 @@ def adjust_time_kb(
                 ).pack(),
             )
         )
-    buttons.append(BACK_TO_SELECTING_ACTIONS_ON_SETTINGS_BTN)
+    buttons.append(
+        InlineKeyboardButton(
+            text="Назад⏪", callback_data=DURATION_OF_STAGES_CB
+        )
+    )
     return generate_inline_kb(
         data_with_buttons=buttons, leave_1_each=1, row=3
     )

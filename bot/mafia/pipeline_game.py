@@ -38,6 +38,8 @@ from loguru import logger
 from mafia.controlling_game import Controller
 from mafia.roles import RoleABC
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from services.common.settings import SettingsRouter
 from states.game import GameFsm
 from utils.informing import (
     get_live_players,
@@ -139,7 +141,12 @@ class Game:
             await self.familiarize_players(game_data)
             await self.bot.send_message(
                 chat_id=self.group_chat_id,
-                text=make_build("🎲Игра начинается!"),
+                text=make_build(
+                    "🎲Игра начинается!\n\nТекущие настройки:\n\n"
+                )
+                + SettingsRouter.get_other_settings_text(
+                    settings=game_data["settings"]
+                ),
                 reply_markup=get_to_bot_kb(),
             )
             while True:

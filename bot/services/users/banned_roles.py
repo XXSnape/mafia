@@ -99,7 +99,7 @@ class RoleAttendant(RouterHelper):
         }
         await self.set_settings_data(poll_data)
         markup = edit_banned_roles_kb(
-            are_there_roles=bool(banned_roles_ids)
+            banned_roles_ids=banned_roles_ids
         )
         if has_order_been_reset:
             await delete_message(self.callback.message)

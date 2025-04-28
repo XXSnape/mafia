@@ -53,14 +53,6 @@ def select_setting_kb():
             text="Продолжительность игровых этапов⏳",
             callback_data=DURATION_OF_STAGES_CB,
         ),
-        # InlineKeyboardButton(
-        #     text="Продолжительность ночи🌃",
-        #     callback_data=TIME_FOR_NIGHT_CB,
-        # ),
-        # InlineKeyboardButton(
-        #     text="Продолжительность дня🌟",
-        #     callback_data=TIME_FOR_DAY_CB,
-        # ),
         InlineKeyboardButton(
             text="Туман войны😶‍🌫️", callback_data=FOG_OF_WAR_CB
         ),

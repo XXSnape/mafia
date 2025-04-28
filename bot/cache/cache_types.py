@@ -60,6 +60,10 @@ class PollBannedRolesCache(TypedDict, total=False):
 
 
 class DifferentSettingsCache(TypedDict):
+    time_for_night: int
+    time_for_day: int
+    time_for_voting: int
+    time_for_confirmation: int
     show_dead_roles_after_night: bool
     show_dead_roles_after_hanging: bool
     show_roles_died_due_to_inactivity: bool
@@ -101,23 +105,11 @@ class InteractionData(TypedDict):
     interacting: PlayersIds
 
 
-class GameSettingsCache(TypedDict, total=False):
+class GameSettingsCache(DifferentSettingsCache, total=False):
     creator_user_id: int
     creator_full_name: str
     order_of_roles: list[RolesLiteral]
     banned_roles: list[RolesLiteral]
-    time_for_night: int
-    time_for_day: int
-    show_dead_roles_after_night: bool
-    show_dead_roles_after_hanging: bool
-    show_roles_died_due_to_inactivity: bool
-    show_killers: bool
-    show_information_in_shared_chat: bool
-    show_information_about_guests_at_night: bool
-    show_usernames_during_voting: bool
-    can_kill_teammates: bool
-    can_marshal_kill: bool
-    mafia_every_3: bool
     is_fog_of_war_on: bool
 
 

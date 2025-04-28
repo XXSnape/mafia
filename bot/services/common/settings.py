@@ -2,6 +2,8 @@ from collections.abc import Awaitable, Callable
 from typing import Concatenate
 
 from aiogram.exceptions import TelegramAPIError
+
+from cache.cache_types import DifferentSettingsCache
 from database.dao.groups import GroupsDao
 from database.dao.settings import SettingsDao
 from database.schemas.common import (
@@ -9,15 +11,26 @@ from database.schemas.common import (
     TgIdSchema,
     UserTgIdSchema,
 )
-from database.schemas.groups import GroupSettingIdSchema
+from database.schemas.groups import (
+    GroupSettingIdSchema,
+    GroupSettingsSchema,
+)
 from keyboards.inline.callback_factory.settings import (
     GroupSettingsCbData,
+)
+from keyboards.inline.keypads.different_settings import (
+    get_for_of_war_buttons,
+    get_different_settings_buttons,
+    check_for_settings,
 )
 from keyboards.inline.keypads.settings import set_up_group_kb
 from services.base import RouterHelper
 from services.users.banned_roles import RoleAttendant
 from services.users.order_of_roles import RoleManager
-from utils.pretty_text import make_build
+from utils.pretty_text import (
+    make_build,
+    get_minutes_and_seconds_text,
+)
 from utils.tg import check_user_for_admin_rights, delete_message
 
 
@@ -83,6 +96,35 @@ def cant_write_to_user[R, **P](
 
 
 class SettingsRouter(RouterHelper):
+
+    @staticmethod
+    def get_other_settings_text(
+        settings: DifferentSettingsCache,
+    ) -> str:
+        buttons = (
+            get_for_of_war_buttons()
+            + get_different_settings_buttons()
+        )
+        check_for_settings(
+            buttons=buttons, different_settings=settings
+        )
+        different_settings_text = "\n\n".join(
+            btn.text for btn in buttons
+        )
+        return make_build(
+            different_settings_text
+            + (
+                f"\n\n{get_minutes_and_seconds_text(message='Продолжительность ночи - ', 
+                                            seconds=settings['time_for_night'])}\n\n"
+                f"{get_minutes_and_seconds_text(message='Продолжительность дня - ', 
+                                            seconds=settings['time_for_day'])}\n\n"
+                f"{get_minutes_and_seconds_text(message='Продолжительность голосования - ', 
+                                            seconds=settings['time_for_voting'])}\n\n"
+                f"{get_minutes_and_seconds_text(message='Продолжительность процесса подтверждения о повешении - ', 
+                                            seconds=settings['time_for_confirmation'])}"
+            )
+        )
+
     @cant_write_to_user
     async def get_group_settings(self):
         await delete_message(self.message)
@@ -119,9 +161,8 @@ class SettingsRouter(RouterHelper):
                 selected_roles=group_settings.order_of_roles,
                 to_save=False,
             )
-            other_settings_text = make_build(
-                f"Ночь длится (в секундах): {group_settings.time_for_night}\n"
-                f"День длится (в секундах): {group_settings.time_for_day}\n"
+            other_settings_text = self.get_other_settings_text(
+                settings=group_settings.model_dump()
             )
             await self.message.bot.send_message(
                 chat_id=self.message.from_user.id,

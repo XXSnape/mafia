@@ -8,8 +8,6 @@ class GroupSettingsSchema(DifferentSettingsSchema):
     id: int
     banned_roles: list[RolesLiteral]
     order_of_roles: list[RolesLiteral]
-    time_for_night: int
-    time_for_day: int
     is_there_settings: bool
 
 

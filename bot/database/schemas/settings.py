@@ -15,13 +15,12 @@ class FogOfWarSchema(BaseModel):
     show_dead_roles_after_hanging: bool = True
     show_roles_died_due_to_inactivity: bool = True
     show_killers: bool = True
-    show_information_in_shared_chat: bool = True
     show_information_about_guests_at_night: bool = True
     show_usernames_during_voting: bool = True
     show_usernames_after_confirmation: bool = False
 
 
-class DifferentSettingsSchema(FogOfWarSchema):
+class DifferentSettingsSchema(FogOfWarSchema, TimeOfDaySchema):
     can_kill_teammates: bool = True
     can_marshal_kill: bool = True
     mafia_every_3: bool = False
