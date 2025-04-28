@@ -23,8 +23,16 @@ BAN_EVERYTHING_CB = "ban_everything"
 SAVE_ORDER_OF_ROLES_CB = "save_order_of_roles"
 SAVE_BANNED_ROLES_CB = "save_banned_roles"
 CANCEL_CB = "cancel"
-LENGTH_OF_NIGHT_CB = "length_of_night"
-LENGTH_OF_DAY_CB = "length_of_day"
+
+DURATION_OF_STAGES_CB = "during_of_stages"
+
+
+TIME_FOR_NIGHT_CB = "time_for_night"
+TIME_FOR_DAY_CB = "time_for_day"
+TIME_FOR_VOTING_CB = "time_for_voting"
+TIME_FOR_CONFIRMATION_CB = "time_for_confirmation"
+
+
 ACTIONS_ON_SETTINGS_CB = "actions_on_settings"
 DELETE_LATEST_ROLE_IN_ORDER_CB = "pop_latest"
 VIEW_ROLES_CB = "view_roles"
@@ -37,13 +45,14 @@ SHOW_ROLES_DIED_DUE_TO_INACTIVITY_CB = (
     "show_roles_died_due_to_inactivity"
 )
 SHOW_KILLERS_CB = "show_killers"
-SHOW_INFORMATION_IN_SHARED_CHAT_CB = (
-    "show_information_in_shared_chat"
-)
 SHOW_INFORMATION_ABOUT_GUESTS_AT_NIGHT_CB = (
     "show_information_about_guests_at_night"
 )
 SHOW_USERNAMES_DURING_VOTING_CB = "show_usernames_during_voting"
+SHOW_USERNAMES_AFTER_CONFIRMATION_CB = (
+    "show_usernames_after_confirmation"
+)
+
 
 CAN_KILL_TEAMMATES_CB = "can_kill_teammates"
 CAN_MARSHAL_KILL_CB = "can_marshal_kill"

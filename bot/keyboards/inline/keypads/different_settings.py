@@ -38,12 +38,12 @@ def fog_of_war_options_kb(fog_of_war: DifferentSettingsCache):
             callback_data=cb_text.SHOW_USERNAMES_DURING_VOTING_CB,
         ),
         InlineKeyboardButton(
-            text="Показывать роли ночных убийц",
-            callback_data=cb_text.SHOW_KILLERS_CB,
+            text="Показывать имена после подтверждения",
+            callback_data=cb_text.SHOW_USERNAMES_AFTER_CONFIRMATION_CB,
         ),
         InlineKeyboardButton(
-            text="Сбрасывать полезную информацию в чат",
-            callback_data=cb_text.SHOW_INFORMATION_IN_SHARED_CHAT_CB,
+            text="Показывать роли ночных убийц",
+            callback_data=cb_text.SHOW_KILLERS_CB,
         ),
         InlineKeyboardButton(
             text="Писать в личку о ночных гостях",

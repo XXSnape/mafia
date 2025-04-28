@@ -8,6 +8,7 @@ def generate_inline_kb(
     data_with_buttons=(),
     sizes: Iterable[int] = (1,),
     leave_1_each: int | None = None,
+    row: int = 2,
 ) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     for data in data_with_buttons:
@@ -15,7 +16,8 @@ def generate_inline_kb(
             builder.add(data)
     if leave_1_each:
         sizes = [
-            *[2] * ((len(data_with_buttons) - leave_1_each) // 2),
+            *[row]
+            * ((len(data_with_buttons) - leave_1_each) // row),
             1,
         ]
     builder.adjust(*sizes)

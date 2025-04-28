@@ -7,7 +7,7 @@ from database.schemas.settings import (
     DifferentSettingsSchema,
 )
 from general.collection_of_roles import BASES_ROLES
-from keyboards.inline.keypads.fog_of_war import (
+from keyboards.inline.keypads.different_settings import (
     fog_of_war_options_kb,
     different_options_kb,
 )

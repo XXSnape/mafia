@@ -8,6 +8,12 @@ LastInteraction: TypeAlias = dict[UserIdStr, list[NumberOfNight]]
 UserAndMoney: TypeAlias = list[int]
 UsersMoney: TypeAlias = list[UserAndMoney]
 UsersInGame: TypeAlias = dict[UserIdStr, "UserGameCache"]
+StagesOfGameLiteral = Literal[
+    "time_for_night",
+    "time_for_day",
+    "time_for_voting",
+    "time_for_confirmation",
+]
 RolesLiteral = Literal[
     "don",
     "doctor",

@@ -1,9 +1,13 @@
 from pydantic import BaseModel
 
+from general import settings
+
 
 class TimeOfDaySchema(BaseModel):
-    time_for_night: int | None = None
-    time_for_day: int | None = None
+    time_for_night: int = settings.mafia.time_for_night
+    time_for_day: int = settings.mafia.time_for_day
+    time_for_voting: int = settings.mafia.time_for_voting
+    time_for_confirmation: int = settings.mafia.time_for_confirmation
 
 
 class FogOfWarSchema(BaseModel):

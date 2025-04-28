@@ -1,11 +1,8 @@
-from enum import IntEnum, auto
+from typing import Literal
 
 from aiogram.filters.callback_data import CallbackData
 
-
-class TimeOfDay(IntEnum):
-    day = auto()
-    night = auto()
+from cache.cache_types import StagesOfGameLiteral
 
 
 class GroupSettingsCbData(CallbackData, prefix="set"):
@@ -14,5 +11,5 @@ class GroupSettingsCbData(CallbackData, prefix="set"):
 
 
 class TimeOfDayCbData(CallbackData, prefix="time"):
-    time_of_day: TimeOfDay
+    stage_of_game: StagesOfGameLiteral
     seconds: int
