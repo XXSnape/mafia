@@ -68,9 +68,9 @@ class DifferentSettingsCache(TypedDict):
     show_dead_roles_after_hanging: bool
     show_roles_died_due_to_inactivity: bool
     show_killers: bool
-    show_information_in_shared_chat: bool
     show_information_about_guests_at_night: bool
     show_usernames_during_voting: bool
+    show_usernames_after_confirmation: bool
     can_kill_teammates: bool
     can_marshal_kill: bool
     mafia_every_3: bool

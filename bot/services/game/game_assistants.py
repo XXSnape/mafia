@@ -217,6 +217,11 @@ async def take_action_and_save_data(
             game_state=game_state,
             callback_data=callback_data,
         )
+        if (
+            callback.from_user.id
+            not in game_data["waiting_for_action_at_night"]
+        ):
+            return game_state, user_id
         role_id = game_data["players"][str(callback.from_user.id)][
             "role_id"
         ]

@@ -142,7 +142,7 @@ class Game:
             await self.bot.send_message(
                 chat_id=self.group_chat_id,
                 text=make_build(
-                    "🎲Игра начинается!\n\nТекущие настройки:\n\n"
+                    "🎲Игра начинается!\n\n⚙️Текущие настройки:\n\n"
                 )
                 + SettingsRouter.get_other_settings_text(
                     settings=game_data["settings"]
@@ -257,13 +257,13 @@ class Game:
         await asyncio.sleep(3)
         result = await self.controller.confirm_final_aim()
         if result:
-            await asyncio.sleep(10)
+            await asyncio.sleep(15)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
         )
         await self.controller.sum_up_after_voting()
-        await self.controller.removing_inactive_players()
+        # await self.controller.removing_inactive_players()
         await self.controller.end_night()
         await asyncio.sleep(3)
 

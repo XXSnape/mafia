@@ -159,7 +159,7 @@ def get_results_of_goal_identification(game_data: GameCache):
     voting = defaultdict(list)
     for voting_id, voted_id in vote_for:
         voting[game_data["players"][str(voted_id)]["url"]].append(
-            game_data["players"][str(voting_id)]["url"]
+            voting_id
         )
 
     voting_result = ""
@@ -170,11 +170,12 @@ def get_results_of_goal_identification(game_data: GameCache):
             f"({len(game_data['refused_to_vote'])}):"
         )
         if game_data["settings"]["show_usernames_during_voting"]:
-            for user_id in game_data["refused_to_vote"]:
-                url = game_data["players"][str(user_id)]["url"]
-                refused_result += f"\n● {url}"
+            refused_result += get_profiles(
+                players_ids=game_data["refused_to_vote"],
+                players=game_data["players"],
+            )
         else:
-            refused_result += "\n● ???"
+            refused_result += "\n???"
 
     if not voting:
         voting_result = make_build(
@@ -185,13 +186,17 @@ def get_results_of_goal_identification(game_data: GameCache):
         voting.items(), key=sorting_by_voting, reverse=True
     ):
         if game_data["settings"]["show_usernames_during_voting"]:
-            text = "\n● ".join(
-                voting_person for voting_person in voting_people
+            text = get_profiles(
+                players_ids=voting_people,
+                players=game_data["players"],
             )
+            # text = "\n● ".join(
+            #     voting_person for voting_person in voting_people
+            # )
         else:
-            text = "???"
+            text = "\n???"
         voting_result += (
-            f"\n\n📝Голосовавшие за {voted} ({len(voting_people)}):\n● "
+            f"\n\n📝Голосовавшие за {voted} ({len(voting_people)}):"
             + text
         )
 
@@ -210,10 +215,37 @@ def get_results_of_voting(
     user_url = game_data["players"][str(removed_user_id)]["url"]
     pros = len(game_data["pros"])
     cons = len(game_data["cons"])
-    return (
-        make_build(f"Подводим итоги судьбы {user_url}:\n\n")
-        + f"✅За линчевание - {pros}\n🚫Против - {cons}\n\n"
+
+    show_users = game_data["settings"][
+        "show_usernames_after_confirmation"
+    ]
+    if show_users and pros:
+        voted_for_text = get_profiles(
+            players_ids=list(set(game_data["pros"])),
+            players=game_data["players"],
+        )
+    else:
+        voted_for_text = ""
+    if show_users and cons:
+        voted_against_text = get_profiles(
+            players_ids=list(set(game_data["cons"])),
+            players=game_data["players"],
+        )
+    else:
+        voted_against_text = ""
+
+    text = (
+        "Подводим итоги судьбы {user_url}:\n\n"
+        "✅За линчевание - {pros}{voted_for_text}\n\n🚫Против - {cons}{voted_against_text}\n\n"
+    ).format(
+        user_url=user_url,
+        pros=pros,
+        voted_for_text=voted_for_text,
+        cons=cons,
+        voted_against_text=voted_against_text,
     )
+
+    return make_build(text)
 
 
 async def notify_aliases_about_transformation(

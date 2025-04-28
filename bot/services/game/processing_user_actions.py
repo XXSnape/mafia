@@ -146,6 +146,11 @@ class UserManager(RouterHelper):
                     self.check_for_cheating(game_data)
                     or voted_user_id
                 )
+            if (
+                self.callback.from_user.id
+                not in game_data["waiting_for_action_at_day"]
+            ):
+                return
             self.delete_user_from_waiting_for_action_at_day(
                 game_data=game_data,
                 user_id=self.callback.from_user.id,
@@ -189,6 +194,11 @@ class UserManager(RouterHelper):
             if self.check_for_cheating(game_data) is True:
                 is_deceived = True
             else:
+                if (
+                    self.callback.from_user.id
+                    not in game_data["waiting_for_action_at_day"]
+                ):
+                    return
                 self.delete_user_from_waiting_for_action_at_day(
                     game_data=game_data,
                     user_id=self.callback.from_user.id,
