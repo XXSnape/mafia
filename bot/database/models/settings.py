@@ -13,10 +13,20 @@ class SettingModel(IdMixin, BaseModel):
         BigInteger, ForeignKey("users.tg_id", ondelete="CASCADE")
     )
     time_for_night: Mapped[int] = mapped_column(
-        default=settings.mafia.time_for_night
+        default=settings.mafia.time_for_night,
+        server_default=str(settings.mafia.time_for_night),
     )
     time_for_day: Mapped[int] = mapped_column(
-        default=settings.mafia.time_for_day
+        default=settings.mafia.time_for_day,
+        server_default=str(settings.mafia.time_for_day),
+    )
+    time_for_voting: Mapped[int] = mapped_column(
+        default=settings.mafia.time_for_voting,
+        server_default=str(settings.mafia.time_for_voting),
+    )
+    time_for_confirmation: Mapped[int] = mapped_column(
+        default=settings.mafia.time_for_confirmation,
+        server_default=str(settings.mafia.time_for_confirmation),
     )
     show_dead_roles_after_night: Mapped[bool] = mapped_column(
         default=True, server_default="1"
@@ -30,14 +40,14 @@ class SettingModel(IdMixin, BaseModel):
     show_killers: Mapped[bool] = mapped_column(
         default=True, server_default="1"
     )
-    show_information_in_shared_chat: Mapped[bool] = mapped_column(
-        default=True, server_default="1"
-    )
     show_information_about_guests_at_night: Mapped[bool] = (
         mapped_column(default=True, server_default="1")
     )
     show_usernames_during_voting: Mapped[bool] = mapped_column(
         default=True, server_default="1"
+    )
+    show_usernames_after_confirmation: Mapped[bool] = mapped_column(
+        default=False, server_default="0"
     )
     can_kill_teammates: Mapped[bool] = mapped_column(
         default=True, server_default="1"

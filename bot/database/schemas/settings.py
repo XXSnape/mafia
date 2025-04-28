@@ -14,6 +14,7 @@ class FogOfWarSchema(BaseModel):
     show_information_in_shared_chat: bool = True
     show_information_about_guests_at_night: bool = True
     show_usernames_during_voting: bool = True
+    show_usernames_after_confirmation: bool = False
 
 
 class DifferentSettingsSchema(FogOfWarSchema):

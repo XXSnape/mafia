@@ -29,9 +29,8 @@ class GroupsDao(BaseDAO[GroupModel]):
                 id=group.id,
                 banned_roles=[],
                 order_of_roles=list(BASES_ROLES),
-                time_for_night=settings.mafia.time_for_night,
-                time_for_day=settings.mafia.time_for_day,
                 is_there_settings=False,
+                **DifferentSettingsSchema().model_dump(),
             )
         elif group.setting_id is not None:
             settings_of_group = await SettingsDao(
@@ -51,20 +50,12 @@ class GroupsDao(BaseDAO[GroupModel]):
         order_of_roles = await OrderOfRolesDAO(
             session=self._session
         ).get_roles_ids_of_order_of_roles(user_tg_id)
-        if settings_of_group:
-            time_for_night = settings_of_group.time_for_night
-            time_for_day = settings_of_group.time_for_day
-        else:
-            time_for_night = settings.mafia.time_for_night
-            time_for_day = settings.mafia.time_for_day
         return GroupSettingsSchema(
             id=group.id,
             banned_roles=banned_roles,
             order_of_roles=order_of_roles,
-            time_for_night=time_for_night,
-            time_for_day=time_for_day,
             is_there_settings=True,
             **DifferentSettingsSchema.model_validate(
                 settings_of_group, from_attributes=True
-            ).model_dump()
+            ).model_dump(),
         )
