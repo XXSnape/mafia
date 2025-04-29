@@ -77,14 +77,20 @@ class WerewolfSaver(RouterHelper):
                 f"решение превратиться в {make_pretty(new_role.role)}. "
                 f"Уже со следующего дня изменения в миропорядке вступят в силу.",
             )
-        if are_there_many_senders:
+        if are_there_many_senders and (
+            self.callback.data == WEREWOLF_TO_MAFIA_CB
+            or game_data["settings"]["show_peaceful_allies"]
+        ):
             await notify_aliases_about_transformation(
                 game_data=game_data,
                 bot=self.callback.bot,
                 new_role=new_role,
                 user_id=user_id,
             )
-        if self.callback.data == WEREWOLF_TO_POLICEMAN_CB:
+        if self.callback.data == WEREWOLF_TO_POLICEMAN_CB and (
+            are_there_many_senders is False
+            or game_data["settings"]["show_peaceful_allies"]
+        ):
             await self.callback.message.answer(
                 text=remind_commissioner_about_inspections(game_data)
             )

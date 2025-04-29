@@ -88,6 +88,14 @@ class RoleABC(ABC):
     def role_description(self) -> RoleDescription:
         pass
 
+    def get_general_text_before_sending(
+        self,
+        game_data: GameCache,
+    ) -> str | None:
+        if self.grouping == Groupings.criminals:
+            return remind_criminals_about_inspections(game_data)
+        return None
+
     def introducing_users_to_roles(self, game_data: GameCache):
         roles_tasks = []
         aliases_tasks = []
@@ -110,7 +118,14 @@ class RoleABC(ABC):
                     f"{purpose}",
                 )
             )
-            if len(game_data[self.roles_key]) > 1 and self.alias:
+            if (
+                len(game_data[self.roles_key]) > 1
+                and self.alias
+                and (
+                    self.grouping == Groupings.criminals
+                    or game_data["settings"]["show_peaceful_allies"]
+                )
+            ):
                 profiles = get_profiles(
                     players_ids=persons,
                     players=game_data["players"],
@@ -174,18 +189,33 @@ class RoleABC(ABC):
             make_pretty(self.role)
         )
         game_data["players"][str(new_boss_id)]["role_id"] = role_id
-        profiles = get_profiles(
-            players_ids=game_data[self.roles_key],
-            players=game_data["players"],
-            role=True,
-        )
-        await send_a_lot_of_messages_safely(
-            bot=self.bot,
-            users=players,
-            text=f"❗️❗️❗️Погиб {role} {url}.\n\n"
-            f"Новый {role} - {new_boss_url}\n\n"
-            f"Текущие союзники:\n{profiles}",
-        )
+        if (
+            self.grouping == Groupings.criminals
+            or game_data["settings"]["show_peaceful_allies"]
+        ):
+            profiles = get_profiles(
+                players_ids=game_data[self.roles_key],
+                players=game_data["players"],
+                role=True,
+            )
+            await send_a_lot_of_messages_safely(
+                bot=self.bot,
+                users=players,
+                text=f"❗️❗️❗️Погиб {role} {url}.\n\n"
+                f"Новый {role} - {new_boss_url}\n\n"
+                f"Текущие союзники:\n{profiles}",
+            )
+        else:
+            await send_a_lot_of_messages_safely(
+                bot=self.bot,
+                users=[new_boss_id],
+                text=f"❗️❗️❗️Погиб {role}.\n\n" f"Ты новый {role}",
+            )
+            text = self.get_general_text_before_sending(game_data)
+            if text:
+                await send_a_lot_of_messages_safely(
+                    bot=self.bot, users=[new_boss_id], text=text
+                )
         if game_data["settings"]["show_roles_after_death"] is False:
             return
         if self.grouping == Groupings.criminals:
@@ -432,6 +462,12 @@ class AliasRoleABC(ABC):
     async def alias_is_dead(
         self, current_id: int, game_data: GameCache
     ):
+        if (
+            self.grouping != Groupings.criminals
+            and game_data["settings"]["show_peaceful_allies"]
+            is False
+        ):
+            return
         url = game_data["players"][str(current_id)]["url"]
         role = game_data["players"][str(current_id)]["pretty_role"]
         profiles = get_profiles(
@@ -659,13 +695,6 @@ class ActiveRoleAtNightABC(RoleABC):
             extra_buttons=extra_buttons,
         )
 
-    def get_general_text_before_sending(
-        self,
-        game_data: GameCache,
-    ) -> str | None:
-        if self.grouping == Groupings.criminals:
-            return remind_criminals_about_inspections(game_data)
-
     @staticmethod
     def allow_sending_mailing(game_data: GameCache) -> bool:
         return True
@@ -690,9 +719,15 @@ class ActiveRoleAtNightABC(RoleABC):
         )
         if general_text is not None:
             text = make_build(general_text)
+            users = (
+                roles
+                if self.grouping == Groupings.criminals
+                or game_data["settings"]["show_peaceful_allies"]
+                else [roles[0]]
+            )
             await send_a_lot_of_messages_safely(
                 bot=self.bot,
-                users=roles,
+                users=users,
                 text=text,
             )
 

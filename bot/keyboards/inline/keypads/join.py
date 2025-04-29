@@ -7,7 +7,11 @@ from cache.cache_types import PlayersIds, RolesLiteral
 from general import settings
 from general.collection_of_roles import get_data_with_roles
 from keyboards.inline.builder import generate_inline_kb
-from keyboards.inline.buttons.common import CANCEL_BTN, TO_BOT_BTN, get_join_to_game_btn
+from keyboards.inline.buttons.common import (
+    CANCEL_BTN,
+    TO_BOT_BTN,
+    get_join_to_game_btn,
+)
 from keyboards.inline.cb.cb_text import (
     FINISH_REGISTRATION_CB,
 )
@@ -29,10 +33,10 @@ async def join_to_game_kb(
         )
     return generate_inline_kb(data_with_buttons=buttons)
 
+
 async def remind_about_joining_kb(bot: Bot, game_chat: int):
     btn = await get_join_to_game_btn(bot=bot, game_chat=game_chat)
     return generate_inline_kb(data_with_buttons=[btn])
-
 
 
 async def offer_to_place_bet(banned_roles: list[RolesLiteral]):

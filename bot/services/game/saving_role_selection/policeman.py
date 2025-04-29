@@ -37,8 +37,14 @@ class PolicemanSaver(RouterHelper):
         )
         game_data: GameCache = await game_state.get_data()
         not_to_kill = [self.callback.from_user.id]
-        if game_data["settings"]["can_kill_teammates"] is False:
+        if (
+            game_data["settings"]["can_kill_teammates"] is False
+            and game_data["settings"]["show_peaceful_allies"]
+        ):
             not_to_kill = game_data[Policeman.roles_key]
+        not_to_check = [self.callback.from_user.id]
+        if game_data["settings"]["show_peaceful_allies"]:
+            not_to_check = game_data[Policeman.roles_key]
         data = {
             POLICEMAN_KILLS_CB: [
                 police_kill_cb_data,
@@ -48,7 +54,7 @@ class PolicemanSaver(RouterHelper):
             POLICEMAN_CHECKS_CB: [
                 police_check_cb_data,
                 "Кого будешь проверять?",
-                game_data[Policeman.roles_key],
+                not_to_check,
             ],
         }
         police_action = data[self.callback.data]
@@ -115,9 +121,14 @@ class PolicemanSaver(RouterHelper):
             f"🔍{game_data['players'][str(self.callback.from_user.id)]['pretty_role']} "
             f"{game_data['players'][str(self.callback.from_user.id)]['url']} принял решение проверить роль {url}"
         )
+        users = (
+            game_data[Policeman.roles_key]
+            if game_data["settings"]["show_peaceful_allies"]
+            else [self.callback.from_user.id]
+        )
         await send_a_lot_of_messages_safely(
             bot=self.callback.bot,
-            users=game_data[Policeman.roles_key],
+            users=users,
             text=text,
         )
         if game_data["settings"]["show_roles_after_death"]:

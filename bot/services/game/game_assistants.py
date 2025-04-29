@@ -98,10 +98,9 @@ async def inform_aliases(
     url: str,
 ):
     if (
-        current_role.alias
-        or current_role.is_alias
-        or current_role.grouping == Groupings.criminals
-    ):
+        (current_role.alias or current_role.is_alias)
+        and game_data["settings"]["show_peaceful_allies"]
+    ) or current_role.grouping == Groupings.criminals:
         current_url = game_data["players"][
             str(callback.from_user.id)
         ]["url"]

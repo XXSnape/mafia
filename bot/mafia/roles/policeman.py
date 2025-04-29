@@ -136,12 +136,17 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
             )
             role = make_pretty(self.all_roles[user_role_id].role)
             text = f"🌃Ночь {game_data['number_of_night']}\n{url} - {role}!"
+            game_data["text_about_checks"] += text + "\n\n"
+            users = (
+                game_data[self.roles_key]
+                if game_data["settings"]["show_peaceful_allies"]
+                else [game_data[self.roles_key][0]]
+            )
             await send_a_lot_of_messages_safely(
                 bot=self.bot,
-                users=game_data[self.roles_key],
+                users=users,
                 text=text,
             )
-            game_data["text_about_checks"] += text + "\n\n"
         else:
             processed_user_id = self.get_processed_user_id(game_data)
             if processed_user_id:

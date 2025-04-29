@@ -87,9 +87,11 @@ async def remind_of_beginning_of_game(bot: Bot, state: FSMContext):
     )
     kb = await remind_about_joining_kb(
         bot=bot,
-        game_chat=game_data['game_chat'],
+        game_chat=game_data["game_chat"],
     )
     with suppress(TelegramBadRequest):
         await bot.send_message(
-            chat_id=game_data["game_chat"], text=make_build(message), reply_markup=kb
+            chat_id=game_data["game_chat"],
+            text=make_build(message),
+            reply_markup=kb,
         )

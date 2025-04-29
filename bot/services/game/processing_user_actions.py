@@ -67,18 +67,25 @@ class UserManager(RouterHelper):
             user_state=self.state,
             dispatcher=self.dispatcher,
         )
-        game_data = await game_state.get_data()
+        game_data: GameCache = await game_state.get_data()
+        current_role = get_data_with_roles(
+            game_data["players"][str(self.message.from_user.id)][
+                "role_id"
+            ]
+        )
+        if (
+            current_role.grouping != Groupings.criminals
+            and game_data["settings"]["show_peaceful_allies"]
+            is False
+        ):
+            return
+
         url = game_data["players"][str(self.message.from_user.id)][
             "url"
         ]
         role = game_data["players"][str(self.message.from_user.id)][
             "pretty_role"
         ]
-        current_role = get_data_with_roles(
-            game_data["players"][str(self.message.from_user.id)][
-                "role_id"
-            ]
-        )
         criminals_ids = get_criminals_ids(game_data)
         if current_role.grouping == Groupings.criminals:
             aliases = criminals_ids
@@ -119,6 +126,7 @@ class UserManager(RouterHelper):
             and deceived_user[1] in game_data["live_players_ids"]
         ):
             return deceived_user[1]
+        return None
 
     async def vote_for(
         self, callback_data: UserActionIndexCbData | None

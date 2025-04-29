@@ -259,7 +259,7 @@ async def notify_aliases_about_transformation(
                     game_data["number_of_night"]
                 )
                 + f"{initial_role} {url} превратился в "
-                f"{make_pretty(new_role.role)}\n"
+                f"{make_pretty(new_role.role)}\n\n"
                 f"Текущие союзники:\n{profiles}",
             )
             for player_id in game_data[new_role.roles_key]

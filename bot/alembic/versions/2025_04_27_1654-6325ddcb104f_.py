@@ -33,7 +33,10 @@ def upgrade() -> None:
     op.add_column(
         "settings",
         sa.Column(
-            "mafia_every_3", sa.Boolean(), server_default="0", nullable=False
+            "mafia_every_3",
+            sa.Boolean(),
+            server_default="0",
+            nullable=False,
         ),
     )
     # ### end Alembic commands ###
