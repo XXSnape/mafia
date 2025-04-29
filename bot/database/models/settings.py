@@ -28,13 +28,7 @@ class SettingModel(IdMixin, BaseModel):
         default=settings.mafia.time_for_confirmation,
         server_default=str(settings.mafia.time_for_confirmation),
     )
-    show_dead_roles_after_night: Mapped[bool] = mapped_column(
-        default=True, server_default="1"
-    )
-    show_dead_roles_after_hanging: Mapped[bool] = mapped_column(
-        default=True, server_default="1"
-    )
-    show_roles_died_due_to_inactivity: Mapped[bool] = mapped_column(
+    show_roles_after_death: Mapped[bool] = mapped_column(
         default=True, server_default="1"
     )
     show_killers: Mapped[bool] = mapped_column(

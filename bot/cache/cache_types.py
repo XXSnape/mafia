@@ -64,9 +64,10 @@ class DifferentSettingsCache(TypedDict):
     time_for_day: int
     time_for_voting: int
     time_for_confirmation: int
-    show_dead_roles_after_night: bool
-    show_dead_roles_after_hanging: bool
-    show_roles_died_due_to_inactivity: bool
+    show_roles_after_death: bool
+    # show_dead_roles_after_night: bool
+    # show_dead_roles_after_hanging: bool
+    # show_roles_died_due_to_inactivity: bool
     show_killers: bool
     show_information_about_guests_at_night: bool
     show_usernames_during_voting: bool
