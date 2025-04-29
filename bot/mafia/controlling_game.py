@@ -113,6 +113,7 @@ class Controller:
         if (
             game_data["number_of_night"] == 1
             and game_data["settings"]["show_roles_after_death"]
+            is False
         ):
             players, roles = get_live_players(
                 game_data=game_data, all_roles=self.all_roles
@@ -125,8 +126,7 @@ class Controller:
                 or self.all_roles,
             )
         night_starts_text = make_build(
-            f"🌃Наступает ночь {game_data['number_of_night']} "
-            f"(продлится {game_data["settings"]["time_for_night"]} секунд)"
+            f"🌃Наступает ночь {game_data['number_of_night']}"
         )
         await self.bot.send_photo(
             chat_id=self.group_chat_id,

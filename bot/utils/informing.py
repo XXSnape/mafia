@@ -93,7 +93,12 @@ def get_live_roles(
         total = sum(count for _, count in roles)
         total_text = make_build(f"- {total}:")
         result += f"\n{grouping.value.name} {total_text}\n● {grouping_roles}\n"
-    return f"{make_build('👥Состав группировок:')}\n" + result
+    composition_of_groupings = (
+        "👥Состав группировок:"
+        if game_data["settings"]["show_roles_after_death"]
+        else "👥Изначальный состав группировок во время Тумана Войны:"
+    )
+    return f"{make_build(composition_of_groupings)}\n" + result
 
 
 def get_profiles(
