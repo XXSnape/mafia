@@ -30,9 +30,16 @@ always_available_router.message.filter(
 always_available_router.message.middleware(
     DatabaseMiddlewareWithoutCommit()
 )
+always_available_router.message.middleware(
+    DatabaseMiddlewareWithCommit()
+)
+always_available_router.callback_query.middleware(
+    DatabaseMiddlewareWithCommit()
+)
 always_available_router.include_routers(
     profile_router,
     help_router,
+    settings_router,
 )
 
 
@@ -40,7 +47,6 @@ router.include_routers(
     ban_roles_router,
     order_of_roles_router,
     start_router,
-    settings_router,
     time_router,
     fog_of_war_router,
 )

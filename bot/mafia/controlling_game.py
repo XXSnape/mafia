@@ -353,8 +353,8 @@ class Controller:
                 else "???"
             )
             text_about_dead += (
-                f"🌹Убит {role} - {url}\n"
-                f"один из виновных — {killer}!\n\n"
+                f"🌹Убит {role} - {url}.\n\n"
+                f"Один из виновных — {killer}!\n\n"
             )
         text_about_dead = (
             text_about_dead or "💕Сегодня ночью все выжили!"
