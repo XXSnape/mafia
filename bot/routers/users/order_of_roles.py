@@ -16,7 +16,6 @@ from keyboards.inline.cb.cb_text import (
 )
 from services.users.order_of_roles import RoleManager
 from sqlalchemy.ext.asyncio import AsyncSession
-from states.settings import SettingsFsm
 
 router = Router(name=__name__)
 

@@ -6,11 +6,10 @@ from keyboards.inline.cb import cb_text
 from keyboards.inline.cb.cb_text import (
     FOG_OF_WAR_CB,
     DIFFERENT_SETTINGS_CB,
+    SHOW_ROLES_AFTER_DEATH_CB,
 )
 from services.users.different_settings import DifferentSettings
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from states.settings import SettingsFsm
 
 router = Router(name=__name__)
 
@@ -52,15 +51,7 @@ async def change_settings_for_non_deceased_roles(
     await fog_of_war.change_settings_for_non_deceased_roles()
 
 
-@router.callback_query(
-    F.data.in_(
-        (
-            cb_text.SHOW_DEAD_ROLES_AFTER_NIGHT_CB,
-            cb_text.SHOW_DEAD_ROLES_AFTER_HANGING_CB,
-            cb_text.SHOW_ROLES_DIED_DUE_TO_INACTIVITY_CB,
-        )
-    ),
-)
+@router.callback_query(F.data == SHOW_ROLES_AFTER_DEATH_CB)
 async def change_settings_related_to_deceased_roles(
     callback: CallbackQuery,
     state: FSMContext,

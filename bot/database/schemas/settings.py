@@ -11,9 +11,7 @@ class TimeOfDaySchema(BaseModel):
 
 
 class FogOfWarSchema(BaseModel):
-    show_dead_roles_after_night: bool = True
-    show_dead_roles_after_hanging: bool = True
-    show_roles_died_due_to_inactivity: bool = True
+    show_roles_after_death: bool = True
     show_killers: bool = True
     show_information_about_guests_at_night: bool = True
     show_usernames_during_voting: bool = True

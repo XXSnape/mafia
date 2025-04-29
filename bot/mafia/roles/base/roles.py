@@ -186,7 +186,7 @@ class RoleABC(ABC):
             f"Новый {role} - {new_boss_url}\n\n"
             f"Текущие союзники:\n{profiles}",
         )
-        if game_data["settings"]["is_fog_of_war_on"]:
+        if game_data["settings"]["show_roles_after_death"] is False:
             return
         if self.grouping == Groupings.criminals:
             message = (

@@ -104,7 +104,6 @@ class InstigatorSaver(RouterHelper):
             f"{object_url}, если попытается голосовать",
             current_role=Instigator(),
             message_to_group=game_data["settings"][
-                "is_fog_of_war_on"
-            ]
-            is False,
+                "show_roles_after_death"
+            ],
         )

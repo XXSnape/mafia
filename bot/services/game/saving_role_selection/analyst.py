@@ -31,7 +31,6 @@ class AnalystSaver(RouterHelper):
             message_to_user="Ты предположил, что никого не повесят днём",
             current_role=Analyst(),
             message_to_group=game_data["settings"][
-                "is_fog_of_war_on"
-            ]
-            is False,
+                "show_roles_after_death"
+            ],
         )

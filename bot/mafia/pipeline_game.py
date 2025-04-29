@@ -205,7 +205,7 @@ class Game:
         await self.state.set_data(game_data)
         if (
             game_data["number_of_night"] == 1
-            and game_data["settings"]["is_fog_of_war_on"]
+            and game_data["settings"]["show_roles_after_death"]
         ):
             players, roles = get_live_players(
                 game_data=game_data, all_roles=self.all_roles

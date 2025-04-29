@@ -65,9 +65,6 @@ class DifferentSettingsCache(TypedDict):
     time_for_voting: int
     time_for_confirmation: int
     show_roles_after_death: bool
-    # show_dead_roles_after_night: bool
-    # show_dead_roles_after_hanging: bool
-    # show_roles_died_due_to_inactivity: bool
     show_killers: bool
     show_information_about_guests_at_night: bool
     show_usernames_during_voting: bool
@@ -111,7 +108,6 @@ class GameSettingsCache(DifferentSettingsCache, total=False):
     creator_full_name: str
     order_of_roles: list[RolesLiteral]
     banned_roles: list[RolesLiteral]
-    is_fog_of_war_on: bool
 
 
 class UserCache(TypedDict, total=False):
@@ -153,4 +149,3 @@ class GameCache(TypedDict, total=False):
     angels_died: PlayersIds
     cant_vote: PlayersIds
     cant_talk: PlayersIds
-    show_in_fog_of_war: PlayersIds

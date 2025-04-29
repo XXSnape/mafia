@@ -1,7 +1,6 @@
 from aiogram import F, Router
-from aiogram.filters import Command, StateFilter
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery, Message
 
 from cache.cache_types import PersonalSettingsCache
@@ -16,7 +15,6 @@ from keyboards.inline.cb.cb_text import (
 from keyboards.inline.keypads.settings import select_setting_kb
 from services.common.settings import SettingsRouter
 from sqlalchemy.ext.asyncio import AsyncSession
-from states.settings import SettingsFsm
 from utils.pretty_text import make_build
 
 router = Router(name=__name__)

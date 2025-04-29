@@ -7,7 +7,7 @@ def make_build(string: str) -> str:
 
 
 def make_pretty(string: str) -> str:
-    return f"<b><i><u>{string}</u></i></b>"
+    return f"<code>{string}</code>"
 
 
 def get_minutes_and_seconds_text(

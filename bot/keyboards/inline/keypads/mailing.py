@@ -139,32 +139,19 @@ def choose_fake_role_kb(game_data: GameCache):
     )
     all_roles = get_data_with_roles()
     current_roles = set()
-    if game_data["settings"]["is_fog_of_war_on"]:
-        all_roles_in_game = {
-            player_data["role_id"]
-            for player_data in game_data["players"].values()
-        }
-        all_roles_in_game -= {
-            game_data["players"][str(user_id)]["role_id"]
-            for user_id in game_data["show_in_fog_of_war"]
-        }
-        all_roles_in_game |= {
-            game_data["players"][str(user_id)]["role_id"]
-            for user_id in game_data["live_players_ids"]
-        }
-        for role in all_roles_in_game:
-            if role not in policeman:
-                current_roles.add((all_roles[role].role, role))
+    if game_data["settings"]["show_roles_after_death"]:
+        users = game_data["live_players_ids"]
     else:
-        for user_id in game_data["live_players_ids"]:
-            user_data = game_data["players"][str(user_id)]
-            if user_data["role_id"] not in policeman:
-                current_roles.add(
-                    (
-                        all_roles[user_data["role_id"]].role,
-                        user_data["role_id"],
-                    )
+        users = game_data["players"].keys()
+    for user_id in users:
+        user_data = game_data["players"][str(user_id)]
+        if user_data["role_id"] not in policeman:
+            current_roles.add(
+                (
+                    all_roles[user_data["role_id"]].role,
+                    user_data["role_id"],
                 )
+            )
 
     buttons = [
         InlineKeyboardButton(text=role[0], callback_data=role[1])

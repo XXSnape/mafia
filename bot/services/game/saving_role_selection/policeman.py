@@ -120,7 +120,7 @@ class PolicemanSaver(RouterHelper):
             users=game_data[Policeman.roles_key],
             text=text,
         )
-        if game_data["settings"]["is_fog_of_war_on"] is False:
+        if game_data["settings"]["show_roles_after_death"]:
             message_to_group = "Армия насильно заставила кого-то показать документы!"
         else:
             message_to_group = False

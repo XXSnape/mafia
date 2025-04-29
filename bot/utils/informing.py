@@ -57,15 +57,7 @@ def get_live_roles(
     game_data: GameCache, all_roles: Union["DataWithRoles", str]
 ):
     if isinstance(all_roles, str):
-        if not game_data["show_in_fog_of_war"]:
-            return all_roles
-        text = "\n\n💀Выбывшие игроки с известными ролями:\n"
-        for user_id in game_data["show_in_fog_of_war"]:
-            text += (
-                f"\n● {game_data['players'][str(user_id)]['url']} "
-                f"был {game_data['players'][str(user_id)]['pretty_role']}"
-            )
-        return all_roles + make_build(text)
+        return all_roles
 
     gropings: dict[Groupings, list[tuple[str, int]]] = {
         Groupings.civilians: [],
@@ -190,9 +182,6 @@ def get_results_of_goal_identification(game_data: GameCache):
                 players_ids=voting_people,
                 players=game_data["players"],
             )
-            # text = "\n● ".join(
-            #     voting_person for voting_person in voting_people
-            # )
         else:
             text = "\n???"
         voting_result += (

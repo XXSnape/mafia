@@ -3,7 +3,6 @@ from database.dao.order import OrderOfRolesDAO
 from database.dao.settings import SettingsDao
 from database.schemas.common import UserTgIdSchema
 from database.schemas.settings import (
-    FogOfWarSchema,
     DifferentSettingsSchema,
 )
 from general.collection_of_roles import BASES_ROLES
@@ -12,7 +11,6 @@ from keyboards.inline.keypads.different_settings import (
     different_options_kb,
 )
 from services.base import RouterHelper
-from states.settings import SettingsFsm
 from utils.pretty_text import make_build
 
 
@@ -22,27 +20,17 @@ class DifferentSettings(RouterHelper):
         super().__init__(*args, **kwargs)
         self.key = "different_settings"
         self.message_to_change = (
-            "Чтобы изменить настройку, просто нажми на неё\n\n"
+            "⚙️Чтобы изменить настройку, просто нажми на неё\n\n"
             "✅ - настройка включена\n"
-            "🚫 - настройка отключена\n\n"
+            "❌ - настройка отключена\n\n"
         )
-
-    @staticmethod
-    def is_anonymous_mode_enabled(
-        fog_of_war_data: DifferentSettingsCache,
-    ):
-        return (
-            fog_of_war_data["show_dead_roles_after_night"]
-            and fog_of_war_data["show_dead_roles_after_hanging"]
-            and fog_of_war_data["show_roles_died_due_to_inactivity"]
-        ) is False
 
     def _get_info_about_anonymous_mode(
         self, fog_of_war_data: DifferentSettingsCache
     ):
-        if self.is_anonymous_mode_enabled(fog_of_war_data):
+        if fog_of_war_data["show_roles_after_death"] is False:
             mode = (
-                "🔴Во время игры некоторые роли будут скрыты и "
+                "🔴Во время игры роли будут скрыты и "
                 "не будет сообщений о ночных действиях"
             )
         else:

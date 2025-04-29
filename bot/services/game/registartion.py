@@ -573,11 +573,6 @@ class Registration(RouterHelper):
             "creator_full_name": self.message.from_user.full_name,
             **group_settings_schema.model_dump(),
         }
-        game_settings["is_fog_of_war_on"] = (
-            DifferentSettings.is_anonymous_mode_enabled(
-                game_settings
-            )
-        )
         game_data: GameCache = {
             "game_chat": self.message.chat.id,
             "settings": game_settings,

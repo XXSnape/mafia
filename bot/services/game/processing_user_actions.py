@@ -35,9 +35,7 @@ class UserManager(RouterHelper):
             game_data["players"][str(self.message.from_user.id)][
                 "pretty_role"
             ]
-            if game_data["settings"]["is_fog_of_war_on"] is False
-            or self.message.from_user.id
-            in game_data["show_in_fog_of_war"]
+            if game_data["settings"]["show_roles_after_death"]
             else "???"
         )
         url = game_data["players"][str(self.message.from_user.id)][

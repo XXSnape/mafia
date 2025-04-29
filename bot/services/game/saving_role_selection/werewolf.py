@@ -69,7 +69,7 @@ class WerewolfSaver(RouterHelper):
             photo=new_role.photo,
             caption=f"Твоя новая роль - {make_pretty(new_role.role)}!",
         )
-        if game_data["settings"]["is_fog_of_war_on"] is False:
+        if game_data["settings"]["show_roles_after_death"]:
             await self.callback.bot.send_photo(
                 chat_id=game_data["game_chat"],
                 photo=new_role.photo,

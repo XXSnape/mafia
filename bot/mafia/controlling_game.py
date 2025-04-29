@@ -43,6 +43,7 @@ from utils.informing import (
 )
 from utils.pretty_text import (
     make_build,
+    make_pretty,
 )
 from utils.state import get_state_and_assign, reset_user_state
 
@@ -231,7 +232,7 @@ class Controller:
         await asyncio.sleep(1)
         role = (
             user_info["pretty_role"]
-            if game_data["settings"]["show_dead_roles_after_hanging"]
+            if game_data["settings"]["show_roles_after_death"]
             else "???"
         )
         await self.bot.send_message(
@@ -293,13 +294,11 @@ class Controller:
             url = game_data["players"][str(victim_id)]["url"]
             role = (
                 game_data["players"][str(victim_id)]["pretty_role"]
-                if game_data["settings"][
-                    "show_dead_roles_after_night"
-                ]
+                if game_data["settings"]["show_roles_after_death"]
                 else "???"
             )
             killer = (
-                killers_of[victim_id][0].role
+                make_pretty(killers_of[victim_id][0].role)
                 if game_data["settings"]["show_killers"]
                 else "???"
             )
@@ -373,13 +372,6 @@ class Controller:
                 bot_id=self.bot.id,
                 new_state=UserFsm.WAIT_FOR_LATEST_LETTER,
             )
-            if (
-                game_data["settings"]["is_fog_of_war_on"]
-                and game_data["settings"][
-                    "show_dead_roles_after_night"
-                ]
-            ):
-                game_data["show_in_fog_of_war"].append(user_id)
         elif at_night is None or (
             at_night is False and role.clearing_state_after_death
         ):
@@ -388,21 +380,6 @@ class Controller:
                 user_id=user_id,
                 bot_id=self.bot.id,
             )
-            if game_data["settings"]["is_fog_of_war_on"]:
-                if (
-                    game_data["settings"][
-                        "show_dead_roles_after_hanging"
-                    ]
-                    and at_night is False
-                ):
-                    game_data["show_in_fog_of_war"].append(user_id)
-                elif (
-                    game_data["settings"][
-                        "show_roles_died_due_to_inactivity"
-                    ]
-                    and at_night is None
-                ):
-                    game_data["show_in_fog_of_war"].append(user_id)
 
         game_data["live_players_ids"].remove(user_id)
         game_data["players"][str(user_id)][
@@ -525,7 +502,7 @@ class Controller:
         profiles = get_profiles(
             players_ids=inactive_users,
             players=game_data["players"],
-            role=game_data["settings"]["is_fog_of_war_on"] is False,
+            role=game_data["settings"]["show_roles_after_death"],
         )
         text = f"{make_build('❗️Игроки выбывают:')}\n{profiles}"
         await self.bot.send_photo(

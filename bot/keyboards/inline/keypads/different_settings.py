@@ -6,6 +6,7 @@ from keyboards.inline.buttons.common import (
     BACK_TO_SELECTING_ACTIONS_ON_SETTINGS_BTN,
 )
 from keyboards.inline.cb import cb_text
+from keyboards.inline.cb.cb_text import SHOW_ROLES_AFTER_DEATH_CB
 
 
 def check_for_settings(
@@ -16,22 +17,14 @@ def check_for_settings(
         if different_settings[btn.callback_data]:
             btn.text += "✅"
         else:
-            btn.text += "🚫"
+            btn.text += "❌"
 
 
 def get_for_of_war_buttons():
     return (
         InlineKeyboardButton(
-            text="Показывать роли умерших ночью",
-            callback_data=cb_text.SHOW_DEAD_ROLES_AFTER_NIGHT_CB,
-        ),
-        InlineKeyboardButton(
-            text="Показывать роли умерших днём",
-            callback_data=cb_text.SHOW_DEAD_ROLES_AFTER_HANGING_CB,
-        ),
-        InlineKeyboardButton(
-            text="Показывать роли умерших из-за неактивности",
-            callback_data=cb_text.SHOW_ROLES_DIED_DUE_TO_INACTIVITY_CB,
+            text="Показывать роли погибших",
+            callback_data=SHOW_ROLES_AFTER_DEATH_CB,
         ),
         InlineKeyboardButton(
             text="Показывать имена во время голосования",
