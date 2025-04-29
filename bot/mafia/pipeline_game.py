@@ -202,7 +202,9 @@ class Game:
     ):
         await self.controller.start_new_night()
         game_data = await self.controller.mailing()
-        await asyncio.sleep(game_data["settings"]["time_for_night"] - 3)
+        await asyncio.sleep(
+            game_data["settings"]["time_for_night"] - 3
+        )
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -220,7 +222,9 @@ class Game:
         await asyncio.sleep(3)
         result = await self.controller.confirm_final_aim()
         if result:
-            await asyncio.sleep(game_data["settings"]["time_for_confirmation"])
+            await asyncio.sleep(
+                game_data["settings"]["time_for_confirmation"]
+            )
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
