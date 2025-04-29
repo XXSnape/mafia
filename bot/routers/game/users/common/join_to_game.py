@@ -5,7 +5,7 @@ from aiogram.types import CallbackQuery, Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
 from general.collection_of_roles import get_data_with_roles
-from keyboards.inline.cb.cb_text import CANCEL_CB
+from keyboards.inline.cb.cb_text import CANCEL_CB, CANCEL_BET_CB
 from middlewares.db import (
     DatabaseMiddlewareWithCommit,
     DatabaseMiddlewareWithoutCommit,
@@ -44,7 +44,7 @@ async def join_to_game(
 
 
 @router.callback_query(
-    GameFsm.WAIT_FOR_STARTING_GAME, F.data == CANCEL_CB
+    GameFsm.WAIT_FOR_STARTING_GAME, F.data == CANCEL_BET_CB
 )
 async def cancel_bet(
     callback: CallbackQuery,

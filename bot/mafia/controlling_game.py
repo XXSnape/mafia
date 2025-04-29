@@ -18,6 +18,7 @@ from general.exceptions import GameIsOver
 from general.groupings import Groupings
 from keyboards.inline.keypads.to_bot import (
     participate_in_social_life,
+    get_to_bot_kb,
 )
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from loguru import logger
@@ -40,12 +41,17 @@ from utils.informing import (
     get_results_of_voting,
     send_messages_after_night,
     send_request_to_vote,
+    get_live_players,
 )
 from utils.pretty_text import (
     make_build,
     make_pretty,
 )
-from utils.state import get_state_and_assign, reset_user_state
+from utils.state import (
+    get_state_and_assign,
+    reset_user_state,
+    lock_state,
+)
 
 if TYPE_CHECKING:
     from mafia.pipeline_game import Game
@@ -98,6 +104,50 @@ class Controller:
         self.group_chat_id = group_chat_id
         self.all_roles = {}
         self.aim_id: UserIdInt | None = None
+        self.original_roles_in_fog_of_war: str | None = None
+
+    async def start_new_night(self):
+        game_data: GameCache = await self.state.get_data()
+        game_data["number_of_night"] += 1
+        await self.state.set_data(game_data)
+        if (
+            game_data["number_of_night"] == 1
+            and game_data["settings"]["show_roles_after_death"]
+        ):
+            players, roles = get_live_players(
+                game_data=game_data, all_roles=self.all_roles
+            )
+            self.original_roles_in_fog_of_war = roles
+        else:
+            players, _ = get_live_players(
+                game_data=game_data,
+                all_roles=self.original_roles_in_fog_of_war
+                or self.all_roles,
+            )
+        night_starts_text = make_build(
+            f"🌃Наступает ночь {game_data['number_of_night']} "
+            f"(продлится {game_data["settings"]["time_for_night"]} секунд)"
+        )
+        await self.bot.send_photo(
+            chat_id=self.group_chat_id,
+            photo="https://i.pinimg.com/originals/f0/43/ed/f043edcac9690fdec845925508006459.jpg",
+            caption=f"{night_starts_text}\n\n{players}",
+            reply_markup=get_to_bot_kb("Действовать!"),
+        )
+
+    async def start_discussions(self, game_data: GameCache):
+        players_after_night, _ = get_live_players(
+            game_data=game_data,
+            all_roles=self.original_roles_in_fog_of_war
+            or self.all_roles,
+        )
+        await self.bot.send_photo(
+            chat_id=self.group_chat_id,
+            photo="https://i.pinimg.com/originals/b1/80/98/b18098074864e4b1bf5cc8412ced6421.jpg",
+            caption=f"{make_build('💬Пришло время провести следственные мероприятия жителям города!')}\n\n"
+            f"{players_after_night}",
+            reply_markup=get_to_bot_kb("Пища для размышлений тут"),
+        )
 
     async def end_night(self):
         game_data: GameCache = await self.state.get_data()
@@ -152,7 +202,7 @@ class Controller:
         game_data["cant_vote"].clear()
         await self.state.set_data(game_data)
 
-    def get_roles_if_isinstance[P: ABC](
+    def _get_roles_if_isinstance[P: ABC](
         self, parent: type[P]
     ) -> list[P]:
         return [
@@ -173,7 +223,7 @@ class Controller:
         result_text = get_results_of_voting(
             game_data=game_data, removed_user_id=removed_user_id
         )
-        voting_roles = self.get_roles_if_isinstance(
+        voting_roles = self._get_roles_if_isinstance(
             parent=ProcedureAfterVotingABC
         )
         voting_roles.sort(
@@ -253,7 +303,7 @@ class Controller:
     @check_end_of_game
     async def sum_up_after_night(self):
         game_data: GameCache = await self.state.get_data()
-        roles = self.get_roles_if_isinstance(
+        roles = self._get_roles_if_isinstance(
             parent=ProcedureAfterNightABC
         )
         roles.sort(key=attrgetter("number_in_order_after_night"))
@@ -274,7 +324,7 @@ class Controller:
         for role in roles:
             await role.accrual_of_overnight_rewards(**kwargs)
 
-        active_roles = self.get_roles_if_isinstance(
+        active_roles = self._get_roles_if_isinstance(
             parent=ActiveRoleAtNightABC
         )
         for active_role in active_roles:
@@ -404,18 +454,20 @@ class Controller:
             )
 
     async def mailing(self):
-        game_data: GameCache = await self.state.get_data()
-        active_roles = self.get_roles_if_isinstance(
-            ActiveRoleAtNightABC
-        )
-        await asyncio.gather(
-            *(
-                role.mailing(game_data=game_data)
-                for role in active_roles
-            ),
-            return_exceptions=True,
-        )
-        await self.state.set_data(game_data)
+        async with lock_state(self.state):
+            game_data: GameCache = await self.state.get_data()
+            active_roles = self._get_roles_if_isinstance(
+                ActiveRoleAtNightABC
+            )
+            await asyncio.gather(
+                *(
+                    role.mailing(game_data=game_data)
+                    for role in active_roles
+                ),
+                return_exceptions=True,
+            )
+            await self.state.set_data(game_data)
+        return game_data
 
     async def suggest_vote(self):
         await self.bot.send_photo(
@@ -424,26 +476,27 @@ class Controller:
             caption="Кого обвиним во всем и повесим?",
             reply_markup=participate_in_social_life(),
         )
-        game_data: GameCache = await self.state.get_data()
-        live_players_ids = game_data["live_players_ids"]
-        await asyncio.gather(
-            *(
-                send_request_to_vote(
-                    game_data=game_data,
-                    user_id=user_id,
-                    players_ids=live_players_ids,
-                    players=game_data["players"],
-                    bot=self.bot,
-                )
-                for user_id in live_players_ids
-                if user_id not in game_data["cant_vote"]
-            ),
-            return_exceptions=True,
-        )
-        await self.state.set_data(game_data)
+        async with lock_state(self.state):
+            game_data: GameCache = await self.state.get_data()
+            live_players_ids = game_data["live_players_ids"]
+            await asyncio.gather(
+                *(
+                    send_request_to_vote(
+                        game_data=game_data,
+                        user_id=user_id,
+                        players_ids=live_players_ids,
+                        players=game_data["players"],
+                        bot=self.bot,
+                    )
+                    for user_id in live_players_ids
+                    if user_id not in game_data["cant_vote"]
+                ),
+                return_exceptions=True,
+            )
+            await self.state.set_data(game_data)
 
     @staticmethod
-    def add_user_to_deleted(
+    def _add_user_to_deleted(
         waiting_for: PlayersIds,
         live_players_ids: PlayersIds,
         inactive_users: PlayersIds,
@@ -461,7 +514,7 @@ class Controller:
                 potentially_deleted.add(user_id)
 
     @staticmethod
-    def delete_inactive_users_from_data(
+    def _delete_inactive_users_from_data(
         waiting_for: PlayersIds,
         live_players_ids: PlayersIds,
         inactive_users: PlayersIds,
@@ -477,24 +530,24 @@ class Controller:
         game_data: GameCache = await self.state.get_data()
         live_players_ids = game_data["live_players_ids"]
         inactive_users = []
-        self.add_user_to_deleted(
+        self._add_user_to_deleted(
             waiting_for=game_data["waiting_for_action_at_night"],
             live_players_ids=live_players_ids,
             inactive_users=inactive_users,
         )
-        self.add_user_to_deleted(
+        self._add_user_to_deleted(
             waiting_for=game_data["waiting_for_action_at_day"],
             live_players_ids=live_players_ids,
             inactive_users=inactive_users,
         )
         if not inactive_users:
             return
-        self.delete_inactive_users_from_data(
+        self._delete_inactive_users_from_data(
             waiting_for=game_data["waiting_for_action_at_night"],
             live_players_ids=live_players_ids,
             inactive_users=inactive_users,
         )
-        self.delete_inactive_users_from_data(
+        self._delete_inactive_users_from_data(
             waiting_for=game_data["waiting_for_action_at_day"],
             live_players_ids=live_players_ids,
             inactive_users=inactive_users,

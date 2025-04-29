@@ -32,7 +32,7 @@ TIME_FOR_DAY_CB = "time_for_day"
 TIME_FOR_VOTING_CB = "time_for_voting"
 TIME_FOR_CONFIRMATION_CB = "time_for_confirmation"
 
-
+CANCEL_BET_CB = "cancel_bet"
 ACTIONS_ON_SETTINGS_CB = "actions_on_settings"
 DELETE_LATEST_ROLE_IN_ORDER_CB = "pop_latest"
 VIEW_ROLES_CB = "view_roles"

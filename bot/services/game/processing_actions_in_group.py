@@ -87,14 +87,14 @@ class GroupManager(RouterHelper):
                     ),
                 )
             await self.state.set_data(game_data)
-        with suppress(TelegramBadRequest, AttributeError):
-            await self.callback.message.edit_reply_markup(
-                reply_markup=get_vote_for_aim_kb(
-                    user_id=callback_data.user_id,
-                    pros=game_data["pros"],
-                    cons=game_data["cons"],
+            with suppress(TelegramBadRequest, AttributeError):
+                await self.callback.message.edit_reply_markup(
+                    reply_markup=get_vote_for_aim_kb(
+                        user_id=callback_data.user_id,
+                        pros=game_data["pros"],
+                        cons=game_data["cons"],
+                    )
                 )
-            )
         await self.callback.answer(
             text="✅Мы обязательно учтём твое мнение",
             show_alert=True,

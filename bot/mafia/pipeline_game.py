@@ -200,56 +200,19 @@ class Game:
     async def start_night(
         self,
     ):
-        game_data: GameCache = await self.state.get_data()
-        game_data["number_of_night"] += 1
-        await self.state.set_data(game_data)
-        if (
-            game_data["number_of_night"] == 1
-            and game_data["settings"]["show_roles_after_death"]
-        ):
-            players, roles = get_live_players(
-                game_data=game_data, all_roles=self.all_roles
-            )
-            self.original_roles_in_fog_of_war = roles
-        else:
-            players, _ = get_live_players(
-                game_data=game_data,
-                all_roles=self.original_roles_in_fog_of_war
-                or self.all_roles,
-            )
-        night_starts_text = make_build(
-            f"🌃Наступает ночь {game_data['number_of_night']} "
-            f"(продлится {game_data["settings"]["time_for_night"]} секунд)"
-        )
-        await self.bot.send_photo(
-            chat_id=self.group_chat_id,
-            photo="https://i.pinimg.com/originals/f0/43/ed/f043edcac9690fdec845925508006459.jpg",
-            caption=f"{night_starts_text}\n\n{players}",
-            reply_markup=get_to_bot_kb("Действовать!"),
-        )
-        await self.controller.mailing()
-        await asyncio.sleep(10)
+        await self.controller.start_new_night()
+        game_data = await self.controller.mailing()
+        await asyncio.sleep(game_data["settings"]["time_for_night"] - 3)
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
         )
         await asyncio.sleep(3)
         game_data = await self.controller.sum_up_after_night()
-        players_after_night, _ = get_live_players(
-            game_data=game_data,
-            all_roles=self.original_roles_in_fog_of_war
-            or self.all_roles,
-        )
-        await self.bot.send_photo(
-            chat_id=self.group_chat_id,
-            photo="https://i.pinimg.com/originals/b1/80/98/b18098074864e4b1bf5cc8412ced6421.jpg",
-            caption=f"{make_build('💬Пришло время провести следственные мероприятия жителям города!')}\n\n"
-            f"{players_after_night}",
-            reply_markup=get_to_bot_kb("Пища для размышлений тут"),
-        )
-        # await asyncio.sleep(game_data["settings"]["time_for_day"]) # TODO CORRECT
+        await self.controller.start_discussions(game_data)
+        await asyncio.sleep(game_data["settings"]["time_for_day"])
         await self.controller.suggest_vote()
-        await asyncio.sleep(18)
+        await asyncio.sleep(game_data["settings"]["time_for_voting"])
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
@@ -257,13 +220,13 @@ class Game:
         await asyncio.sleep(3)
         result = await self.controller.confirm_final_aim()
         if result:
-            await asyncio.sleep(15)
+            await asyncio.sleep(game_data["settings"]["time_for_confirmation"])
         await delete_messages_from_to_delete(
             bot=self.bot,
             state=self.state,
         )
         await self.controller.sum_up_after_voting()
-        # await self.controller.removing_inactive_players()
+        await self.controller.removing_inactive_players()
         await self.controller.end_night()
         await asyncio.sleep(3)
 

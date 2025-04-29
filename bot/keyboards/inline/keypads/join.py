@@ -14,6 +14,7 @@ from keyboards.inline.buttons.common import (
 )
 from keyboards.inline.cb.cb_text import (
     FINISH_REGISTRATION_CB,
+    CANCEL_BET_CB,
 )
 
 
@@ -53,4 +54,10 @@ async def offer_to_place_bet(banned_roles: list[RolesLiteral]):
 
 
 def cancel_bet():
-    return generate_inline_kb(data_with_buttons=[CANCEL_BTN])
+    return generate_inline_kb(
+        data_with_buttons=[
+            InlineKeyboardButton(
+                text="❌Отменить", callback_data=CANCEL_BET_CB
+            )
+        ]
+    )
