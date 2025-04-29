@@ -430,7 +430,7 @@ class Registration(RouterHelper):
         await self.state.update_data(user_data)
         await self.callback.message.edit_text(
             text=make_build(
-                f"Ты выбрал поставить на {make_pretty(coveted_role.role)}.\n\n"
+                f"Ты выбрал поставить на {coveted_role.pretty_role}.\n\n"
                 f"Твой баланс: {balance}{MONEY_SYM}.\n\n"
                 f"Введи сумму денег или отмени"
             ),
@@ -546,7 +546,7 @@ class Registration(RouterHelper):
                 chat_id=user_id,
                 text=make_build(
                     f"✅Ты успешно поставил {self.message.text}{MONEY_SYM} "
-                    f"на роль {make_pretty(role.role)}!\n\n"
+                    f"на роль {role.pretty_role}!\n\n"
                     f"Чтобы изменить сумму, просто введи ее\n\n"
                     f"Твой текущий баланс: {balance}{MONEY_SYM}"
                 ),

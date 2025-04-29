@@ -86,8 +86,8 @@ class Traitor(
         text = NUMBER_OF_NIGHT.format(
             game_data["number_of_night"]
         ) + (
-            f"❗️{make_pretty(self.role)} проверил и узнал, "
-            f"что {user_url} - {make_pretty(processed_role.role)}!"
+            f"❗️{self.pretty_role} проверил и узнал, "
+            f"что {user_url} - {processed_role.pretty_role}!"
         )
         await send_a_lot_of_messages_safely(
             bot=self.bot,

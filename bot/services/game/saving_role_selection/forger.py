@@ -85,13 +85,13 @@ class ForgerSaver(RouterHelper):
         forger_url = game_data["players"][
             str(self.callback.from_user.id)
         ]["url"]
-        pretty_user_role = make_pretty(current_role.role)
+        pretty_user_role = current_role.pretty_role
         forger = Forger()
         await send_a_lot_of_messages_safely(
             bot=self.callback.bot,
             users=get_criminals_ids(game_data),
             text=NUMBER_OF_NIGHT.format(game_data["number_of_night"])
-            + f"{make_pretty(forger.role)} {forger_url} подменил документы "
+            + f"{forger.pretty_role} {forger_url} подменил документы "
             f"{user_url} на {pretty_user_role}",
         )
         await send_messages_to_user_and_group(

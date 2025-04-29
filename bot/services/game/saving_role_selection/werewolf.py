@@ -67,14 +67,14 @@ class WerewolfSaver(RouterHelper):
             await game_state.set_data(game_data)
         await self.callback.message.answer_photo(
             photo=new_role.photo,
-            caption=f"Твоя новая роль - {make_pretty(new_role.role)}!",
+            caption=f"Твоя новая роль - {new_role.pretty_role}!",
         )
         if game_data["settings"]["show_roles_after_death"]:
             await self.callback.bot.send_photo(
                 chat_id=game_data["game_chat"],
                 photo=new_role.photo,
-                caption=f"{make_pretty(Werewolf.role)} принял "
-                f"решение превратиться в {make_pretty(new_role.role)}. "
+                caption=f"{Werewolf.pretty_role} принял "
+                f"решение превратиться в {new_role.pretty_role}. "
                 f"Уже со следующего дня изменения в миропорядке вступят в силу.",
             )
         if are_there_many_senders and (

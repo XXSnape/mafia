@@ -52,8 +52,7 @@ class StatisticsRouter(RouterHelper):
                 money_sum += row.money_sum
                 current_role = all_roles[row.role_id]
                 text = (
-                    f"{num}) {make_pretty(current_role.role)}"
-                    f"{current_role.grouping.value.name[-1]}: "
+                    f"{num}) {current_role.pretty_role}: "
                     f"выиграно {row.is_winner_count} из {row.number_of_games} "
                     f"({int(row.efficiency)}%) {row.money_sum}{MONEY_SYM}\n\n"
                 )

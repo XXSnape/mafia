@@ -61,7 +61,7 @@ class Forger(
                 "Не может подменить документы игроку на роль, которая может эту роль раскрыть",
             ],
             features=[
-                f"Становится мафией после смерти {make_pretty(Policeman.role)} и его союзников по роли",
+                f"Становится мафией после смерти {Policeman.pretty_role} и его союзников по роли",
                 CAN_CHOOSE_YOURSELF,
                 CAN_SEE_ALLIES,
             ],

@@ -558,8 +558,8 @@ class Game:
             roles = game_data[current_role.roles_key]
             user_data: UserGameCache = {
                 "number": players_ids.index(winner_id) + 1,
-                "pretty_role": make_pretty(current_role.role),
-                "initial_role": make_pretty(current_role.role),
+                "pretty_role": current_role.pretty_role,
+                "initial_role": current_role.pretty_role,
                 "role_id": role_id,
                 "initial_role_id": role_id,
                 "roles_key": current_role.roles_key,

@@ -103,18 +103,18 @@ class RoleABC(ABC):
         persons = game_data[self.roles_key]
         for number, user_id in enumerate(persons):
             photo = self.photo
-            role_name = self.role
+            role_name = self.pretty_role
             purpose = self.purpose
             if number != 0 and self.alias:
                 photo = self.alias.photo
-                role_name = self.alias.role
+                role_name = self.alias.pretty_role
                 purpose = self.alias.purpose
             roles_tasks.append(
                 self.bot.send_photo(
                     chat_id=user_id,
                     photo=photo,
                     caption=f"Твоя роль - "
-                    f"{make_pretty(role_name)}! "
+                    f"{role_name}! "
                     f"{purpose}",
                 )
             )
@@ -185,9 +185,9 @@ class RoleABC(ABC):
         shuffle(players)
         new_boss_id = players[0]
         new_boss_url = game_data["players"][str(new_boss_id)]["url"]
-        game_data["players"][str(new_boss_id)]["pretty_role"] = (
-            make_pretty(self.role)
-        )
+        game_data["players"][str(new_boss_id)][
+            "pretty_role"
+        ] = self.role.pretty_role
         game_data["players"][str(new_boss_id)]["role_id"] = role_id
         if (
             self.grouping == Groupings.criminals
@@ -224,14 +224,17 @@ class RoleABC(ABC):
                 "Оу нет! Мои верные союзники уже заняли пост главы криминала!"
             )
         else:
-            message = (
-                f"😎Встречайте нового {make_pretty(self.role)}!"
-            )
+            message = f"😎Встречайте нового {self.role.pretty_role}!"
         await self.bot.send_photo(
             chat_id=game_data["game_chat"],
             photo=self.photo,
             caption=make_build(message),
         )
+
+    @classmethod
+    @property
+    def pretty_role(cls) -> str:
+        return make_pretty(cls.role) + cls.grouping.value.name[-1]
 
     @classmethod
     @property
@@ -372,7 +375,7 @@ class RoleABC(ABC):
             if custom_message:
                 message = custom_message
             else:
-                message = f"{beginning_message} {user_url} ({make_pretty(processed_role.role)})"
+                message = f"{beginning_message} {user_url} ({processed_role.pretty_role})"
             message += " - {money}" + MONEY_SYM
             if self.temporary_roles:
                 message += " (🚫ОБМАНУТ ВО ВРЕМЯ ИГРЫ)"
@@ -506,7 +509,7 @@ class AliasRoleABC(ABC):
     @property
     def boss_name(cls):
         super_classes = cls.__bases__
-        return super_classes[1].role
+        return super_classes[1].pretty_role
 
 
 class ActiveRoleAtNightABC(RoleABC):
@@ -527,7 +530,9 @@ class ActiveRoleAtNightABC(RoleABC):
     @classmethod
     @property
     def notification_message(cls) -> str:
-        return f"С тобой этой ночью взаимодействовал {make_pretty(cls.role)}"
+        return (
+            f"С тобой этой ночью взаимодействовал {cls.pretty_role}"
+        )
 
     def leave_notification_message(
         self,
@@ -576,7 +581,7 @@ class ActiveRoleAtNightABC(RoleABC):
                 game_data=game_data, user_id=user_id
             )
             message_to_aliases = (
-                f"{make_pretty(self.role)} "
+                f"{self.pretty_role} "
                 f"{game_data['players'][str(user_id)]['url']} "
                 f"был усыплён, поэтому вся команда не вышла на работу ночью"
             )

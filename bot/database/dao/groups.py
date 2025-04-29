@@ -50,12 +50,17 @@ class GroupsDao(BaseDAO[GroupModel]):
         order_of_roles = await OrderOfRolesDAO(
             session=self._session
         ).get_roles_ids_of_order_of_roles(user_tg_id)
+        model = (
+            DifferentSettingsSchema.model_validate(
+                settings_of_group, from_attributes=True
+            )
+            if settings_of_group
+            else DifferentSettingsSchema()
+        )
         return GroupSettingsSchema(
             id=group.id,
             banned_roles=banned_roles,
             order_of_roles=order_of_roles,
             is_there_settings=True,
-            **DifferentSettingsSchema.model_validate(
-                settings_of_group, from_attributes=True
-            ).model_dump(),
+            **model.model_dump(),
         )

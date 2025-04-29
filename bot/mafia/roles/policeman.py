@@ -134,7 +134,7 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
                 user_id,
                 game_data["players"][str(user_id)]["role_id"],
             )
-            role = make_pretty(self.all_roles[user_role_id].role)
+            role = self.all_roles[user_role_id].pretty_role
             text = f"🌃Ночь {game_data['number_of_night']}\n{url} - {role}!"
             game_data["text_about_checks"] += text + "\n\n"
             users = (

@@ -35,10 +35,10 @@ class Werewolf(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         from .policeman import Policeman
 
         return RoleDescription(
-            skill=f"На 4ую ночь превращается в {make_pretty(Policeman.role)} ({Policeman.alias.role})"
-            f", {make_pretty(Doctor.role)} "
-            f"({Doctor.alias.role}) "
-            f"или {make_pretty(MafiaAlias.role)}",
+            skill=f"На 4ую ночь превращается в {Policeman.pretty_role} ({Policeman.alias.pretty_role})"
+            f", {Doctor.pretty_role} "
+            f"({Doctor.alias.pretty_role}) "
+            f"или {MafiaAlias.pretty_role}",
             pay_for=["Достижения в других ролях"],
             limitations=[
                 f"Может превратиться в мафию, если после превращения "

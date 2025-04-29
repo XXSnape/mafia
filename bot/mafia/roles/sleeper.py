@@ -45,7 +45,7 @@ class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
             limitations=[
                 CANT_CHOOSE_IN_ROW,
                 "Если жертва может делать ходы ночью после смерти, "
-                f"то она не может быть усыплена ({make_pretty(AngelOfDeath.role)})",
+                f"то она не может быть усыплена ({AngelOfDeath.pretty_role})",
             ],
             features=[
                 "Ход жертвы отменяется полностью, поэтому она "

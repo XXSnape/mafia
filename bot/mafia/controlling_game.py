@@ -348,11 +348,14 @@ class Controller:
                 else "???"
             )
             killer = (
-                make_pretty(killers_of[victim_id][0].role)
+                killers_of[victim_id][0].pretty_role
                 if game_data["settings"]["show_killers"]
                 else "???"
             )
-            text_about_dead += f"🌹Убит {role} - {url} (один из виновных — {killer})!\n\n"
+            text_about_dead += (
+                f"🌹Убит {role} - {url}\n"
+                f"один из виновных — {killer}!\n\n"
+            )
         text_about_dead = (
             text_about_dead or "💕Сегодня ночью все выжили!"
         )

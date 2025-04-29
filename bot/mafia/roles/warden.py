@@ -130,8 +130,8 @@ class Warden(ProcedureAfterNightABC, ActiveRoleAtNightABC):
             game_data=game_data,
             money=9,
             custom_message=f"Проверка на совпадение групп {user1_url} "
-            f"({make_pretty(user1_role.role)}) и "
-            f"{user2_url} ({make_pretty(user2_role.role)})",
+            f"({user1_role.pretty_role}) и "
+            f"{user2_url} ({user2_role.pretty_role})",
         )
 
     def leave_notification_message(
