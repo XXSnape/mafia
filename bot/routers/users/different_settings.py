@@ -31,6 +31,7 @@ async def show_fog_of_war_options(
 @router.callback_query(
     F.data.in_(
         (
+            cb_text.SHOW_PEACEFUL_ALLIES_CB,
             cb_text.SHOW_KILLERS_CB,
             cb_text.SHOW_INFORMATION_ABOUT_GUESTS_AT_NIGHT_CB,
             cb_text.SHOW_USERNAMES_DURING_VOTING_CB,

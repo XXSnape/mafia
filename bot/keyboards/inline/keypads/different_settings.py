@@ -6,7 +6,10 @@ from keyboards.inline.buttons.common import (
     BACK_TO_SELECTING_ACTIONS_ON_SETTINGS_BTN,
 )
 from keyboards.inline.cb import cb_text
-from keyboards.inline.cb.cb_text import SHOW_ROLES_AFTER_DEATH_CB
+from keyboards.inline.cb.cb_text import (
+    SHOW_ROLES_AFTER_DEATH_CB,
+    SHOW_PEACEFUL_ALLIES_CB,
+)
 
 
 def check_for_settings(
@@ -25,6 +28,10 @@ def get_for_of_war_buttons():
         InlineKeyboardButton(
             text="Показывать роли погибших",
             callback_data=SHOW_ROLES_AFTER_DEATH_CB,
+        ),
+        InlineKeyboardButton(
+            text="Показывать мирным своих заместителей",
+            callback_data=SHOW_PEACEFUL_ALLIES_CB,
         ),
         InlineKeyboardButton(
             text="Показывать имена во время голосования",

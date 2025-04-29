@@ -31,6 +31,9 @@ class SettingModel(IdMixin, BaseModel):
     show_roles_after_death: Mapped[bool] = mapped_column(
         default=True, server_default="1"
     )
+    show_peaceful_allies: Mapped[bool] = mapped_column(
+        default=True, server_default="1"
+    )
     show_killers: Mapped[bool] = mapped_column(
         default=True, server_default="1"
     )

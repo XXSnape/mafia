@@ -39,6 +39,7 @@ VIEW_ROLES_CB = "view_roles"
 FOG_OF_WAR_CB = "fog_of_war"
 DIFFERENT_SETTINGS_CB = "different_settings"
 SHOW_ROLES_AFTER_DEATH_CB = "show_roles_after_death"
+SHOW_PEACEFUL_ALLIES_CB = "show_peaceful_allies"
 SHOW_KILLERS_CB = "show_killers"
 SHOW_INFORMATION_ABOUT_GUESTS_AT_NIGHT_CB = (
     "show_information_about_guests_at_night"

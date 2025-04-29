@@ -65,6 +65,7 @@ class DifferentSettingsCache(TypedDict):
     time_for_voting: int
     time_for_confirmation: int
     show_roles_after_death: bool
+    show_peaceful_allies: bool
     show_killers: bool
     show_information_about_guests_at_night: bool
     show_usernames_during_voting: bool
