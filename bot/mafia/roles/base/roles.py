@@ -113,8 +113,8 @@ class RoleABC(ABC):
                 self.bot.send_photo(
                     chat_id=user_id,
                     photo=photo,
-                    caption=f"Твоя роль - "
-                    f"{role_name}! "
+                    caption=f"Твоя роль — "
+                    f"{role_name}!\n\n"
                     f"{purpose}",
                 )
             )
@@ -171,23 +171,26 @@ class RoleABC(ABC):
                     )
         return roles_tasks, aliases_tasks, other_tasks
 
+    def _get_players(self, game_data: GameCache):
+        return game_data[self.roles_key]
+
     async def boss_is_dead(
         self,
         game_data: GameCache,
         current_id: int,
     ):
+        players = self._get_players(game_data)
+        if not players:
+            return
         url = game_data["players"][str(current_id)]["url"]
         role = game_data["players"][str(current_id)]["pretty_role"]
         role_id = game_data["players"][str(current_id)]["role_id"]
-        players = game_data[self.roles_key]
-        if not players:
-            return
         shuffle(players)
         new_boss_id = players[0]
         new_boss_url = game_data["players"][str(new_boss_id)]["url"]
         game_data["players"][str(new_boss_id)][
             "pretty_role"
-        ] = self.role.pretty_role
+        ] = self.pretty_role
         game_data["players"][str(new_boss_id)]["role_id"] = role_id
         if (
             self.grouping == Groupings.criminals
@@ -198,12 +201,19 @@ class RoleABC(ABC):
                 players=game_data["players"],
                 role=True,
             )
+            if self.grouping == Groupings.criminals:
+                players = get_criminals_ids(game_data)
+                profiles = get_profiles(
+                    players_ids=players,
+                    players=game_data["players"],
+                    role=True,
+                )
             await send_a_lot_of_messages_safely(
                 bot=self.bot,
                 users=players,
-                text=f"❗️❗️❗️Погиб {role} {url}.\n\n"
-                f"Новый {role} - {new_boss_url}\n\n"
-                f"Текущие союзники:\n{profiles}",
+                text=f"❗️❗️❗️Погиб {role} — {url}.\n\n"
+                f"Новый {role} — {new_boss_url}\n\n"
+                f"Все текущие союзники и сокомандники:\n{profiles}",
             )
         else:
             await send_a_lot_of_messages_safely(
@@ -224,7 +234,7 @@ class RoleABC(ABC):
                 "Оу нет! Мои верные союзники уже заняли пост главы криминала!"
             )
         else:
-            message = f"😎Встречайте нового {self.role.pretty_role}!"
+            message = f"😎Встречайте нового {self.pretty_role}!"
         await self.bot.send_photo(
             chat_id=game_data["game_chat"],
             photo=self.photo,
@@ -473,14 +483,7 @@ class AliasRoleABC(ABC):
             return
         url = game_data["players"][str(current_id)]["url"]
         role = game_data["players"][str(current_id)]["pretty_role"]
-        profiles = get_profiles(
-            players_ids=game_data[self.roles_key],
-            players=game_data["players"],
-            role=True,
-        )
-        text = (
-            f"❗️Погиб {role} {url}.\n\nТекущие союзники:\n{profiles}"
-        )
+        text = f"❗️Погиб {role} — {url}"
         await send_a_lot_of_messages_safely(
             bot=self.bot,
             users=game_data[self.roles_key],

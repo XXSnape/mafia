@@ -150,5 +150,5 @@ class MafiaConverterABC(FinisherOfNight):
             await self.bot.send_photo(
                 chat_id=game_data["game_chat"],
                 photo=MafiaAlias.photo,
-                caption=f"{self.role.pretty_role} превращается в {MafiaAlias.pretty_role}",
+                caption=f"{self.pretty_role} превращается в {MafiaAlias.pretty_role}",
             )

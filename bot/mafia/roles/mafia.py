@@ -14,6 +14,7 @@ from mafia.roles.base import (
 )
 from mafia.roles.base.mixins import (
     MurderAfterNightABC,
+    MafiaConverterABC,
 )
 from mafia.roles.base.roles import RoleABC
 from mafia.roles.descriptions.description import RoleDescription
@@ -24,7 +25,10 @@ from mafia.roles.descriptions.texts import (
 )
 from states.game import UserFsm
 from utils.common import get_criminals_ids
-from utils.roles import get_processed_role_and_user_if_exists
+from utils.roles import (
+    get_processed_role_and_user_if_exists,
+    change_role,
+)
 
 
 class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
@@ -55,6 +59,36 @@ class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.MAFIA_ATTACKS
+
+    def _get_players(self, game_data: GameCache):
+        mafias = super()._get_players(game_data)
+        if mafias:
+            return mafias
+        criminals = get_criminals_ids(game_data)
+        if not criminals:
+            return criminals
+        user_id = criminals[0]
+        for criminal_id in criminals:
+            role: MafiaConverterABC = self.all_roles[
+                game_data["players"][str(criminal_id)]["role_id"]
+            ]
+            if role.check_for_possibility_to_transform(game_data):
+                change_role(
+                    game_data=game_data,
+                    previous_role=role,
+                    new_role=self,
+                    user_id=criminal_id,
+                )
+                return [criminal_id]
+        change_role(
+            game_data=game_data,
+            previous_role=self.all_roles[
+                game_data["players"][str(user_id)]["role_id"]
+            ],
+            new_role=self,
+            user_id=user_id,
+        )
+        return [user_id]
 
     def generate_markup(
         self,

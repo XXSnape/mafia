@@ -25,6 +25,6 @@ def get_criminals_ids(game_data: GameCache) -> PlayersIds:
 
     return (
         game_data.get(Mafia.roles_key, [])
-        + game_data.get(Forger.roles_key, [])
         + game_data.get(Traitor.roles_key, [])
+        + game_data.get(Forger.roles_key, [])
     )
