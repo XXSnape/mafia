@@ -291,13 +291,13 @@ class Controller:
                 f'{user_info["url"]} с ролью {role}!'
             ),
         )
-        aliases_tasks, other_tasks = self.remove_user_from_game(
+        other_tasks, boss_is_dead_tasks = self.remove_user_from_game(
             game_data=game_data,
             user_id=removed_user_id,
             at_night=False,
         )
-        await asyncio.gather(*aliases_tasks, return_exceptions=True)
         await asyncio.gather(*other_tasks, return_exceptions=True)
+        await asyncio.gather(*boss_is_dead_tasks, return_exceptions=True)
         await self.state.set_data(game_data)
 
     @check_end_of_game
@@ -332,16 +332,16 @@ class Controller:
                 game_data=game_data
             )
         text_about_dead = ""
-        aliases_tasks = []
         other_tasks = []
+        boss_is_dead_tasks = []
         for victim_id in victims:
-            aliases, other = self.remove_user_from_game(
+            other, boss_is_dead = self.remove_user_from_game(
                 game_data=game_data,
                 user_id=victim_id,
                 at_night=True,
             )
-            aliases_tasks.extend(aliases)
             other_tasks.extend(other)
+            boss_is_dead_tasks.extend(boss_is_dead)
             url = game_data["players"][str(victim_id)]["url"]
             role = (
                 game_data["players"][str(victim_id)]["pretty_role"]
@@ -369,8 +369,8 @@ class Controller:
             bot=self.bot,
             group_chat_id=self.group_chat_id,
         )
-        await asyncio.gather(*aliases_tasks, return_exceptions=True)
         await asyncio.gather(*other_tasks, return_exceptions=True)
+        await asyncio.gather(*boss_is_dead_tasks, return_exceptions=True)
         await self.state.set_data(game_data)
         await asyncio.sleep(1)
         return game_data
@@ -420,7 +420,7 @@ class Controller:
     ):
         user_role = game_data["players"][str(user_id)]["role_id"]
         role: RoleABC = self.all_roles[user_role]
-        aliases_tasks = []
+        boss_is_dead_tasks = []
         other_tasks = []
         if at_night is True:
             other_tasks.append(
@@ -455,18 +455,18 @@ class Controller:
             )
         )
         if role.alias:
-            other_tasks.append(
+            boss_is_dead_tasks.append(
                 role.boss_is_dead(
                     current_id=user_id, game_data=game_data
                 )
             )
         if isinstance(role, AliasRoleABC):
-            aliases_tasks.append(
+            other_tasks.append(
                 role.alias_is_dead(
                     current_id=user_id, game_data=game_data
                 )
             )
-        return aliases_tasks, other_tasks
+        return other_tasks, boss_is_dead_tasks
 
     async def mailing(self):
         async with lock_state(self.state):
@@ -570,7 +570,7 @@ class Controller:
         profiles = get_profiles(
             players_ids=inactive_users,
             players=game_data["players"],
-            role=game_data["settings"]["show_roles_after_death"],
+            show_current_roles=game_data["settings"]["show_roles_after_death"],
         )
         text = f"{make_build('❗️Игроки выбывают:')}\n{profiles}"
         await self.bot.send_photo(
@@ -578,16 +578,16 @@ class Controller:
             photo="https://media.zenfs.com/en/nerdist_761/342f5f2b17659cb424aaabef1951a1a1",
             caption=text,
         )
-        aliases_tasks = []
         other_tasks = []
+        boss_is_dead_tasks = []
         for user_id in inactive_users:
-            aliases, other = self.remove_user_from_game(
+            other, boss_is_dead = self.remove_user_from_game(
                 game_data=game_data,
                 user_id=user_id,
                 at_night=None,
             )
-            aliases_tasks.extend(aliases)
             other_tasks.extend(other)
-        await asyncio.gather(*aliases_tasks, return_exceptions=True)
+            boss_is_dead_tasks.extend(boss_is_dead)
         await asyncio.gather(*other_tasks, return_exceptions=True)
+        await asyncio.gather(*boss_is_dead_tasks, return_exceptions=True)
         await self.state.set_data(game_data)

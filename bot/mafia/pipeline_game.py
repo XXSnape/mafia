@@ -257,9 +257,9 @@ class Game:
         winners_text = make_build("🔥Победители:\n") + get_profiles(
             players_ids=winners,
             players=game_data["players"],
-            initial_role=True,
-            money_need=True,
-            role=True,
+            show_initial_roles=True,
+            show_money=True,
+            show_current_roles=True,
             if_there_are_no_players=make_build(
                 "\n😲Де-факто нет победителей!"
             ),
@@ -270,9 +270,9 @@ class Game:
         ) + get_profiles(
             players_ids=losers,
             players=game_data["players"],
-            initial_role=True,
-            money_need=True,
-            role=True,
+            show_initial_roles=True,
+            show_money=True,
+            show_current_roles=True,
         )
         end_of_game = datetime.datetime.now()
         message = get_minutes_and_seconds_text(

@@ -100,7 +100,7 @@ class WerewolfSaver(RouterHelper):
                 + get_profiles(
                     players_ids=criminals,
                     players=game_data["players"],
-                    role=True,
+                    show_current_roles=True,
                 )
             )
             await send_a_lot_of_messages_safely(

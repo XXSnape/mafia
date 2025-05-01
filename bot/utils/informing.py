@@ -102,9 +102,9 @@ def get_live_roles(
 def get_profiles(
     players_ids: PlayersIds,
     players: UsersInGame,
-    role: bool = False,
-    initial_role: bool = False,
-    money_need: bool = False,
+    show_current_roles: bool = False,
+    show_initial_roles: bool = False,
+    show_money: bool = False,
     sorting_factory: Callable = sorting_by_number,
     if_there_are_no_players: str = "\nПока нет участников!",
 ) -> str:
@@ -117,16 +117,16 @@ def get_profiles(
     ):
         url = players[str(user_id)]["url"]
         number = players[str(user_id)].get("number", index)
-        if role:
-            if initial_role:
-                role = players[str(user_id)]["initial_role"]
+        if show_current_roles:
+            if show_initial_roles:
+                show_current_roles = players[str(user_id)]["initial_role"]
             else:
-                role = players[str(user_id)]["pretty_role"]
-            if money_need:
+                show_current_roles = players[str(user_id)]["pretty_role"]
+            if show_money:
                 money = players[str(user_id)]["money"]
-                result += f"\n{number}) {url} - {role} ({money}{MONEY_SYM})"
+                result += f"\n{number}) {url} - {show_current_roles} ({money}{MONEY_SYM})"
             else:
-                result += f"\n{number}) {url} - {role}"
+                result += f"\n{number}) {url} - {show_current_roles}"
         else:
             result += f"\n{number}) {url}"
     return make_build(result)
@@ -251,7 +251,7 @@ async def notify_aliases_about_transformation(
     profiles = get_profiles(
         players_ids=game_data[new_role.roles_key],
         players=game_data["players"],
-        role=True,
+        show_current_roles=True,
     )
     await asyncio.gather(
         *(
@@ -397,7 +397,7 @@ def remind_criminals_about_inspections(
     profiles = get_profiles(
         players_ids=users,
         players=game_data["players"],
-        role=True,
+        show_current_roles=True,
     )
     return "По результатам прошлых проверок выяснено:\n" + profiles
 
