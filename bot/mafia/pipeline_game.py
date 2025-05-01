@@ -229,7 +229,7 @@ class Game:
         await self.controller.sum_up_after_voting()
         await self.controller.removing_inactive_players()
         await self.controller.end_night()
-        await asyncio.sleep(3)
+        await asyncio.sleep(4)
 
     async def give_out_rewards(self, e: GameIsOver):
         await asyncio.sleep(1)

@@ -376,7 +376,7 @@ class Controller:
             *boss_is_dead_tasks, return_exceptions=True
         )
         await self.state.set_data(game_data)
-        await asyncio.sleep(1)
+        await asyncio.sleep(3)
         return game_data
 
     async def confirm_final_aim(

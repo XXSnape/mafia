@@ -135,7 +135,7 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
                 game_data["players"][str(user_id)]["role_id"],
             )
             role = self.all_roles[user_role_id].pretty_role
-            text = f"🌃Ночь {game_data['number_of_night']}\n{url} - {role}!"
+            text = f"🌃Ночь {game_data['number_of_night']}\n{url} — {role}!"
             game_data["text_about_checks"] += text + "\n\n"
             users = (
                 game_data[self.roles_key]
@@ -187,7 +187,7 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
 
 class PolicemanAlias(AliasRoleABC, Policeman):
     role = "Генерал"
-    role_id = "general"
+    role_id: RolesLiteral = "general"
     photo = "https://img.clipart-library.com/2/clip-monsters-vs-aliens/clip-monsters-vs-aliens-21.gif"
     payment_for_treatment = 11
     payment_for_murder = 14
