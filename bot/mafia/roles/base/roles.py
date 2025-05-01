@@ -448,22 +448,21 @@ class RoleABC(ABC):
         at_night: bool | None,
         user_id: int,
     ):
-        if self.grouping == Groupings.criminals and self.alias is None:
+        if (
+            self.grouping == Groupings.criminals
+            and self.alias is None
+        ):
             criminals = get_criminals_ids(game_data)
             url = game_data["players"][str(user_id)]["url"]
-            role = game_data["players"][str(user_id)][
-                "pretty_role"
-            ]
+            role = game_data["players"][str(user_id)]["pretty_role"]
             profiles = get_profiles(
                 players_ids=criminals,
-                players=game_data['players'],
-                show_current_roles=True
+                players=game_data["players"],
+                show_current_roles=True,
             )
             text = f"❗️Погиб {role} — {url}\n\nВсе текущие союзники и сокомандники:\n{profiles}"
             await send_a_lot_of_messages_safely(
-                bot=self.bot,
-                users=criminals,
-                text=text
+                bot=self.bot, users=criminals, text=text
             )
         if at_night is True:
             message = "😢🌃К сожалению, тебя убили! Отправь напоследок все, что думаешь!"
@@ -494,16 +493,15 @@ class AliasRoleABC(ABC):
     ):
         if (
             self.grouping == Groupings.criminals
-            or game_data["settings"]["show_peaceful_allies"]
-            is False
+            or game_data["settings"]["show_peaceful_allies"] is False
         ):
             return
         url = game_data["players"][str(current_id)]["url"]
         role = game_data["players"][str(current_id)]["pretty_role"]
         profiles = get_profiles(
             players_ids=game_data[self.roles_key],
-            players=game_data['players'],
-            show_current_roles=True
+            players=game_data["players"],
+            show_current_roles=True,
         )
         text = f"❗️Погиб {role} — {url}\n\nТекущие сокомандники:\n{profiles}"
         await send_a_lot_of_messages_safely(

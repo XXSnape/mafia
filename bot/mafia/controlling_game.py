@@ -297,7 +297,9 @@ class Controller:
             at_night=False,
         )
         await asyncio.gather(*other_tasks, return_exceptions=True)
-        await asyncio.gather(*boss_is_dead_tasks, return_exceptions=True)
+        await asyncio.gather(
+            *boss_is_dead_tasks, return_exceptions=True
+        )
         await self.state.set_data(game_data)
 
     @check_end_of_game
@@ -370,7 +372,9 @@ class Controller:
             group_chat_id=self.group_chat_id,
         )
         await asyncio.gather(*other_tasks, return_exceptions=True)
-        await asyncio.gather(*boss_is_dead_tasks, return_exceptions=True)
+        await asyncio.gather(
+            *boss_is_dead_tasks, return_exceptions=True
+        )
         await self.state.set_data(game_data)
         await asyncio.sleep(1)
         return game_data
@@ -570,7 +574,9 @@ class Controller:
         profiles = get_profiles(
             players_ids=inactive_users,
             players=game_data["players"],
-            show_current_roles=game_data["settings"]["show_roles_after_death"],
+            show_current_roles=game_data["settings"][
+                "show_roles_after_death"
+            ],
         )
         text = f"{make_build('❗️Игроки выбывают:')}\n{profiles}"
         await self.bot.send_photo(
@@ -589,5 +595,7 @@ class Controller:
             other_tasks.extend(other)
             boss_is_dead_tasks.extend(boss_is_dead)
         await asyncio.gather(*other_tasks, return_exceptions=True)
-        await asyncio.gather(*boss_is_dead_tasks, return_exceptions=True)
+        await asyncio.gather(
+            *boss_is_dead_tasks, return_exceptions=True
+        )
         await self.state.set_data(game_data)

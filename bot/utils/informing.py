@@ -119,9 +119,13 @@ def get_profiles(
         number = players[str(user_id)].get("number", index)
         if show_current_roles:
             if show_initial_roles:
-                show_current_roles = players[str(user_id)]["initial_role"]
+                show_current_roles = players[str(user_id)][
+                    "initial_role"
+                ]
             else:
-                show_current_roles = players[str(user_id)]["pretty_role"]
+                show_current_roles = players[str(user_id)][
+                    "pretty_role"
+                ]
             if show_money:
                 money = players[str(user_id)]["money"]
                 result += f"\n{number}) {url} - {show_current_roles} ({money}{MONEY_SYM})"
