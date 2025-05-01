@@ -293,11 +293,13 @@ class Controller:
                 f'{user_info["url"]} с ролью {role}!'
             ),
         )
-        await self.remove_user_from_game(
+        aliases_tasks, other_tasks = self.remove_user_from_game(
             game_data=game_data,
             user_id=removed_user_id,
             at_night=False,
         )
+        await asyncio.gather(*aliases_tasks, return_exceptions=True)
+        await asyncio.gather(*other_tasks, return_exceptions=True)
         await self.state.set_data(game_data)
 
     @check_end_of_game
@@ -332,15 +334,16 @@ class Controller:
                 game_data=game_data
             )
         text_about_dead = ""
-        tasks = []
+        aliases_tasks = []
+        other_tasks = []
         for victim_id in victims:
-            tasks.append(
-                self.remove_user_from_game(
-                    game_data=game_data,
-                    user_id=victim_id,
-                    at_night=True,
-                )
+            aliases, other = self.remove_user_from_game(
+                game_data=game_data,
+                user_id=victim_id,
+                at_night=True,
             )
+            aliases_tasks.extend(aliases)
+            other_tasks.extend(other)
             url = game_data["players"][str(victim_id)]["url"]
             role = (
                 game_data["players"][str(victim_id)]["pretty_role"]
@@ -368,7 +371,8 @@ class Controller:
             bot=self.bot,
             group_chat_id=self.group_chat_id,
         )
-        await asyncio.gather(*tasks, return_exceptions=True)
+        await asyncio.gather(*aliases_tasks, return_exceptions=True)
+        await asyncio.gather(*other_tasks, return_exceptions=True)
         await self.state.set_data(game_data)
         await asyncio.sleep(1)
         return game_data
@@ -410,7 +414,7 @@ class Controller:
         await self.state.set_data(game_data)
         return True
 
-    async def remove_user_from_game(
+    def remove_user_from_game(
         self,
         game_data: GameCache,
         user_id: int,
@@ -418,20 +422,26 @@ class Controller:
     ):
         user_role = game_data["players"][str(user_id)]["role_id"]
         role: RoleABC = self.all_roles[user_role]
+        aliases_tasks = []
+        other_tasks = []
         if at_night is True:
-            await get_state_and_assign(
-                dispatcher=self.dispatcher,
-                chat_id=user_id,
-                bot_id=self.bot.id,
-                new_state=UserFsm.WAIT_FOR_LATEST_LETTER,
+            other_tasks.append(
+                get_state_and_assign(
+                    dispatcher=self.dispatcher,
+                    chat_id=user_id,
+                    bot_id=self.bot.id,
+                    new_state=UserFsm.WAIT_FOR_LATEST_LETTER,
+                )
             )
         elif at_night is None or (
             at_night is False and role.clearing_state_after_death
         ):
-            await reset_user_state(
-                dispatcher=self.dispatcher,
-                user_id=user_id,
-                bot_id=self.bot.id,
+            other_tasks.append(
+                reset_user_state(
+                    dispatcher=self.dispatcher,
+                    user_id=user_id,
+                    bot_id=self.bot.id,
+                )
             )
 
         game_data["live_players_ids"].remove(user_id)
@@ -439,22 +449,26 @@ class Controller:
             "number_died_at_night"
         ] = (game_data["number_of_night"] - 1)
         game_data[role.roles_key].remove(user_id)
-        try:
-            await role.report_death(
+        other_tasks.append(
+            role.report_death(
                 game_data=game_data,
                 at_night=at_night,
                 user_id=user_id,
             )
-        except Exception as e:
-            logger.exception("Error")
+        )
         if role.alias:
-            await role.boss_is_dead(
-                current_id=user_id, game_data=game_data
+            other_tasks.append(
+                role.boss_is_dead(
+                    current_id=user_id, game_data=game_data
+                )
             )
         if isinstance(role, AliasRoleABC):
-            await role.alias_is_dead(
-                current_id=user_id, game_data=game_data
+            aliases_tasks.append(
+                role.alias_is_dead(
+                    current_id=user_id, game_data=game_data
+                )
             )
+        return aliases_tasks, other_tasks
 
     async def mailing(self):
         async with lock_state(self.state):
@@ -566,15 +580,16 @@ class Controller:
             photo="https://media.zenfs.com/en/nerdist_761/342f5f2b17659cb424aaabef1951a1a1",
             caption=text,
         )
-        await asyncio.gather(
-            *(
-                self.remove_user_from_game(
-                    game_data=game_data,
-                    user_id=user_id,
-                    at_night=None,
-                )
-                for user_id in inactive_users
-            ),
-            return_exceptions=True,
-        )
+        aliases_tasks = []
+        other_tasks = []
+        for user_id in inactive_users:
+            aliases, other = self.remove_user_from_game(
+                game_data=game_data,
+                user_id=user_id,
+                at_night=None,
+            )
+            aliases_tasks.extend(aliases)
+            other_tasks.extend(other)
+        await asyncio.gather(*aliases_tasks, return_exceptions=True)
+        await asyncio.gather(*other_tasks, return_exceptions=True)
         await self.state.set_data(game_data)
