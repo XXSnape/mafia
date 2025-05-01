@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache, UserIdInt
+from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import ProcedureAfterVotingABC
@@ -16,7 +16,7 @@ from utils.roles import get_processed_role_and_user_if_exists
 
 class Lawyer(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
     role = "Адвокат"
-    role_id = "lawyer"
+    role_id: RolesLiteral = "lawyer"
     mail_message = "Кого защитить на голосовании?"
     is_self_selecting = True
     do_not_choose_self = 2

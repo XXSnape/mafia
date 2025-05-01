@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Union
 
 from aiogram import Bot
 from aiogram.types import InlineKeyboardButton
-
 from cache.cache_types import (
     GameCache,
     PlayersIds,
@@ -24,7 +23,6 @@ from keyboards.inline.keypads.mailing import (
 from utils.pretty_text import (
     cut_off_old_text,
     make_build,
-    make_pretty,
 )
 from utils.sorting import sorting_by_number
 

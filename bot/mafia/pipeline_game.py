@@ -37,19 +37,16 @@ from keyboards.inline.keypads.to_bot import get_to_bot_kb
 from loguru import logger
 from mafia.controlling_game import Controller
 from mafia.roles import RoleABC
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from services.common.settings import SettingsRouter
+from sqlalchemy.ext.asyncio import AsyncSession
 from states.game import GameFsm
 from utils.informing import (
-    get_live_players,
     get_profiles,
     send_a_lot_of_messages_safely,
 )
 from utils.pretty_text import (
     get_minutes_and_seconds_text,
     make_build,
-    make_pretty,
 )
 from utils.sorting import sorting_by_money, sorting_by_rate
 from utils.state import (
@@ -238,7 +235,7 @@ class Game:
         await asyncio.sleep(1)
         game_data: GameCache = await self.state.get_data()
         result = make_build(
-            f"🚩Игра завершена! Победившая группировка: {e.winner.value.name}\n\n"
+            f"🚩Игра завершена! Победившая группировка — {e.winner.value.name}\n\n"
         )
         winners = []
         losers = []

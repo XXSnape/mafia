@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache, UserIdInt
+from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from mafia.roles.base import RoleABC
 from mafia.roles.base.mixins import ProcedureAfterVotingABC
 from mafia.roles.descriptions.description import RoleDescription
@@ -12,7 +12,7 @@ from utils.roles import get_user_role_and_url
 
 class PrimeMinister(ProcedureAfterVotingABC, RoleABC):
     role = "Премьер-министр"
-    role_id = "prime_minister"
+    role_id: RolesLiteral = "prime_minister"
     photo = (
         "https://avatars.mds.yandex.net/i?id=fb2e5e825d183d5344d93bc563"
         "6bc4c4_l-5084109-images-thumbs&n=13"

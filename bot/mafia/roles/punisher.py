@@ -1,4 +1,9 @@
-from cache.cache_types import GameCache, PlayersIds, UserIdInt
+from cache.cache_types import (
+    GameCache,
+    PlayersIds,
+    RolesLiteral,
+    UserIdInt,
+)
 from general import settings
 from general.groupings import Groupings
 from mafia.roles import Bodyguard
@@ -12,7 +17,7 @@ from mafia.roles.descriptions.texts import (
 
 class Punisher(ProcedureAfterNightABC, RoleABC):
     role = "Каратель"
-    role_id = "punisher"
+    role_id: RolesLiteral = "punisher"
     photo = "https://lastfm.freetls.fastly.net/i/u/ar0/d04cdfdf3f65412bc1e7870ec6599ed7.png"
     purpose = "Спровоцируй мафию и забери её с собой!"
     number_in_order_after_night = 4

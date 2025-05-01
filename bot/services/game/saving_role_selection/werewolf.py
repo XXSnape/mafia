@@ -22,7 +22,6 @@ from utils.informing import (
     remind_criminals_about_inspections,
     send_a_lot_of_messages_safely,
 )
-from utils.pretty_text import make_pretty
 from utils.roles import change_role
 from utils.state import lock_state
 from utils.tg import delete_message

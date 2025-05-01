@@ -3,7 +3,6 @@ from functools import wraps
 from typing import TYPE_CHECKING, Concatenate
 
 from cache.cache_types import GameCache, UserIdInt
-from utils.pretty_text import make_pretty
 
 if TYPE_CHECKING:
     from general.collection_of_roles import DataWithRoles

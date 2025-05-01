@@ -1,14 +1,13 @@
-from aiogram import Dispatcher, Router, F
+from aiogram import Dispatcher, F, Router
 from aiogram.exceptions import TelegramRetryAfter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
-from loguru import logger
-
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
     UserVoteIndexCbData,
 )
 from keyboards.inline.cb.cb_text import DONT_VOTE_FOR_ANYONE_CB
+from loguru import logger
 from services.game.processing_user_actions import UserManager
 
 router = Router(name=__name__)

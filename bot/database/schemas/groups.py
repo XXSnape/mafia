@@ -1,7 +1,6 @@
 from cache.cache_types import RolesLiteral
-from pydantic import BaseModel
-
 from database.schemas.settings import DifferentSettingsSchema
+from pydantic import BaseModel
 
 
 class GroupSettingsSchema(DifferentSettingsSchema):

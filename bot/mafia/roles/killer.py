@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache, UserIdInt
+from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
@@ -16,7 +16,7 @@ from utils.roles import get_processed_role_and_user_if_exists
 
 class Killer(MurderAfterNightABC, ActiveRoleAtNightABC):
     role = "Наёмный убийца"
-    role_id = "killer"
+    role_id: RolesLiteral = "killer"
     need_to_monitor_interaction = False
     photo = (
         "https://steamuserimages-a.akamaihd.net/ugc/633105202506112549/988D"

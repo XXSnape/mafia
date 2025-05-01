@@ -1,23 +1,20 @@
 from aiogram.types import InlineKeyboardButton
-
 from cache.cache_types import RolesLiteral
 from general.collection_of_roles import (
-    get_data_with_roles,
     REQUIRED_ROLES,
-    BASES_ROLES,
+    get_data_with_roles,
 )
 from general.text import TO_SAVE
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import (
-    CANCEL_BTN,
     BACK_TO_SELECTING_ACTIONS_ON_SETTINGS_BTN,
+    CANCEL_BTN,
 )
 from keyboards.inline.callback_factory.help import BannedRolesCbData
 from keyboards.inline.cb.cb_text import (
-    EDIT_BANNED_ROLES_CB,
-    CLEAR_BANNED_ROLES_CB,
     BAN_EVERYTHING_CB,
-    SAVE_ORDER_OF_ROLES_CB,
+    CLEAR_BANNED_ROLES_CB,
+    EDIT_BANNED_ROLES_CB,
     SAVE_BANNED_ROLES_CB,
 )
 from utils.sorting import sorting_roles_by_name

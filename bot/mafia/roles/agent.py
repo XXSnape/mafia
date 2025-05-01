@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache, UserIdInt
+from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from cache.extra import ExtraCache
 from mafia.roles.base import ActiveRoleAtNightABC, RoleABC
 from mafia.roles.base.mixins import ProcedureAfterNightABC
@@ -16,7 +16,7 @@ from utils.roles import (
 
 class Agent(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Агент 008"
-    role_id = "agent"
+    role_id: RolesLiteral = "agent"
     mail_message = "За кем следить этой ночью?"
     photo = (
         "https://avatars.mds.yandex.net/i?"

@@ -1,6 +1,6 @@
 from random import randint
 
-from cache.cache_types import GameCache, PlayersIds
+from cache.cache_types import GameCache, PlayersIds, RolesLiteral
 from mafia.roles.base import RoleABC
 from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,
@@ -11,7 +11,7 @@ from mafia.roles.descriptions.texts import PAYMENT_FOR_NIGHTS
 
 class LuckyGay(ProcedureAfterNightABC, RoleABC):
     role = "Везунчик"
-    role_id = "lucky_gay"
+    role_id: RolesLiteral = "lucky_gay"
     photo = "https://avatars.mds.yandex.net/get-mpic/5031100/img_id5520953584482126492.jpeg/orig"
     purpose = (
         "Возможно тебе повезет и ты останешься жив после покушения."

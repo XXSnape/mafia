@@ -1,4 +1,9 @@
-from cache.cache_types import GameCache, PlayersIds, UserIdInt
+from cache.cache_types import (
+    GameCache,
+    PlayersIds,
+    RolesLiteral,
+    UserIdInt,
+)
 from general.groupings import Groupings
 from mafia.roles.base import (
     ActiveRoleAtNightABC,
@@ -22,7 +27,7 @@ from utils.roles import (
 
 class Doctor(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Главный врач"
-    role_id = "doctor"
+    role_id: RolesLiteral = "doctor"
     mail_message = "Кого вылечить этой ночью?"
     is_self_selecting = True
     do_not_choose_self = 2
@@ -89,7 +94,7 @@ class Doctor(ProcedureAfterNightABC, ActiveRoleAtNightABC):
 
 class DoctorAlias(AliasRoleABC, Doctor):
     role = "Медсестра"
-    role_id = "nurse"
+    role_id: RolesLiteral = "nurse"
     photo = "https://cdn.culture.ru/images/e2464a8d-222e-54b1-9016-86f63e902959"
 
     purpose = "Тебе нужно во всем помогать главврачу. В случае его смерти вступишь в должность."

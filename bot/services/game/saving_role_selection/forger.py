@@ -17,7 +17,6 @@ from services.game.game_assistants import (
 )
 from utils.common import get_criminals_ids
 from utils.informing import send_a_lot_of_messages_safely
-from utils.pretty_text import make_pretty
 from utils.state import lock_state
 from utils.tg import delete_message
 

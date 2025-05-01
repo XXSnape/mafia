@@ -1,8 +1,7 @@
-from sqlalchemy import select
-
 from database.dao.base import BaseDAO
 from database.models import SettingModel
 from database.schemas.common import UserTgIdSchema
+from sqlalchemy import select
 
 
 class SettingsDao(BaseDAO[SettingModel]):

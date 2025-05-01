@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache
+from cache.cache_types import GameCache, RolesLiteral
 from general.groupings import Groupings
 from mafia.roles.base import RoleABC
 from mafia.roles.base.mixins import SuicideRoleMixin
@@ -13,7 +13,7 @@ from utils.pretty_text import make_build
 
 class Masochist(SuicideRoleMixin, RoleABC):
     role = "Мазохист"
-    role_id = "masochist"
+    role_id: RolesLiteral = "masochist"
     photo = "https://i.pinimg.com/736x/14/a5/f5/14a5f5eb5dbd73c4707f24d436d80c0b.jpg"
     grouping = Groupings.other
     purpose = "Тебе нужно умереть на дневном голосовании."

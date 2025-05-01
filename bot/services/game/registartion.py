@@ -26,8 +26,6 @@ from general.collection_of_roles import (
     get_data_with_roles,
 )
 from general.text import MONEY_SYM, REQUIRED_PERMISSIONS
-from keyboards.inline.builder import generate_inline_kb
-from keyboards.inline.buttons.common import get_join_to_game_btn
 from keyboards.inline.keypads.join import (
     cancel_bet,
     join_to_game_kb,
@@ -45,7 +43,6 @@ from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_state_by_user_state,
 )
-from services.users.different_settings import DifferentSettings
 from services.users.order_of_roles import RoleManager
 from states.game import GameFsm
 from utils.informing import get_profiles_during_registration
@@ -53,7 +50,6 @@ from utils.pretty_text import (
     get_minutes_and_seconds_text,
     get_profile_link,
     make_build,
-    make_pretty,
 )
 from utils.state import (
     clear_game_data,
@@ -595,6 +591,5 @@ class Registration(RouterHelper):
             "number_of_night": 0,
             "cant_vote": [],
             "cant_talk": [],
-            "show_in_fog_of_war": [],
         }
         await self.state.set_data(game_data)

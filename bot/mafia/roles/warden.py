@@ -2,6 +2,7 @@ from aiogram.types import InlineKeyboardButton
 from cache.cache_types import (
     GameCache,
     PlayersIds,
+    RolesLiteral,
 )
 from cache.extra import ExtraCache
 from general.text import ROLE_IS_KNOWN
@@ -14,12 +15,11 @@ from utils.informing import (
     remind_worden_about_inspections,
     send_a_lot_of_messages_safely,
 )
-from utils.pretty_text import make_pretty
 
 
 class Warden(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Соглядатай"
-    role_id = "warden"
+    role_id: RolesLiteral = "warden"
     photo = (
         "https://cdn1.tenchat.ru/static"
         "/vbc-gostinder/2024-08-03/2aa74472-db98-47ac-a427-b3f7dbb020cb.jpeg?"

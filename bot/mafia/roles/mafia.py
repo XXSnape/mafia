@@ -1,6 +1,5 @@
 from aiogram.types import InlineKeyboardButton
-
-from cache.cache_types import GameCache, UserIdInt
+from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general.groupings import Groupings
 from general.text import (
     ATTEMPT_TO_KILL,
@@ -13,27 +12,26 @@ from mafia.roles.base import (
     AliasRoleABC,
 )
 from mafia.roles.base.mixins import (
-    MurderAfterNightABC,
     MafiaConverterABC,
+    MurderAfterNightABC,
 )
 from mafia.roles.base.roles import RoleABC
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CAN_KILL_AT_NIGHT,
-    CAN_SEE_ALLIES,
     KILLING_PLAYER,
 )
 from states.game import UserFsm
 from utils.common import get_criminals_ids
 from utils.roles import (
-    get_processed_role_and_user_if_exists,
     change_role,
+    get_processed_role_and_user_if_exists,
 )
 
 
 class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
     role = "Дон. Высшее звание в преступных группировках"
-    role_id = "don"
+    role_id: RolesLiteral = "don"
     photo = "https://proza.ru/pics/2021/02/21/523.jpg"
     grouping = Groupings.criminals
     purpose = "Тебе нужно руководить преступниками и убивать мирных."
@@ -52,8 +50,7 @@ class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
             skill=CAN_KILL_AT_NIGHT,
             pay_for=[KILLING_PLAYER],
             features=[
-                "Жертва выбирается решением большинства союзников. В случае неопределенности решение принимает представитель роли.",
-                CAN_SEE_ALLIES,
+                "Жертва выбирается решением большинства союзников. В случае неопределенности решение принимает Дон.",
             ],
         )
 
@@ -135,7 +132,7 @@ class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
 
 class MafiaAlias(AliasRoleABC, Mafia):
     role = "Мафия"
-    role_id = "mafia"
+    role_id: RolesLiteral = "mafia"
     photo = (
         "https://steamuserimages-a.akamaihd.net/ugc/253717829589048899/"
         "949E084C8E9DDEA99B969B9CB7B497D86D35D3F1/?imw=512&amp;imh=332&amp;"

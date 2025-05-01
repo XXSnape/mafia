@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache, UserIdInt
+from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from cache.extra import ExtraCache
 from general.groupings import Groupings
 from general.text import (
@@ -12,17 +12,15 @@ from mafia.roles.base.mixins import (
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CAN_CHOOSE_YOURSELF,
-    CAN_SEE_ALLIES,
 )
 from states.game import UserFsm
-from utils.pretty_text import make_pretty
 
 
 class Forger(
     MafiaConverterABC, ProcedureAfterNightABC, ActiveRoleAtNightABC
 ):
     role = "Румпельштильцхен"
-    role_id = "forger"
+    role_id: RolesLiteral = "forger"
     grouping = Groupings.criminals
     purpose = (
         "Ты должен обманывать местную полицию и "
@@ -62,8 +60,8 @@ class Forger(
             ],
             features=[
                 f"Становится мафией после смерти {Policeman.pretty_role} и его союзников по роли",
+                f"Во время Тумана Войны может подменить документы на роль, которая была в игре",
                 CAN_CHOOSE_YOURSELF,
-                CAN_SEE_ALLIES,
             ],
         )
 

@@ -1,6 +1,6 @@
 import asyncio
 
-from cache.cache_types import GameCache, UserIdInt
+from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from cache.extra import ExtraCache
 from general.groupings import Groupings
 from general.text import (
@@ -31,7 +31,7 @@ class AngelOfDeath(
     ActiveRoleAtNightABC,
 ):
     role = "Ангел смерти"
-    role_id = "angel_of_death"
+    role_id: RolesLiteral = "angel_of_death"
     mail_message = (
         "Глупые людишки тебя линчевали, кому ты отомстишь?"
     )

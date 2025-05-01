@@ -1,11 +1,10 @@
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery
 from keyboards.inline.cb import cb_text
 from keyboards.inline.cb.cb_text import (
-    FOG_OF_WAR_CB,
     DIFFERENT_SETTINGS_CB,
+    FOG_OF_WAR_CB,
     SHOW_ROLES_AFTER_DEATH_CB,
 )
 from services.users.different_settings import DifferentSettings

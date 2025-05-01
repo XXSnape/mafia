@@ -1,6 +1,7 @@
 from cache.cache_types import (
     GameCache,
     PlayersIds,
+    RolesLiteral,
     UserIdInt,
 )
 from cache.extra import ExtraCache
@@ -29,7 +30,7 @@ class Poisoner(
     FinisherOfNight, ProcedureAfterNightABC, ActiveRoleAtNightABC
 ):
     role = "Отравитель"
-    role_id = "poisoner"
+    role_id: RolesLiteral = "poisoner"
     photo = "https://cdn.culture.ru/images/e949d2ef-65de-5336-aa98-50a16401045c"
     need_to_monitor_interaction = False
     purpose = (

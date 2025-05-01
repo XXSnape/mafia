@@ -1,20 +1,18 @@
 from aiogram.types import InlineKeyboardButton
-
 from cache.cache_types import StagesOfGameLiteral
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import (
     BACK_TO_SELECTING_ACTIONS_ON_SETTINGS_BTN,
-    CANCEL_BTN,
 )
 from keyboards.inline.callback_factory.settings import (
     TimeOfDayCbData,
 )
 from keyboards.inline.cb.cb_text import (
-    TIME_FOR_NIGHT_CB,
-    TIME_FOR_DAY_CB,
-    TIME_FOR_VOTING_CB,
-    TIME_FOR_CONFIRMATION_CB,
     DURATION_OF_STAGES_CB,
+    TIME_FOR_CONFIRMATION_CB,
+    TIME_FOR_DAY_CB,
+    TIME_FOR_NIGHT_CB,
+    TIME_FOR_VOTING_CB,
 )
 from utils.pretty_text import get_minutes_and_seconds_text
 

@@ -10,18 +10,17 @@ from aiogram.fsm.context import FSMContext
 from cache.cache_types import (
     GameCache,
     LastInteraction,
+    PlayersIds,
     UserGameCache,
     UserIdInt,
-    PlayersIds,
 )
 from general.exceptions import GameIsOver
 from general.groupings import Groupings
 from keyboards.inline.keypads.to_bot import (
-    participate_in_social_life,
     get_to_bot_kb,
+    participate_in_social_life,
 )
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
-from loguru import logger
 from mafia.roles import Killer, Mafia
 from mafia.roles.base import (
     ActiveRoleAtNightABC,
@@ -36,21 +35,20 @@ from mafia.roles.base.mixins import (
 from states.game import UserFsm
 from utils.common import get_the_most_frequently_encountered_id
 from utils.informing import (
+    get_live_players,
     get_profiles,
     get_results_of_goal_identification,
     get_results_of_voting,
     send_messages_after_night,
     send_request_to_vote,
-    get_live_players,
 )
 from utils.pretty_text import (
     make_build,
-    make_pretty,
 )
 from utils.state import (
     get_state_and_assign,
-    reset_user_state,
     lock_state,
+    reset_user_state,
 )
 
 if TYPE_CHECKING:

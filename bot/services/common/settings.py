@@ -2,7 +2,6 @@ from collections.abc import Awaitable, Callable
 from typing import Concatenate
 
 from aiogram.exceptions import TelegramAPIError
-
 from cache.cache_types import DifferentSettingsCache
 from database.dao.groups import GroupsDao
 from database.dao.settings import SettingsDao
@@ -13,23 +12,22 @@ from database.schemas.common import (
 )
 from database.schemas.groups import (
     GroupSettingIdSchema,
-    GroupSettingsSchema,
 )
 from keyboards.inline.callback_factory.settings import (
     GroupSettingsCbData,
 )
 from keyboards.inline.keypads.different_settings import (
-    get_for_of_war_buttons,
-    get_different_settings_buttons,
     check_for_settings,
+    get_different_settings_buttons,
+    get_for_of_war_buttons,
 )
 from keyboards.inline.keypads.settings import set_up_group_kb
 from services.base import RouterHelper
 from services.users.banned_roles import RoleAttendant
 from services.users.order_of_roles import RoleManager
 from utils.pretty_text import (
-    make_build,
     get_minutes_and_seconds_text,
+    make_build,
 )
 from utils.tg import check_user_for_admin_rights, delete_message
 

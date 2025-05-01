@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache
+from cache.cache_types import GameCache, RolesLiteral
 from cache.extra import ExtraCache
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
@@ -10,7 +10,7 @@ from utils.roles import get_user_role_and_url
 
 class Instigator(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
     role = "Подстрекатель"
-    role_id = "instigator"
+    role_id: RolesLiteral = "instigator"
     photo = "https://avatars.dzeninfra.ru/get-zen_doc/3469057/pub_620655d2a7947c53d6c601a2_620671b4b495be46b12c0a0c/scale_1200"
     grouping = Groupings.civilians
     purpose = "Твоя жертва проголосует за того, за кого прикажешь."

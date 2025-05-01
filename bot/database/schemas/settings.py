@@ -1,6 +1,5 @@
-from pydantic import BaseModel
-
 from general import settings
+from pydantic import BaseModel
 
 
 class TimeOfDaySchema(BaseModel):

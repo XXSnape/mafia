@@ -1,5 +1,5 @@
 from aiogram.types import InlineKeyboardButton
-from cache.cache_types import GameCache, UserIdInt
+from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general import settings
 from general.groupings import Groupings
 from keyboards.inline.cb.cb_text import DRAW_CB
@@ -18,7 +18,7 @@ from utils.roles import (
 
 class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
     role = "Политический аналитик"
-    role_id = "analyst"
+    role_id: RolesLiteral = "analyst"
     grouping = Groupings.other
     photo = "https://habrastorage.org/files/2e3/371/6a2/2e33716a2bb74f8eb67378334960ebb5.png"
     purpose = "Тебе нужно на основе ранее полученных данных предсказать, кого повесят на дневном голосовании"
@@ -47,7 +47,7 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
                 CAN_CHOOSE_YOURSELF,
             ],
             limitations=[DONT_PAY_FOR_VOTING],
-            wins_if="Сделать 3 правильных прогноза или больше",
+            wins_if="Сделать 4 правильных прогноза или больше",
         )
 
     def __init__(self):
@@ -85,7 +85,7 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
         game_data: GameCache,
         **kwargs,
     ):
-        if self.number_of_predictions >= 3:
+        if self.number_of_predictions >= 4:
             payment = (
                 15
                 * (

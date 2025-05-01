@@ -1,21 +1,19 @@
 from _operator import attrgetter
-
 from aiogram.types import InlineKeyboardButton
-
 from cache.cache_types import OrderOfRolesCache
 from general import settings
 from general.collection_of_roles import get_data_with_roles
 from general.text import TO_SAVE
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import (
-    CANCEL_BTN,
     BACK_TO_SELECTING_ACTIONS_ON_SETTINGS_BTN,
+    CANCEL_BTN,
 )
 from keyboards.inline.callback_factory.help import OrderOfRolesCbData
 from keyboards.inline.cb.cb_text import (
+    CLEAR_ORDER_OF_ROLES_CB,
     DELETE_LATEST_ROLE_IN_ORDER_CB,
     EDIT_ORDER_OF_ROLES_CB,
-    CLEAR_ORDER_OF_ROLES_CB,
     SAVE_ORDER_OF_ROLES_CB,
 )
 from mafia.roles import MafiaAlias

@@ -1,5 +1,4 @@
 import asyncio
-from operator import attrgetter
 
 from database.dao.games import GamesDao
 from database.dao.groups import GroupsDao

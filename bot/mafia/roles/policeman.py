@@ -2,6 +2,7 @@ from aiogram.types import InlineKeyboardButton
 from cache.cache_types import (
     GameCache,
     PlayersIds,
+    RolesLiteral,
     UserIdInt,
 )
 from cache.extra import ExtraCache
@@ -28,7 +29,6 @@ from utils.informing import (
     remind_commissioner_about_inspections,
     send_a_lot_of_messages_safely,
 )
-from utils.pretty_text import make_pretty
 from utils.roles import (
     get_user_role_and_url,
 )
@@ -36,7 +36,7 @@ from utils.roles import (
 
 class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Маршал. Верховный главнокомандующий армии"
-    role_id = "policeman"
+    role_id: RolesLiteral = "policeman"
     photo = "https://avatars.mds.yandex.net/get-kinopoisk-image/1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x"
     need_to_monitor_interaction = False
     purpose = "Тебе нужно вычислить мафию или уничтожить её. Только ты можешь принимать решения."

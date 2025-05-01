@@ -1,18 +1,13 @@
 from aiogram import F, Router
-from aiogram.filters import and_f, or_f
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery
-from general.collection_of_roles import get_data_with_roles
 from keyboards.inline.callback_factory.help import OrderOfRolesCbData
 from keyboards.inline.cb.cb_text import (
-    CANCEL_CB,
-    DELETE_LATEST_ROLE_IN_ORDER_CB,
-    EDIT_SETTINGS_CB,
-    VIEW_ORDER_OF_ROLES_CB,
     CLEAR_ORDER_OF_ROLES_CB,
+    DELETE_LATEST_ROLE_IN_ORDER_CB,
     EDIT_ORDER_OF_ROLES_CB,
     SAVE_ORDER_OF_ROLES_CB,
+    VIEW_ORDER_OF_ROLES_CB,
 )
 from services.users.order_of_roles import RoleManager
 from sqlalchemy.ext.asyncio import AsyncSession

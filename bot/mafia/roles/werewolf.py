@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache
+from cache.cache_types import GameCache, RolesLiteral
 from general.groupings import Groupings
 from keyboards.inline.keypads.mailing import send_transformation_kb
 from mafia.roles.base import ActiveRoleAtNightABC
@@ -6,12 +6,11 @@ from mafia.roles.base.mixins import ProcedureAfterNightABC
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import DONT_PAY_FOR_NIGHTS
 from states.game import UserFsm
-from utils.pretty_text import make_pretty
 
 
 class Werewolf(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Оборотень"
-    role_id = "werewolf"
+    role_id: RolesLiteral = "werewolf"
     need_to_monitor_interaction = False
     need_to_process = False
     photo = (
@@ -20,13 +19,20 @@ class Werewolf(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         "96&sign=bf5555ef2b801954b0b92848975525fd&type=album"
         "?imw=512&imh=512&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true"
     )
-    purpose = "На 4ую ночь ты сможешь превратиться в мафию, маршала или доктора."
     mail_message = "Реши, в кого сегодня превратишься!"
     payment_for_treatment = 11
     payment_for_murder = 12
     payment_for_night_spent = 0
     number_in_order_after_night = 0
     number_of_night_for_transformation = 4
+
+    @classmethod
+    @property
+    def purpose(cls):
+        return (
+            f"На {cls.number_of_night_for_transformation}-ую "
+            f"ночь ты сможешь превратиться в мафию, маршала или доктора."
+        )
 
     @property
     def role_description(self) -> RoleDescription:
@@ -35,15 +41,15 @@ class Werewolf(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         from .policeman import Policeman
 
         return RoleDescription(
-            skill=f"На 4ую ночь превращается в {Policeman.pretty_role} ({Policeman.alias.pretty_role})"
-            f", {Doctor.pretty_role} "
-            f"({Doctor.alias.pretty_role}) "
+            skill=f"На {self.number_of_night_for_transformation}-ую ночь "
+            f"превращается в {Policeman.pretty_role} (или союзника)"
+            f", {Doctor.pretty_role} (или союзника) "
             f"или {MafiaAlias.pretty_role}",
             pay_for=["Достижения в других ролях"],
             limitations=[
                 f"Может превратиться в мафию, если после превращения "
                 f"группировка {Groupings.criminals.value.name} автоматически не победит",
-                DONT_PAY_FOR_NIGHTS,
+                f"{DONT_PAY_FOR_NIGHTS} до перевоплощения",
             ],
         )
 

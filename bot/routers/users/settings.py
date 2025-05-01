@@ -2,7 +2,6 @@ from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
-
 from cache.cache_types import PersonalSettingsCache
 from database.dao.users import UsersDao
 from database.schemas.common import TgIdSchema

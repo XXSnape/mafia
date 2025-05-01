@@ -2,19 +2,17 @@ from operator import attrgetter
 
 from aiogram import Bot
 from aiogram.types import InlineKeyboardButton
-from aiogram.utils.deep_linking import create_start_link
 from cache.cache_types import PlayersIds, RolesLiteral
 from general import settings
 from general.collection_of_roles import get_data_with_roles
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import (
-    CANCEL_BTN,
     TO_BOT_BTN,
     get_join_to_game_btn,
 )
 from keyboards.inline.cb.cb_text import (
-    FINISH_REGISTRATION_CB,
     CANCEL_BET_CB,
+    FINISH_REGISTRATION_CB,
 )
 
 

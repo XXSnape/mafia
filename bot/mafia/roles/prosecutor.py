@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache, UserIdInt
+from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
@@ -22,7 +22,7 @@ class Prosecutor(
     ActiveRoleAtNightABC,
 ):
     role = "Прокурор"
-    role_id = "prosecutor"
+    role_id: RolesLiteral = "prosecutor"
     mail_message = "Кого арестовать этой ночью?"
     photo = (
         "https://avatars.mds.yandex.net/i?"

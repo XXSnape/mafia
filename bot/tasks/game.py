@@ -16,7 +16,7 @@ from general.collection_of_roles import get_data_with_roles
 from general.config import bot, broker
 from general.text import MONEY_SYM
 from tasks.dependencies import SessionWithCommitDep
-from utils.pretty_text import make_build, make_pretty
+from utils.pretty_text import make_build
 
 
 @broker.subscriber("betting_results")

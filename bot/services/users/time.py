@@ -2,7 +2,6 @@ from contextlib import suppress
 from typing import cast
 
 from aiogram.exceptions import TelegramBadRequest
-
 from cache.cache_types import StagesOfGameLiteral
 from database.dao.settings import SettingsDao
 from database.schemas.common import UserTgIdSchema
@@ -11,10 +10,10 @@ from keyboards.inline.callback_factory.settings import (
     TimeOfDayCbData,
 )
 from keyboards.inline.cb.cb_text import (
-    TIME_FOR_NIGHT_CB,
-    TIME_FOR_DAY_CB,
-    TIME_FOR_VOTING_CB,
     TIME_FOR_CONFIRMATION_CB,
+    TIME_FOR_DAY_CB,
+    TIME_FOR_NIGHT_CB,
+    TIME_FOR_VOTING_CB,
 )
 from keyboards.inline.keypads.time import (
     adjust_time_kb,

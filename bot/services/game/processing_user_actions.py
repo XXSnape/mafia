@@ -1,5 +1,4 @@
 from contextlib import suppress
-from typing import cast
 
 from cache.cache_types import GameCache, UserIdInt
 from general.collection_of_roles import get_data_with_roles

@@ -4,7 +4,6 @@ from cache.cache_types import OrderOfRolesCache, RolesLiteral
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.dao.settings import SettingsDao
-from database.dao.users import UsersDao
 from database.schemas.common import UserTgIdSchema
 from database.schemas.roles import OrderOfRolesSchema
 from general import settings
@@ -16,8 +15,8 @@ from general.groupings import Groupings
 from general.text import REQUIRE_TO_SAVE
 from keyboards.inline.callback_factory.help import OrderOfRolesCbData
 from keyboards.inline.keypads.order_of_roles import (
-    get_next_role_kb,
     edit_order_of_roles_kb,
+    get_next_role_kb,
 )
 from mafia.roles import Doctor, Mafia, Policeman
 from services.base import RouterHelper

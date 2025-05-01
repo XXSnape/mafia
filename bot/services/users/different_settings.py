@@ -7,8 +7,8 @@ from database.schemas.settings import (
 )
 from general.collection_of_roles import BASES_ROLES
 from keyboards.inline.keypads.different_settings import (
-    fog_of_war_options_kb,
     different_options_kb,
+    fog_of_war_options_kb,
 )
 from services.base import RouterHelper
 from utils.pretty_text import make_build

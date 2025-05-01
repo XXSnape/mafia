@@ -1,3 +1,4 @@
+from cache.cache_types import RolesLiteral
 from mafia.roles.base import RoleABC
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import PAYMENT_FOR_NIGHTS
@@ -5,7 +6,7 @@ from mafia.roles.descriptions.texts import PAYMENT_FOR_NIGHTS
 
 class Civilian(RoleABC):
     role = "Мирный житель"
-    role_id = "civilian"
+    role_id: RolesLiteral = "civilian"
     photo = "https://cdn.culture.ru/c/820179.jpg"
     purpose = "Тебе нужно вычислить мафию на голосовании."
     payment_for_night_spent = 12

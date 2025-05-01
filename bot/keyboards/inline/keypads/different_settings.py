@@ -1,5 +1,4 @@
 from aiogram.types import InlineKeyboardButton
-
 from cache.cache_types import DifferentSettingsCache
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import (
@@ -7,8 +6,8 @@ from keyboards.inline.buttons.common import (
 )
 from keyboards.inline.cb import cb_text
 from keyboards.inline.cb.cb_text import (
-    SHOW_ROLES_AFTER_DEATH_CB,
     SHOW_PEACEFUL_ALLIES_CB,
+    SHOW_ROLES_AFTER_DEATH_CB,
 )
 
 
@@ -30,10 +29,6 @@ def get_for_of_war_buttons():
             callback_data=SHOW_ROLES_AFTER_DEATH_CB,
         ),
         InlineKeyboardButton(
-            text="Показывать мирным своих заместителей",
-            callback_data=SHOW_PEACEFUL_ALLIES_CB,
-        ),
-        InlineKeyboardButton(
             text="Показывать имена во время голосования",
             callback_data=cb_text.SHOW_USERNAMES_DURING_VOTING_CB,
         ),
@@ -46,8 +41,12 @@ def get_for_of_war_buttons():
             callback_data=cb_text.SHOW_KILLERS_CB,
         ),
         InlineKeyboardButton(
-            text="Писать в личку о ночных гостях",
+            text="Показывать ночных гостей",
             callback_data=cb_text.SHOW_INFORMATION_ABOUT_GUESTS_AT_NIGHT_CB,
+        ),
+        InlineKeyboardButton(
+            text="Показывать мирным своих заместителей",
+            callback_data=SHOW_PEACEFUL_ALLIES_CB,
         ),
     )
 

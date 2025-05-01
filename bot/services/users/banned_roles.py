@@ -13,8 +13,8 @@ from general.collection_of_roles import (
 from general.text import REQUIRE_TO_SAVE
 from keyboards.inline.callback_factory.help import BannedRolesCbData
 from keyboards.inline.keypads.banned_roles import (
-    suggest_banning_roles_kb,
     edit_banned_roles_kb,
+    suggest_banning_roles_kb,
 )
 from services.base import RouterHelper
 from utils.pretty_text import make_build

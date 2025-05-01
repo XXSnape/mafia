@@ -1,4 +1,9 @@
-from cache.cache_types import GameCache, PlayersIds, UserIdInt
+from cache.cache_types import (
+    GameCache,
+    PlayersIds,
+    RolesLiteral,
+    UserIdInt,
+)
 from general import settings
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
@@ -18,7 +23,7 @@ from utils.roles import get_processed_role_and_user_if_exists
 
 class Bodyguard(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Телохранитель"
-    role_id = "bodyguard"
+    role_id: RolesLiteral = "bodyguard"
     mail_message = "За кого пожертвовать собой?"
     photo = (
         "https://sun6-22.userapi.com/impg/zAaADEA19scv86EFl8bY1wUYRCJyBPGg1qamiA/"
@@ -45,9 +50,9 @@ class Bodyguard(ProcedureAfterNightABC, ActiveRoleAtNightABC):
                 "выплата не происходит, если выбранного игрока лечил кто-то другой",
             ],
             features=[
-                "Если вылечат представителя роли, "
-                "а выбор представителя роли падет на игрока, который должен умереть, "
-                "тогда этот игрок не умрет, как и сам представитель роли, которому заплатят, как за спасение"
+                "Если вылечат телохранителя, "
+                "а выбор телохранителя падет на игрока, который должен умереть, "
+                "тогда этот игрок не умрет, как и сам телохранителя, которому заплатят, как за спасение"
             ],
         )
 

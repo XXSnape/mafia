@@ -7,13 +7,11 @@ from keyboards.inline.callback_factory.settings import (
     GroupSettingsCbData,
 )
 from keyboards.inline.cb.cb_text import (
-    TIME_FOR_DAY_CB,
-    TIME_FOR_NIGHT_CB,
-    VIEW_BANNED_ROLES_CB,
-    VIEW_ORDER_OF_ROLES_CB,
-    FOG_OF_WAR_CB,
     DIFFERENT_SETTINGS_CB,
     DURATION_OF_STAGES_CB,
+    FOG_OF_WAR_CB,
+    VIEW_BANNED_ROLES_CB,
+    VIEW_ORDER_OF_ROLES_CB,
 )
 
 

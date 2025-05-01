@@ -1,7 +1,7 @@
 from contextlib import suppress
 
 from aiogram.exceptions import TelegramBadRequest
-from cache.cache_types import GameCache, UserIdInt
+from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from cache.extra import ExtraCache
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC, RoleABC
@@ -9,7 +9,7 @@ from mafia.roles.base.mixins import ProcedureAfterNightABC
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import CANT_CHOOSE_IN_ROW
 from states.game import UserFsm
-from utils.pretty_text import make_build, make_pretty
+from utils.pretty_text import make_build
 from utils.roles import (
     get_processed_role_and_user_if_exists,
     get_processed_user_id_if_exists,
@@ -18,14 +18,16 @@ from utils.roles import (
 
 class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Клофелинщица"
-    role_id = "sleeper"
+    role_id: RolesLiteral = "sleeper"
     mail_message = "Кого усыпить этой ночью?"
     photo = (
         "https://masterpiecer-images.s3.yandex.net/c94e9c"
         "b6787b11eeb1ce1e5d9776cfa6:upscaled"
     )
     grouping = Groupings.civilians
-    purpose = "Ты можешь усыпить кого-нибудь"
+    purpose = (
+        "Ты можешь усыпить кого-нибудь и не дать сделать ход ночью"
+    )
     message_to_group_after_action = "Спят взрослые и дети. Не обошлось и без помощи клофелинщиков!"
     message_to_user_after_action = "Ты выбрал усыпить {url}"
     extra_data = [
@@ -38,6 +40,7 @@ class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     @property
     def role_description(self) -> RoleDescription:
         from .angel_of_death import AngelOfDeath
+        from .mafia import Mafia
 
         return RoleDescription(
             skill="Отменяет ночные ходы жертвы",
@@ -50,6 +53,7 @@ class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
             features=[
                 "Ход жертвы отменяется полностью, поэтому она "
                 "может выбрать одного и того же игрока дважды",
+                f"Если усыпляет {Mafia.pretty_role}, то все мафии бездействуют ночью",
             ],
         )
 

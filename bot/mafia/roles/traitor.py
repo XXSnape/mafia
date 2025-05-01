@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 from aiogram.types import InlineKeyboardButton
-from cache.cache_types import GameCache, UserIdInt
+from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from cache.extra import ExtraCache
 from general.groupings import Groupings
 from general.text import (
@@ -18,13 +18,11 @@ from mafia.roles.base.mixins import (
 )
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
-    CAN_SEE_ALLIES,
     CHECKING_PLAYER,
 )
 from states.game import UserFsm
 from utils.common import get_criminals_ids
 from utils.informing import send_a_lot_of_messages_safely
-from utils.pretty_text import make_pretty
 from utils.roles import get_processed_role_and_user_if_exists
 
 if TYPE_CHECKING:
@@ -35,7 +33,7 @@ class Traitor(
     MafiaConverterABC, ProcedureAfterNightABC, ActiveRoleAtNightABC
 ):
     role = "Госизменщик"
-    role_id = "traitor"
+    role_id: RolesLiteral = "traitor"
     photo = "https://i.playground.ru/p/sLHLRFjDy8_89wYe26RIQw.jpeg"
     grouping = Groupings.criminals
     need_to_monitor_interaction = False
@@ -65,7 +63,6 @@ class Traitor(
             pay_for=[CHECKING_PLAYER],
             features=[
                 "Становится мафией после того, как узнал роли всех игроков",
-                CAN_SEE_ALLIES,
             ],
         )
 

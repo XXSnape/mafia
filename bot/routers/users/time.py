@@ -4,11 +4,11 @@ from keyboards.inline.callback_factory.settings import (
     TimeOfDayCbData,
 )
 from keyboards.inline.cb.cb_text import (
+    DURATION_OF_STAGES_CB,
+    TIME_FOR_CONFIRMATION_CB,
     TIME_FOR_DAY_CB,
     TIME_FOR_NIGHT_CB,
-    DURATION_OF_STAGES_CB,
     TIME_FOR_VOTING_CB,
-    TIME_FOR_CONFIRMATION_CB,
 )
 from services.users.time import TimeRouter
 from sqlalchemy.ext.asyncio import AsyncSession
