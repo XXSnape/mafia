@@ -274,7 +274,7 @@ async def notify_aliases_about_transformation(
                 f"{new_role.pretty_role}\n\n"
                 f"Все текущие союзники и сокомандники:\n{profiles}",
             )
-            for player_id in game_data[new_role.roles_key]
+            for player_id in users
         ),
         return_exceptions=True,
     )
@@ -350,8 +350,8 @@ async def send_request_to_vote(
     sent_message = await bot.send_message(
         chat_id=user_id,
         text=make_build(
-            f"Проголосуй за того, кто не нравится "
-            f"или нажми на последнюю кнопку «{SKIP}»!"
+            f"Проголосуй за того, кто угрожает твоим интересам, "
+            f"или нажми на нижнюю кнопку «{SKIP}»!"
         ),
         reply_markup=send_selection_to_players_kb(
             players_ids=players_ids,
