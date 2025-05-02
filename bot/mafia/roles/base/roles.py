@@ -646,7 +646,7 @@ class ActiveRoleAtNightABC(RoleABC):
         with suppress(TelegramBadRequest):
             sent_survey = await self.bot.send_message(
                 chat_id=player_id,
-                text=self.mail_message,
+                text=make_build(self.mail_message),
                 reply_markup=markup,
             )
             await self.save_information_about_mail_and_change_state(

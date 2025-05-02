@@ -20,6 +20,7 @@ from keyboards.inline.cb.cb_text import DONT_VOTE_FOR_ANYONE_CB
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
+from utils.common import get_criminals_ids
 from utils.pretty_text import (
     cut_off_old_text,
     make_build,
@@ -252,8 +253,12 @@ async def notify_aliases_about_transformation(
 ):
     url = game_data["players"][str(user_id)]["url"]
     initial_role = game_data["players"][str(user_id)]["initial_role"]
+    if new_role.grouping == Groupings.criminals:
+        users = get_criminals_ids(game_data)
+    else:
+        users = game_data[new_role.roles_key]
     profiles = get_profiles(
-        players_ids=game_data[new_role.roles_key],
+        players_ids=users,
         players=game_data["players"],
         show_current_roles=True,
     )
@@ -267,7 +272,7 @@ async def notify_aliases_about_transformation(
                 )
                 + f"{initial_role} {url} превратился в "
                 f"{new_role.pretty_role}\n\n"
-                f"Текущие союзники:\n{profiles}",
+                f"Все текущие союзники и сокомандники:\n{profiles}",
             )
             for player_id in game_data[new_role.roles_key]
         ),
@@ -344,8 +349,10 @@ async def send_request_to_vote(
     game_data["waiting_for_action_at_day"].append(user_id)
     sent_message = await bot.send_message(
         chat_id=user_id,
-        text=f"Проголосуй за того, кто не нравится "
-        f"или нажми на последнюю кнопку «{SKIP}»!",
+        text=make_build(
+            f"Проголосуй за того, кто не нравится "
+            f"или нажми на последнюю кнопку «{SKIP}»!"
+        ),
         reply_markup=send_selection_to_players_kb(
             players_ids=players_ids,
             players=players,
