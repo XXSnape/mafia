@@ -98,15 +98,11 @@ class RoleManager(RouterHelper):
         ).get_every_3_attr(user_schema)
         all_roles = get_data_with_roles()
         for role_id, role in all_roles.items():
-            if (
-                role.role not in banned_roles_ids
-                and role_id
-                not in {
-                    Mafia.role_id,
-                    Doctor.role_id,
-                    Policeman.role_id,
-                }
-            ):
+            if role_id not in banned_roles_ids and role_id not in {
+                Mafia.role_id,
+                Doctor.role_id,
+                Policeman.role_id,
+            }:
                 if role.grouping != Groupings.criminals:
                     other.append(role_id)
                 else:
