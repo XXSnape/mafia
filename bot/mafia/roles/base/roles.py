@@ -39,6 +39,7 @@ from utils.pretty_text import (
     make_build,
     make_pretty,
 )
+from utils.sorting import sorting_by_rank
 from utils.state import get_state_and_assign
 
 if TYPE_CHECKING:
@@ -130,6 +131,7 @@ class RoleABC(ABC):
                     players_ids=persons,
                     players=game_data["players"],
                     show_current_roles=True,
+                    sorting_factory=sorting_by_rank,
                 )
                 aliases_tasks.append(
                     self.bot.send_message(
@@ -165,6 +167,7 @@ class RoleABC(ABC):
                                     players_ids=teammates,
                                     players=game_data["players"],
                                     show_current_roles=True,
+                                    sorting_factory=sorting_by_rank,
                                 )
                             ),
                         )
@@ -200,6 +203,7 @@ class RoleABC(ABC):
                 players_ids=game_data[self.roles_key],
                 players=game_data["players"],
                 show_current_roles=True,
+                sorting_factory=sorting_by_rank,
             )
             if self.grouping == Groupings.criminals:
                 players = get_criminals_ids(game_data)
@@ -207,6 +211,7 @@ class RoleABC(ABC):
                     players_ids=players,
                     players=game_data["players"],
                     show_current_roles=True,
+                    sorting_factory=sorting_by_rank,
                 )
             await send_a_lot_of_messages_safely(
                 bot=self.bot,
@@ -459,6 +464,7 @@ class RoleABC(ABC):
                 players_ids=criminals,
                 players=game_data["players"],
                 show_current_roles=True,
+                sorting_factory=sorting_by_rank,
             )
             text = f"❗️Погиб {role} — {url}\n\nВсе текущие союзники и сокомандники:\n{profiles}"
             await send_a_lot_of_messages_safely(

@@ -27,6 +27,13 @@ def sorting_by_money(players: UsersInGame):
     return wrapper
 
 
+def sorting_by_rank(players: UsersInGame):
+    def wrapper(user_id: UserIdStr | UserIdInt):
+        return -len(players[str(user_id)]["pretty_role"])
+
+    return wrapper
+
+
 def sorting_by_number(players: UsersInGame):
     def wrapper(user_id: UserIdStr | UserIdInt):
         return players[str(user_id)].get("number", 0)
