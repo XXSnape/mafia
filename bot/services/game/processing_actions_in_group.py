@@ -96,6 +96,6 @@ class GroupManager(RouterHelper):
                     )
                 )
         await self.callback.answer(
-            text="✅Мы обязательно учтём твое мнение",
+            text="✅Твое мнение учтено",
             show_alert=True,
         )

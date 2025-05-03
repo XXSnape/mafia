@@ -88,13 +88,10 @@ class PoisonerSaver(RouterHelper):
             state=self.state,
             dispatcher=self.dispatcher,
         )
+        if game_state is None:
+            return
         async with lock_state(game_state):
             game_data = await game_state.get_data()
-            if (
-                self.callback.from_user.id
-                not in game_data["waiting_for_action_at_night"]
-            ):
-                return
             poisoned = game_data["poisoned"]
             if poisoned:
                 poisoned[0].append(user_id)

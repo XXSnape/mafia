@@ -206,7 +206,7 @@ async def take_action_and_save_data(
     callback_data: UserActionIndexCbData,
     state: FSMContext,
     dispatcher: Dispatcher,
-) -> tuple[FSMContext, UserIdInt]:
+) -> tuple[FSMContext, UserIdInt] | tuple[None, None]:
     await delete_message(callback.message)
     game_state = await get_game_state_by_user_state(
         tg_obj=callback, dispatcher=dispatcher, user_state=state
@@ -220,7 +220,7 @@ async def take_action_and_save_data(
             callback.from_user.id
             not in game_data["waiting_for_action_at_night"]
         ):
-            return game_state, user_id
+            return None, None
         role_id = game_data["players"][str(callback.from_user.id)][
             "role_id"
         ]
