@@ -23,6 +23,9 @@ class StatisticsRouter(RouterHelper):
     async def get_my_profile(self):
         await self.message.delete()
         users_dao = UsersDao(session=self.session)
+        user_tg_id_schema = UserTgIdSchema(
+            user_tg_id=self.message.from_user.id
+        )
         user = await users_dao.get_user_or_create(
             tg_id=TgIdSchema(tg_id=self.message.from_user.id)
         )
@@ -35,9 +38,7 @@ class StatisticsRouter(RouterHelper):
         money_sum = 0
 
         result = await results_dao.get_results(
-            user_tg_id=UserTgIdSchema(
-                user_tg_id=self.message.from_user.id
-            )
+            user_tg_id=user_tg_id_schema
         )
         all_roles = get_data_with_roles()
         if not result:
@@ -77,11 +78,7 @@ class StatisticsRouter(RouterHelper):
         result_text += detailed_statistics
         rates_result = await RatesDao(
             session=self.session
-        ).get_results(
-            user_tg_id=UserTgIdSchema(
-                user_tg_id=self.message.from_user.id
-            )
-        )
+        ).get_results(user_tg_id=user_tg_id_schema)
         if rates_result.count:
             rates_text = (
                 f"🎲Сделано ставок: {rates_result.count}\n"

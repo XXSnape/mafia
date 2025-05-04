@@ -233,7 +233,7 @@ def get_results_of_voting(
 
     text = (
         "Подводим итоги судьбы {user_url}:\n\n"
-        "✅За линчевание - {pros}{voted_for_text}\n\n🚫Против - {cons}{voted_against_text}\n\n"
+        "✅За линчевание - {pros}{voted_for_text}\n\n❌Против - {cons}{voted_against_text}\n\n"
     ).format(
         user_url=user_url,
         pros=pros,

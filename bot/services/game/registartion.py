@@ -353,6 +353,8 @@ class Registration(RouterHelper):
         balance = (await self._get_user_or_create()).balance
         async with lock_state(game_state):
             game_data: GameCache = await game_state.get_data()
+            if user_id in game_data["live_players_ids"]:
+                return
             user_game_data: UserGameCache = {
                 "full_name": full_name,
                 "url": get_profile_link(
