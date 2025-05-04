@@ -84,7 +84,7 @@ class Poisoner(
         **kwargs,
     ):
         poisoned = game_data["poisoned"]
-        if poisoned and poisoned[1] == 1:
+        if poisoned and poisoned[1] is True:
             murdered.extend(poisoned[0])
             for killed_id in poisoned[0]:
                 killers_of[killed_id].append(self)
@@ -97,7 +97,7 @@ class Poisoner(
         **kwargs,
     ):
         poisoned = game_data["poisoned"]
-        if not poisoned or poisoned[1] == 0:
+        if not poisoned or poisoned[1] is False:
             return
         for victim_id, roles in killers_of.items():
             if self not in roles:
@@ -132,7 +132,7 @@ class Poisoner(
         poisoned = game_data["poisoned"]
         if not poisoned:
             return
-        if poisoned[1] == 0:
+        if poisoned[1] is False:
             murdered = [
                 user_id
                 for user_id in poisoned[0]
@@ -145,8 +145,8 @@ class Poisoner(
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
         if game_data["poisoned"]:
-            if game_data["poisoned"][1] == 1:
-                game_data["poisoned"][1] = 0
+            if game_data["poisoned"][1] is True:
+                game_data["poisoned"][1] = False
                 return True
             if self.get_processed_user_id(game_data):
                 game_data["poisoned"][0].pop()

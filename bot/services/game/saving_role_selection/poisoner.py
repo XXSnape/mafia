@@ -31,7 +31,7 @@ class PoisonerSaver(RouterHelper):
         async with lock_state(game_state):
             game_data = await game_state.get_data()
             poisoned = game_data["poisoned"]
-            poisoned[1] = 1
+            poisoned[1] = True
             remove_from_expected(
                 callback=self.callback, game_data=game_data
             )
@@ -96,5 +96,5 @@ class PoisonerSaver(RouterHelper):
             if poisoned:
                 poisoned[0].append(user_id)
             else:
-                poisoned[:] = [[user_id], 0]
+                poisoned[:] = [[user_id], False]
             await game_state.set_data(game_data)

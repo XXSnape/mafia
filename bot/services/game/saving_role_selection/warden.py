@@ -35,6 +35,11 @@ class WardenSaver(RouterHelper):
         processed_user_id = int(self.callback.data)
         async with lock_state(game_state):
             game_data = await game_state.get_data()
+            if (
+                self.callback.from_user.id
+                not in game_data["waiting_for_action_at_night"]
+            ):
+                return
             checked = game_data["checked_for_the_same_groups"]
             if len(checked) == 0:
                 checked[:] = [processed_user_id]

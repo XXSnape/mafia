@@ -97,16 +97,22 @@ class PolicemanSaver(RouterHelper):
     async def policeman_chose_to_check(
         self, callback_data: PoliceActionIndexCbData
     ):
-        await delete_message(self.callback.message)
+
         game_state = await get_game_state_by_user_state(
             tg_obj=self.callback,
             user_state=self.state,
             dispatcher=self.dispatcher,
         )
         async with lock_state(game_state):
+            await delete_message(self.callback.message)
             game_data, user_id = await get_game_data_and_user_id(
                 game_state=game_state, callback_data=callback_data
             )
+            if (
+                self.callback.from_user.id
+                not in game_data["waiting_for_action_at_night"]
+            ):
+                return
             game_data["disclosed_roles"] = [user_id]
             trace_all_actions(
                 callback=self.callback,

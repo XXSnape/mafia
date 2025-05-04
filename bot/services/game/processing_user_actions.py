@@ -130,13 +130,13 @@ class UserManager(RouterHelper):
     async def vote_for(
         self, callback_data: UserActionIndexCbData | None
     ):
-        await delete_message(self.callback.message)
         game_state = await get_game_state_by_user_state(
             tg_obj=self.callback,
             user_state=self.state,
             dispatcher=self.dispatcher,
         )
         async with lock_state(game_state):
+            await delete_message(self.callback.message)
             if callback_data is None:
                 game_data: GameCache = await game_state.get_data()
                 voted_user_id = self.check_for_cheating(game_data)
@@ -187,7 +187,6 @@ class UserManager(RouterHelper):
         )
 
     async def dont_vote_for_anyone(self):
-        await delete_message(self.callback.message)
         game_state = await get_game_state_by_user_state(
             tg_obj=self.callback,
             user_state=self.state,
@@ -195,6 +194,7 @@ class UserManager(RouterHelper):
         )
         is_deceived: bool = False
         async with lock_state(game_state):
+            await delete_message(self.callback.message)
             game_data: GameCache = await game_state.get_data()
             if self.check_for_cheating(game_data) is True:
                 is_deceived = True

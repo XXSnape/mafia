@@ -13,6 +13,7 @@ from mafia.roles import (
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_state_by_user_state,
+    remove_from_expected,
 )
 from utils.common import get_criminals_ids
 from utils.informing import (
@@ -29,7 +30,7 @@ from utils.tg import delete_message
 
 class WerewolfSaver(RouterHelper):
     async def werewolf_turns_into(self):
-        await delete_message(self.callback.message)
+
         data = {
             WEREWOLF_TO_MAFIA_CB: [Mafia(), Mafia.alias],
             WEREWOLF_TO_DOCTOR_CB: [Doctor(), Doctor.alias],
@@ -48,7 +49,13 @@ class WerewolfSaver(RouterHelper):
             dispatcher=self.dispatcher,
         )
         async with lock_state(game_state):
+            await delete_message(self.callback.message)
             game_data: GameCache = await game_state.get_data()
+            if (
+                self.callback.from_user.id
+                not in game_data["waiting_for_action_at_night"]
+            ):
+                return
             if len(game_data[roles_key]) == 0:
                 new_role = current_roles[0]
             else:
@@ -59,6 +66,10 @@ class WerewolfSaver(RouterHelper):
                 previous_role=Werewolf(),
                 new_role=new_role,
                 user_id=user_id,
+            )
+            remove_from_expected(
+                callback=self.callback,
+                game_data=game_data,
             )
             await self.state.set_state(
                 new_role.state_for_waiting_for_action
