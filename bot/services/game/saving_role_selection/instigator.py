@@ -73,13 +73,16 @@ class InstigatorSaver(RouterHelper):
     async def instigator_chooses_object(
         self, callback_data: UserActionIndexCbData
     ):
+        await delete_message(
+            message=self.callback.message,
+            raise_exception=True,
+        )
         game_state = await get_game_state_by_user_state(
             tg_obj=self.callback,
             user_state=self.state,
             dispatcher=self.dispatcher,
         )
         async with lock_state(game_state):
-            await delete_message(self.callback.message)
             game_data, user_id = await get_game_data_and_user_id(
                 game_state=game_state, callback_data=callback_data
             )

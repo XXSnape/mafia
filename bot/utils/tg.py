@@ -12,11 +12,17 @@ from aiogram.types import (
     Message,
 )
 from cache.cache_types import PlayersIds
+from general.exceptions import ActionPerformed
 
 
-async def delete_message(message: Message):
-    with suppress(TelegramBadRequest, AttributeError):
+async def delete_message(
+    message: Message, raise_exception: bool = False
+):
+    try:
         await message.delete()
+    except (TelegramBadRequest, AttributeError):
+        if raise_exception:
+            raise ActionPerformed
 
 
 async def delete_message_by_chat(
@@ -41,9 +47,10 @@ async def check_user_for_admin_rights(
 
 async def delete_messages_from_to_delete(
     bot: Bot,
-    state: FSMContext | None,
+    state: FSMContext,
 ):
-    to_delete = (await state.get_data())["to_delete"]
+    game_data = await state.get_data()
+    to_delete = game_data["to_delete"]
     await asyncio.gather(
         *(
             delete_message_by_chat(
@@ -54,7 +61,9 @@ async def delete_messages_from_to_delete(
             for chat_id, message_id in to_delete
         )
     )
-    await state.update_data({"to_delete": []})
+    game_data["to_delete"] = []
+    await state.set_data(game_data)
+    return game_data
 
 
 async def ban_user(

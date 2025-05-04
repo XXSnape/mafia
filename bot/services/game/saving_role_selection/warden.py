@@ -57,7 +57,10 @@ class WardenSaver(RouterHelper):
                     game_data=game_data,
                 )
                 return
-            await delete_message(self.callback.message)
+            await delete_message(
+                message=self.callback.message,
+                raise_exception=True,
+            )
             checked.append(processed_user_id)
             user1_id: int = checked[0]
             user2_id: int = checked[1]

@@ -16,6 +16,7 @@ from cache.cache_types import (
 )
 from general.exceptions import GameIsOver
 from general.groupings import Groupings
+from general.text import NUMBER_OF_NIGHT, NUMBER_OF_DAY
 from keyboards.inline.keypads.to_bot import (
     get_to_bot_kb,
     participate_in_social_life,
@@ -104,6 +105,9 @@ class Controller:
         self.aim_id: UserIdInt | None = None
         self.original_roles_in_fog_of_war: str | None = None
 
+        self.waiting_for_action_at_night = []
+        self.waiting_for_action_at_day = []
+
     async def start_new_night(self):
         game_data: GameCache = await self.state.get_data()
         game_data["number_of_night"] += 1
@@ -146,6 +150,43 @@ class Controller:
             f"{players_after_night}",
             reply_markup=get_to_bot_kb("Пища для размышлений тут"),
         )
+
+    async def send_delay_messages(
+        self, game_data: GameCache, at_night: bool
+    ):
+        if at_night is True:
+            unanswered_users = game_data[
+                "waiting_for_action_at_night"
+            ]
+            message = (
+                NUMBER_OF_NIGHT.format(game_data["number_of_night"])
+                + "😡Ты проспал эту ночь. Бездействие наказывается"
+            )
+            data = self.waiting_for_action_at_night
+        else:
+            unanswered_users = game_data["waiting_for_action_at_day"]
+            message = (
+                NUMBER_OF_DAY.format(game_data["number_of_night"])
+                + "😡Голосовать на выборах — обязанность каждого гражданина"
+            )
+            data = self.waiting_for_action_at_day
+
+        tasks = []
+        for user_id in unanswered_users:
+            if data.count(user_id) > 0:
+                text = "❗️После этого дня ты выбываешь из игры, воспользуйся им по максимуму"
+            else:
+                if at_night is True:
+                    text = "❗️Допустимо проспать только одну ночь"
+                else:
+                    text = "❗️Допустимо прогулять выборы только один раз"
+            tasks.append(
+                self.bot.send_message(
+                    chat_id=user_id,
+                    text=make_build(f"{message}\n\n{text}"),
+                )
+            )
+        await asyncio.gather(*tasks, return_exceptions=True)
 
     async def end_night(self):
         game_data: GameCache = await self.state.get_data()
@@ -198,6 +239,8 @@ class Controller:
         game_data["messages_after_night"].clear()
         game_data["cant_talk"].clear()
         game_data["cant_vote"].clear()
+        game_data["waiting_for_action_at_night"].clear()
+        game_data["waiting_for_action_at_day"].clear()
         await self.state.set_data(game_data)
 
     def _get_roles_if_isinstance[P: ABC](
@@ -532,45 +575,28 @@ class Controller:
             else:
                 potentially_deleted.add(user_id)
 
-    @staticmethod
-    def _delete_inactive_users_from_data(
-        waiting_for: PlayersIds,
-        live_players_ids: PlayersIds,
-        inactive_users: PlayersIds,
-    ):
-        waiting_for[:] = list(
-            user_id
-            for user_id in set(waiting_for) - set(inactive_users)
-            if user_id in live_players_ids
-        )
-
     @check_end_of_game
     async def removing_inactive_players(self):
         game_data: GameCache = await self.state.get_data()
-        live_players_ids = game_data["live_players_ids"]
         inactive_users = []
+        self.waiting_for_action_at_night.extend(
+            game_data["waiting_for_action_at_night"]
+        )
+        self.waiting_for_action_at_day.extend(
+            game_data["waiting_for_action_at_day"]
+        )
         self._add_user_to_deleted(
-            waiting_for=game_data["waiting_for_action_at_night"],
-            live_players_ids=live_players_ids,
+            waiting_for=self.waiting_for_action_at_night,
+            live_players_ids=game_data["live_players_ids"],
             inactive_users=inactive_users,
         )
         self._add_user_to_deleted(
-            waiting_for=game_data["waiting_for_action_at_day"],
-            live_players_ids=live_players_ids,
+            waiting_for=self.waiting_for_action_at_day,
+            live_players_ids=game_data["live_players_ids"],
             inactive_users=inactive_users,
         )
         if not inactive_users:
             return
-        self._delete_inactive_users_from_data(
-            waiting_for=game_data["waiting_for_action_at_night"],
-            live_players_ids=live_players_ids,
-            inactive_users=inactive_users,
-        )
-        self._delete_inactive_users_from_data(
-            waiting_for=game_data["waiting_for_action_at_day"],
-            live_players_ids=live_players_ids,
-            inactive_users=inactive_users,
-        )
         profiles = get_profiles(
             players_ids=inactive_users,
             players=game_data["players"],
@@ -599,3 +625,13 @@ class Controller:
             *boss_is_dead_tasks, return_exceptions=True
         )
         await self.state.set_data(game_data)
+        self.waiting_for_action_at_night = list(
+            user_id
+            for user_id in self.waiting_for_action_at_night
+            if user_id in game_data["live_players_ids"]
+        )
+        self.waiting_for_action_at_day = list(
+            user_id
+            for user_id in self.waiting_for_action_at_day
+            if user_id in game_data["live_players_ids"]
+        )

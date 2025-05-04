@@ -5,6 +5,8 @@ from aiogram import BaseMiddleware
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import CallbackQuery, Message, TelegramObject
 from loguru import logger
+
+from general.exceptions import ActionPerformed
 from utils.pretty_text import make_build
 from utils.tg import delete_message
 
@@ -27,12 +29,18 @@ class HandleCallbackErrorMiddleware(BaseMiddleware):
         """
         try:
             return await handler(callback, data)
+        except ActionPerformed:
+            await callback.answer(
+                text="🙂Не спеши! Скоро тебе придет сообщение о подтверждении твоих намерений!"
+            )
+            return
         except Exception as e:
             await callback.answer(
-                "Попробуй еще раз...", show_alert=True
+                "🙂Попробуй еще раз", show_alert=True
             )
             await delete_message(callback.message)
             logger.exception("Произошла ошибка в callback")
+            return
 
 
 class HandleMessageErrorMiddleware(BaseMiddleware):

@@ -30,7 +30,10 @@ from utils.tg import delete_message
 
 class WerewolfSaver(RouterHelper):
     async def werewolf_turns_into(self):
-
+        await delete_message(
+            message=self.callback.message,
+            raise_exception=True,
+        )
         data = {
             WEREWOLF_TO_MAFIA_CB: [Mafia(), Mafia.alias],
             WEREWOLF_TO_DOCTOR_CB: [Doctor(), Doctor.alias],
@@ -49,7 +52,6 @@ class WerewolfSaver(RouterHelper):
             dispatcher=self.dispatcher,
         )
         async with lock_state(game_state):
-            await delete_message(self.callback.message)
             game_data: GameCache = await game_state.get_data()
             if (
                 self.callback.from_user.id

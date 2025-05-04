@@ -12,13 +12,15 @@ from utils.tg import delete_message
 
 class AnalystSaver(RouterHelper):
     async def analyst_assumes_draw(self):
+        await delete_message(
+            message=self.callback.message, raise_exception=True
+        )
         game_state = await get_game_state_by_user_state(
             tg_obj=self.callback,
             user_state=self.state,
             dispatcher=self.dispatcher,
         )
         async with lock_state(game_state):
-            await delete_message(self.callback.message)
             game_data: GameCache = await game_state.get_data()
             if (
                 self.callback.from_user.id

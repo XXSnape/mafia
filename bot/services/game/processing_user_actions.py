@@ -3,6 +3,7 @@ from contextlib import suppress
 from cache.cache_types import GameCache, UserIdInt
 from general.collection_of_roles import get_data_with_roles
 from general.groupings import Groupings
+from general.text import NUMBER_OF_DAY
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
@@ -130,13 +131,15 @@ class UserManager(RouterHelper):
     async def vote_for(
         self, callback_data: UserActionIndexCbData | None
     ):
+        await delete_message(
+            self.callback.message, raise_exception=True
+        )
         game_state = await get_game_state_by_user_state(
             tg_obj=self.callback,
             user_state=self.state,
             dispatcher=self.dispatcher,
         )
         async with lock_state(game_state):
-            await delete_message(self.callback.message)
             if callback_data is None:
                 game_data: GameCache = await game_state.get_data()
                 voted_user_id = self.check_for_cheating(game_data)
@@ -174,8 +177,8 @@ class UserManager(RouterHelper):
         voted_url = game_data["players"][str(voted_user_id)]["url"]
         await self.callback.message.answer(
             make_build(
-                f"🌟День {game_data['number_of_night']}\n\n"
-                f"Ты выбрал голосовать за повешение {voted_url}"
+                NUMBER_OF_DAY.format(game_data["number_of_night"])
+                + f"Ты выбрал голосовать за повешение {voted_url}"
             )
         )
         await self.callback.bot.send_message(
@@ -187,6 +190,9 @@ class UserManager(RouterHelper):
         )
 
     async def dont_vote_for_anyone(self):
+        await delete_message(
+            self.callback.message, raise_exception=True
+        )
         game_state = await get_game_state_by_user_state(
             tg_obj=self.callback,
             user_state=self.state,
@@ -194,7 +200,6 @@ class UserManager(RouterHelper):
         )
         is_deceived: bool = False
         async with lock_state(game_state):
-            await delete_message(self.callback.message)
             game_data: GameCache = await game_state.get_data()
             if self.check_for_cheating(game_data) is True:
                 is_deceived = True
@@ -224,8 +229,8 @@ class UserManager(RouterHelper):
         )
         await self.callback.message.answer(
             make_build(
-                f"🌟День {game_data['number_of_night']}\n\n"
-                f"Ты решил ни за кого не голосовать"
+                NUMBER_OF_DAY.format(game_data["number_of_night"])
+                + f"Ты решил ни за кого не голосовать"
             )
         )
         await self.callback.bot.send_message(

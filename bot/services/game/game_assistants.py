@@ -207,11 +207,11 @@ async def take_action_and_save_data(
     state: FSMContext,
     dispatcher: Dispatcher,
 ) -> tuple[FSMContext, UserIdInt] | tuple[None, None]:
+    await delete_message(callback.message, raise_exception=True)
     game_state = await get_game_state_by_user_state(
         tg_obj=callback, dispatcher=dispatcher, user_state=state
     )
     async with lock_state(game_state):
-        await delete_message(callback.message)
         game_data, user_id = await get_game_data_and_user_id(
             game_state=game_state,
             callback_data=callback_data,
