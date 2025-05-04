@@ -131,9 +131,10 @@ class UserManager(RouterHelper):
     async def vote_for(
         self, callback_data: UserActionIndexCbData | None
     ):
-        await delete_message(
-            self.callback.message, raise_exception=True
-        )
+        if callback_data is not None:
+            await delete_message(
+                self.callback.message, raise_exception=True
+            )
         game_state = await get_game_state_by_user_state(
             tg_obj=self.callback,
             user_state=self.state,
