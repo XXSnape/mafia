@@ -58,3 +58,6 @@ class SettingModel(IdMixin, BaseModel):
     allow_betting: Mapped[bool] = mapped_column(
         default=True, server_default="1"
     )
+    speed_up_nights_and_voting: Mapped[bool] = mapped_column(
+        default=False, server_default="0"
+    )
