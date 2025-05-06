@@ -272,8 +272,16 @@ class Registration(RouterHelper):
 
     async def _offer_bet(self, game_data: GameCache, balance: int):
         to_user_markup = None
-        offer_for_role = "Ты не можешь сделать ставку на роль\n\n"
-        if balance > 0:
+        allow_betting = game_data["settings"]["allow_betting"]
+        if allow_betting is False:
+            offer_for_role = (
+                "🚫Система ставок отключена в настройках группы\n\n"
+            )
+        else:
+            offer_for_role = (
+                "Ты пока не можешь сделать ставку на роль\n\n"
+            )
+        if allow_betting and balance > 0:
             to_user_markup = await offer_to_place_bet(
                 banned_roles=game_data["settings"]["banned_roles"]
             )
