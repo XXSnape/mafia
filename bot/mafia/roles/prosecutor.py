@@ -1,5 +1,15 @@
-from cache.cache_types import GameCache, RolesLiteral, UserIdInt
+from contextlib import suppress
+
+from aiogram.exceptions import TelegramBadRequest
+
+from cache.cache_types import (
+    GameCache,
+    RolesLiteral,
+    UserIdInt,
+    NumberOfNight,
+)
 from general.groupings import Groupings
+from general.text import NUMBER_OF_NIGHT, NUMBER_OF_DAY
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,
@@ -9,6 +19,7 @@ from mafia.roles.base.roles import RoleABC
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import CANT_CHOOSE_IN_ROW
 from states.game import UserFsm
+from utils.pretty_text import make_build
 from utils.roles import (
     get_processed_role_and_user_if_exists,
     get_processed_user_id_if_exists,
@@ -29,9 +40,7 @@ class Prosecutor(
         "id=b5115d431dafc24be07a55a8b6343540_l-5205087-"
         "images-thumbs&n=13"
     )
-    purpose = (
-        "Тебе нельзя допустить, чтобы днем мафия могла говорить."
-    )
+    purpose = "Тебе нельзя допустить, чтобы днём мафия или иные изверги могли говорить и голосовать."
     message_to_group_after_action = (
         "По данным разведки потенциальный злоумышленник арестован!"
     )
@@ -55,6 +64,16 @@ class Prosecutor(
     ):
         game_data["cant_talk"].append(processed_user_id)
         game_data["cant_vote"].append(processed_user_id)
+        with suppress(TelegramBadRequest):
+            await self.bot.send_message(
+                chat_id=processed_user_id,
+                text=make_build(
+                    NUMBER_OF_DAY.format(
+                        game_data["number_of_night"]
+                    )
+                    + "🚫Тебе запретили общаться и принимать участие в выборах на 1 день"
+                ),
+            )
         await ban_user(
             bot=self.bot,
             chat_id=game_data["game_chat"],
