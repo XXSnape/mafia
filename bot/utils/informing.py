@@ -25,7 +25,11 @@ from utils.pretty_text import (
     cut_off_old_text,
     make_build,
 )
-from utils.sorting import sorting_by_number
+from utils.sorting import (
+    sorting_by_number,
+    sorting_by_rate,
+    sorting_by_rank,
+)
 
 if TYPE_CHECKING:
     from general.collection_of_roles import DataWithRoles
@@ -263,6 +267,7 @@ async def notify_aliases_about_transformation(
         players_ids=users,
         players=game_data["players"],
         show_current_roles=True,
+        sorting_factory=sorting_by_rank,
     )
     await asyncio.gather(
         *(

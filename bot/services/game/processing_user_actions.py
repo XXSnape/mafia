@@ -202,7 +202,7 @@ class UserManager(RouterHelper):
         is_deceived: bool = False
         async with lock_state(game_state):
             game_data: GameCache = await game_state.get_data()
-            if self.check_for_cheating(game_data) is True:
+            if self.check_for_cheating(game_data):
                 is_deceived = True
             else:
                 if (
