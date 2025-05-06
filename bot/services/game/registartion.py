@@ -541,14 +541,15 @@ class Registration(RouterHelper):
         )
         async with lock_state(game_state):
             game_data = await game_state.get_data()
+            covered_role = user_data.get("coveted_role")
+            if covered_role is None:
+                return
             self._delete_bet(
                 user_data=user_data, game_data=game_data
             )
             bids: RolesAndUsersMoney = game_data["bids"]
-            bids.setdefault(user_data["coveted_role"], []).append(
-                [user_id, rate]
-            )
-            role = get_data_with_roles(user_data["coveted_role"])
+            bids.setdefault(covered_role, []).append([user_id, rate])
+            role = get_data_with_roles(covered_role)
             await self.state.set_data(user_data)
             await game_state.set_data(game_data)
         with suppress(TelegramBadRequest):
