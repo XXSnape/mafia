@@ -74,6 +74,7 @@ class DifferentSettingsCache(TypedDict):
     can_marshal_kill: bool
     mafia_every_3: bool
     allow_betting: bool
+    speed_up_nights_and_voting: bool
 
 
 class AllSettingsCache(TypedDict, total=False):

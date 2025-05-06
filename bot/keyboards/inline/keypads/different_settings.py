@@ -69,6 +69,10 @@ def get_different_settings_buttons():
             text="Мафией будет каждый 3-ий игрок",
             callback_data=cb_text.MAFIA_EVERY_3_CB,
         ),
+        InlineKeyboardButton(
+            text="Ускорять наступление дня и подтверждения",
+            callback_data=cb_text.SPEED_UP_NIGHTS_AND_VOTING_CB,
+        ),
     )
 
 

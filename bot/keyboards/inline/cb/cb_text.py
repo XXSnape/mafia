@@ -51,6 +51,9 @@ SHOW_USERNAMES_AFTER_CONFIRMATION_CB = (
 
 ALLOW_BETTING_CB = "allow_betting"
 
+SPEED_UP_NIGHTS_AND_VOTING_CB = "speed_up_nights_and_voting"
+
+
 CAN_KILL_TEAMMATES_CB = "can_kill_teammates"
 CAN_MARSHAL_KILL_CB = "can_marshal_kill"
 MAFIA_EVERY_3_CB = "mafia_every_3"
