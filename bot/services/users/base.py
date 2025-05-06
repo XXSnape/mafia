@@ -235,8 +235,8 @@ class BaseRouter(RouterHelper):
             text=make_build(text),
             reply_markup=generate_inline_kb(
                 data_with_buttons=[
-                    ROLES_SELECTION_BTN,
                     HOW_TO_SET_UP_GROUP_BTN,
+                    ROLES_SELECTION_BTN,
                     HELP_BTN,
                 ]
             ),

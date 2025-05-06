@@ -48,6 +48,7 @@ def help_options_kb():
             callback_data=HOW_TO_PLAY_CB,
         ),
         HOW_TO_SET_UP_GAME_BTN,
+        HOW_TO_SET_UP_GROUP_BTN,
         InlineKeyboardButton(
             text="Как посмотреть статистику?📈",
             callback_data=HOW_TO_SEE_STATISTICS_CB,
