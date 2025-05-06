@@ -20,7 +20,7 @@ from keyboards.inline.cb.cb_text import DONT_VOTE_FOR_ANYONE_CB
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
-from utils.common import get_criminals_ids
+from utils.common import get_criminals_ids, add_message_to_delete
 from utils.pretty_text import (
     cut_off_old_text,
     make_build,
@@ -372,7 +372,11 @@ async def send_request_to_vote(
             ),
         ),
     )
-    game_data["to_delete"].append([user_id, sent_message.message_id])
+    add_message_to_delete(
+        game_data=game_data,
+        chat_id=user_id,
+        message_id=sent_message.message_id,
+    )
 
 
 async def send_a_lot_of_messages_safely(

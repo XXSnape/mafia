@@ -29,6 +29,7 @@ from mafia.roles.descriptions.description import RoleDescription
 from utils.common import (
     get_criminals_ids,
     get_the_most_frequently_encountered_id,
+    add_message_to_delete,
 )
 from utils.informing import (
     get_profiles,
@@ -667,7 +668,11 @@ class ActiveRoleAtNightABC(RoleABC):
         player_id: int,
         message_id: int,
     ):
-        game_data["to_delete"].append([player_id, message_id])
+        add_message_to_delete(
+            game_data=game_data,
+            chat_id=player_id,
+            message_id=message_id,
+        )
         await get_state_and_assign(
             dispatcher=self.dispatcher,
             chat_id=player_id,

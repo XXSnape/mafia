@@ -47,12 +47,24 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
                 CAN_CHOOSE_YOURSELF,
             ],
             limitations=[DONT_PAY_FOR_VOTING],
-            wins_if="Сделать 4 правильных прогноза или больше",
+            wins_if="Сделать столько прогнозов, сколько равняется количество игроков "
+            "всего, деленное на 2. "
+            "Например, если играют 5 человек, нужно сделать 2 верных прогноза, если 8, тогда 4 и т.д.",
         )
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.ANALYST_ASSUMES
         self.number_of_predictions = 0
+        self.necessary_to_win: int | None = None
+
+    def introducing_users_to_roles(self, game_data: GameCache):
+        self.necessary_to_win = (
+            len(game_data["live_players_ids"]) // 2
+        )
+        self.purpose = f"{self.purpose}\n\nДля победы нужно угадать {self.necessary_to_win} раз(а)"
+        return super().introducing_users_to_roles(
+            game_data=game_data
+        )
 
     def generate_markup(
         self,
@@ -85,7 +97,7 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
         game_data: GameCache,
         **kwargs,
     ):
-        if self.number_of_predictions >= 4:
+        if self.number_of_predictions >= self.necessary_to_win:
             payment = (
                 15
                 * (

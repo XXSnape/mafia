@@ -45,6 +45,7 @@ from services.game.game_assistants import (
 )
 from services.users.order_of_roles import RoleManager
 from states.game import GameFsm
+from utils.common import add_message_to_delete
 from utils.informing import get_profiles_during_registration
 from utils.pretty_text import (
     get_minutes_and_seconds_text,
@@ -382,9 +383,12 @@ class Registration(RouterHelper):
                 "message_with_offer_id": sent_message.message_id,
                 "balance": balance,
             }
-            game_data["to_delete"].append(
-                [user_id, sent_message.message_id]
+            add_message_to_delete(
+                game_data=game_data,
+                chat_id=user_id,
+                message_id=sent_message.message_id,
             )
+
             await self.state.set_data(user_data)
             await self.state.set_state(
                 GameFsm.WAIT_FOR_STARTING_GAME

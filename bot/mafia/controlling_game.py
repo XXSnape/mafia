@@ -34,7 +34,10 @@ from mafia.roles.base.mixins import (
     ProcedureAfterVotingABC,
 )
 from states.game import UserFsm
-from utils.common import get_the_most_frequently_encountered_id
+from utils.common import (
+    get_the_most_frequently_encountered_id,
+    add_message_to_delete,
+)
 from utils.informing import (
     get_live_players,
     get_profiles,
@@ -456,8 +459,10 @@ class Controller:
             ),
         )
         await sent_survey.pin()
-        game_data["to_delete"].append(
-            [self.group_chat_id, sent_survey.message_id]
+        add_message_to_delete(
+            game_data=game_data,
+            chat_id=self.group_chat_id,
+            message_id=sent_survey.message_id,
         )
         await self.state.set_data(game_data)
         return True

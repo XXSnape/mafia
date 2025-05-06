@@ -52,7 +52,10 @@ class Poisoner(
             skill="За 1 ночь может либо отравить игрока, либо убить всех отравленных ранее",
             pay_for=["Убийство любого игрока"],
             limitations=[DONT_PAY_FOR_VOTING],
-            wins_if="Побеждает, если убьет минимум 3х игроков за игру",
+            wins_if="Побеждает, если убьет столько игроков, "
+            "сколько равняется количество игроков всего, "
+            "делённое нацело на 4 и еще одного. "
+            "Например, если в игре 5 человек, то нужно убить двоих, если 8, то троих и т.д.",
         )
 
     def __init__(self):
@@ -60,11 +63,21 @@ class Poisoner(
             UserFsm.POISONER_CHOOSES_ACTION
         )
         self.victims = 0
+        self.necessary_to_win: int | None = None
+
+    def introducing_users_to_roles(self, game_data: GameCache):
+        self.necessary_to_win = (
+            len(game_data["live_players_ids"]) // 4
+        ) + 1
+        self.purpose = f"{self.purpose}\n\nДля победы нужно убить {self.necessary_to_win} человек"
+        return super().introducing_users_to_roles(
+            game_data=game_data
+        )
 
     def get_money_for_victory_and_nights(
         self, game_data: GameCache, **kwargs
     ):
-        if self.victims >= 3:
+        if self.victims >= self.necessary_to_win:
             return (
                 self.victims
                 * 20
