@@ -73,6 +73,7 @@ class DifferentSettingsCache(TypedDict):
     can_kill_teammates: bool
     can_marshal_kill: bool
     mafia_every_3: bool
+    allow_betting: bool
 
 
 class AllSettingsCache(TypedDict, total=False):

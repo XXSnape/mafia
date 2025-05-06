@@ -19,3 +19,4 @@ class DifferentSettingsSchema(TimeOfDaySchema):
     can_kill_teammates: bool = True
     can_marshal_kill: bool = True
     mafia_every_3: bool = False
+    allow_betting: bool = True

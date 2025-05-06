@@ -54,6 +54,10 @@ def get_for_of_war_buttons():
 def get_different_settings_buttons():
     return (
         InlineKeyboardButton(
+            text="Разрешать делать ставки",
+            callback_data=cb_text.ALLOW_BETTING_CB,
+        ),
+        InlineKeyboardButton(
             text="Можно убивать сокомандников",
             callback_data=cb_text.CAN_KILL_TEAMMATES_CB,
         ),
