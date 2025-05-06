@@ -16,6 +16,7 @@ from keyboards.inline.cb.cb_text import (
     HOW_TO_START_GAME_CB,
     VIEW_ROLES_CB,
     WHAT_ARE_BIDS_CB,
+    HOW_TO_SET_UP_GROUP_CB,
 )
 
 
@@ -76,6 +77,10 @@ def go_back_to_options_kb():
 HOW_TO_START_GAME_BTN = InlineKeyboardButton(
     text="Как начать игру?🎲",
     callback_data=HOW_TO_START_GAME_CB,
+)
+HOW_TO_SET_UP_GROUP_BTN = InlineKeyboardButton(
+    text="Как настроить конкретную группу?👥",
+    callback_data=HOW_TO_SET_UP_GROUP_CB,
 )
 ROLES_SELECTION_BTN = InlineKeyboardButton(
     text=ROLES_SELECTION, callback_data=VIEW_ROLES_CB
