@@ -1,7 +1,7 @@
 from aiogram import F, Router
 from aiogram.enums import ChatType
 
-from .ban_chat import router as ban_chat_router
+from .messages_during_game import router as ban_chat_router
 from .confirm_vote import router as confirm_vote_router
 from .registration import router as registration_router
 

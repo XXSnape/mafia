@@ -601,5 +601,6 @@ class Registration(RouterHelper):
             "number_of_night": 0,
             "cant_vote": [],
             "cant_talk": [],
+            "wish_to_leave_game": [],
         }
         await self.state.set_data(game_data)

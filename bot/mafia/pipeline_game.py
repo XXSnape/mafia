@@ -270,6 +270,12 @@ class Game:
                 )
                 if not game_data[key]:
                     return
+            if len(game_data["wish_to_leave_game"]) >= len(
+                game_data["live_players_ids"]
+            ) and set(game_data["wish_to_leave_game"]).issuperset(
+                game_data["live_players_ids"]
+            ):
+                raise GameIsOver(winner=Groupings.civilians)
             seconds -= 5
 
     async def give_out_rewards(self, e: GameIsOver):

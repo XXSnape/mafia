@@ -10,6 +10,8 @@ from keyboards.inline.callback_factory.recognize_user import (
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from mafia.roles import PrimeMinister
 from services.base import RouterHelper
+from utils.informing import get_profiles
+from utils.pretty_text import make_build
 from utils.state import lock_state
 from utils.tg import ban_user, delete_message
 
@@ -99,3 +101,43 @@ class GroupManager(RouterHelper):
             text="✅Твое мнение учтено",
             show_alert=True,
         )
+
+    async def want_to_exit_game(self):
+        await delete_message(message=self.message)
+        user_id = self.message.from_user.id
+        async with lock_state(self.state):
+            game_data: GameCache = await self.state.get_data()
+            if user_id not in game_data["live_players_ids"]:
+                await ban_user(
+                    bot=self.message.bot,
+                    chat_id=game_data["game_chat"],
+                    user_id=user_id,
+                    until_date=timedelta(seconds=30),
+                )
+                return
+            if user_id in game_data["wish_to_leave_game"]:
+                return
+            game_data["wish_to_leave_game"] = [
+                wish_to_leave_id
+                for wish_to_leave_id in game_data[
+                    "wish_to_leave_game"
+                ]
+                if wish_to_leave_id in game_data["live_players_ids"]
+            ] + [user_id]
+            await self.state.set_data(game_data)
+        users = get_profiles(
+            players_ids=game_data["wish_to_leave_game"],
+            players=game_data["players"],
+            sorting_factory=None,
+        )
+        number_of_people_to_leave = len(
+            game_data["wish_to_leave_game"]
+        )
+        total_number_of_players = len(game_data["live_players_ids"])
+        text = (
+            f"❗️Игроки, желающие завершить игру досрочно "
+            f"({number_of_people_to_leave} из {total_number_of_players}):\n{users}"
+        )
+        if number_of_people_to_leave == total_number_of_players:
+            text += "\n\n🏁Игра скоро завершится"
+        await self.message.answer(text=make_build(text))

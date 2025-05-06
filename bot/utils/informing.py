@@ -106,16 +106,18 @@ def get_profiles(
     show_current_roles: bool = False,
     show_initial_roles: bool = False,
     show_money: bool = False,
-    sorting_factory: Callable = sorting_by_number,
+    sorting_factory: Callable | None = sorting_by_number,
     if_there_are_no_players: str = "\nПока нет участников!",
 ) -> str:
-    sorting_func = sorting_factory(players=players)
+    if sorting_factory:
+        sorting_func = sorting_factory(players=players)
+        users = sorted(players_ids, key=sorting_func)
+    else:
+        users = players_ids
     result = ""
-    if not players_ids:
+    if not users:
         return if_there_are_no_players
-    for index, user_id in enumerate(
-        sorted(players_ids, key=sorting_func), 1
-    ):
+    for index, user_id in enumerate(users, 1):
         url = players[str(user_id)]["url"]
         number = players[str(user_id)].get("number", index)
         if show_current_roles:

@@ -152,3 +152,4 @@ class GameCache(TypedDict, total=False):
     angels_died: PlayersIds
     cant_vote: PlayersIds
     cant_talk: PlayersIds
+    wish_to_leave_game: PlayersIds

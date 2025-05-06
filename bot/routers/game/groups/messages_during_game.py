@@ -1,11 +1,17 @@
 from aiogram import Router
-from aiogram.filters import StateFilter
+from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from services.game.processing_actions_in_group import GroupManager
 from states.game import GameFsm
 
 router = Router(name=__name__)
+
+
+@router.message(StateFilter(GameFsm.STARTED), Command("leave"))
+async def want_to_exit_game(message: Message, state: FSMContext):
+    group_manager = GroupManager(message=message, state=state)
+    await group_manager.want_to_exit_game()
 
 
 @router.message(StateFilter(GameFsm.STARTED))
