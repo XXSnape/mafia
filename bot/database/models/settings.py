@@ -55,3 +55,6 @@ class SettingModel(IdMixin, BaseModel):
     mafia_every_3: Mapped[bool] = mapped_column(
         default=False, server_default="0"
     )
+    allow_betting: Mapped[bool] = mapped_column(
+        default=True, server_default="1"
+    )
