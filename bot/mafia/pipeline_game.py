@@ -3,6 +3,7 @@ import datetime
 from operator import itemgetter
 from pprint import pprint
 from random import choice
+from typing import cast, Literal
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
@@ -199,8 +200,9 @@ class Game:
     ):
         await self.controller.start_new_night()
         game_data = await self.controller.mailing()
-        await asyncio.sleep(
-            game_data["settings"]["time_for_night"] - 3
+        await self.background_scanning(
+            seconds=game_data["settings"]["time_for_night"],
+            at_night=True,
         )
         game_data = await delete_messages_from_to_delete(
             bot=self.bot, state=self.state
@@ -211,9 +213,14 @@ class Game:
         )
         game_data = await self.controller.sum_up_after_night()
         await self.controller.start_discussions(game_data)
-        await asyncio.sleep(game_data["settings"]["time_for_day"])
+        await self.background_scanning(
+            seconds=game_data["settings"]["time_for_day"]
+        )
         await self.controller.suggest_vote()
-        await asyncio.sleep(game_data["settings"]["time_for_voting"])
+        await self.background_scanning(
+            seconds=game_data["settings"]["time_for_voting"],
+            at_night=False,
+        )
         game_data = await delete_messages_from_to_delete(
             bot=self.bot, state=self.state
         )
@@ -223,8 +230,10 @@ class Game:
         )
         result = await self.controller.confirm_final_aim()
         if result:
-            await asyncio.sleep(
-                game_data["settings"]["time_for_confirmation"]
+            await self.background_scanning(
+                seconds=game_data["settings"][
+                    "time_for_confirmation"
+                ],
             )
         await delete_messages_from_to_delete(
             bot=self.bot,
@@ -234,6 +243,34 @@ class Game:
         await self.controller.removing_inactive_players()
         await self.controller.end_night()
         await asyncio.sleep(4)
+
+    async def background_scanning(
+        self, seconds: int, at_night: bool | None = None
+    ):
+        while seconds > 0:
+            await asyncio.sleep(5)
+            game_data: GameCache = await self.state.get_data()
+            key = None
+            if at_night is True:
+                key = "waiting_for_action_at_night"
+            elif at_night is False:
+                key = "waiting_for_action_at_day"
+            if (
+                key
+                and game_data["settings"][
+                    "speed_up_nights_and_voting"
+                ]
+            ):
+                key = cast(
+                    Literal[
+                        "waiting_for_action_at_night",
+                        "waiting_for_action_at_day",
+                    ],
+                    key,
+                )
+                if not game_data[key]:
+                    return
+            seconds -= 5
 
     async def give_out_rewards(self, e: GameIsOver):
         await asyncio.sleep(1)
