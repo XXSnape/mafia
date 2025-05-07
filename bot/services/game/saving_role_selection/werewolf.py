@@ -15,13 +15,10 @@ from services.game.game_assistants import (
     get_game_state_by_user_state,
     remove_from_expected,
 )
-from utils.common import get_criminals_ids
 from utils.informing import (
-    get_profiles,
     notify_aliases_about_transformation,
     remind_commissioner_about_inspections,
     remind_criminals_about_inspections,
-    send_a_lot_of_messages_safely,
 )
 from utils.roles import change_role
 from utils.state import lock_state

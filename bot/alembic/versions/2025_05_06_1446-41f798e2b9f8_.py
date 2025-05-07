@@ -8,9 +8,8 @@ Create Date: 2025-05-06 14:46:54.610990
 
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "41f798e2b9f8"
@@ -24,7 +23,10 @@ def upgrade() -> None:
     op.add_column(
         "settings",
         sa.Column(
-            "allow_betting", sa.Boolean(), server_default="1", nullable=False
+            "allow_betting",
+            sa.Boolean(),
+            server_default="1",
+            nullable=False,
         ),
     )
     # ### end Alembic commands ###

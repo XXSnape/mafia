@@ -231,7 +231,7 @@ class UserManager(RouterHelper):
         await self.callback.message.answer(
             make_build(
                 NUMBER_OF_DAY.format(game_data["number_of_night"])
-                + f"Ты решил ни за кого не голосовать"
+                + "Ты решил ни за кого не голосовать"
             )
         )
         await self.callback.bot.send_message(

@@ -20,14 +20,13 @@ from keyboards.inline.cb.cb_text import DONT_VOTE_FOR_ANYONE_CB
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
-from utils.common import get_criminals_ids, add_message_to_delete
+from utils.common import add_message_to_delete, get_criminals_ids
 from utils.pretty_text import (
     cut_off_old_text,
     make_build,
 )
 from utils.sorting import (
     sorting_by_number,
-    sorting_by_rate,
     sorting_by_rank,
 )
 

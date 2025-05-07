@@ -1,5 +1,5 @@
 from aiogram import Router
-from aiogram.filters import StateFilter, Command
+from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from services.game.processing_actions_in_group import GroupManager

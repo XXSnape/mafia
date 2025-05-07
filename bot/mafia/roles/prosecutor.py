@@ -1,15 +1,13 @@
 from contextlib import suppress
 
 from aiogram.exceptions import TelegramBadRequest
-
 from cache.cache_types import (
     GameCache,
     RolesLiteral,
     UserIdInt,
-    NumberOfNight,
 )
 from general.groupings import Groupings
-from general.text import NUMBER_OF_NIGHT, NUMBER_OF_DAY
+from general.text import NUMBER_OF_DAY
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,

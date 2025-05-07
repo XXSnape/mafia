@@ -27,9 +27,9 @@ from keyboards.inline.keypads.mailing import (
 )
 from mafia.roles.descriptions.description import RoleDescription
 from utils.common import (
+    add_message_to_delete,
     get_criminals_ids,
     get_the_most_frequently_encountered_id,
-    add_message_to_delete,
 )
 from utils.informing import (
     get_profiles,

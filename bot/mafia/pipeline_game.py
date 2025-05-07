@@ -3,7 +3,7 @@ import datetime
 from operator import itemgetter
 from pprint import pprint
 from random import choice
-from typing import cast, Literal
+from typing import Literal, cast
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
@@ -435,6 +435,11 @@ class Game:
     def check_bids(
         game_data: GameCache,
     ) -> tuple[RoleAndUserMoney, list[BidForRoleSchema]]:
+        if game_data["settings"]["allow_betting"] is False:
+            return (
+                {},
+                [],
+            )
         role_and_winner_with_money: RoleAndUserMoney = {}
         bids = game_data["bids"]
         losers: list[BidForRoleSchema] = []

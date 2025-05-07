@@ -16,7 +16,7 @@ from cache.cache_types import (
 )
 from general.exceptions import GameIsOver
 from general.groupings import Groupings
-from general.text import NUMBER_OF_NIGHT, NUMBER_OF_DAY
+from general.text import NUMBER_OF_DAY, NUMBER_OF_NIGHT
 from keyboards.inline.keypads.to_bot import (
     get_to_bot_kb,
     participate_in_social_life,
@@ -35,8 +35,8 @@ from mafia.roles.base.mixins import (
 )
 from states.game import UserFsm
 from utils.common import (
-    get_the_most_frequently_encountered_id,
     add_message_to_delete,
+    get_the_most_frequently_encountered_id,
 )
 from utils.informing import (
     get_live_players,

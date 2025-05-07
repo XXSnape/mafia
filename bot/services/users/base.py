@@ -10,16 +10,19 @@ from general.text import (
     ROLES_SELECTION,
 )
 from keyboards.inline.builder import generate_inline_kb
-from keyboards.inline.buttons.common import HELP_BTN
+from keyboards.inline.buttons.common import (
+    ADD_BOT_TO_GROUP,
+    HELP_BTN,
+)
 from keyboards.inline.callback_factory.help import RoleCbData
 from keyboards.inline.keypads.help import (
     HOW_TO_SET_UP_GAME_BTN,
+    HOW_TO_SET_UP_GROUP_BTN,
     ROLES_SELECTION_BTN,
     get_roles_kb,
     go_back_to_options_kb,
     help_options_kb,
     to_help_kb,
-    HOW_TO_SET_UP_GROUP_BTN,
 )
 from mafia.roles import Instigator, Warden
 from services.base import RouterHelper
@@ -80,13 +83,22 @@ class BaseRouter(RouterHelper):
             "затем игра автоматически начнётся. Игру можно запустить раньше, нажав на соответсвующую "
             "кнопку под сообщением о начале регистрации.\n\n"
             f"🎟️Присоединиться к игре можно так же нажав на кнопку под этим сообщением, "
-            f"а выйти с помощью команды {BotCommands.leave.name} в группе\n\n"
+            f"а выйти с помощью команды /{BotCommands.leave.name} в группе. "
+            f"Если игра уже началась, то завершить её досрочно победой группировки "
+            f"«{Groupings.civilians.value.name}» можно тогда и только тогда, когда все живые участники введут /{BotCommands.leave.name}.\n\n"
             f"❗️Минимум в игре могут участвовать {settings.mafia.minimum_number_of_players} человека, "
             f"максимум {settings.mafia.maximum_number_of_players}. Если за время регистрации минимальное количество игроков не набралось, "
             "игра не запустится."
         )
         await self.callback.message.edit_text(
-            text=make_build(text), reply_markup=to_help_kb()
+            text=make_build(text),
+            reply_markup=generate_inline_kb(
+                data_with_buttons=[
+                    ADD_BOT_TO_GROUP,
+                    ROLES_SELECTION_BTN,
+                    HELP_BTN,
+                ]
+            ),
         )
 
     async def what_are_bids(self):

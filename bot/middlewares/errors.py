@@ -4,9 +4,8 @@ from typing import Any, Awaitable, Callable, Dict
 from aiogram import BaseMiddleware
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import CallbackQuery, Message, TelegramObject
-from loguru import logger
-
 from general.exceptions import ActionPerformed
+from loguru import logger
 from utils.pretty_text import make_build
 from utils.tg import delete_message
 
