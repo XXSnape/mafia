@@ -559,7 +559,7 @@ class Registration(RouterHelper):
                     f"✅Ты успешно поставил {self.message.text}{MONEY_SYM} "
                     f"на роль {role.pretty_role}!\n\n"
                     f"Чтобы изменить сумму, просто введи ее\n\n"
-                    f"Твой текущий баланс: {balance}{MONEY_SYM}"
+                    f"Твой баланс до результатов аукциона: {balance}{MONEY_SYM}"
                 ),
                 reply_markup=cancel_bet(),
                 message_id=user_data["message_with_offer_id"],

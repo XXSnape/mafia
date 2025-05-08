@@ -134,9 +134,9 @@ def get_profiles(
                 ]
             if show_money:
                 money = players[str(user_id)]["money"]
-                result += f"\n{number}) {url} - {show_current_roles} ({money}{MONEY_SYM})"
+                result += f"\n{number}) {url} — {show_current_roles} ({money}{MONEY_SYM})"
             else:
-                result += f"\n{number}) {url} - {show_current_roles}"
+                result += f"\n{number}) {url} — {show_current_roles}"
         else:
             result += f"\n{number}) {url}"
     return make_build(result)

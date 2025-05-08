@@ -60,7 +60,7 @@ class GroupManager(RouterHelper):
 
             if callback_data.user_id == self.callback.from_user.id:
                 await self.callback.answer(
-                    "🚫Теперь твой судья - демократия!",
+                    "🚫Теперь твой судья — демократия!",
                     show_alert=True,
                 )
                 return
