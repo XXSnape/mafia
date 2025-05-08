@@ -183,7 +183,9 @@ class BaseDAO[M: Base]:
     async def delete(self, filters: BaseModel) -> int:
         filter_dict = filters.model_dump(exclude_unset=True)
         logger.info(
-            "Удаление записей {} по фильтру: {}", self.model.__name__, filter_dict
+            "Удаление записей {} по фильтру: {}",
+            self.model.__name__,
+            filter_dict,
         )
         if not filter_dict:
             logger.error("Нужен хотя бы один фильтр для удаления.")
@@ -201,4 +203,3 @@ class BaseDAO[M: Base]:
         except SQLAlchemyError as e:
             logger.error("Ошибка при удалении записей: {}", e)
             raise
-
