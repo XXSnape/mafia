@@ -383,9 +383,34 @@ class RoleABC(ABC):
     ):
         if self.temporary_roles:
             money = 0
-        players = game_data[self.roles_key]
+        players = game_data[self.roles_key][:]
+        if at_night is False:
+            dead_players = set(
+                int(user_id) for user_id in game_data["players"]
+            ) - set(game_data["live_players_ids"])
+            players_with_salary_after_death = []
+            for dead_player_id in dead_players:
+                number_died_at_night = game_data["players"][
+                    str(dead_player_id)
+                ]["number_died_at_night"]
+                role_id = game_data["players"][str(dead_player_id)][
+                    "role_id"
+                ]
+                if (
+                    role_id == self.role_id
+                    and game_data["number_of_night"]
+                    - 1
+                    - number_died_at_night
+                    == 0
+                ):
+                    players_with_salary_after_death.append(
+                        dead_player_id
+                    )
+            players = players + players_with_salary_after_death
+
         if additional_players:
-            players += game_data[additional_players]
+            players = players + game_data[additional_players]
+
         for player_id in players:
             game_data["players"][str(player_id)]["money"] += money
             if custom_message:
