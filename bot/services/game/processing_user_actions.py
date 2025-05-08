@@ -30,6 +30,7 @@ class UserManager(RouterHelper):
             user_state=self.state,
             dispatcher=self.dispatcher,
         )
+        await self.state.clear()
         game_data: GameCache = await game_state.get_data()
         role = (
             game_data["players"][str(self.message.from_user.id)][
@@ -44,15 +45,14 @@ class UserManager(RouterHelper):
 
         await self.message.bot.send_message(
             chat_id=game_data["game_chat"],
-            text=f"По слухам, {role} {url} перед смертью "
+            text=f"⚡️⚡️⚡️По слухам, {role} {url} перед смертью "
             f"проглаголил такие слова:\n\n{self.message.text}"[
                 :3900
             ],
         )
         await self.message.answer(
-            make_build("Сообщение успешно отправлено!")
+            make_build("✅Сообщение успешно доставлено!")
         )
-        await self.state.clear()
 
     @staticmethod
     def delete_user_from_waiting_for_action_at_day(
@@ -113,7 +113,7 @@ class UserManager(RouterHelper):
                 users=game_data[Hacker.roles_key],
             )
         await self.message.answer(
-            make_build("Сообщение успешно отправлено!")
+            make_build("✅Сообщение успешно доставлено!")
         )
 
     def check_for_cheating(

@@ -332,6 +332,13 @@ class Controller:
             if game_data["settings"]["show_roles_after_death"]
             else "???"
         )
+
+        other_tasks, boss_is_dead_tasks = self.remove_user_from_game(
+            game_data=game_data,
+            user_id=removed_user_id,
+            at_night=False,
+        )
+        await self.state.set_data(game_data)
         await self.bot.send_message(
             chat_id=self.group_chat_id,
             text=result_text
@@ -339,11 +346,6 @@ class Controller:
                 f"❗️❗️❗️Сегодня народ принял тяжелое решение и повесил "
                 f'{user_info["url"]} с ролью {role}!'
             ),
-        )
-        other_tasks, boss_is_dead_tasks = self.remove_user_from_game(
-            game_data=game_data,
-            user_id=removed_user_id,
-            at_night=False,
         )
         await asyncio.gather(*other_tasks, return_exceptions=True)
         await asyncio.gather(
@@ -411,6 +413,7 @@ class Controller:
         text_about_dead = (
             text_about_dead or "💕Сегодня ночью все выжили!"
         )
+        await self.state.set_data(game_data)
         await self.bot.send_message(
             chat_id=self.group_chat_id,
             text=make_build(text_about_dead),
@@ -605,6 +608,17 @@ class Controller:
         )
         if not inactive_users:
             return
+        other_tasks = []
+        boss_is_dead_tasks = []
+        for user_id in inactive_users:
+            other, boss_is_dead = self.remove_user_from_game(
+                game_data=game_data,
+                user_id=user_id,
+                at_night=None,
+            )
+            other_tasks.extend(other)
+            boss_is_dead_tasks.extend(boss_is_dead)
+        await self.state.set_data(game_data)
         profiles = get_profiles(
             players_ids=inactive_users,
             players=game_data["players"],
@@ -618,16 +632,6 @@ class Controller:
             photo="https://media.zenfs.com/en/nerdist_761/342f5f2b17659cb424aaabef1951a1a1",
             caption=text,
         )
-        other_tasks = []
-        boss_is_dead_tasks = []
-        for user_id in inactive_users:
-            other, boss_is_dead = self.remove_user_from_game(
-                game_data=game_data,
-                user_id=user_id,
-                at_night=None,
-            )
-            other_tasks.extend(other)
-            boss_is_dead_tasks.extend(boss_is_dead)
         await asyncio.gather(*other_tasks, return_exceptions=True)
         await asyncio.gather(
             *boss_is_dead_tasks, return_exceptions=True
