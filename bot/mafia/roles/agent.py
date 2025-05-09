@@ -65,7 +65,10 @@ class Agent(ProcedureAfterNightABC, ActiveRoleAtNightABC):
             else f"{user_url} навещал: {visitors}"
         )
         await send_a_lot_of_messages_safely(
-            bot=self.bot, users=game_data[self.roles_key], text=text
+            bot=self.bot,
+            users=game_data[self.roles_key],
+            text=text,
+            protect_content=game_data["settings"]["protect_content"],
         )
 
     @get_processed_role_and_user_if_exists

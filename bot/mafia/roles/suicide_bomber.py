@@ -39,7 +39,11 @@ class SuicideBomber(SuicideRoleMixin, RoleABC):
                 "🥳Поздравляем! Тебя убили ночью, как ты и хотел. Обязательно поглумись над мафией"
             )
             await self.bot.send_message(
-                chat_id=user_id, text=message
+                chat_id=user_id,
+                text=message,
+                protect_content=game_data["settings"][
+                    "protect_content"
+                ],
             )
             self._winners.append(user_id)
             return

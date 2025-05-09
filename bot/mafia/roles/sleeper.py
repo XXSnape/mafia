@@ -93,6 +93,9 @@ class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
                         text=make_build(
                             "😴Сложно поверить, но все твои действия ночью были лишь сном!"
                         ),
+                        protect_content=game_data["settings"][
+                            "protect_content"
+                        ],
                     )
 
     @get_processed_role_and_user_if_exists

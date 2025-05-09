@@ -76,7 +76,8 @@ class WerewolfSaver(RouterHelper):
             await game_state.set_data(game_data)
         await self.callback.message.answer_photo(
             photo=new_role.photo,
-            caption=f"Твоя новая роль - {new_role.pretty_role}!",
+            caption=f"Твоя новая роль — {new_role.pretty_role}!",
+            protect_content=game_data["settings"]["protect_content"],
         )
         if game_data["settings"]["show_roles_after_death"]:
             await self.callback.bot.send_photo(
@@ -108,4 +109,9 @@ class WerewolfSaver(RouterHelper):
                 game_data
             )
             if remind_text:
-                await self.callback.message.answer(text=remind_text)
+                await self.callback.message.answer(
+                    text=remind_text,
+                    protect_content=game_data["settings"][
+                        "protect_content"
+                    ],
+                )

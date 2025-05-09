@@ -106,6 +106,7 @@ class Warden(ProcedureAfterNightABC, ActiveRoleAtNightABC):
             bot=self.bot,
             users=game_data[self.roles_key],
             text=common_text,
+            protect_content=game_data["settings"]["protect_content"],
         )
         game_data["text_about_checked_for_the_same_groups"] += (
             common_text + "\n\n"

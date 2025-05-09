@@ -118,6 +118,9 @@ class RoleABC(ABC):
                     caption=f"Твоя роль — "
                     f"{role_name}!\n\n"
                     f"{purpose}",
+                    protect_content=game_data["settings"][
+                        "protect_content"
+                    ],
                 )
             )
             if (
@@ -141,6 +144,9 @@ class RoleABC(ABC):
                             "❗️Твои союзники, с которыми можно общаться прямо в этом чате:\n"
                         )
                         + profiles,
+                        protect_content=game_data["settings"][
+                            "protect_content"
+                        ],
                     )
                 )
             if self.state_for_waiting_for_action:
@@ -171,6 +177,9 @@ class RoleABC(ABC):
                                     sorting_factory=sorting_by_rank,
                                 )
                             ),
+                            protect_content=game_data["settings"][
+                                "protect_content"
+                            ],
                         )
                     )
         return roles_tasks, aliases_tasks, other_tasks
@@ -220,17 +229,28 @@ class RoleABC(ABC):
                 text=f"❗️❗️❗️Погиб {role} — {url}.\n\n"
                 f"Новый {role} — {new_boss_url}\n\n"
                 f"Все текущие союзники и сокомандники:\n{profiles}",
+                protect_content=game_data["settings"][
+                    "protect_content"
+                ],
             )
         else:
             await send_a_lot_of_messages_safely(
                 bot=self.bot,
                 users=[new_boss_id],
                 text=f"❗️❗️❗️Погиб {role}.\n\n" f"Ты новый {role}",
+                protect_content=game_data["settings"][
+                    "protect_content"
+                ],
             )
             text = self.get_general_text_before_sending(game_data)
             if text:
                 await send_a_lot_of_messages_safely(
-                    bot=self.bot, users=[new_boss_id], text=text
+                    bot=self.bot,
+                    users=[new_boss_id],
+                    text=text,
+                    protect_content=game_data["settings"][
+                        "protect_content"
+                    ],
                 )
         if game_data["settings"]["show_roles_after_death"] is False:
             return
@@ -494,7 +514,12 @@ class RoleABC(ABC):
             )
             text = f"❗️Погиб {role} — {url}\n\nВсе текущие союзники и сокомандники:\n{profiles}"
             await send_a_lot_of_messages_safely(
-                bot=self.bot, users=criminals, text=text
+                bot=self.bot,
+                users=criminals,
+                text=text,
+                protect_content=game_data["settings"][
+                    "protect_content"
+                ],
             )
         if at_night is True:
             message = "😢🌃К сожалению, тебя убили! Отправь напоследок все, что думаешь!"
@@ -511,7 +536,9 @@ class RoleABC(ABC):
             )
             self.dropped_out.add(user_id)
         await self.bot.send_message(
-            chat_id=user_id, text=make_build(message)
+            chat_id=user_id,
+            text=make_build(message),
+            protect_content=game_data["settings"]["protect_content"],
         )
 
 
@@ -540,6 +567,7 @@ class AliasRoleABC(ABC):
             bot=self.bot,
             users=game_data[self.roles_key],
             text=text,
+            protect_content=game_data["settings"]["protect_content"],
         )
 
     @classmethod
@@ -680,6 +708,9 @@ class ActiveRoleAtNightABC(RoleABC):
                 chat_id=player_id,
                 text=self.mail_message,
                 reply_markup=markup,
+                protect_content=game_data["settings"][
+                    "protect_content"
+                ],
             )
             await self.save_information_about_mail_and_change_state(
                 game_data=game_data,
@@ -776,6 +807,9 @@ class ActiveRoleAtNightABC(RoleABC):
                 bot=self.bot,
                 users=[roles[0]],
                 text=make_build(text),
+                protect_content=game_data["settings"][
+                    "protect_content"
+                ],
             )
             return
         general_text = self.get_general_text_before_sending(
@@ -793,6 +827,9 @@ class ActiveRoleAtNightABC(RoleABC):
                 bot=self.bot,
                 users=users,
                 text=text,
+                protect_content=game_data["settings"][
+                    "protect_content"
+                ],
             )
 
         await self.send_survey(

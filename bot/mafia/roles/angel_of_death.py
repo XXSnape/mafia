@@ -113,6 +113,9 @@ class AngelOfDeath(
                 text=make_build(
                     "😈Тебя линчевали на голосовании, не забудь отомстить обидчикам!"
                 ),
+                protect_content=game_data["settings"][
+                    "protect_content"
+                ],
             )
             return
         await super().report_death(

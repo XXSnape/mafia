@@ -51,7 +51,8 @@ class UserManager(RouterHelper):
             ],
         )
         await self.message.answer(
-            make_build("✅Сообщение успешно доставлено!")
+            make_build("✅Сообщение успешно доставлено!"),
+            protect_content=game_data["settings"]["protect_content"],
         )
 
     @staticmethod
@@ -100,6 +101,7 @@ class UserManager(RouterHelper):
                 :3900
             ],
             exclude=[self.message.from_user.id],
+            protect_content=game_data["settings"]["protect_content"],
         )
         if (
             self.message.from_user.id in criminals_ids
@@ -111,9 +113,13 @@ class UserManager(RouterHelper):
                     :3900
                 ],
                 users=game_data[Hacker.roles_key],
+                protect_content=game_data["settings"][
+                    "protect_content"
+                ],
             )
         await self.message.answer(
-            make_build("✅Сообщение успешно доставлено!")
+            make_build("✅Сообщение успешно доставлено!"),
+            protect_content=game_data["settings"]["protect_content"],
         )
 
     def check_for_cheating(
@@ -180,7 +186,8 @@ class UserManager(RouterHelper):
             make_build(
                 NUMBER_OF_DAY.format(game_data["number_of_night"])
                 + f"Ты выбрал голосовать за повешение {voted_url}"
-            )
+            ),
+            protect_content=game_data["settings"]["protect_content"],
         )
         await self.callback.bot.send_message(
             chat_id=game_data["game_chat"],
@@ -232,7 +239,8 @@ class UserManager(RouterHelper):
             make_build(
                 NUMBER_OF_DAY.format(game_data["number_of_night"])
                 + "Ты решил ни за кого не голосовать"
-            )
+            ),
+            protect_content=game_data["settings"]["protect_content"],
         )
         await self.callback.bot.send_message(
             chat_id=game_data["game_chat"],

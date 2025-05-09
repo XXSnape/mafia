@@ -146,6 +146,9 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
                 bot=self.bot,
                 users=users,
                 text=text,
+                protect_content=game_data["settings"][
+                    "protect_content"
+                ],
             )
         else:
             processed_user_id = self.get_processed_user_id(game_data)

@@ -90,6 +90,7 @@ class Traitor(
             bot=self.bot,
             users=get_criminals_ids(game_data),
             text=text,
+            protect_content=game_data["settings"]["protect_content"],
         )
 
     def check_for_possibility_to_transform(

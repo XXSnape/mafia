@@ -315,6 +315,9 @@ async def send_messages_after_night(
                             number_of_night
                             + "К тебе определенно кто-то приходил, но Туман Войны скрыл это..."
                         ),
+                        protect_content=game_data["settings"][
+                            "protect_content"
+                        ],
                     )
                 )
     else:
@@ -333,6 +336,9 @@ async def send_messages_after_night(
                                 )
                             )
                         ),
+                        protect_content=game_data["settings"][
+                            "protect_content"
+                        ],
                     )
                 )
             else:
@@ -382,11 +388,16 @@ async def send_a_lot_of_messages_safely(
     bot: Bot,
     users: list[UserIdInt],
     text: str,
+    protect_content: bool,
     exclude: Iterable[UserIdInt] = (),
 ):
     await asyncio.gather(
         *(
-            bot.send_message(chat_id=user_id, text=text)
+            bot.send_message(
+                chat_id=user_id,
+                text=text,
+                protect_content=protect_content,
+            )
             for user_id in users
             if user_id not in exclude
         ),

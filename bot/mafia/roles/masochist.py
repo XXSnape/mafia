@@ -36,7 +36,11 @@ class Masochist(SuicideRoleMixin, RoleABC):
                 "🥳Поздравляем! Тебя линчевали на голосовании, как ты и хотел!"
             )
             await self.bot.send_message(
-                chat_id=user_id, text=message
+                chat_id=user_id,
+                text=message,
+                protect_content=game_data["settings"][
+                    "protect_content"
+                ],
             )
             self._winners.append(user_id)
             return

@@ -138,6 +138,7 @@ class PolicemanSaver(RouterHelper):
             bot=self.callback.bot,
             users=users,
             text=text,
+            protect_content=game_data["settings"]["protect_content"],
         )
         if game_data["settings"]["show_roles_after_death"]:
             message_to_group = "Армия насильно заставила кого-то показать документы!"

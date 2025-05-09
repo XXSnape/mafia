@@ -100,6 +100,7 @@ class ForgerSaver(RouterHelper):
             text=NUMBER_OF_NIGHT.format(game_data["number_of_night"])
             + f"{forger.pretty_role} {forger_url} подменил документы "
             f"{user_url} на {pretty_user_role}",
+            protect_content=game_data["settings"]["protect_content"],
         )
         await send_messages_to_user_and_group(
             callback=self.callback,

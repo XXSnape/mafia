@@ -44,7 +44,9 @@ async def analyze_betting_results(
     users_dao = UsersDao(session=session)
     await asyncio.gather(
         *[
-            bot.send_message(chat_id=user_id, text=message)
+            bot.send_message(
+                chat_id=user_id, text=message, protect_content=True
+            )
             for user_id, message in messages
         ],
         return_exceptions=True,
@@ -73,7 +75,9 @@ async def report_role_outside_game(bids: list[BidForRoleSchema]):
     ]
     await asyncio.gather(
         *[
-            bot.send_message(chat_id=user_id, text=message)
+            bot.send_message(
+                chat_id=user_id, text=message, protect_content=True
+            )
             for user_id, message in messages
         ],
         return_exceptions=True,

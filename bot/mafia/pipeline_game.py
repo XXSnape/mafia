@@ -181,6 +181,7 @@ class Game:
             ),
             users=list(game_data["players"].keys())
             + [self.group_chat_id],
+            protect_content=False,
         )
         await unban_users(
             bot=self.bot,

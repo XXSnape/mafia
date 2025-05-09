@@ -190,6 +190,9 @@ class Controller:
                 self.bot.send_message(
                     chat_id=user_id,
                     text=make_build(f"{message}\n\n{text}"),
+                    protect_content=game_data["settings"][
+                        "protect_content"
+                    ],
                 )
             )
         await asyncio.gather(*tasks, return_exceptions=True)

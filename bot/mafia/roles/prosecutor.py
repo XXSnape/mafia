@@ -71,6 +71,9 @@ class Prosecutor(
                     )
                     + "🚫Тебе запретили общаться и принимать участие в выборах на 1 день"
                 ),
+                protect_content=game_data["settings"][
+                    "protect_content"
+                ],
             )
         await ban_user(
             bot=self.bot,

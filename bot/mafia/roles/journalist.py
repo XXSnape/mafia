@@ -73,6 +73,7 @@ class Journalist(ProcedureAfterNightABC, ActiveRoleAtNightABC):
             bot=self.bot,
             users=game_data[self.roles_key],
             text=text,
+            protect_content=game_data["settings"]["protect_content"],
         )
 
     @get_processed_role_and_user_if_exists

@@ -63,7 +63,8 @@ async def send_messages_to_user_and_group(
             make_build(
                 NUMBER_OF_NIGHT.format(game_data["number_of_night"])
                 + message_to_user_after_action
-            )
+            ),
+            protect_content=game_data["settings"]["protect_content"],
         )
 
 
@@ -121,6 +122,7 @@ async def inform_aliases(
             users=users,
             text=text,
             exclude=[callback.from_user.id],
+            protect_content=game_data["settings"]["protect_content"],
         )
         if callback.from_user.id in game_data[
             Mafia.roles_key
@@ -130,6 +132,9 @@ async def inform_aliases(
                 users=game_data[Hacker.roles_key],
                 text=f"{pretty_role} ??? выбрал "
                 f"{current_role.words_to_aliases_and_teammates.lower()} {url}",
+                protect_content=game_data["settings"][
+                    "protect_content"
+                ],
             )
 
 
