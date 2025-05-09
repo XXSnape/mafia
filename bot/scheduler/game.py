@@ -2,7 +2,7 @@ import datetime
 from contextlib import suppress
 
 from aiogram import Bot, Dispatcher
-from aiogram.exceptions import TelegramBadRequest
+from aiogram.exceptions import TelegramAPIError
 from aiogram.fsm.context import FSMContext
 from apscheduler.jobstores.base import JobLookupError
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -44,7 +44,7 @@ async def start_game(
             state=state,
             message_id=game_data["start_message_id"],
         )
-        with suppress(TelegramBadRequest):
+        with suppress(TelegramAPIError):
             await bot.send_message(
                 chat_id=game_data["game_chat"],
                 text=make_build(
@@ -89,7 +89,7 @@ async def remind_of_beginning_of_game(bot: Bot, state: FSMContext):
         bot=bot,
         game_chat=game_data["game_chat"],
     )
-    with suppress(TelegramBadRequest):
+    with suppress(TelegramAPIError):
         await bot.send_message(
             chat_id=game_data["game_chat"],
             text=make_build(message),

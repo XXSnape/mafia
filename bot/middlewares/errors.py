@@ -2,7 +2,7 @@ from contextlib import suppress
 from typing import Any, Awaitable, Callable, Dict
 
 from aiogram import BaseMiddleware
-from aiogram.exceptions import TelegramBadRequest
+from aiogram.exceptions import TelegramAPIError
 from aiogram.types import CallbackQuery, Message, TelegramObject
 from general.exceptions import ActionPerformed
 from loguru import logger
@@ -61,7 +61,7 @@ class HandleMessageErrorMiddleware(BaseMiddleware):
         try:
             return await handler(message, data)
         except Exception as e:
-            with suppress(TelegramBadRequest):
+            with suppress(TelegramAPIError):
                 await message.answer(
                     make_build("Попробуй еще раз...")
                 )

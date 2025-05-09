@@ -1,6 +1,6 @@
 from contextlib import suppress
 
-from aiogram.exceptions import TelegramBadRequest
+from aiogram.exceptions import TelegramAPIError
 from cache.cache_types import PollBannedRolesCache, RolesLiteral
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
@@ -108,7 +108,7 @@ class RoleAttendant(RouterHelper):
                 reply_markup=markup,
             )
         else:
-            with suppress(TelegramBadRequest):
+            with suppress(TelegramAPIError):
                 await self.callback.message.edit_text(
                     text=message,
                     reply_markup=markup,

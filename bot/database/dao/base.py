@@ -4,9 +4,6 @@ from database.common.base import BaseModel as Base
 from loguru import logger
 from pydantic import BaseModel
 from sqlalchemy import delete as sqlalchemy_delete
-from sqlalchemy import (
-    func,
-)
 from sqlalchemy import update as sqlalchemy_update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession

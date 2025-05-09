@@ -1,7 +1,7 @@
 from contextlib import suppress
 from datetime import timedelta
 
-from aiogram.exceptions import TelegramBadRequest
+from aiogram.exceptions import TelegramAPIError
 from cache.cache_types import GameCache, PlayersIds
 from keyboards.inline.callback_factory.recognize_user import (
     AimedUserCbData,
@@ -89,7 +89,7 @@ class GroupManager(RouterHelper):
                     ),
                 )
             await self.state.set_data(game_data)
-            with suppress(TelegramBadRequest, AttributeError):
+            with suppress(TelegramAPIError, AttributeError):
                 await self.callback.message.edit_reply_markup(
                     reply_markup=get_vote_for_aim_kb(
                         user_id=callback_data.user_id,

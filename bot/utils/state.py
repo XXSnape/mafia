@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager, suppress
 from typing import cast
 
 from aiogram import Bot, Dispatcher
-from aiogram.exceptions import TelegramBadRequest
+from aiogram.exceptions import TelegramAPIError
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.fsm.storage.base import StorageKey
@@ -88,7 +88,7 @@ async def clear_game_data(
     state: FSMContext,
     message_id: int,
 ):
-    with suppress(TelegramBadRequest):
+    with suppress(TelegramAPIError):
         await bot.delete_message(
             chat_id=game_data["game_chat"], message_id=message_id
         )

@@ -1,6 +1,6 @@
 from contextlib import suppress
 
-from aiogram.exceptions import TelegramBadRequest
+from aiogram.exceptions import TelegramAPIError
 from cache.cache_types import (
     GameCache,
     RolesLiteral,
@@ -62,7 +62,7 @@ class Prosecutor(
     ):
         game_data["cant_talk"].append(processed_user_id)
         game_data["cant_vote"].append(processed_user_id)
-        with suppress(TelegramBadRequest):
+        with suppress(TelegramAPIError):
             await self.bot.send_message(
                 chat_id=processed_user_id,
                 text=make_build(

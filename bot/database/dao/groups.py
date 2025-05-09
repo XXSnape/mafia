@@ -10,7 +10,6 @@ from database.schemas.common import (
 )
 from database.schemas.groups import GroupSettingsSchema
 from database.schemas.settings import DifferentSettingsSchema
-from general import settings
 from general.collection_of_roles import BASES_ROLES
 
 

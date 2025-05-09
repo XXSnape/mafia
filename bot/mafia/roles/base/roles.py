@@ -5,7 +5,7 @@ from random import shuffle
 from typing import TYPE_CHECKING, Callable, Optional, Self
 
 from aiogram import Bot, Dispatcher
-from aiogram.exceptions import TelegramBadRequest
+from aiogram.exceptions import TelegramAPIError
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.types import InlineKeyboardButton
@@ -675,7 +675,7 @@ class ActiveRoleAtNightABC(RoleABC):
             game_data=game_data,
         )
         game_data["waiting_for_action_at_night"].append(player_id)
-        with suppress(TelegramBadRequest):
+        with suppress(TelegramAPIError):
             sent_survey = await self.bot.send_message(
                 chat_id=player_id,
                 text=self.mail_message,

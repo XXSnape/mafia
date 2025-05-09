@@ -3,7 +3,7 @@ from contextlib import suppress
 from datetime import UTC, datetime, timedelta
 from typing import Concatenate, cast
 
-from aiogram.exceptions import TelegramBadRequest
+from aiogram.exceptions import TelegramAPIError
 from aiogram.filters import CommandObject
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ChatMemberAdministrator
@@ -324,7 +324,7 @@ class Registration(RouterHelper):
             game_chat=game_chat,
             players_ids=game_data["live_players_ids"],
         )
-        with suppress(TelegramBadRequest):
+        with suppress(TelegramAPIError):
             await bot.edit_message_text(
                 chat_id=game_chat,
                 text=text,
@@ -552,7 +552,7 @@ class Registration(RouterHelper):
             role = get_data_with_roles(covered_role)
             await self.state.set_data(user_data)
             await game_state.set_data(game_data)
-        with suppress(TelegramBadRequest):
+        with suppress(TelegramAPIError):
             await bot.edit_message_text(
                 chat_id=user_id,
                 text=make_build(

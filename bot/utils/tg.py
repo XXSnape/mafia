@@ -3,7 +3,7 @@ from contextlib import suppress
 from datetime import timedelta
 
 from aiogram import Bot
-from aiogram.exceptions import TelegramBadRequest
+from aiogram.exceptions import TelegramAPIError
 from aiogram.fsm.context import FSMContext
 from aiogram.types import (
     ChatMemberAdministrator,
@@ -20,7 +20,7 @@ async def delete_message(
 ):
     try:
         await message.delete()
-    except (TelegramBadRequest, AttributeError):
+    except (TelegramAPIError, AttributeError):
         if raise_exception:
             raise ActionPerformed
 
@@ -28,7 +28,7 @@ async def delete_message(
 async def delete_message_by_chat(
     bot: Bot, chat_id: int, message_id: int
 ):
-    with suppress(TelegramBadRequest):
+    with suppress(TelegramAPIError):
         await bot.delete_message(
             chat_id=chat_id, message_id=message_id
         )
@@ -72,7 +72,7 @@ async def ban_user(
     user_id: int,
     until_date: timedelta | None = None,
 ):
-    with suppress(TelegramBadRequest):
+    with suppress(TelegramAPIError):
         await bot.restrict_chat_member(
             chat_id=chat_id,
             user_id=user_id,

@@ -1,7 +1,7 @@
 from contextlib import suppress
 from typing import cast
 
-from aiogram.exceptions import TelegramBadRequest
+from aiogram.exceptions import TelegramAPIError
 from cache.cache_types import StagesOfGameLiteral
 from database.dao.settings import SettingsDao
 from database.schemas.common import UserTgIdSchema
@@ -67,7 +67,7 @@ class TimeRouter(RouterHelper):
             ),
             values=value,
         )
-        with suppress(TelegramBadRequest):
+        with suppress(TelegramAPIError):
             await self.callback.message.edit_reply_markup(
                 reply_markup=adjust_time_kb(
                     current_time=callback_data.seconds,

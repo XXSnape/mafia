@@ -1,6 +1,6 @@
 from contextlib import suppress
 
-from aiogram.exceptions import TelegramBadRequest
+from aiogram.exceptions import TelegramAPIError
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from cache.extra import ExtraCache
 from general.groupings import Groupings
@@ -87,7 +87,7 @@ class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
                     "show_information_about_guests_at_night"
                 ]
             ):
-                with suppress(TelegramBadRequest):
+                with suppress(TelegramAPIError):
                     await self.bot.send_message(
                         chat_id=processed_user_id,
                         text=make_build(
