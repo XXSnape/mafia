@@ -399,7 +399,7 @@ class RoleABC(ABC):
         user_url: str | None = None,
         processed_role: Optional["RoleABC"] = None,
         at_night: bool = True,
-        additional_players: str | None = None,
+        additional_players: PlayersIds | None = None,
     ):
         if self.temporary_roles:
             money = 0
@@ -429,7 +429,7 @@ class RoleABC(ABC):
             players = players + players_with_salary_after_death
 
         if additional_players:
-            players = players + game_data[additional_players]
+            players = players + additional_players
 
         for player_id in players:
             game_data["players"][str(player_id)]["money"] += money

@@ -101,7 +101,7 @@ class AngelOfDeath(
             beginning_message="Отомщённое убийство",
             user_url=user_url,
             processed_role=processed_role,
-            additional_players="angels_died",
+            additional_players=game_data["angels_died"],
         )
 
     async def report_death(
