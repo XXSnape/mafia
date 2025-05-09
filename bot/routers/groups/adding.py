@@ -1,4 +1,5 @@
 from aiogram import Bot, F, Router
+from aiogram.enums import ChatType
 from aiogram.filters import (
     JOIN_TRANSITION,
     ChatMemberUpdatedFilter,
@@ -13,7 +14,8 @@ router = Router(name=__name__)
 
 
 @router.my_chat_member(
-    ChatMemberUpdatedFilter(member_status_changed=JOIN_TRANSITION)
+    ChatMemberUpdatedFilter(member_status_changed=JOIN_TRANSITION),
+    F.chat.type.in_({ChatType.GROUP, ChatType.SUPERGROUP}),
 )
 async def adding_to_group(
     event: ChatMemberUpdated,
