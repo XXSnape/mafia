@@ -61,3 +61,6 @@ class SettingModel(IdMixin, BaseModel):
     speed_up_nights_and_voting: Mapped[bool] = mapped_column(
         default=False, server_default="0"
     )
+    protect_content: Mapped[bool] = mapped_column(
+        default=False, server_default="0"
+    )
