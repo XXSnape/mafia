@@ -411,7 +411,7 @@ class Controller:
             )
             text_about_dead += (
                 f"🌹Убит {role} — {url}.\n\n"
-                f"Один из виновных — {killer}!\n\n"
+                f"Один из виновных — {killer}!\n{"━" * 22}\n\n"
             )
         text_about_dead = (
             text_about_dead or "💕Сегодня ночью все выжили!"
