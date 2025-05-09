@@ -29,6 +29,10 @@ from routers.users import (
 from routers.users import router as users_router
 
 
+def json_dumps[**P](*args: P.args, **kwargs: P.kwargs) -> str:
+    return orjson.dumps(*args, **kwargs).decode()
+
+
 async def main() -> None:
     """
     Функция для запуска бота и задач по расписанию
@@ -40,7 +44,9 @@ async def main() -> None:
     scheduler = AsyncIOScheduler()
     scheduler.configure()
     redis = Redis(host=settings.redis.host, port=settings.redis.port)
-    storage = RedisStorage(redis=redis, json_loads=orjson.loads)
+    storage = RedisStorage(
+        redis=redis, json_loads=orjson.loads, json_dumps=json_dumps
+    )
     dp = Dispatcher(
         fsm_strategy=FSMStrategy.CHAT,
         scheduler=scheduler,
