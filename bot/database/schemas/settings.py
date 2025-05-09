@@ -21,3 +21,4 @@ class DifferentSettingsSchema(TimeOfDaySchema):
     mafia_every_3: bool = False
     allow_betting: bool = True
     speed_up_nights_and_voting: bool = False
+    protect_content: bool = False

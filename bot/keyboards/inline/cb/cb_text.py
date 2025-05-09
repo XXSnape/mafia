@@ -25,7 +25,7 @@ SAVE_BANNED_ROLES_CB = "save_banned_roles"
 CANCEL_CB = "cancel"
 
 DURATION_OF_STAGES_CB = "during_of_stages"
-
+PROTECT_CONTENT_CB = "protect_content"
 
 TIME_FOR_NIGHT_CB = "time_for_night"
 TIME_FOR_DAY_CB = "time_for_day"

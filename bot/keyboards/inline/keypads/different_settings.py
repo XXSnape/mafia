@@ -5,10 +5,6 @@ from keyboards.inline.buttons.common import (
     BACK_TO_SELECTING_ACTIONS_ON_SETTINGS_BTN,
 )
 from keyboards.inline.cb import cb_text
-from keyboards.inline.cb.cb_text import (
-    SHOW_PEACEFUL_ALLIES_CB,
-    SHOW_ROLES_AFTER_DEATH_CB,
-)
 
 
 def check_for_settings(
@@ -26,7 +22,7 @@ def get_for_of_war_buttons():
     return (
         InlineKeyboardButton(
             text="Показывать роли погибших",
-            callback_data=SHOW_ROLES_AFTER_DEATH_CB,
+            callback_data=cb_text.SHOW_ROLES_AFTER_DEATH_CB,
         ),
         InlineKeyboardButton(
             text="Показывать имена во время голосования",
@@ -46,7 +42,7 @@ def get_for_of_war_buttons():
         ),
         InlineKeyboardButton(
             text="Показывать мирным своих заместителей",
-            callback_data=SHOW_PEACEFUL_ALLIES_CB,
+            callback_data=cb_text.SHOW_PEACEFUL_ALLIES_CB,
         ),
     )
 
@@ -72,6 +68,10 @@ def get_different_settings_buttons():
         InlineKeyboardButton(
             text="Ускорять наступление дня и подтверждения",
             callback_data=cb_text.SPEED_UP_NIGHTS_AND_VOTING_CB,
+        ),
+        InlineKeyboardButton(
+            text="Запрещать пересылку сообщений от бота",
+            callback_data=cb_text.PROTECT_CONTENT_CB,
         ),
     )
 
