@@ -10,6 +10,8 @@ from aiogram.types import (
     ChatMemberOwner,
     ChatPermissions,
     Message,
+    ChatMemberBanned,
+    ChatMemberLeft,
 )
 from cache.cache_types import PlayersIds
 from general.exceptions import ActionPerformed
@@ -42,6 +44,24 @@ async def check_user_for_admin_rights(
     )
     return isinstance(
         member, (ChatMemberOwner, ChatMemberAdministrator)
+    )
+
+
+async def checking_for_presence_in_group(
+    bot: Bot, chat_id: int, user_id: int
+):
+    member = await bot.get_chat_member(
+        chat_id=chat_id, user_id=user_id
+    )
+    return (
+        isinstance(
+            member,
+            (
+                ChatMemberLeft,
+                ChatMemberBanned,
+            ),
+        )
+        is False
     )
 
 

@@ -60,6 +60,7 @@ from utils.state import (
 from utils.tg import (
     check_user_for_admin_rights,
     delete_message,
+    checking_for_presence_in_group,
 )
 
 
@@ -346,6 +347,7 @@ class Registration(RouterHelper):
             await self.message.answer(make_build("🙂Ты уже в игре!"))
             return
         bot = self._get_bot()
+        user_id = self.message.from_user.id
         game_state = await get_state_and_assign(
             dispatcher=self.dispatcher,
             chat_id=game_chat,
@@ -357,7 +359,16 @@ class Registration(RouterHelper):
                 make_build("Начни регистрацию в группе!")
             )
             return
-        user_id = self.message.from_user.id
+        if (
+            await checking_for_presence_in_group(
+                bot=bot, chat_id=game_chat, user_id=user_id
+            )
+            is False
+        ):
+            await self.message.answer(
+                make_build("🚫Тебя нет в данной группе")
+            )
+            return
         full_name = self.message.from_user.full_name
         balance = (await self._get_user_or_create()).balance
         async with lock_state(game_state):
