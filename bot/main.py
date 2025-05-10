@@ -101,6 +101,10 @@ async def main() -> None:
             command=BotCommands.statistics.name,
             description=BotCommands.statistics,
         ),
+        BotCommand(
+            command=BotCommands.subscribe.name,
+            description=BotCommands.subscribe,
+        ),
     ]
     await bot.set_my_commands(
         private_commands, BotCommandScopeAllPrivateChats()

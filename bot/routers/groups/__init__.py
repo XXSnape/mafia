@@ -8,6 +8,7 @@ from middlewares.db import (
 from .adding import router as adding_router
 from .settings import router as settings_router
 from .statistics import router as statistics_router
+from .subscriptions import router as subscriptions_router
 
 router = Router(name=__name__)
 router.message.filter(
@@ -20,4 +21,5 @@ router.include_routers(
     adding_router,
     settings_router,
     statistics_router,
+    subscriptions_router,
 )

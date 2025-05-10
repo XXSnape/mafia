@@ -8,6 +8,9 @@ from cache.cache_types import PersonalSettingsCache
 from faststream.rabbit import RabbitBroker
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from database.dao.groups import GroupsDao
+from database.schemas.common import TgIdSchema
+
 
 @dataclass
 class RouterHelper:
@@ -43,3 +46,13 @@ class RouterHelper:
     async def get_settings_data(self):
         settings: PersonalSettingsCache = await self.state.get_data()
         return settings["settings"][self.key]
+
+    async def get_group_or_create(self):
+        groups_dao = GroupsDao(session=self.session)
+        group_schema = TgIdSchema(tg_id=self.message.chat.id)
+        group = await groups_dao.find_one_or_none(
+            TgIdSchema(tg_id=self.message.chat.id)
+        )
+        if group is None:
+            group = await groups_dao.add(group_schema)
+        return group

@@ -111,13 +111,7 @@ class StatisticsRouter(RouterHelper):
 
     async def get_group_statistics(self):
         await delete_message(self.message)
-        groups_dao = GroupsDao(session=self.session)
-        group_schema = TgIdSchema(tg_id=self.message.chat.id)
-        group = await groups_dao.find_one_or_none(
-            TgIdSchema(tg_id=self.message.chat.id)
-        )
-        if group is None:
-            group = await groups_dao.add(group_schema)
+        group = await self.get_group_or_create()
         group_id_filter = GroupIdSchema(group_id=group.id)
         games_dao = GamesDao(session=self.session)
         game_result = await games_dao.get_results(group_id_filter)
