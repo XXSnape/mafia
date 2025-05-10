@@ -14,6 +14,7 @@ from database.models import (
     RoleModel,
     SettingModel,
     UserModel,
+    SubscriptionModel,
 )
 from general import settings
 from sqlalchemy import pool
