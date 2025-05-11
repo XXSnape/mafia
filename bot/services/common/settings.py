@@ -138,9 +138,9 @@ class SettingsRouter(RouterHelper):
             chat_id=group_tg_id,
             user_id=self.message.from_user.id,
         )
-        chat_info = await self.message.bot.get_chat(group_tg_id)
+        # chat_info = await self.message.bot.get_chat(group_tg_id)
         group_name = make_build(
-            f"🔧Настройки группы «{chat_info.title}»\n\n"
+            f"🔧Настройки группы «{self.message.chat.title}»\n\n"
         )
         if group_settings.is_there_settings is False:
             await self.message.bot.send_message(
@@ -178,7 +178,7 @@ class SettingsRouter(RouterHelper):
             await self.message.bot.send_message(
                 chat_id=self.message.from_user.id,
                 text=make_build(
-                    f"❗️Ты можешь поменять настройки группы «{chat_info.title}» с помощью кнопок ниже:"
+                    f"❗️Ты можешь поменять настройки группы «{self.message.chat.title}» с помощью кнопок ниже:"
                 ),
                 reply_markup=set_up_group_kb(
                     group_id=group_settings.id,

@@ -102,7 +102,7 @@ class StatisticsRouter(RouterHelper):
                         rows[i].number_of_games
                         - rows[i + 1].number_of_games
                     )
-                    <= 3
+                    <= 8
                     and rows[i + 1].efficiency > rows[i].efficiency
                 ):
                     rows[i], rows[i + 1] = rows[i + 1], rows[i]

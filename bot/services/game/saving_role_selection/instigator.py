@@ -96,7 +96,7 @@ class InstigatorSaver(RouterHelper):
             trace_all_actions(
                 callback=self.callback,
                 game_data=game_data,
-                user_id=user_id,
+                user_id=deceived_user[0],
             )
             await game_state.set_data(game_data)
         subject_url = game_data["players"][str(deceived_user[0])][
