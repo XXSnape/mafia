@@ -52,6 +52,7 @@ from utils.pretty_text import (
 from utils.sorting import sorting_by_money, sorting_by_rate
 from utils.state import (
     reset_user_state_if_in_game,
+    lock_state,
 )
 from utils.tg import delete_messages_from_to_delete, unban_users
 
@@ -121,20 +122,24 @@ class Game:
         self,
     ):
         try:
-            game_data: GameCache = await self.state.get_data()
-            await asyncio.gather(
-                delete_messages_from_to_delete(
-                    bot=self.bot,
-                    state=self.state,
-                ),
-                self.bot.delete_message(
-                    chat_id=self.group_chat_id,
-                    message_id=game_data["start_message_id"],
-                ),
-            )
-            await self.create_game_in_db()
-            await self.state.set_state(GameFsm.STARTED)
-            game_data = await self.select_roles()
+            async with lock_state(self.state):
+                current_game_state = await self.state.get_state()
+                if current_game_state != GameFsm.REGISTRATION.state:
+                    return
+                game_data: GameCache = await self.state.get_data()
+                await asyncio.gather(
+                    delete_messages_from_to_delete(
+                        bot=self.bot,
+                        state=self.state,
+                    ),
+                    self.bot.delete_message(
+                        chat_id=self.group_chat_id,
+                        message_id=game_data["start_message_id"],
+                    ),
+                )
+                await self.create_game_in_db()
+                await self.state.set_state(GameFsm.STARTED)
+                game_data = await self.select_roles()
             self.init_existing_roles(game_data)
             await self.familiarize_players(game_data)
             await self.bot.send_message(
