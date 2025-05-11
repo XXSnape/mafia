@@ -6,7 +6,7 @@ from aiogram.types import Message
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from services.groups.subscriptions import SubscriptionsRouter
+from services.common.subscriptions import SubscriptionsRouter
 
 
 router = Router(name=__name__)

@@ -3,6 +3,7 @@ import asyncio
 from database.dao.games import GamesDao
 from database.dao.rates import RatesDao
 from database.dao.results import ResultsDao
+from database.dao.subscriptions import SubscriptionsDAO
 from database.dao.users import UsersDao
 from database.schemas.bids import (
     BidForRoleSchema,
@@ -10,11 +11,17 @@ from database.schemas.bids import (
 )
 from database.schemas.common import IdSchema
 from database.schemas.games import EndOfGameSchema
+from database.schemas.groups import GroupIdSchema
 from database.schemas.results import PersonalResultSchema
 from faststream import FastStream
+
+from database.schemas.subscriptions import NotificationSchema
 from general.collection_of_roles import get_data_with_roles
 from general.config import bot, broker
 from general.text import MONEY_SYM
+from keyboards.inline.keypads.subscriptions import (
+    newsletter_about_new_game,
+)
 from tasks.dependencies import SessionWithCommitDep
 from utils.pretty_text import make_build
 
@@ -139,4 +146,37 @@ async def refund_money_for_bets(
     )
 
 
+@broker.subscriber("notifications_of_start_of_new_game")
+async def notify_of_start_of_new_game(
+    notification: NotificationSchema,
+    session: SessionWithCommitDep,
+):
+    subscriptions_dao = SubscriptionsDAO(session=session)
+    subscribed_people = await subscriptions_dao.find_all(
+        GroupIdSchema(group_id=notification.group_id)
+    )
+    markup = await newsletter_about_new_game(
+        bot=bot,
+        game_chat=notification.game_chat,
+        group_id=notification.group_id,
+    )
+    text = make_build(
+        "❗️ВНИМАНИЕ\n\n"
+        f"В группе «{notification.title}» начинается новая игра!"
+    )
+    await asyncio.gather(
+        *(
+            bot.send_message(
+                chat_id=subscription.user_tg_id,
+                text=text,
+                reply_markup=markup,
+            )
+            for subscription in subscribed_people
+        )
+    )
+
+
 app = FastStream(broker)
+
+if __name__ == "__main__":
+    asyncio.run(app.run())

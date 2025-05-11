@@ -1,3 +1,6 @@
+from keyboards.inline.callback_factory.subscriptions import (
+    GameNotificationCbData,
+)
 from services.base import RouterHelper
 from contextlib import suppress
 
@@ -41,3 +44,18 @@ class SubscriptionsRouter(RouterHelper):
                 chat_id=self.message.from_user.id,
                 text=make_build(to_user),
             )
+
+    async def disable_notifications(
+        self, callback_data: GameNotificationCbData
+    ):
+        await SubscriptionsDAO(session=self.session).delete(
+            SubscriptionSchema(
+                user_tg_id=self.callback.from_user.id,
+                group_id=callback_data.group_id,
+            )
+        )
+        await self.callback.answer(
+            text="✅Уведомления о начале следующей игры успешно отключены",
+            show_alert=True,
+        )
+        await delete_message(message=self.callback.message)

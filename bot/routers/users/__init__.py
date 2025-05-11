@@ -13,6 +13,7 @@ from .profiles import router as profile_router
 from .settings import router as settings_router
 from .start import router as start_router
 from .time import router as time_router
+from .subscriptions import router as subscriptions_router
 
 router = Router(name=__name__)
 router.message.filter(F.chat.type == ChatType.PRIVATE)
@@ -49,4 +50,5 @@ router.include_routers(
     start_router,
     time_router,
     fog_of_war_router,
+    subscriptions_router,
 )

@@ -1,6 +1,7 @@
 from collections.abc import Awaitable, Callable
 from contextlib import suppress
 from datetime import UTC, datetime, timedelta
+from pprint import pprint
 from typing import Concatenate, cast
 
 from aiogram.exceptions import TelegramAPIError
@@ -21,6 +22,7 @@ from cache.cache_types import (
 from database.dao.groups import GroupsDao
 from database.dao.users import UsersDao
 from database.schemas.common import TgIdSchema, UserTgIdSchema
+from database.schemas.subscriptions import NotificationSchema
 from general import settings
 from general.collection_of_roles import (
     get_data_with_roles,
@@ -185,7 +187,7 @@ class Registration(RouterHelper):
                 ),
                 reply_markup=markup,
             )
-            await self._init_game(
+            game_data: GameCache = await self._init_game(
                 message_id=sent_message.message_id,
                 start_of_registration=start_of_registration,
                 end_of_registration=end_of_registration,
@@ -220,6 +222,14 @@ class Registration(RouterHelper):
             id=f"remind_{self.message.chat.id}",
             kwargs={"bot": self.message.bot, "state": self.state},
             replace_existing=True,
+        )
+        await self.broker.publish(
+            message=NotificationSchema(
+                game_chat=game_data["game_chat"],
+                group_id=game_data["settings"]["id"],
+                title=self.message.chat.title,
+            ),
+            queue="notifications_of_start_of_new_game",
         )
 
     @verification_for_admin_or_creator
@@ -620,3 +630,4 @@ class Registration(RouterHelper):
             "wish_to_leave_game": [],
         }
         await self.state.set_data(game_data)
+        return game_data

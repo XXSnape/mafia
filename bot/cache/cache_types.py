@@ -108,6 +108,7 @@ class InteractionData(TypedDict):
 
 
 class GameSettingsCache(DifferentSettingsCache, total=False):
+    id: int
     creator_user_id: int
     creator_full_name: str
     order_of_roles: list[RolesLiteral]
