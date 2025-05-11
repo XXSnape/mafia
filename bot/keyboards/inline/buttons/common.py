@@ -2,6 +2,9 @@ from aiogram import Bot
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.deep_linking import create_start_link
 from general import settings
+from keyboards.inline.callback_factory.subscriptions import (
+    GameNotificationCbData,
+)
 from keyboards.inline.cb.cb_text import (
     ACTIONS_ON_SETTINGS_CB,
     HELP_CB,
@@ -15,6 +18,15 @@ async def get_join_to_game_btn(bot: Bot, game_chat: int):
         url=await create_start_link(
             bot, str(game_chat), encode=True
         ),
+    )
+
+
+def opt_out_of_notifications_btn(group_id: int):
+    return InlineKeyboardButton(
+        text="❌Отключить уведомления",
+        callback_data=GameNotificationCbData(
+            group_id=group_id
+        ).pack(),
     )
 
 

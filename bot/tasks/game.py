@@ -1,5 +1,11 @@
 import asyncio
 
+from aiogram.exceptions import (
+    TelegramForbiddenError,
+    TelegramAPIError,
+)
+from loguru import logger
+
 from database.dao.games import GamesDao
 from database.dao.rates import RatesDao
 from database.dao.results import ResultsDao
@@ -24,6 +30,7 @@ from keyboards.inline.keypads.subscriptions import (
 )
 from tasks.dependencies import SessionWithCommitDep
 from utils.pretty_text import make_build
+from utils.tg import checking_for_presence_in_group
 
 
 @broker.subscriber("betting_results")
@@ -161,19 +168,36 @@ async def notify_of_start_of_new_game(
         group_id=notification.group_id,
     )
     text = make_build(
-        "❗️ВНИМАНИЕ\n\n"
-        f"В группе «{notification.title}» начинается новая игра!"
+        f"❗️В группе «{notification.title}» начинается новая игра!"
     )
-    await asyncio.gather(
-        *(
-            bot.send_message(
+    to_delete = set[int]()
+    for subscription in subscribed_people:
+        try:
+            await bot.send_message(
                 chat_id=subscription.user_tg_id,
                 text=text,
                 reply_markup=markup,
             )
-            for subscription in subscribed_people
-        )
-    )
+        except TelegramForbiddenError:
+            to_delete.add(subscription.id)
+        except Exception as e:
+            logger.exception(
+                "Ошибка при отправке уведомления о начале игры"
+            )
+    for subscription in subscribed_people:
+        try:
+            result = await checking_for_presence_in_group(
+                bot=bot,
+                chat_id=notification.game_chat,
+                user_id=subscription.user_tg_id,
+            )
+            if result is False:
+                to_delete.add(subscription.id)
+        except TelegramAPIError as e:
+            logger.exception(
+                "Ошибка при проверке наличия пользователя в группе"
+            )
+    await subscriptions_dao.delete_subscriptions(ids=to_delete)
 
 
 app = FastStream(broker)
