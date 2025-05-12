@@ -329,7 +329,7 @@ class Controller:
                 game_data=game_data,
                 user_id=user_id,
             )
-        await asyncio.sleep(1)
+        await asyncio.sleep(2)
         role = (
             user_info["pretty_role"]
             if game_data["settings"]["show_roles_after_death"]
