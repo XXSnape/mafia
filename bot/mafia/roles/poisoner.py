@@ -80,7 +80,7 @@ class Poisoner(
         if self.victims >= self.necessary_to_win:
             return (
                 self.victims
-                * 20
+                * 40
                 * (
                     len(game_data["players"])
                     // settings.mafia.minimum_number_of_players

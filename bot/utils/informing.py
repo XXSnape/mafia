@@ -341,7 +341,7 @@ async def send_messages_after_night(
                         ],
                     )
                 )
-            else:
+            elif game_data["settings"]["show_roles_after_death"]:
                 for message in messages:
                     tasks.append(
                         bot.send_message(

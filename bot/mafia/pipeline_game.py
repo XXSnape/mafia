@@ -527,7 +527,6 @@ class Game:
         banned_roles = game_data["settings"]["banned_roles"]
         order_of_roles = game_data["settings"]["order_of_roles"]
         players_ids = game_data["live_players_ids"][:]
-        pprint(game_data)
         all_roles = get_data_with_roles()
         criminals: list[RolesLiteral] = []
         other: list[RolesLiteral] = []
@@ -621,6 +620,7 @@ class Game:
             }
             game_data["players"][str(winner_id)].update(user_data)
             roles.append(winner_id)
+        pprint(game_data)
         await self.record_data_about_betting_results(
             order_of_roles=order_of_roles,
             winners_bets=winners_bets,

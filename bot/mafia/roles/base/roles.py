@@ -141,7 +141,7 @@ class RoleABC(ABC):
                     self.bot.send_message(
                         chat_id=user_id,
                         text=make_build(
-                            "❗️Твои союзники, с которыми можно общаться прямо в этом чате:\n"
+                            "❗️Ты и твои союзники, с которыми можно общаться прямо в этом чате:\n"
                         )
                         + profiles,
                         protect_content=game_data["settings"][

@@ -202,5 +202,3 @@ async def notify_of_start_of_new_game(
 
 app = FastStream(broker)
 
-if __name__ == "__main__":
-    asyncio.run(app.run())
