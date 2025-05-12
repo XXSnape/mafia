@@ -24,7 +24,7 @@ class Journalist(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         "company_press_release_image/"
         "022eef78-63a5-4a2b-bb88-e4dcae639e34.jpg"
     )
-    purpose = "Ты можешь приходить к местным жителям и узнавать, что они видели"
+    purpose = "Ты можешь приходить к местным жителям и узнавать, что они видели."
     message_to_group_after_action = (
         "Что случилось? Отчаянные СМИ спешат выяснить правду!"
     )

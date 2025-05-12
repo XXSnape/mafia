@@ -37,7 +37,7 @@ class Traitor(
     photo = "https://i.playground.ru/p/sLHLRFjDy8_89wYe26RIQw.jpeg"
     grouping = Groupings.criminals
     need_to_monitor_interaction = False
-    purpose = "Ты можешь просыпаться каждую 2-ую ночь и узнавать роль других игроков для мафии."
+    purpose = "Ты можешь узнавать роли других игроков и быть разведывательной силой мафии."
     message_to_group_after_action = (
         "Мафия и Даркнет. Что может сочетаться лучше? "
         "Поддельные ксивы помогают узнавать правду!"
