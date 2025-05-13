@@ -5,11 +5,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from cache.cache_types import PersonalSettingsCache
-from faststream.rabbit import RabbitBroker
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from database.dao.groups import GroupsDao
 from database.schemas.common import TgIdSchema
+from faststream.rabbit import RabbitBroker
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 @dataclass

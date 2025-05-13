@@ -1,7 +1,6 @@
 import asyncio
 
 from database.dao.games import GamesDao
-from database.dao.groups import GroupsDao
 from database.dao.rates import RatesDao
 from database.dao.results import ResultsDao
 from database.dao.users import UsersDao

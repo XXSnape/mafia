@@ -1,8 +1,7 @@
-from loguru import logger
-from sqlalchemy import delete
-
 from database.dao.base import BaseDAO
 from database.models import SubscriptionModel
+from loguru import logger
+from sqlalchemy import delete
 
 
 class SubscriptionsDAO(BaseDAO[SubscriptionModel]):

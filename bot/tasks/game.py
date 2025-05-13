@@ -1,11 +1,9 @@
 import asyncio
 
 from aiogram.exceptions import (
-    TelegramForbiddenError,
     TelegramAPIError,
+    TelegramForbiddenError,
 )
-from loguru import logger
-
 from database.dao.games import GamesDao
 from database.dao.rates import RatesDao
 from database.dao.results import ResultsDao
@@ -19,15 +17,15 @@ from database.schemas.common import IdSchema
 from database.schemas.games import EndOfGameSchema
 from database.schemas.groups import GroupIdSchema
 from database.schemas.results import PersonalResultSchema
-from faststream import FastStream
-
 from database.schemas.subscriptions import NotificationSchema
+from faststream import FastStream
 from general.collection_of_roles import get_data_with_roles
 from general.config import bot, broker
 from general.text import MONEY_SYM
 from keyboards.inline.keypads.subscriptions import (
     newsletter_about_new_game,
 )
+from loguru import logger
 from tasks.dependencies import SessionWithCommitDep
 from utils.pretty_text import make_build
 from utils.tg import checking_for_presence_in_group

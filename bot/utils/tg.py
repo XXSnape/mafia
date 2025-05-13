@@ -7,11 +7,11 @@ from aiogram.exceptions import TelegramAPIError
 from aiogram.fsm.context import FSMContext
 from aiogram.types import (
     ChatMemberAdministrator,
+    ChatMemberBanned,
+    ChatMemberLeft,
     ChatMemberOwner,
     ChatPermissions,
     Message,
-    ChatMemberBanned,
-    ChatMemberLeft,
 )
 from cache.cache_types import PlayersIds
 from general.exceptions import ActionPerformed

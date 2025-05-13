@@ -51,8 +51,8 @@ from utils.pretty_text import (
 )
 from utils.sorting import sorting_by_money, sorting_by_rate
 from utils.state import (
-    reset_user_state_if_in_game,
     lock_state,
+    reset_user_state_if_in_game,
 )
 from utils.tg import delete_messages_from_to_delete, unban_users
 

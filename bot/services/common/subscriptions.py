@@ -1,5 +1,10 @@
+from contextlib import suppress
+
+from aiogram.exceptions import TelegramAPIError
+from database.dao.subscriptions import SubscriptionsDAO
 from database.dao.users import UsersDao
 from database.schemas.common import TgIdSchema
+from database.schemas.subscriptions import SubscriptionSchema
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import (
     opt_out_of_notifications_btn,
@@ -8,13 +13,6 @@ from keyboards.inline.callback_factory.subscriptions import (
     GameNotificationCbData,
 )
 from services.base import RouterHelper
-from contextlib import suppress
-
-from aiogram.exceptions import TelegramAPIError
-
-from database.dao.subscriptions import SubscriptionsDAO
-from database.schemas.subscriptions import SubscriptionSchema
-
 from utils.pretty_text import make_build
 from utils.tg import delete_message
 

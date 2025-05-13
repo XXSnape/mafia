@@ -7,5 +7,5 @@ from .rates import RateModel
 from .results import ResultModel
 from .roles import RoleModel
 from .settings import SettingModel
-from .users import UserModel
 from .subscriptions import SubscriptionModel
+from .users import UserModel

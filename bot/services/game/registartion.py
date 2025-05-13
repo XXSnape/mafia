@@ -1,7 +1,6 @@
 from collections.abc import Awaitable, Callable
 from contextlib import suppress
 from datetime import UTC, datetime, timedelta
-from pprint import pprint
 from typing import Concatenate, cast
 
 from aiogram.exceptions import TelegramAPIError
@@ -61,8 +60,8 @@ from utils.state import (
 )
 from utils.tg import (
     check_user_for_admin_rights,
-    delete_message,
     checking_for_presence_in_group,
+    delete_message,
 )
 
 

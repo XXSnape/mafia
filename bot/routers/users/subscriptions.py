@@ -1,12 +1,10 @@
-from aiogram import F, Router
+from aiogram import Router
 from aiogram.types import CallbackQuery
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from keyboards.inline.callback_factory.subscriptions import (
     GameNotificationCbData,
 )
 from services.common.subscriptions import SubscriptionsRouter
-from services.users.time import TimeRouter
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = Router(name=__name__)
 

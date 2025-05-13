@@ -13,8 +13,8 @@ from database.models import (
     ResultModel,
     RoleModel,
     SettingModel,
-    UserModel,
     SubscriptionModel,
+    UserModel,
 )
 from general import settings
 from sqlalchemy import pool

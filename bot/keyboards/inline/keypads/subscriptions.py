@@ -1,13 +1,8 @@
 from aiogram import Bot
-from aiogram.types import InlineKeyboardButton
-
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import (
     get_join_to_game_btn,
     opt_out_of_notifications_btn,
-)
-from keyboards.inline.callback_factory.subscriptions import (
-    GameNotificationCbData,
 )
 
 

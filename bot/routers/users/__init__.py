@@ -12,8 +12,8 @@ from .order_of_roles import router as order_of_roles_router
 from .profiles import router as profile_router
 from .settings import router as settings_router
 from .start import router as start_router
-from .time import router as time_router
 from .subscriptions import router as subscriptions_router
+from .time import router as time_router
 
 router = Router(name=__name__)
 router.message.filter(F.chat.type == ChatType.PRIVATE)
