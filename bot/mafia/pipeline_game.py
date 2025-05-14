@@ -213,7 +213,7 @@ class Game:
         game_data = await delete_messages_from_to_delete(
             bot=self.bot, state=self.state
         )
-        await asyncio.sleep(3)
+        await asyncio.sleep(4)
         await self.controller.send_delay_messages(
             game_data=game_data, at_night=True
         )
@@ -230,7 +230,7 @@ class Game:
         game_data = await delete_messages_from_to_delete(
             bot=self.bot, state=self.state
         )
-        await asyncio.sleep(3)
+        await asyncio.sleep(4)
         await self.controller.send_delay_messages(
             game_data=game_data, at_night=False
         )

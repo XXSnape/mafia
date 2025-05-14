@@ -129,10 +129,13 @@ class Lucifer(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         processed_user_id: UserIdInt,
         **kwargs,
     ):
-
+        if processed_role.grouping == Groupings.criminals:
+            money = 0
+        else:
+            money = processed_role.payment_for_murder * 2 + 10
         self.add_money_to_all_allies(
             game_data=game_data,
-            money=processed_role.payment_for_murder * 2 + 10,
+            money=money,
             beginning_message="Блокировка",
             user_url=user_url,
             processed_role=processed_role,
