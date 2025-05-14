@@ -21,12 +21,13 @@ def get_the_most_frequently_encountered_id(
 
 
 def get_criminals_ids(game_data: GameCache) -> PlayersIds:
-    from mafia.roles import Forger, Mafia, Traitor
+    from mafia.roles import Forger, Mafia, Traitor, Lucifer
 
     return (
         game_data.get(Mafia.roles_key, [])
         + game_data.get(Traitor.roles_key, [])
         + game_data.get(Forger.roles_key, [])
+        + game_data.get(Lucifer.roles_key, [])
     )
 
 

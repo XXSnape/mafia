@@ -26,10 +26,7 @@ class Bodyguard(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role_id: RolesLiteral = "bodyguard"
     mail_message = "За кого пожертвовать собой?"
     photo = (
-        "https://sun6-22.userapi.com/impg/zAaADEA19scv86EFl8bY1wUYRCJyBPGg1qamiA/"
-        "xjMRCUhA20g.jpg?size=1280x1280&quality=96&sign="
-        "de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag=EOC9ErRHImjvmda4Qd5Pq59H"
-        "Pf-wUgr77rzHZvabHjc&type=album"
+        "https://i.pinimg.com/originals/d7/27/c2/d727c2dc975bd8a14f1f947c88aeff9b.gif"
     )
     purpose = "Тебе нужно защитить собой лучших специалистов"
     message_to_group_after_action = "Кто-то пожертвовал собой!"
@@ -47,11 +44,11 @@ class Bodyguard(ProcedureAfterNightABC, ActiveRoleAtNightABC):
             pay_for=[SAVING_PLAYER],
             limitations=[
                 CANT_CHOOSE_IN_ROW,
-                "выплата не происходит, если выбранного игрока лечил кто-то другой",
+                "Выплата не происходит, если выбранного игрока лечил кто-то другой",
             ],
             features=[
                 "Если вылечат телохранителя, "
-                "а выбор телохранителя падет на игрока, который должен умереть, "
+                "а выбор телохранителя падёт на игрока, который должен умереть, "
                 "тогда этот игрок не умрет, как и сам телохранителя, которому заплатят, как за спасение"
             ],
         )

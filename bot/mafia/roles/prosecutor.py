@@ -26,7 +26,6 @@ from utils.tg import ban_user, unban_users
 
 
 class Prosecutor(
-    ProcedureAfterVotingABC,
     ProcedureAfterNightABC,
     ActiveRoleAtNightABC,
 ):
@@ -103,18 +102,6 @@ class Prosecutor(
             beginning_message="Арест",
         )
 
-    @get_processed_user_id_if_exists
-    async def take_action_after_voting(
-        self,
-        game_data: GameCache,
-        processed_user_id: UserIdInt,
-        **kwargs,
-    ):
-        await unban_users(
-            bot=self.bot,
-            chat_id=game_data["game_chat"],
-            users=[processed_user_id],
-        )
 
     def __init__(self):
         self.state_for_waiting_for_action = (

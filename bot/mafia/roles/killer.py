@@ -8,7 +8,7 @@ from mafia.roles.base.roles import RoleABC
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CAN_KILL_AT_NIGHT,
-    KILLING_PLAYER,
+    KILLING_PLAYER, MAKES_MOVE_EVERY_ODD_NIGHT,
 )
 from states.game import UserFsm
 from utils.roles import get_processed_role_and_user_if_exists
@@ -39,7 +39,7 @@ class Killer(MurderAfterNightABC, ActiveRoleAtNightABC):
             skill=CAN_KILL_AT_NIGHT,
             pay_for=[KILLING_PLAYER],
             limitations=[
-                "Может делать ход только на чётную ночь",
+                MAKES_MOVE_EVERY_ODD_NIGHT,
             ],
             features=[
                 "Начинает просыпаться каждую ночь после смерти всех мафий"

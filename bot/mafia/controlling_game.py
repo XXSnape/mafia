@@ -54,6 +54,7 @@ from utils.state import (
     lock_state,
     reset_user_state,
 )
+from utils.tg import unban_users
 
 if TYPE_CHECKING:
     from mafia.pipeline_game import Game
@@ -107,7 +108,6 @@ class Controller:
         self.all_roles = {}
         self.aim_id: UserIdInt | None = None
         self.original_roles_in_fog_of_war: str | None = None
-
         self.waiting_for_action_at_night = []
         self.waiting_for_action_at_day = []
 
@@ -241,6 +241,11 @@ class Controller:
                     current_role.end_night(game_data=game_data)
                 )
         await asyncio.gather(*tasks, return_exceptions=True)
+        await unban_users(
+            bot=self.bot,
+            chat_id=game_data["game_chat"],
+            users=game_data["cant_talk"],
+        )
         game_data["pros"].clear()
         game_data["cons"].clear()
         game_data["vote_for"].clear()

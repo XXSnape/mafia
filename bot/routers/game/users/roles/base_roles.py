@@ -27,6 +27,7 @@ router = Router(name=__name__)
         UserFsm.MAFIA_ATTACKS,
         UserFsm.CLOFFELINE_GIRL_PUTS_TO_SLEEP,
         UserFsm.PROSECUTOR_ARRESTS,
+        UserFsm.LUCIFER_BLOCKS,
     ),
     UserActionIndexCbData.filter(),
 )

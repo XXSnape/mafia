@@ -36,8 +36,6 @@ class Forger(
         "size=604x302&quality=95&sign"
         "=0fb255f26d2fd1775b2db1c2001f7a0b&type=album"
     )
-    do_not_choose_self = 2
-    do_not_choose_others = 2
     mail_message = "Кому сегодня подделаешь документы?"
     extra_data = [ExtraCache(key="forged_roles")]
     need_to_monitor_interaction = False

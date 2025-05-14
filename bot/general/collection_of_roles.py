@@ -27,6 +27,7 @@ def get_data_with_roles(
         roles.Civilian(),
         roles.MafiaAlias(),
         roles.Traitor(),
+        roles.Lucifer(),
         roles.Killer(),
         roles.Werewolf(),
         roles.Forger(),

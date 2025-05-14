@@ -24,3 +24,4 @@ from .suicide_bomber import SuicideBomber
 from .traitor import Traitor
 from .warden import Warden
 from .werewolf import Werewolf
+from .lucifer import Lucifer

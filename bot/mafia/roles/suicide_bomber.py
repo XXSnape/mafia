@@ -15,8 +15,7 @@ class SuicideBomber(SuicideRoleMixin, RoleABC):
     role = "Ночной смертник"
     role_id: RolesLiteral = "suicide_bomber"
     photo = (
-        "https://sun6-22.userapi.com/impg/zAaADEA19s"
-        "cv86EFl8bY1wUYRCJyBPGg1qamiA/xjMRCUhA20g.jpg?size=1280x1280&quality=96&sign=de22e32d9a16e37a3d46a2df767eab0b&c_uniq_tag=EOC9ErRHImjvmda4Qd5Pq59HPf-wUgr77rzHZvabHjc&type=album"
+        "https://mir-s3-cdn-cf.behance.net/project_modules/fs/5777bc31520907.56546e3faae08.jpg"
     )
     grouping = Groupings.other
     purpose = "Тебе нужно умереть ночью."
