@@ -66,9 +66,11 @@ class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
             return criminals
         user_id = criminals[0]
         for criminal_id in criminals:
-            role: MafiaConverterABC = self.all_roles[
-                game_data["players"][str(criminal_id)]["role_id"]
-            ]
+            role: MafiaConverterABC | ActiveRoleAtNightABC = (
+                self.all_roles[
+                    game_data["players"][str(criminal_id)]["role_id"]
+                ]
+            )
             if isinstance(
                 role, MafiaConverterABC
             ) is False or role.check_for_possibility_to_transform(
