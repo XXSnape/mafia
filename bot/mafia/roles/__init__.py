@@ -11,6 +11,7 @@ from .instigator import Instigator
 from .journalist import Journalist
 from .killer import Killer
 from .lawyer import Lawyer
+from .lucifer import Lucifer
 from .lucky_gay import LuckyGay
 from .mafia import Mafia, MafiaAlias
 from .masochist import Masochist
@@ -24,4 +25,3 @@ from .suicide_bomber import SuicideBomber
 from .traitor import Traitor
 from .warden import Warden
 from .werewolf import Werewolf
-from .lucifer import Lucifer

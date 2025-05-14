@@ -43,7 +43,7 @@ class Lucifer(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         "Повелитель преисподней отправился в поиски невинной души"
     )
     message_to_user_after_action = (
-        "Ты выбрал забрать с собой на 1 ночь и день душу {url}"
+        "Ты выбрал забрать с собой на ночь и день душу {url}"
     )
     words_to_aliases_and_teammates = "Забрать душу"
     mail_message = "Чью душу заберешь?"
