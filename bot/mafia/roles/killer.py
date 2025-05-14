@@ -8,7 +8,8 @@ from mafia.roles.base.roles import RoleABC
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CAN_KILL_AT_NIGHT,
-    KILLING_PLAYER, MAKES_MOVE_EVERY_ODD_NIGHT,
+    KILLING_PLAYER,
+    MAKES_MOVE_EVERY_ODD_NIGHT,
 )
 from states.game import UserFsm
 from utils.roles import get_processed_role_and_user_if_exists

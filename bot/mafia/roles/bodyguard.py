@@ -25,9 +25,7 @@ class Bodyguard(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Телохранитель"
     role_id: RolesLiteral = "bodyguard"
     mail_message = "За кого пожертвовать собой?"
-    photo = (
-        "https://i.pinimg.com/originals/d7/27/c2/d727c2dc975bd8a14f1f947c88aeff9b.gif"
-    )
+    photo = "https://i.pinimg.com/originals/d7/27/c2/d727c2dc975bd8a14f1f947c88aeff9b.gif"
     purpose = "Тебе нужно защитить собой лучших специалистов"
     message_to_group_after_action = "Кто-то пожертвовал собой!"
     message_to_user_after_action = (

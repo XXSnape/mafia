@@ -6,7 +6,7 @@ from aiogram.types import InlineKeyboardButton
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general.groupings import Groupings
 from general.text import (
-     NUMBER_OF_DAY,
+    NUMBER_OF_DAY,
 )
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
@@ -17,7 +17,7 @@ from mafia.roles.base.mixins import (
 )
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
-     MAKES_MOVE_EVERY_ODD_NIGHT,
+    MAKES_MOVE_EVERY_ODD_NIGHT,
 )
 from states.game import UserFsm
 from utils.common import get_criminals_ids
@@ -29,37 +29,41 @@ if TYPE_CHECKING:
     from mafia.roles import RoleABC
 
 
-class Lucifer(
-    ProcedureAfterNightABC, ActiveRoleAtNightABC
-):
+class Lucifer(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     role = "Люцифер"
     role_id: RolesLiteral = "lucifer"
     photo = "https://masterpiecer-images.s3.yandex.net/9bd6ec1c5b6911ee93bebeb332dff282:upscaled"
     grouping = Groupings.criminals
     need_to_monitor_interaction = False
-    purpose = ("Каждую нечётную ночь ты забираешь душу жертвы, "
-               "поэтому она не сможет ничего сделать в ночное время, а также говорить и голосовать днём.")
-    message_to_group_after_action = (
-        "Повелитель преисподней отправился в пуски невинной души"
+    purpose = (
+        "Каждую нечётную ночь ты забираешь душу жертвы, "
+        "поэтому она не сможет ничего сделать в ночное время, а также говорить и голосовать днём."
     )
-    message_to_user_after_action = "Ты выбрал забрать с собой на 1 ночь и день душу {url}"
+    message_to_group_after_action = (
+        "Повелитель преисподней отправился в поиски невинной души"
+    )
+    message_to_user_after_action = (
+        "Ты выбрал забрать с собой на 1 ночь и день душу {url}"
+    )
     words_to_aliases_and_teammates = "Забрать душу"
     mail_message = "Чью душу заберешь?"
     payment_for_treatment = 0
     payment_for_murder = 15
     number_in_order_after_night = -1
 
-
     @property
     def role_description(self) -> RoleDescription:
         from .sleeper import Sleeper
+
         return RoleDescription(
             skill="Отменяет ход жертвы ночью и запрещает говорить и голосовать ей днём",
-            pay_for=['Блокировку игрока не союзной группировки'],
+            pay_for=["Блокировку игрока не союзной группировки"],
             limitations=[MAKES_MOVE_EVERY_ODD_NIGHT],
-            features=[f'Усыпление Люцифера происходит раньше всех, '
-                      f'поэтому если он выбрал усыпить {Sleeper.pretty_role},'
-                      f' а она его, то будет отменен ход {Sleeper.pretty_role}']
+            features=[
+                f"Усыпление Люцифера происходит раньше всех, "
+                f"поэтому если он выбрал усыпить {Sleeper.pretty_role},"
+                f" а она его, то будет отменен ход {Sleeper.pretty_role}"
+            ],
         )
 
     def __init__(self):
@@ -82,8 +86,8 @@ class Lucifer(
             role.cancel_actions(
                 game_data=game_data, user_id=processed_user_id
             )
-        game_data['cant_talk'].append(processed_user_id)
-        game_data['cant_vote'].append(processed_user_id)
+        game_data["cant_talk"].append(processed_user_id)
+        game_data["cant_vote"].append(processed_user_id)
         with suppress(TelegramAPIError):
             await self.bot.send_message(
                 chat_id=processed_user_id,
@@ -133,3 +137,9 @@ class Lucifer(
             user_url=user_url,
             processed_role=processed_role,
         )
+
+    @staticmethod
+    def allow_sending_mailing(game_data: GameCache):
+        if game_data["number_of_night"] % 2 != 0:
+            return True
+        return None

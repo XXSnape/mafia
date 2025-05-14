@@ -14,9 +14,7 @@ from utils.pretty_text import make_build
 class SuicideBomber(SuicideRoleMixin, RoleABC):
     role = "Ночной смертник"
     role_id: RolesLiteral = "suicide_bomber"
-    photo = (
-        "https://mir-s3-cdn-cf.behance.net/project_modules/fs/5777bc31520907.56546e3faae08.jpg"
-    )
+    photo = "https://mir-s3-cdn-cf.behance.net/project_modules/fs/5777bc31520907.56546e3faae08.jpg"
     grouping = Groupings.other
     purpose = "Тебе нужно умереть ночью."
 

@@ -14,4 +14,6 @@ PAY_FOR_EARLY_DEATH = "За более раннюю смерть платят б
 CHECKING_PLAYER = "Проверку игрока"
 CAN_SEE_ALLIES = "Может видеть всех членов группировки"
 DONT_PAY_FOR_VOTING = "Нет выплат за повешение игроков днём"
-MAKES_MOVE_EVERY_ODD_NIGHT = "Может делать ход только на нечётную ночь"
+MAKES_MOVE_EVERY_ODD_NIGHT = (
+    "Может делать ход только на нечётную ночь"
+)
