@@ -138,7 +138,6 @@ class SettingsRouter(RouterHelper):
             chat_id=group_tg_id,
             user_id=self.message.from_user.id,
         )
-        # chat_info = await self.message.bot.get_chat(group_tg_id)
         group_name = make_build(
             f"🔧Настройки группы «{self.message.chat.title}»\n\n"
         )

@@ -35,7 +35,7 @@ def json_dumps[**P](*args: P.args, **kwargs: P.kwargs) -> str:
 
 async def main() -> None:
     """
-    Функция для запуска бота и задач по расписанию
+    Функция для запуска бота
 
     :return: None
     """
