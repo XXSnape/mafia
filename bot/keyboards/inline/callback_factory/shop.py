@@ -9,4 +9,5 @@ class ChooseToPurchaseCbData(CallbackData, prefix="purchase"):
 class BuyResourcesCbData(
     ChooseToPurchaseCbData, prefix="buy_resource"
 ):
+    is_confirmed: bool
     count: int

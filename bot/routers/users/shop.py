@@ -7,7 +7,11 @@ from database.dao.assets import AssetsDao
 from database.dao.users import UsersDao
 from database.schemas.assets import AssetsSchema
 from database.schemas.common import TgIdSchema
-from general.resources import Resources
+from general.resources import (
+    Resources,
+    get_data_about_resource,
+    get_cost_of_discounted_resource,
+)
 from general.text import MONEY_SYM
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import SHOP_BTN
@@ -22,7 +26,6 @@ from keyboards.inline.cb.cb_text import (
 from keyboards.inline.keypads.shop import available_resources_kb
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from utils.common import get_cost_of_discounted_resource
 from utils.pretty_text import make_build
 
 router = Router(name=__name__)
@@ -63,16 +66,8 @@ async def select_number_of_resources(
     asset = await AssetsDao(
         session=session_without_commit
     ).find_one_or_none(AssetsSchema(name=resource))
-
-    match resource:
-        case Resources.anonymous_letters:
-            text = (
-                "💌Анонимки позволяют отправлять сообщения в группу, "
-                "где проходит игра, от лица бота.\n"
-                "Сообщения будут доставлены, если игрок еще жив.\n\n"
-            )
-        case _:
-            assert_never(resource)
+    asset_data = get_data_about_resource(resource=resource)
+    text = asset_data.description
 
     prices = ""
     buttons = []
@@ -84,7 +79,9 @@ async def select_number_of_resources(
             InlineKeyboardButton(
                 text=f"{count} ({cost}{MONEY_SYM})",
                 callback_data=BuyResourcesCbData(
-                    resource=resource, count=count
+                    resource=resource,
+                    count=count,
+                    is_confirmed=False,
                 ).pack(),
             )
         )
@@ -100,4 +97,42 @@ async def select_number_of_resources(
     )
     await callback.message.edit_text(
         text=make_build(text), reply_markup=markup
+    )
+
+
+@router.callback_query(
+    BuyResourcesCbData.filter(F.is_confirmed.is_(False))
+)
+async def confirm_purchase_of_resource(
+    callback: CallbackQuery,
+    callback_data: BuyResourcesCbData,
+    session_without_commit: AsyncSession,
+):
+    asset_data = get_data_about_resource(
+        resource=callback_data.resource
+    )
+    asset = await AssetsDao(
+        session=session_without_commit
+    ).find_one_or_none(AssetsSchema(name=callback_data.resource))
+    cost = get_cost_of_discounted_resource(
+        cost=asset.cost, count=callback_data.count
+    )
+    message = (
+        f"❗️Ты уверен, что хочешь купить «{asset_data.name}» "
+        f"в количестве {callback_data.count} шт за {cost}{MONEY_SYM}?"
+    )
+    callback_data.is_confirmed = True
+    await callback.message.edit_text(
+        text=make_build(message),
+        reply_markup=generate_inline_kb(
+            data_with_buttons=(
+                InlineKeyboardButton(
+                    text="🎁Купить",
+                    callback_data=callback_data.pack(),
+                ),
+                InlineKeyboardButton(
+                    text="❌Отмена", callback_data=SHOP_CB
+                ),
+            )
+        ),
     )
