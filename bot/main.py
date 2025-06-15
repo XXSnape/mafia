@@ -82,6 +82,10 @@ async def main() -> None:
             description=BotCommands.registration,
         ),
         BotCommand(
+            command=BotCommands.game.name,
+            description=BotCommands.game
+        ),
+        BotCommand(
             command=BotCommands.extend.name,
             description=BotCommands.extend,
         ),

@@ -164,7 +164,6 @@ class Registration(RouterHelper):
         markup = await join_to_game_kb(
             bot=self._get_bot(),
             game_chat=self.message.chat.id,
-            players_ids=[],
         )
         start_of_registration_dt = datetime.now(UTC)
         end_of_registration = int(
@@ -330,7 +329,6 @@ class Registration(RouterHelper):
         to_group_markup = await join_to_game_kb(
             bot=bot,
             game_chat=game_chat,
-            players_ids=game_data["live_players_ids"],
         )
         with suppress(TelegramAPIError):
             await bot.edit_message_text(
@@ -423,12 +421,19 @@ class Registration(RouterHelper):
                     game_data=game_data, game_state=game_state
                 )
 
-    async def finish_registration(self):
+    async def finish_registration_and_start_game(self):
+        await self.message.delete()
         async with lock_state(self.state):
             game_data: GameCache = await self.state.get_data()
+            players = game_data["live_players_ids"]
+            if (
+                len(players)
+                < settings.mafia.minimum_number_of_players
+            ):
+                return
             user_id = self._get_user_id()
             is_admin = await check_user_for_admin_rights(
-                bot=self.callback.bot,
+                bot=self.message.bot,
                 chat_id=game_data["game_chat"],
                 user_id=user_id,
             )
@@ -437,13 +442,6 @@ class Registration(RouterHelper):
                 and game_data["settings"]["creator_user_id"]
                 != user_id
             ):
-                full_name = game_data["settings"][
-                    "creator_full_name"
-                ]
-                await self.callback.answer(
-                    f"Пожалуйста, попроси {full_name} или администраторов начать игру!",
-                    show_alert=True,
-                )
                 return
         await self._start_game(
             game_data=game_data, game_state=self.state
