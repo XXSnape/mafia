@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 6ca407f80e2a
+Revision ID: 6aa88d85c68d
 Revises: 6d3c0908f7d9
-Create Date: 2025-06-15 19:14:00.421104
+Create Date: 2025-06-15 19:32:32.837776
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "6ca407f80e2a"
+revision: str = "6aa88d85c68d"
 down_revision: Union[str, None] = "6d3c0908f7d9"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -24,7 +24,9 @@ def upgrade() -> None:
     op.create_table(
         "assets",
         sa.Column(
-            "name", sa.Enum("anonymous_letters", name="assets"), nullable=False
+            "name",
+            sa.Enum("anonymous_letters", name="resources"),
+            nullable=False,
         ),
         sa.Column("cost", sa.Integer(), nullable=False),
         sa.CheckConstraint("cost > 0"),

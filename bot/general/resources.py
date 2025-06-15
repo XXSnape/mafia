@@ -1,5 +1,5 @@
 from enum import StrEnum
 
 
-class Assets(StrEnum):
+class Resources(StrEnum):
     anonymous_letters = "anonymous_letters"
