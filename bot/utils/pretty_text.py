@@ -1,5 +1,10 @@
+from html import escape
+
+
 def get_profile_link(user_id: int | str, full_name: str) -> str:
-    return f'<a href="tg://user?id={user_id}">{full_name}</a>'
+    return (
+        f'<a href="tg://user?id={user_id}">{escape(full_name)}</a>'
+    )
 
 
 def make_build(string: str) -> str:
