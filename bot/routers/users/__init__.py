@@ -11,6 +11,7 @@ from .help import router as help_router
 from .order_of_roles import router as order_of_roles_router
 from .profiles import router as profile_router
 from .settings import router as settings_router
+from .shop import router as shop_router
 from .start import router as start_router
 from .subscriptions import router as subscriptions_router
 from .time import router as time_router
@@ -37,10 +38,14 @@ always_available_router.message.middleware(
 always_available_router.callback_query.middleware(
     DatabaseMiddlewareWithCommit()
 )
+always_available_router.callback_query.middleware(
+    DatabaseMiddlewareWithoutCommit()
+)
 always_available_router.include_routers(
     profile_router,
     help_router,
     settings_router,
+    shop_router,
 )
 
 

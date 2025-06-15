@@ -1,5 +1,7 @@
 import asyncio
 
+from aiogram.types import InlineKeyboardButton
+
 from database.dao.games import GamesDao
 from database.dao.rates import RatesDao
 from database.dao.results import ResultsDao
@@ -8,6 +10,8 @@ from database.schemas.common import TgIdSchema, UserTgIdSchema
 from database.schemas.groups import GroupIdSchema
 from general.collection_of_roles import get_data_with_roles
 from general.text import MONEY_SYM
+from keyboards.inline.builder import generate_inline_kb
+from keyboards.inline.buttons.common import SHOP_BTN
 from services.base import RouterHelper
 from utils.pretty_text import (
     get_minutes_and_seconds_text,
@@ -16,6 +20,7 @@ from utils.pretty_text import (
     make_pretty,
 )
 from utils.tg import delete_message
+from html import escape
 
 
 class StatisticsRouter(RouterHelper):
@@ -67,8 +72,9 @@ class StatisticsRouter(RouterHelper):
             if number_of_games
             else "Нет информации"
         )
+
         result_text = (
-            f"👤Профиль {self.message.from_user.full_name}\n\n"
+            f"👤Профиль {escape(self.message.from_user.full_name)}\n\n"
             f"💰Текущий баланс: {balance}{MONEY_SYM}\n"
             f"🎮Всего игр: {number_of_games}\n"
             f"✌️Побед: {number_of_wins} {total_percentage_of_wins}\n"
@@ -87,7 +93,12 @@ class StatisticsRouter(RouterHelper):
             )
             result_text += rates_text
         result_text += f"💲Всего заработано: {money_sum}{MONEY_SYM}"
-        await self.message.answer(make_build(result_text))
+        await self.message.answer(
+            make_build(result_text),
+            reply_markup=generate_inline_kb(
+                data_with_buttons=[SHOP_BTN]
+            ),
+        )
 
     @staticmethod
     def sorting_by_efficiency(rows):

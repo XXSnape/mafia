@@ -9,6 +9,7 @@ from keyboards.inline.cb.cb_text import (
     ACTIONS_ON_SETTINGS_CB,
     HELP_CB,
     PLAYER_BACKS_CB,
+    SHOP_CB,
 )
 
 
@@ -52,4 +53,8 @@ ADD_BOT_TO_GROUP = InlineKeyboardButton(
     url=f"https://{settings.bot.url}?startgroup&admin=post_messages+"
     f"delete_messages+"
     f"restrict_members+pin_messages",
+)
+
+SHOP_BTN = InlineKeyboardButton(
+    text="🏪Магазин", callback_data=SHOP_CB
 )

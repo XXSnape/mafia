@@ -62,3 +62,6 @@ WHAT_ARE_BIDS_CB = "what_are_bids"
 HOW_TO_PLAY_CB = "how_to_play"
 HOW_TO_SET_UP_GAME_CB = "how_to_set_up_game"
 HOW_TO_SEE_STATISTICS_CB = "what_are_statistics"
+
+
+SHOP_CB = "shop"
