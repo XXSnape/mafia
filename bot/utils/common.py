@@ -35,3 +35,7 @@ def add_message_to_delete(
     game_data: GameCache, chat_id: int, message_id: int
 ):
     game_data["to_delete"].append([chat_id, message_id])
+
+
+def get_cost_of_discounted_resource(cost: int, count: int):
+    return (count * cost) - ((count // 5) * cost)
