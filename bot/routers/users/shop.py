@@ -1,20 +1,7 @@
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, InlineKeyboardButton
+from aiogram.types import CallbackQuery
 
-from database.dao.assets import AssetsDao
-from database.dao.users import UsersDao
-from database.schemas.assets import AssetsSchema
-from database.schemas.common import TgIdSchema
-from general.exceptions import NotEnoughMoney
-from general.resources import (
-    Resources,
-    get_data_about_resource,
-    get_cost_of_discounted_resource,
-)
-from general.text import MONEY_SYM
-from keyboards.inline.builder import generate_inline_kb
-from keyboards.inline.buttons.common import SHOP_BTN
 from keyboards.inline.callback_factory.shop import (
     ChooseToPurchaseCbData,
     BuyResourcesCbData,
@@ -23,11 +10,10 @@ from keyboards.inline.callback_factory.shop import (
 from keyboards.inline.cb.cb_text import (
     SHOP_CB,
 )
-from keyboards.inline.keypads.shop import available_resources_kb
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from states.game import GameFsm
-from utils.pretty_text import make_build
+from services.users.shop import ShopManager
+
 
 router = Router(name=__name__)
 
@@ -37,19 +23,10 @@ async def show_assets(
     callback: CallbackQuery,
     session_without_commit: AsyncSession,
 ):
-    user = await UsersDao(
-        session=session_without_commit
-    ).get_user_or_create(TgIdSchema(tg_id=callback.from_user.id))
-    resource_text = (
-        f"💰Баланс: {user.balance}{MONEY_SYM}\n\n"
-        f"🛍️Доступные ресурсы:\n\n"
-        f"💌Анонимки: {user.anonymous_letters}\n\n"
-        f"🛒️Выбери, что хочешь докупить"
+    shop_manager = ShopManager(
+        callback=callback, session=session_without_commit
     )
-    markup = available_resources_kb()
-    await callback.message.edit_text(
-        text=make_build(resource_text), reply_markup=markup
-    )
+    await shop_manager.show_assets()
 
 
 @router.callback_query(ChooseToPurchaseCbData.filter())
@@ -58,46 +35,11 @@ async def select_number_of_resources(
     callback_data: ChooseToPurchaseCbData,
     session_without_commit: AsyncSession,
 ):
-    resource = callback_data.resource
-    user = await UsersDao(
-        session=session_without_commit
-    ).get_user_or_create(TgIdSchema(tg_id=callback.from_user.id))
-    resource_count = getattr(user, resource.value)
-
-    asset = await AssetsDao(
-        session=session_without_commit
-    ).find_one_or_none(AssetsSchema(name=resource))
-    asset_data = get_data_about_resource(resource=resource)
-    text = asset_data.description
-
-    prices = ""
-    buttons = []
-    for count in [1, 3, 5, 10, 15, 20]:
-        cost = get_cost_of_discounted_resource(
-            cost=asset.cost, count=count
-        )
-        buttons.append(
-            InlineKeyboardButton(
-                text=f"{count} ({cost}{MONEY_SYM})",
-                callback_data=BuyResourcesCbData(
-                    resource=resource,
-                    count=count,
-                    is_confirmed=False,
-                ).pack(),
-            )
-        )
-        prices += f"\n{count} шт: {cost}{MONEY_SYM}"
-    buttons.append(SHOP_BTN)
-    text += (
-        f"💰Баланс: {user.balance}{MONEY_SYM}\n"
-        f"🧰Текущее количество: {resource_count}\n\n"
-        f"📈Цены:\n{prices}"
+    shop_manager = ShopManager(
+        callback=callback, session=session_without_commit
     )
-    markup = generate_inline_kb(
-        data_with_buttons=buttons, sizes=(2,)
-    )
-    await callback.message.edit_text(
-        text=make_build(text), reply_markup=markup
+    await shop_manager.select_number_of_resources(
+        callback_data=callback_data
     )
 
 
@@ -109,33 +51,11 @@ async def confirm_purchase_of_resource(
     callback_data: BuyResourcesCbData,
     session_without_commit: AsyncSession,
 ):
-    asset_data = get_data_about_resource(
-        resource=callback_data.resource
+    shop_manager = ShopManager(
+        callback=callback, session=session_without_commit
     )
-    asset = await AssetsDao(
-        session=session_without_commit
-    ).find_one_or_none(AssetsSchema(name=callback_data.resource))
-    cost = get_cost_of_discounted_resource(
-        cost=asset.cost, count=callback_data.count
-    )
-    message = (
-        f"❗️Ты уверен, что хочешь купить «{asset_data.name}» "
-        f"в количестве {callback_data.count} шт за {cost}{MONEY_SYM}?"
-    )
-    callback_data.is_confirmed = True
-    await callback.message.edit_text(
-        text=make_build(message),
-        reply_markup=generate_inline_kb(
-            data_with_buttons=(
-                InlineKeyboardButton(
-                    text="🎁Купить",
-                    callback_data=callback_data.pack(),
-                ),
-                InlineKeyboardButton(
-                    text="❌Отмена", callback_data=SHOP_CB
-                ),
-            )
-        ),
+    await shop_manager.confirm_purchase_of_resource(
+        callback_data=callback_data
     )
 
 
@@ -148,36 +68,7 @@ async def buy_resources(
     state: FSMContext,
     session_with_commit: AsyncSession,
 ):
-    current_state = await state.get_state()
-    if current_state == GameFsm.WAIT_FOR_STARTING_GAME.state:
-        await callback.answer(
-            "❌Во время регистрацию в игру нельзя покупать ресурсы",
-            show_alert=True,
-        )
-        return
-    asset = await AssetsDao(
-        session=session_with_commit
-    ).find_one_or_none(AssetsSchema(name=callback_data.resource))
-    cost = get_cost_of_discounted_resource(
-        cost=asset.cost, count=callback_data.count
+    shop_manager = ShopManager(
+        callback=callback, session=session_with_commit, state=state
     )
-    try:
-        await UsersDao(session=session_with_commit).update_assets(
-            tg_id=TgIdSchema(tg_id=callback.from_user.id),
-            asset=Resources[callback_data.resource],
-            count=callback_data.count,
-            cost=cost,
-        )
-    except NotEnoughMoney as e:
-        await callback.answer(
-            "❌Недостаточно средств на счету!\n\n"
-            f"Текущий баланс: {e.balance}{MONEY_SYM}\n\n"
-            f"Требуемая сумма к оплате: {cost}{MONEY_SYM}",
-            show_alert=True,
-        )
-        return
-    await callback.answer(
-        f"✅Спасибо за покупку! С баланса списано {cost}{MONEY_SYM}",
-        show_alert=True,
-    )
-    await callback.message.delete()
+    await shop_manager.buy_resources(callback_data=callback_data)
