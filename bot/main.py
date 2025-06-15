@@ -83,7 +83,7 @@ async def main() -> None:
         ),
         BotCommand(
             command=BotCommands.game.name,
-            description=BotCommands.game
+            description=BotCommands.game,
         ),
         BotCommand(
             command=BotCommands.extend.name,

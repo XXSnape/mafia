@@ -3,6 +3,7 @@ from enum import StrEnum
 
 class BotCommands(StrEnum):
     registration = "Начать регистрацию"
+    game = "Запустить игру"
     extend = "Продлить регистрацию на 30 секунд"
     revoke = "Отменить регистрацию"
     leave = "Выйти из игры"

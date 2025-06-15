@@ -1,5 +1,7 @@
 from contextlib import suppress
 
+from aiogram.filters import CommandObject
+
 from cache.cache_types import GameCache, UserIdInt
 from general.collection_of_roles import get_data_with_roles
 from general.groupings import Groupings
@@ -54,6 +56,11 @@ class UserManager(RouterHelper):
             make_build("✅Сообщение успешно доставлено!"),
             protect_content=game_data["settings"]["protect_content"],
         )
+
+    async def send_anonymously_to_group(
+        self, command: CommandObject
+    ):
+        pass
 
     @staticmethod
     def delete_user_from_waiting_for_action_at_day(
