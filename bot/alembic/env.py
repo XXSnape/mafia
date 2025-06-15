@@ -4,6 +4,7 @@ from logging.config import fileConfig
 from alembic import context
 from database.common.base import BaseModel
 from database.models import (
+    AssetModel,
     GameModel,
     GroupingModel,
     GroupModel,

@@ -1,3 +1,4 @@
+from .assets import AssetModel
 from .games import GameModel
 from .groupings import GroupingModel
 from .groups import GroupModel
