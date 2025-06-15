@@ -1,13 +1,11 @@
-from aiogram import Dispatcher, F, Router
+from aiogram import Dispatcher, Router
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
-from keyboards.inline.cb.cb_text import (
-    FINISH_REGISTRATION_CB,
-)
+
 from middlewares.db import (
     DatabaseMiddlewareWithCommit,
 )
@@ -68,11 +66,9 @@ async def cancel_game(
     await registration.cancel_game()
 
 
-@router.callback_query(
-    GameFsm.REGISTRATION, F.data == FINISH_REGISTRATION_CB
-)
-async def finish_registration(
-    callback: CallbackQuery,
+@router.message(GameFsm.REGISTRATION, Command("game"))
+async def finish_registration_and_start_game(
+    message: Message,
     state: FSMContext,
     dispatcher: Dispatcher,
     scheduler: AsyncIOScheduler,
@@ -80,14 +76,14 @@ async def finish_registration(
     session_with_commit: AsyncSession,
 ):
     registration = Registration(
-        callback=callback,
+        message=message,
         state=state,
         dispatcher=dispatcher,
         scheduler=scheduler,
         broker=broker,
         session=session_with_commit,
     )
-    await registration.finish_registration()
+    await registration.finish_registration_and_start_game()
 
 
 @router.message(GameFsm.REGISTRATION, Command("leave"))
