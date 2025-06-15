@@ -2,34 +2,21 @@ from operator import attrgetter
 
 from aiogram import Bot
 from aiogram.types import InlineKeyboardButton
-from cache.cache_types import PlayersIds, RolesLiteral
-from general import settings
+from cache.cache_types import RolesLiteral
 from general.collection_of_roles import get_data_with_roles
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import (
-    TO_BOT_BTN,
     get_join_to_game_btn,
 )
 from keyboards.inline.cb.cb_text import (
     CANCEL_BET_CB,
-    FINISH_REGISTRATION_CB,
 )
 
 
-async def join_to_game_kb(
-    bot: Bot, game_chat: int, players_ids: PlayersIds
-):
+async def join_to_game_kb(bot: Bot, game_chat: int):
     buttons = [
         await get_join_to_game_btn(bot=bot, game_chat=game_chat),
-        TO_BOT_BTN,
     ]
-    if len(players_ids) >= settings.mafia.minimum_number_of_players:
-        buttons.append(
-            InlineKeyboardButton(
-                text="Начать игру",
-                callback_data=FINISH_REGISTRATION_CB,
-            )
-        )
     return generate_inline_kb(data_with_buttons=buttons)
 
 
