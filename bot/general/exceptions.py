@@ -9,3 +9,9 @@ class GameIsOver(Exception):
 
 class ActionPerformed(Exception):
     pass
+
+
+class NotEnoughMoney(Exception):
+    def __init__(self, balance: int):
+        super().__init__(balance)
+        self.balance = balance

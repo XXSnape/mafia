@@ -1,12 +1,12 @@
-from typing import assert_never
-
 from aiogram import F, Router
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, InlineKeyboardButton
 
 from database.dao.assets import AssetsDao
 from database.dao.users import UsersDao
 from database.schemas.assets import AssetsSchema
 from database.schemas.common import TgIdSchema
+from general.exceptions import NotEnoughMoney
 from general.resources import (
     Resources,
     get_data_about_resource,
@@ -26,6 +26,7 @@ from keyboards.inline.cb.cb_text import (
 from keyboards.inline.keypads.shop import available_resources_kb
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from states.game import GameFsm
 from utils.pretty_text import make_build
 
 router = Router(name=__name__)
@@ -136,3 +137,47 @@ async def confirm_purchase_of_resource(
             )
         ),
     )
+
+
+@router.callback_query(
+    BuyResourcesCbData.filter(F.is_confirmed.is_(True))
+)
+async def buy_resources(
+    callback: CallbackQuery,
+    callback_data: BuyResourcesCbData,
+    state: FSMContext,
+    session_with_commit: AsyncSession,
+):
+    current_state = await state.get_state()
+    if current_state == GameFsm.WAIT_FOR_STARTING_GAME.state:
+        await callback.answer(
+            "❌Во время регистрацию в игру нельзя покупать ресурсы",
+            show_alert=True,
+        )
+        return
+    asset = await AssetsDao(
+        session=session_with_commit
+    ).find_one_or_none(AssetsSchema(name=callback_data.resource))
+    cost = get_cost_of_discounted_resource(
+        cost=asset.cost, count=callback_data.count
+    )
+    try:
+        await UsersDao(session=session_with_commit).update_assets(
+            tg_id=TgIdSchema(tg_id=callback.from_user.id),
+            asset=Resources[callback_data.resource],
+            count=callback_data.count,
+            cost=cost,
+        )
+    except NotEnoughMoney as e:
+        await callback.answer(
+            "❌Недостаточно средств на счету!\n\n"
+            f"Текущий баланс: {e.balance}{MONEY_SYM}\n\n"
+            f"Требуемая сумма к оплате: {cost}{MONEY_SYM}",
+            show_alert=True,
+        )
+        return
+    await callback.answer(
+        f"✅Спасибо за покупку! С баланса списано {cost}{MONEY_SYM}",
+        show_alert=True,
+    )
+    await callback.message.delete()
