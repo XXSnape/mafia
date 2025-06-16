@@ -37,7 +37,7 @@ class ShopManager(RouterHelper):
         ).get_user_or_create(TgIdSchema(tg_id=user_tg_id))
         resource_text = (
             f"💰Баланс: {user.balance}{MONEY_SYM}\n\n"
-            f"🛍️Доступные ресурсы:\n\n"
+            f"🛍️Ресурсы игры:\n\n"
             f"💌Анонимки: {user.anonymous_letters}\n\n"
             f"🛒️Выбери, что хочешь докупить"
         )
