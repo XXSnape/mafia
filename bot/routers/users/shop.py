@@ -3,6 +3,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
+from general.commands import PrivateCommands
 from keyboards.inline.callback_factory.shop import (
     ChooseToPurchaseCbData,
     BuyResourcesCbData,
@@ -19,7 +20,7 @@ from services.users.shop import ShopManager
 router = Router(name=__name__)
 
 
-@router.message(Command("shop"))
+@router.message(Command(PrivateCommands.shop.name))
 async def show_assets_by_message(
     message: Message,
     session_without_commit: AsyncSession,

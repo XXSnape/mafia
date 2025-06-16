@@ -63,12 +63,12 @@ async def main() -> None:
         groups_router,
     )
     private_commands = [
-        BotCommand(command=command.name, description=command.value)
+        BotCommand(command=command.name, description=command)
         for command in PrivateCommands
     ]
 
     group_commands = [
-        BotCommand(command=command.name, description=command.value)
+        BotCommand(command=command.name, description=command)
         for command in GroupCommands
     ]
     await bot.set_my_commands(

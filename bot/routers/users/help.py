@@ -1,6 +1,8 @@
 from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
+
+from general.commands import PrivateCommands
 from keyboards.inline.callback_factory.help import RoleCbData
 from keyboards.inline.cb.cb_text import (
     HELP_CB,
@@ -17,7 +19,7 @@ from services.users.base import BaseRouter
 router = Router(name=__name__)
 
 
-@router.message(Command("help"))
+@router.message(Command(PrivateCommands.help.name))
 async def handle_help_by_command(message: Message):
     base = BaseRouter(message=message)
     await base.handle_help()

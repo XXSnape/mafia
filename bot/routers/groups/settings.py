@@ -5,13 +5,17 @@ from aiogram.filters import (
 )
 from aiogram.fsm.state import default_state
 from aiogram.types import Message
+
+from general.commands import GroupCommands
 from services.common.settings import SettingsRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = Router(name=__name__)
 
 
-@router.message(Command("settings"), StateFilter(default_state))
+@router.message(
+    Command(GroupCommands.settings.name), StateFilter(default_state)
+)
 async def get_group_settings(
     message: Message, session_with_commit: AsyncSession
 ):

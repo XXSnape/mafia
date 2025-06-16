@@ -6,6 +6,7 @@ from aiogram.types import Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
 
+from general.commands import GroupCommands
 from middlewares.db import (
     DatabaseMiddlewareWithCommit,
 )
@@ -20,7 +21,10 @@ router.message.middleware(DatabaseMiddlewareWithCommit())
 router.callback_query.middleware(DatabaseMiddlewareWithCommit())
 
 
-@router.message(Command("registration"), StateFilter(default_state))
+@router.message(
+    Command(GroupCommands.registration.name),
+    StateFilter(default_state),
+)
 async def start_registration(
     message: Message,
     state: FSMContext,
@@ -40,7 +44,9 @@ async def start_registration(
     await registration.start_registration()
 
 
-@router.message(GameFsm.REGISTRATION, Command("extend"))
+@router.message(
+    GameFsm.REGISTRATION, Command(GroupCommands.extend.name)
+)
 async def extend_registration(
     message: Message, state: FSMContext, scheduler: AsyncIOScheduler
 ):
@@ -50,7 +56,9 @@ async def extend_registration(
     await registration.extend_registration()
 
 
-@router.message(GameFsm.REGISTRATION, Command("revoke"))
+@router.message(
+    GameFsm.REGISTRATION, Command(GroupCommands.revoke.name)
+)
 async def cancel_game(
     message: Message,
     state: FSMContext,
@@ -66,7 +74,9 @@ async def cancel_game(
     await registration.cancel_game()
 
 
-@router.message(GameFsm.REGISTRATION, Command("game"))
+@router.message(
+    GameFsm.REGISTRATION, Command(GroupCommands.game.name)
+)
 async def finish_registration_and_start_game(
     message: Message,
     state: FSMContext,
@@ -86,7 +96,9 @@ async def finish_registration_and_start_game(
     await registration.finish_registration_and_start_game()
 
 
-@router.message(GameFsm.REGISTRATION, Command("leave"))
+@router.message(
+    GameFsm.REGISTRATION, Command(GroupCommands.leave.name)
+)
 async def leave_game(
     message: Message,
     state: FSMContext,

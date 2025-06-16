@@ -5,6 +5,7 @@ from aiogram.types import CallbackQuery, Message
 from cache.cache_types import PersonalSettingsCache
 from database.dao.users import UsersDao
 from database.schemas.common import TgIdSchema
+from general.commands import PrivateCommands
 from keyboards.inline.callback_factory.settings import (
     GroupSettingsCbData,
 )
@@ -20,7 +21,7 @@ router = Router(name=__name__)
 
 
 @router.message(
-    Command("my_settings"),
+    Command(PrivateCommands.my_settings.name),
 )
 async def handle_settings(
     message: Message,
