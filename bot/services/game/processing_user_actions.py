@@ -2,13 +2,21 @@ from contextlib import suppress
 
 from aiogram.filters import CommandObject
 
-from cache.cache_types import GameCache, UserIdInt
+from cache.cache_types import (
+    GameCache,
+    UserIdInt,
+)
+from database.dao.users import UsersDao
+from database.schemas.assets import NumberOfAssetsSchema
+from database.schemas.common import TgIdSchema
 from general.collection_of_roles import get_data_with_roles
+from general.commands import PrivateCommands
 from general.groupings import Groupings
 from general.text import NUMBER_OF_DAY
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
+from keyboards.inline.keypads.shop import to_shop_kb
 from keyboards.inline.keypads.to_bot import (
     participate_in_social_life,
 )
@@ -18,11 +26,13 @@ from services.game.game_assistants import (
     get_game_data_and_user_id,
     get_game_state_by_user_state,
 )
+from states.game import GameFsm
 from utils.common import get_criminals_ids
 from utils.informing import send_a_lot_of_messages_safely
 from utils.pretty_text import make_build
 from utils.state import lock_state
 from utils.tg import delete_message
+from html import escape
 
 
 class UserManager(RouterHelper):
@@ -48,11 +58,11 @@ class UserManager(RouterHelper):
         await self.message.bot.send_message(
             chat_id=game_data["game_chat"],
             text=f"⚡️⚡️⚡️По слухам, {role} {url} перед смертью "
-            f"проглаголил такие слова:\n\n{self.message.text}"[
+            f"проглаголил такие слова:\n\n{escape(self.message.text)}"[
                 :3900
             ],
         )
-        await self.message.answer(
+        await self.message.reply(
             make_build("✅Сообщение успешно доставлено!"),
             protect_content=game_data["settings"]["protect_content"],
         )
@@ -60,11 +70,75 @@ class UserManager(RouterHelper):
     async def send_anonymously_to_group(
         self, command: CommandObject
     ):
-        pass
+        anonym_message = command.args
+        if not anonym_message:
+            await self.message.reply(
+                text=make_build(
+                    "Некорректная форма отправки анонимного сообщения, пример:\n\n"
+                )
+                + f"/{PrivateCommands.anon.name} Всем хорошей игры!"
+            )
+            return
+        try:
+            game_state = await get_game_state_by_user_state(
+                tg_obj=self.message,
+                user_state=self.state,
+                dispatcher=self.dispatcher,
+            )
+        except KeyError:
+            await self.message.reply(
+                text=make_build(
+                    "Анонимные сообщения можно отправлять только во время игры"
+                )
+            )
+            return
+        state = await game_state.get_state()
+        if state != GameFsm.STARTED.state:
+            await self.message.reply(
+                text=make_build("Игра еще не началась!")
+            )
+            return
+        user_id = self.message.from_user.id
+        game_data: GameCache = await game_state.get_data()
+        if user_id not in game_data["live_players_ids"]:
+            await self.message.reply(
+                text=make_build(
+                    "Отправлять сообщения анонимно можно только будучи в игре!"
+                )
+            )
+            return
+        user_tg_id = TgIdSchema(tg_id=user_id)
+        users_dao = UsersDao(session=self.session)
+        user = await users_dao.get_user_or_create(user_tg_id)
+        if user.anonymous_letters < 1:
+            await self.message.reply(
+                text=make_build("Нет анонимок! Купи их в магазине!"),
+                reply_markup=to_shop_kb(),
+            )
+            return
+        await self.message.bot.send_message(
+            chat_id=game_data["game_chat"],
+            text=f"😱😱😱НЕИЗВЕСТНЫЙ ОТПРАВИТЕЛЬ\n\n{escape(anonym_message)}"[
+                :3900
+            ],
+        )
+        await users_dao.update(
+            filters=user_tg_id,
+            values=NumberOfAssetsSchema(
+                anonymous_letters=user.anonymous_letters - 1
+            ),
+        )
+        await self.message.reply(
+            make_build(
+                f"✅Анонимное сообщение успешно доставлено, "
+                f"осталось анонимок: {user.anonymous_letters}"
+            ),
+            reply_markup=to_shop_kb(),
+        )
 
     @staticmethod
     def delete_user_from_waiting_for_action_at_day(
-        game_data: GameCache, user_id: int
+        game_data: GameCache, user_id: UserIdInt
     ):
         with suppress(ValueError):
             game_data["waiting_for_action_at_day"].remove(user_id)
@@ -104,7 +178,7 @@ class UserManager(RouterHelper):
         await send_a_lot_of_messages_safely(
             bot=self.message.bot,
             users=aliases,
-            text=f"{role} {url} передает:\n\n{self.message.text}"[
+            text=f"{role} {url} передает:\n\n{escape(self.message.text)}"[
                 :3900
             ],
             exclude=[self.message.from_user.id],
@@ -116,7 +190,7 @@ class UserManager(RouterHelper):
         ):
             await send_a_lot_of_messages_safely(
                 bot=self.message.bot,
-                text=f"{role} ??? передает:\n\n{self.message.text}"[
+                text=f"{role} ??? передает:\n\n{escape(self.message.text)}"[
                     :3900
                 ],
                 users=game_data[Hacker.roles_key],
@@ -124,7 +198,7 @@ class UserManager(RouterHelper):
                     "protect_content"
                 ],
             )
-        await self.message.answer(
+        await self.message.reply(
             make_build("✅Сообщение успешно доставлено!"),
             protect_content=game_data["settings"]["protect_content"],
         )

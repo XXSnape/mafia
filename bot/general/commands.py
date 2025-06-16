@@ -14,9 +14,9 @@ class GroupCommands(StrEnum):
     )
 
 
-
 class PrivateCommands(StrEnum):
     help = "Помощь во всем"
     profile = "Посмотреть свой профиль"
     shop = "Магазин"
     my_settings = "Персональные настройки игры"
+    anon = "Анонимная отправка сообщений (работает во время игры)"

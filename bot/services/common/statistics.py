@@ -12,6 +12,7 @@ from general.collection_of_roles import get_data_with_roles
 from general.text import MONEY_SYM
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import SHOP_BTN
+from keyboards.inline.keypads.shop import to_shop_kb
 from services.base import RouterHelper
 from utils.pretty_text import (
     get_minutes_and_seconds_text,
@@ -95,9 +96,7 @@ class StatisticsRouter(RouterHelper):
         result_text += f"💲Всего заработано: {money_sum}{MONEY_SYM}"
         await self.message.answer(
             make_build(result_text),
-            reply_markup=generate_inline_kb(
-                data_with_buttons=[SHOP_BTN]
-            ),
+            reply_markup=to_shop_kb(),
         )
 
     @staticmethod

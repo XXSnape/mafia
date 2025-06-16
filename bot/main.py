@@ -23,9 +23,7 @@ from redis.asyncio import Redis
 from routers.game.groups import router as game_groups_router
 from routers.game.users import router as game_users_router
 from routers.groups import router as groups_router
-from routers.users import (
-    always_available_router,
-)
+from routers import always_available_router
 from routers.users import router as users_router
 
 
