@@ -2,7 +2,7 @@ from aiogram import Bot
 from aiogram.types import ChatMemberUpdated
 from database.dao.groups import GroupsDao
 from database.schemas.common import TgIdSchema
-from general.commands import BotCommands
+from general.commands import PrivateCommands, GroupCommands
 from general.text import REQUIRED_PERMISSIONS
 from services.base import RouterHelper
 from utils.pretty_text import make_build
@@ -19,9 +19,9 @@ class AddingRouter(RouterHelper):
             text = (
                 "Привет! Чтобы запустить игру, выдайте боту "
                 "следующие права и введите "
-                f"/{BotCommands.registration.name}:\n\n{REQUIRED_PERMISSIONS}\n\n"
+                f"/{GroupCommands.registration.name}:\n\n{REQUIRED_PERMISSIONS}\n\n"
                 f"Чтобы узнать подробности о правилах, "
-                f"напишите /{BotCommands.help.name} боту в личные сообщения!"
+                f"напишите /{PrivateCommands.help.name} боту в личные сообщения!"
             )
             await event.answer(text=make_build(text))
 

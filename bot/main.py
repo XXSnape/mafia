@@ -12,7 +12,7 @@ from aiogram.types import (
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from database.dao.init_db import fill_database_with_roles
 from general import settings
-from general.commands import BotCommands
+from general.commands import PrivateCommands, GroupCommands
 from general.config import bot, broker
 from general.log import configure_logging
 from middlewares.errors import (
@@ -63,56 +63,13 @@ async def main() -> None:
         groups_router,
     )
     private_commands = [
-        BotCommand(
-            command=BotCommands.help.name,
-            description=BotCommands.help,
-        ),
-        BotCommand(
-            command=BotCommands.my_settings.name,
-            description=BotCommands.my_settings,
-        ),
-        BotCommand(
-            command=BotCommands.profile.name,
-            description=BotCommands.profile,
-        ),
-        BotCommand(
-            command=BotCommands.shop.name,
-            description=BotCommands.shop,
-        ),
+        BotCommand(command=command.name, description=command.value)
+        for command in PrivateCommands
     ]
+
     group_commands = [
-        BotCommand(
-            command=BotCommands.registration.name,
-            description=BotCommands.registration,
-        ),
-        BotCommand(
-            command=BotCommands.game.name,
-            description=BotCommands.game,
-        ),
-        BotCommand(
-            command=BotCommands.extend.name,
-            description=BotCommands.extend,
-        ),
-        BotCommand(
-            command=BotCommands.revoke.name,
-            description=BotCommands.revoke,
-        ),
-        BotCommand(
-            command=BotCommands.leave.name,
-            description=BotCommands.leave,
-        ),
-        BotCommand(
-            command=BotCommands.settings.name,
-            description=BotCommands.settings,
-        ),
-        BotCommand(
-            command=BotCommands.statistics.name,
-            description=BotCommands.statistics,
-        ),
-        BotCommand(
-            command=BotCommands.subscribe.name,
-            description=BotCommands.subscribe,
-        ),
+        BotCommand(command=command.name, description=command.value)
+        for command in GroupCommands
     ]
     await bot.set_my_commands(
         private_commands, BotCommandScopeAllPrivateChats()
