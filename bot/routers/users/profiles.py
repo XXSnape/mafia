@@ -1,7 +1,6 @@
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
-
 from general.commands import PrivateCommands
 from middlewares.db import DatabaseMiddlewareWithCommit
 from services.common.statistics import StatisticsRouter

@@ -1,7 +1,7 @@
 from contextlib import suppress
+from html import escape
 
 from aiogram.filters import CommandObject
-
 from cache.cache_types import (
     GameCache,
     UserIdInt,
@@ -32,7 +32,6 @@ from utils.informing import send_a_lot_of_messages_safely
 from utils.pretty_text import make_build
 from utils.state import lock_state
 from utils.tg import delete_message
-from html import escape
 
 
 class UserManager(RouterHelper):

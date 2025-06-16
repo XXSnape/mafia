@@ -1,13 +1,12 @@
 from aiogram import Router
-
 from middlewares.db import (
     DatabaseMiddlewareWithCommit,
     DatabaseMiddlewareWithoutCommit,
 )
 from middlewares.time_limits import CallbackTimelimiterMiddleware
-from .users import router as users_router
-from .groups import router as groups_router
 
+from .groups import router as groups_router
+from .users import router as users_router
 
 router = Router(name=__name__)
 

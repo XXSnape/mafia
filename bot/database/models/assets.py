@@ -1,7 +1,7 @@
+from database.common.base import BaseModel
+from general.resources import Resources
 from sqlalchemy import CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column
-from general.resources import Resources
-from database.common.base import BaseModel
 
 
 class AssetModel(BaseModel):

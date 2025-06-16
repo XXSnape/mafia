@@ -1,5 +1,5 @@
-from pydantic import BaseModel
 from general.resources import Resources
+from pydantic import BaseModel
 
 
 class AssetsSchema(BaseModel):

@@ -2,8 +2,8 @@ from aiogram import F, Router
 from aiogram.enums import ChatType
 
 from .common import router as common_router
-from .roles import router as roles_router
 from .common.anonymizer import router as anonymizer_router
+from .roles import router as roles_router
 
 router = Router(name=__name__)
 

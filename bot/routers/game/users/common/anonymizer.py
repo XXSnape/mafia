@@ -1,11 +1,9 @@
-from aiogram import Router, Dispatcher
+from aiogram import Dispatcher, Router
 from aiogram.filters import Command, CommandObject
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
-
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from services.game.processing_user_actions import UserManager
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = Router(name=__name__)
 

@@ -6,10 +6,6 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
 from general.collection_of_roles import get_data_with_roles
 from keyboards.inline.cb.cb_text import CANCEL_BET_CB
-from middlewares.db import (
-    DatabaseMiddlewareWithCommit,
-    DatabaseMiddlewareWithoutCommit,
-)
 from services.game.registartion import Registration
 from sqlalchemy.ext.asyncio import AsyncSession
 from states.game import GameFsm

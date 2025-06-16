@@ -1,7 +1,4 @@
-from services.base import RouterHelper
-
 from aiogram.types import InlineKeyboardButton
-
 from database.dao.assets import AssetsDao
 from database.dao.users import UsersDao
 from database.schemas.assets import AssetsSchema
@@ -9,22 +6,21 @@ from database.schemas.common import TgIdSchema
 from general.exceptions import NotEnoughMoney
 from general.resources import (
     Resources,
-    get_data_about_resource,
     get_cost_of_discounted_resource,
+    get_data_about_resource,
 )
 from general.text import MONEY_SYM
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import SHOP_BTN
 from keyboards.inline.callback_factory.shop import (
-    ChooseToPurchaseCbData,
     BuyResourcesCbData,
+    ChooseToPurchaseCbData,
 )
-
 from keyboards.inline.cb.cb_text import (
     SHOP_CB,
 )
 from keyboards.inline.keypads.shop import available_resources_kb
-
+from services.base import RouterHelper
 from states.game import GameFsm
 from utils.pretty_text import make_build
 

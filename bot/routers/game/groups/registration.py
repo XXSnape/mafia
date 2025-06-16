@@ -5,11 +5,7 @@ from aiogram.fsm.state import default_state
 from aiogram.types import Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from faststream.rabbit import RabbitBroker
-
 from general.commands import GroupCommands
-from middlewares.db import (
-    DatabaseMiddlewareWithCommit,
-)
 from services.game.registartion import (
     Registration,
 )

@@ -5,7 +5,6 @@ from aiogram.filters import (
 )
 from aiogram.fsm.state import default_state
 from aiogram.types import Message
-
 from general.commands import GroupCommands
 from services.common.settings import SettingsRouter
 from sqlalchemy.ext.asyncio import AsyncSession

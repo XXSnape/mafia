@@ -1,12 +1,10 @@
-from collections.abc import Callable, Awaitable
+from collections.abc import Awaitable, Callable
+from datetime import UTC, datetime
 from typing import Any
 
 from aiogram import BaseMiddleware
-from aiogram.types import TelegramObject, CallbackQuery
-from datetime import datetime, UTC
-
+from aiogram.types import CallbackQuery, TelegramObject
 from loguru import logger
-
 from utils.tg import delete_message
 
 

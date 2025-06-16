@@ -1,16 +1,15 @@
-from aiogram import Router, F
+from aiogram import F, Router
 from aiogram.enums import ChatType
-from .users import (
-    always_available_router as users_always_available_router,
+from middlewares.db import (
+    DatabaseMiddlewareWithCommit,
+    DatabaseMiddlewareWithoutCommit,
 )
+
 from .game.users import (
     always_available_router as game_users_always_available_router,
 )
-
-
-from middlewares.db import (
-    DatabaseMiddlewareWithoutCommit,
-    DatabaseMiddlewareWithCommit,
+from .users import (
+    always_available_router as users_always_available_router,
 )
 
 always_available_router = Router(name=__name__)

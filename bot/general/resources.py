@@ -1,5 +1,5 @@
-from enum import StrEnum
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import assert_never
 
 

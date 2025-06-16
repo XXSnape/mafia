@@ -1,5 +1,4 @@
 from aiogram.types import InlineKeyboardButton
-
 from general.resources import Resources, get_data_about_resource
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import SHOP_BTN

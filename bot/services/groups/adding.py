@@ -2,7 +2,7 @@ from aiogram import Bot
 from aiogram.types import ChatMemberUpdated
 from database.dao.groups import GroupsDao
 from database.schemas.common import TgIdSchema
-from general.commands import PrivateCommands, GroupCommands
+from general.commands import GroupCommands, PrivateCommands
 from general.text import REQUIRED_PERMISSIONS
 from services.base import RouterHelper
 from utils.pretty_text import make_build

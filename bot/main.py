@@ -12,7 +12,7 @@ from aiogram.types import (
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from database.dao.init_db import fill_database_with_roles
 from general import settings
-from general.commands import PrivateCommands, GroupCommands
+from general.commands import GroupCommands, PrivateCommands
 from general.config import bot, broker
 from general.log import configure_logging
 from middlewares.errors import (
@@ -20,11 +20,9 @@ from middlewares.errors import (
     HandleMessageErrorMiddleware,
 )
 from redis.asyncio import Redis
-
-from routers.game import router as game_router
-
-from routers.groups import router as groups_router
 from routers import always_available_router
+from routers.game import router as game_router
+from routers.groups import router as groups_router
 from routers.users import router as users_router
 
 

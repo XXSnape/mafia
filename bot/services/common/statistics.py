@@ -1,6 +1,5 @@
 import asyncio
-
-from aiogram.types import InlineKeyboardButton
+from html import escape
 
 from database.dao.games import GamesDao
 from database.dao.rates import RatesDao
@@ -10,8 +9,6 @@ from database.schemas.common import TgIdSchema, UserTgIdSchema
 from database.schemas.groups import GroupIdSchema
 from general.collection_of_roles import get_data_with_roles
 from general.text import MONEY_SYM
-from keyboards.inline.builder import generate_inline_kb
-from keyboards.inline.buttons.common import SHOP_BTN
 from keyboards.inline.keypads.shop import to_shop_kb
 from services.base import RouterHelper
 from utils.pretty_text import (
@@ -21,7 +18,6 @@ from utils.pretty_text import (
     make_pretty,
 )
 from utils.tg import delete_message
-from html import escape
 
 
 class StatisticsRouter(RouterHelper):

@@ -2,20 +2,16 @@ from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
-
 from general.commands import PrivateCommands
 from keyboards.inline.callback_factory.shop import (
-    ChooseToPurchaseCbData,
     BuyResourcesCbData,
+    ChooseToPurchaseCbData,
 )
-
 from keyboards.inline.cb.cb_text import (
     SHOP_CB,
 )
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from services.users.shop import ShopManager
-
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = Router(name=__name__)
 

@@ -3,7 +3,6 @@ from aiogram.filters import (
     Command,
 )
 from aiogram.types import Message
-
 from general.commands import GroupCommands
 from services.common.subscriptions import SubscriptionsRouter
 from sqlalchemy.ext.asyncio import AsyncSession

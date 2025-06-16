@@ -1,16 +1,14 @@
-from loguru import logger
-from sqlalchemy.exc import IntegrityError
-
 from database.dao.base import BaseDAO
 from database.dao.settings import SettingsDao
 from database.models import UserModel
 from database.schemas.bids import UserMoneySchema
 from database.schemas.common import TgIdSchema, UserTgIdSchema
-from sqlalchemy import update
-
 from general.exceptions import NotEnoughMoney
 from general.resources import Resources
 from general.text import MONEY_SYM
+from loguru import logger
+from sqlalchemy import update
+from sqlalchemy.exc import IntegrityError
 
 
 class UsersDao(BaseDAO[UserModel]):
