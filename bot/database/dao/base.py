@@ -113,8 +113,8 @@ class BaseDAO[M: Base]:
             )
             return new_instance
         except SQLAlchemyError as e:
-            logger.error("Ошибка при добавлении записи {}", e)
             await self._session.rollback()
+            logger.error("Ошибка при добавлении записи {}", e)
 
     async def add_many(
         self,
@@ -141,6 +141,7 @@ class BaseDAO[M: Base]:
             )
             return new_instances
         except SQLAlchemyError as e:
+            await self._session.rollback()
             logger.error(
                 "Ошибка при добавлении нескольких записей: {}", e
             )
@@ -174,6 +175,7 @@ class BaseDAO[M: Base]:
             logger.info("Обновлено {} записей.", result.rowcount)
             return result.rowcount
         except SQLAlchemyError as e:
+            await self._session.rollback()
             logger.error("Ошибка при обновлении записей: {}", e)
             raise
 
@@ -198,5 +200,6 @@ class BaseDAO[M: Base]:
             logger.info("Удалено {} записей.", result.rowcount)
             return result.rowcount
         except SQLAlchemyError as e:
+            await self._session.rollback()
             logger.error("Ошибка при удалении записей: {}", e)
             raise
