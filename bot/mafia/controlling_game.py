@@ -54,7 +54,7 @@ from utils.state import (
     lock_state,
     reset_user_state,
 )
-from utils.tg import unban_users
+from utils.tg import unban_users, resending_message
 
 if TYPE_CHECKING:
     from mafia.pipeline_game import Game
@@ -133,12 +133,19 @@ class Controller:
         night_starts_text = make_build(
             f"🌃Наступает ночь {game_data['number_of_night']}"
         )
-        await self.bot.send_photo(
+        await resending_message(
+            bot=self.bot,
             chat_id=self.group_chat_id,
+            text=f"{night_starts_text}\n\n{players}",
             photo="https://i.pinimg.com/originals/f0/43/ed/f043edcac9690fdec845925508006459.jpg",
-            caption=f"{night_starts_text}\n\n{players}",
             reply_markup=get_to_bot_kb("Действовать!"),
         )
+        # await self.bot.send_photo(
+        #     chat_id=self.group_chat_id,
+        #     photo="https://i.pinimg.com/originals/f0/43/ed/f043edcac9690fdec845925508006459.jpg",
+        #     caption=f"{night_starts_text}\n\n{players}",
+        #     reply_markup=get_to_bot_kb("Действовать!"),
+        # )
 
     async def start_discussions(self, game_data: GameCache):
         players_after_night, _ = get_live_players(
@@ -146,13 +153,20 @@ class Controller:
             all_roles=self.original_roles_in_fog_of_war
             or self.all_roles,
         )
-        await self.bot.send_photo(
+        await resending_message(
+            bot=self.bot,
             chat_id=self.group_chat_id,
+            text=f"{make_build('💬Пришло время провести следственные мероприятия жителям города!')}\n\n",
             photo="https://i.pinimg.com/originals/b1/80/98/b18098074864e4b1bf5cc8412ced6421.jpg",
-            caption=f"{make_build('💬Пришло время провести следственные мероприятия жителям города!')}\n\n"
-            f"{players_after_night}",
             reply_markup=get_to_bot_kb("Пища для размышлений тут"),
         )
+        # await self.bot.send_photo(
+        #     chat_id=self.group_chat_id,
+        #     photo="https://i.pinimg.com/originals/b1/80/98/b18098074864e4b1bf5cc8412ced6421.jpg",
+        #     caption=f"{make_build('💬Пришло время провести следственные мероприятия жителям города!')}\n\n"
+        #     f"{players_after_night}",
+        #     reply_markup=get_to_bot_kb("Пища для размышлений тут"),
+        # )
 
     async def send_delay_messages(
         self, game_data: GameCache, at_night: bool
@@ -304,20 +318,30 @@ class Controller:
         await self.state.set_data(game_data)
         if removed_user_id is None:
             await asyncio.sleep(1)
-            await self.bot.send_message(
+            await resending_message(
+                bot=self.bot,
                 chat_id=self.group_chat_id,
                 text=result_text,
             )
+            # await self.bot.send_message(
+            #     chat_id=self.group_chat_id,
+            #     text=result_text,
+            # )
             return
 
         if is_not_there_removed:
             result_text += make_build(
                 f"🥳🥳🥳{game_data['players'][str(removed_user_id)]['url']} дали еще шанс!"
             )
-            await self.bot.send_message(
+            await resending_message(
+                bot=self.bot,
                 chat_id=self.group_chat_id,
                 text=result_text,
             )
+            # await self.bot.send_message(
+            #     chat_id=self.group_chat_id,
+            #     text=result_text,
+            # )
             return
         if removed_user_id != removed_user[0]:
             return
@@ -347,7 +371,8 @@ class Controller:
             at_night=False,
         )
         await self.state.set_data(game_data)
-        await self.bot.send_message(
+        await resending_message(
+            bot=self.bot,
             chat_id=self.group_chat_id,
             text=result_text
             + make_build(
@@ -355,6 +380,14 @@ class Controller:
                 f'{user_info["url"]} с ролью {role}!'
             ),
         )
+        # await self.bot.send_message(
+        #     chat_id=self.group_chat_id,
+        #     text=result_text
+        #     + make_build(
+        #         f"❗️❗️❗️Сегодня народ принял тяжелое решение и повесил "
+        #         f'{user_info["url"]} с ролью {role}!'
+        #     ),
+        # )
         await asyncio.gather(*other_tasks, return_exceptions=True)
         await asyncio.gather(
             *boss_is_dead_tasks, return_exceptions=True
@@ -422,10 +455,15 @@ class Controller:
             text_about_dead or "💕Сегодня ночью все выжили!"
         )
         await self.state.set_data(game_data)
-        await self.bot.send_message(
+        await resending_message(
+            bot=self.bot,
             chat_id=self.group_chat_id,
             text=make_build(text_about_dead),
         )
+        # await self.bot.send_message(
+        #     chat_id=self.group_chat_id,
+        #     text=make_build(text_about_dead),
+        # )
         await send_messages_after_night(
             game_data=game_data,
             bot=self.bot,
@@ -460,7 +498,8 @@ class Controller:
             return False
         await asyncio.sleep(2)
         url = game_data["players"][str(self.aim_id)]["url"]
-        sent_survey = await self.bot.send_message(
+        sent_survey = await resending_message(
+            bot=self.bot,
             chat_id=self.group_chat_id,
             text=make_build(f"На кону судьба {url}!"),
             reply_markup=get_vote_for_aim_kb(
@@ -469,6 +508,15 @@ class Controller:
                 cons=game_data["cons"],
             ),
         )
+        # sent_survey = await self.bot.send_message(
+        #     chat_id=self.group_chat_id,
+        #     text=make_build(f"На кону судьба {url}!"),
+        #     reply_markup=get_vote_for_aim_kb(
+        #         user_id=self.aim_id,
+        #         pros=game_data["pros"],
+        #         cons=game_data["cons"],
+        #     ),
+        # )
         await sent_survey.pin()
         add_message_to_delete(
             game_data=game_data,
@@ -551,12 +599,19 @@ class Controller:
         return game_data
 
     async def suggest_vote(self):
-        await self.bot.send_photo(
+        await resending_message(
+            bot=self.bot,
             chat_id=self.group_chat_id,
+            text="Кого обвиним во всем и повесим?",
             photo="https://studychinese.ru/content/dictionary/pictures/25/12774.jpg",
-            caption="Кого обвиним во всем и повесим?",
             reply_markup=participate_in_social_life(),
         )
+        # await self.bot.send_photo(
+        #     chat_id=self.group_chat_id,
+        #     photo="https://studychinese.ru/content/dictionary/pictures/25/12774.jpg",
+        #     caption="Кого обвиним во всем и повесим?",
+        #     reply_markup=participate_in_social_life(),
+        # )
         async with lock_state(self.state):
             game_data: GameCache = await self.state.get_data()
             live_players_ids = game_data["live_players_ids"]
@@ -635,11 +690,17 @@ class Controller:
             ],
         )
         text = f"{make_build('❗️Игроки выбывают:')}\n{profiles}"
-        await self.bot.send_photo(
+        await resending_message(
+            bot=self.bot,
             chat_id=self.group_chat_id,
+            text=text,
             photo="https://media.zenfs.com/en/nerdist_761/342f5f2b17659cb424aaabef1951a1a1",
-            caption=text,
         )
+        # await self.bot.send_photo(
+        #     chat_id=self.group_chat_id,
+        #     photo="https://media.zenfs.com/en/nerdist_761/342f5f2b17659cb424aaabef1951a1a1",
+        #     caption=text,
+        # )
         await asyncio.gather(*other_tasks, return_exceptions=True)
         await asyncio.gather(
             *boss_is_dead_tasks, return_exceptions=True
