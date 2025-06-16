@@ -31,14 +31,10 @@ from utils.pretty_text import make_build
 
 class ShopManager(RouterHelper):
 
-    async def show_assets(
-        self,
-    ):
+    async def show_assets(self, user_tg_id: int):
         user = await UsersDao(
             session=self.session
-        ).get_user_or_create(
-            TgIdSchema(tg_id=self.callback.from_user.id)
-        )
+        ).get_user_or_create(TgIdSchema(tg_id=user_tg_id))
         resource_text = (
             f"💰Баланс: {user.balance}{MONEY_SYM}\n\n"
             f"🛍️Доступные ресурсы:\n\n"
@@ -46,9 +42,15 @@ class ShopManager(RouterHelper):
             f"🛒️Выбери, что хочешь докупить"
         )
         markup = available_resources_kb()
-        await self.callback.message.edit_text(
-            text=make_build(resource_text), reply_markup=markup
-        )
+        if self.callback:
+            await self.callback.message.edit_text(
+                text=make_build(resource_text), reply_markup=markup
+            )
+        else:
+            await self.message.delete()
+            await self.message.answer(
+                text=make_build(resource_text), reply_markup=markup
+            )
 
     async def select_number_of_resources(
         self,
@@ -167,4 +169,4 @@ class ShopManager(RouterHelper):
             f"✅Спасибо за покупку! С баланса списано {cost}{MONEY_SYM}",
             show_alert=True,
         )
-        await self.show_assets()
+        await self.show_assets(user_tg_id=self.callback.from_user.id)

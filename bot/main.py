@@ -75,6 +75,10 @@ async def main() -> None:
             command=BotCommands.profile.name,
             description=BotCommands.profile,
         ),
+        BotCommand(
+            command=BotCommands.shop.name,
+            description=BotCommands.shop,
+        ),
     ]
     group_commands = [
         BotCommand(

@@ -1,6 +1,7 @@
 from aiogram import F, Router
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Message
 
 from keyboards.inline.callback_factory.shop import (
     ChooseToPurchaseCbData,
@@ -18,15 +19,26 @@ from services.users.shop import ShopManager
 router = Router(name=__name__)
 
 
+@router.message(Command("shop"))
+async def show_assets_by_message(
+    message: Message,
+    session_without_commit: AsyncSession,
+):
+    shop_manager = ShopManager(
+        message=message, session=session_without_commit
+    )
+    await shop_manager.show_assets(user_tg_id=message.from_user.id)
+
+
 @router.callback_query(F.data == SHOP_CB)
-async def show_assets(
+async def show_assets_by_callback(
     callback: CallbackQuery,
     session_without_commit: AsyncSession,
 ):
     shop_manager = ShopManager(
-        callback=callback, session=session_without_commit
+        message=callback.message, session=session_without_commit
     )
-    await shop_manager.show_assets()
+    await shop_manager.show_assets(user_tg_id=callback.from_user.id)
 
 
 @router.callback_query(ChooseToPurchaseCbData.filter())
