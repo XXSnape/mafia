@@ -17,8 +17,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from states.game import GameFsm
 
 router = Router(name=__name__)
-router.message.middleware(DatabaseMiddlewareWithCommit())
-router.callback_query.middleware(DatabaseMiddlewareWithCommit())
 
 
 @router.message(

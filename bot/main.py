@@ -20,8 +20,9 @@ from middlewares.errors import (
     HandleMessageErrorMiddleware,
 )
 from redis.asyncio import Redis
-from routers.game.groups import router as game_groups_router
-from routers.game.users import router as game_users_router
+
+from routers.game import router as game_router
+
 from routers.groups import router as groups_router
 from routers import always_available_router
 from routers.users import router as users_router
@@ -55,8 +56,7 @@ async def main() -> None:
     dp.message.middleware(HandleMessageErrorMiddleware())
     dp.include_routers(
         always_available_router,
-        game_groups_router,
-        game_users_router,
+        game_router,
         users_router,
         groups_router,
     )
