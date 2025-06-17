@@ -33,6 +33,7 @@ class Masochist(SuicideRoleMixin, RoleABC):
         game_data: GameCache,
         at_night: bool,
         user_id: UserIdInt,
+        message_if_died_especially: str | None = None,
     ):
         if at_night is False:
             self._winners.append(user_id)
@@ -48,5 +49,8 @@ class Masochist(SuicideRoleMixin, RoleABC):
             )
             return
         await super().report_death(
-            game_data=game_data, at_night=at_night, user_id=user_id
+            game_data=game_data,
+            at_night=at_night,
+            user_id=user_id,
+            message_if_died_especially=message_if_died_especially,
         )

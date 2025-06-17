@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache, RolesLiteral
+from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general.groupings import Groupings
 from mafia.roles.base import RoleABC
 from mafia.roles.base.mixins import SuicideRoleMixin
@@ -29,7 +29,11 @@ class SuicideBomber(SuicideRoleMixin, RoleABC):
         )
 
     async def report_death(
-        self, game_data: GameCache, at_night: bool, user_id: int
+        self,
+        game_data: GameCache,
+        at_night: bool,
+        user_id: UserIdInt,
+        message_if_died_especially: str | None = None,
     ):
         if at_night is True:
             self._winners.append(user_id)
@@ -46,5 +50,8 @@ class SuicideBomber(SuicideRoleMixin, RoleABC):
 
             return
         await super().report_death(
-            game_data=game_data, at_night=at_night, user_id=user_id
+            game_data=game_data,
+            at_night=at_night,
+            user_id=user_id,
+            message_if_died_especially=message_if_died_especially,
         )
