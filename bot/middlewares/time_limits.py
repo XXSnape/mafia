@@ -25,24 +25,26 @@ class CallbackTimelimiterMiddleware(BaseMiddleware):
         data: dict[str, Any],
     ) -> Any:
         sending_time = callback.message.date
-        now = datetime.now(UTC)
-        minutes = (now - sending_time).seconds // 60
-        if minutes > 5:
-            await callback.answer(
-                "🙂Кнопка устарела, нажми новую", show_alert=True
-            )
-            await delete_message(message=callback.message)
-            logger.warning(
-                "Пользователь {} ({}) "
-                "использует устаревшую кнопку ({}) с текстом:\n\n{}\n\n"
-                "Отправленную {}, в {} через {} минут",
-                callback.from_user.full_name,
-                callback.from_user.id,
-                callback.message.message_id,
-                callback.message.text,
-                sending_time,
-                now,
-                minutes,
-            )
-            return None
+        if sending_time != 0:
+            now = datetime.now(UTC)
+
+            minutes = (now - sending_time).seconds // 60
+            if minutes > 5:
+                await callback.answer(
+                    "🙂Кнопка устарела, нажми новую", show_alert=True
+                )
+                await delete_message(message=callback.message)
+                logger.warning(
+                    "Пользователь {} ({}) "
+                    "использует устаревшую кнопку ({}) с текстом:\n\n{}\n\n"
+                    "Отправленную {}, в {} через {} минут",
+                    callback.from_user.full_name,
+                    callback.from_user.id,
+                    callback.message.message_id,
+                    callback.message.text,
+                    sending_time,
+                    now,
+                    minutes,
+                )
+                return None
         return await handler(callback, data)

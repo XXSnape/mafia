@@ -21,7 +21,9 @@ from utils.roles import get_processed_user_id_if_exists
 
 
 class Bride(
-    ObligatoryKillerABC, ProcedureAfterNightABC, ActiveRoleAtNightABC
+    ObligatoryKillerABC,
+    ProcedureAfterNightABC,
+    ActiveRoleAtNightABC,
 ):
     role = "Кровавая невеста"
     role_id: RolesLiteral = "bride"
@@ -36,6 +38,7 @@ class Bride(
         "Твой выбор пал на свадьбу с {url}"
     )
     need_to_monitor_interaction = False
+    send_weekend_alerts = False
     notification_message = None
     payment_for_treatment = 5
     payment_for_murder = 13
@@ -54,12 +57,27 @@ class Bride(
             wins_if="Жених должен выжить",
         )
 
+    def get_money_for_victory_and_nights(
+        self, game_data: GameCache, nights_lived: int, **kwargs
+    ):
+        if (
+            self.groom_id is None
+            or self.groom_id not in game_data["live_players_ids"]
+        ):
+            return 0, 0
+        return game_data["number_of_night"] * 10, (
+            self.payment_for_night_spent * nights_lived
+        )
+
     @get_processed_user_id_if_exists
     async def procedure_after_night(
-        self, processed_user_id: UserIdInt, **kwargs
+        self,
+        game_data: GameCache,
+        processed_user_id: UserIdInt,
+        **kwargs
     ):
+        self.my_id = game_data[self.roles_key][0]
         self.groom_id = processed_user_id
-        print("procedure_after_night", self.groom_id)
 
     @staticmethod
     def allow_sending_mailing(game_data: GameCache):
@@ -69,13 +87,16 @@ class Bride(
         return
 
     def kill_after_all_actions(
-        self, game_data: GameCache
+        self,
+        game_data: GameCache,
+        current_inactive_users: list[UserIdInt],
     ) -> tuple[UserIdInt, str] | None:
-        print(self.groom_id, game_data[self.roles_key])
+        if self.dropped_out or self.my_id in current_inactive_users:
+            return None
         if self.groom_id is None and game_data[self.roles_key]:
             return (
                 game_data[self.roles_key][0],
-                "Жениха выбирать обязательно!",
+                "Ты выбываешь из игры, потому что жениха нужно выбирать обязательно в первую ночь!",
             )
         if (
             self.groom_id not in game_data["live_players_ids"]
@@ -88,6 +109,7 @@ class Bride(
         if (
             not game_data[self.roles_key]
             and self.groom_id in game_data["live_players_ids"]
+            and game_data["number_of_night"] % 2 == 0
         ):
             players = [
                 user_id
@@ -108,3 +130,4 @@ class Bride(
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.BRIDE_CHOOSES
         self.groom_id: UserIdInt | None = None
+        self.my_id: UserIdInt | None = None

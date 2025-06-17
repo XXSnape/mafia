@@ -50,6 +50,7 @@ def get_data_with_roles(
         roles.DoctorAlias(),
         roles.PolicemanAlias(),
         roles.Warden(),
+        roles.Bride(),
     ]
     all_roles = {role.role_id: role for role in roles_data}
     if role_id:

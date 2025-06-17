@@ -498,6 +498,7 @@ class RoleABC(ABC):
         game_data: GameCache,
         at_night: bool | None,
         user_id: UserIdInt,
+        message_if_died_especially: str | None = None,
     ):
         if (
             self.grouping == Groupings.criminals
@@ -530,11 +531,14 @@ class RoleABC(ABC):
             if self.grouping == Groupings.civilians:
                 self.killed_in_afternoon.add(user_id)
         else:
-            message = (
-                "😡Ты выбываешь из игры за неактивность! "
-                "Ты проиграешь вне зависимости от былых заслуг и результатов команды."
-            )
-            self.dropped_out.add(user_id)
+            if message_if_died_especially is None:
+                message = (
+                    "😡Ты выбываешь из игры за неактивность! "
+                    "Ты проиграешь вне зависимости от былых заслуг и результатов команды."
+                )
+                self.dropped_out.add(user_id)
+            else:
+                message = message_if_died_especially
         await self.bot.send_message(
             chat_id=user_id,
             text=make_build(message),
@@ -605,6 +609,7 @@ class ActiveRoleAtNightABC(RoleABC):
     mail_message: str
     need_to_monitor_interaction: bool = True
     is_self_selecting: bool = False
+    send_weekend_alerts: bool = True
     do_not_choose_others: int = 1
     do_not_choose_self: int = 1
     payment_for_treatment = 10
@@ -799,6 +804,8 @@ class ActiveRoleAtNightABC(RoleABC):
         if not roles:
             return
         if self.allow_sending_mailing(game_data) is not True:
+            if self.send_weekend_alerts is False:
+                return
             text = (
                 NUMBER_OF_NIGHT.format(game_data["number_of_night"])
                 + "😜У тебя сегодня выходной!"

@@ -156,5 +156,7 @@ class MafiaConverterABC(FinisherOfNight):
 class ObligatoryKillerABC(ABC):
     @abstractmethod
     def kill_after_all_actions(
-        self, game_data: GameCache
+        self,
+        game_data: GameCache,
+        current_inactive_users: list[UserIdInt],
     ) -> tuple[UserIdInt, str] | None: ...

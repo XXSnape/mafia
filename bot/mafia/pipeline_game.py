@@ -251,7 +251,7 @@ class Game:
             state=self.state,
         )
         await self.controller.sum_up_after_voting()
-        await self.controller.removing_inactive_players()
+        await self.controller.removing_players()
         await self.controller.end_night()
         await asyncio.sleep(4)
 

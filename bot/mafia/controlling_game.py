@@ -489,6 +489,7 @@ class Controller:
         game_data: GameCache,
         user_id: int,
         at_night: bool | None,
+        message_if_died_especially: str | None = None,
     ):
         user_role = game_data["players"][str(user_id)]["role_id"]
         role: RoleABC = self.all_roles[user_role]
@@ -524,6 +525,7 @@ class Controller:
                 game_data=game_data,
                 at_night=at_night,
                 user_id=user_id,
+                message_if_died_especially=message_if_died_especially,
             )
         )
         if role.alias:
@@ -602,9 +604,9 @@ class Controller:
                 potentially_deleted.add(user_id)
 
     @check_end_of_game
-    async def removing_inactive_players(self):
+    async def removing_players(self):
         game_data: GameCache = await self.state.get_data()
-        inactive_users = []
+        removed_users = []
         self.waiting_for_action_at_night.extend(
             game_data["waiting_for_action_at_night"]
         )
@@ -614,16 +616,16 @@ class Controller:
         self._add_user_to_deleted(
             waiting_for=self.waiting_for_action_at_night,
             live_players_ids=game_data["live_players_ids"],
-            inactive_users=inactive_users,
+            inactive_users=removed_users,
         )
         self._add_user_to_deleted(
             waiting_for=self.waiting_for_action_at_day,
             live_players_ids=game_data["live_players_ids"],
-            inactive_users=inactive_users,
+            inactive_users=removed_users,
         )
         other_tasks = []
         boss_is_dead_tasks = []
-        for user_id in inactive_users:
+        for user_id in removed_users:
             other, boss_is_dead = self.remove_user_from_game(
                 game_data=game_data,
                 user_id=user_id,
@@ -632,31 +634,34 @@ class Controller:
             other_tasks.extend(other)
             boss_is_dead_tasks.extend(boss_is_dead)
 
+        current_inactive_users = removed_users[:]
         obligatory_killers = self._get_roles_if_isinstance(
             ObligatoryKillerABC
         )
-        murdered = []
-        print("obligatory_killers", obligatory_killers)
         for killer in obligatory_killers:
             result = killer.kill_after_all_actions(
-                game_data=game_data
+                game_data=game_data,
+                current_inactive_users=current_inactive_users,
             )
-            print("res", result)
-            if result is not None:
-                murdered.append(result)
-        for user_id, message_to_user in murdered:
-            inactive_users.append(user_id)
+            if result is None:
+                continue
+            user_id, message_to_user = result
+            if user_id in removed_users:
+                continue
+            removed_users.append(user_id)
             other, boss_is_dead = self.remove_user_from_game(
                 game_data=game_data,
                 user_id=user_id,
                 at_night=None,
+                message_if_died_especially=message_to_user,
             )
             other_tasks.extend(other)
             boss_is_dead_tasks.extend(boss_is_dead)
-
+        if not removed_users:
+            return
         await self.state.set_data(game_data)
         profiles = get_profiles(
-            players_ids=inactive_users,
+            players_ids=removed_users,
             players=game_data["players"],
             show_current_roles=game_data["settings"][
                 "show_roles_after_death"
