@@ -151,3 +151,10 @@ class MafiaConverterABC(FinisherOfNight):
                 photo=MafiaAlias.photo,
                 caption=f"{self.pretty_role} превращается в {MafiaAlias.pretty_role}",
             )
+
+
+class ObligatoryKillerABC(ABC):
+    @abstractmethod
+    def kill_after_all_actions(
+        self, game_data: GameCache
+    ) -> tuple[UserIdInt, str] | None: ...

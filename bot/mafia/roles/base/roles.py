@@ -497,7 +497,7 @@ class RoleABC(ABC):
         self,
         game_data: GameCache,
         at_night: bool | None,
-        user_id: int,
+        user_id: UserIdInt,
     ):
         if (
             self.grouping == Groupings.criminals

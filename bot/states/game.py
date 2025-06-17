@@ -31,4 +31,5 @@ class UserFsm(StatesGroup):
     WEREWOLF_TURNS_INTO = State()
     TRAITOR_FINDS_OUT = State()
     LUCIFER_BLOCKS = State()
+    BRIDE_CHOOSES = State()
     WAIT_FOR_LATEST_LETTER = State()
