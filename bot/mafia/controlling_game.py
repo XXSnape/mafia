@@ -54,7 +54,7 @@ from utils.state import (
     lock_state,
     reset_user_state,
 )
-from utils.tg import unban_users, resending_message
+from utils.tg import resending_message, unban_users
 
 if TYPE_CHECKING:
     from mafia.pipeline_game import Game

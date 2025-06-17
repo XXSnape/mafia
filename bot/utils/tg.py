@@ -1,5 +1,4 @@
 import asyncio
-from collections.abc import Awaitable
 from contextlib import suppress
 from datetime import timedelta
 
@@ -12,13 +11,12 @@ from aiogram.types import (
     ChatMemberLeft,
     ChatMemberOwner,
     ChatPermissions,
-    Message,
     InlineKeyboardMarkup,
+    Message,
 )
-from loguru import logger
-
 from cache.cache_types import PlayersIds
 from general.exceptions import ActionPerformed
+from loguru import logger
 
 
 async def delete_message(
