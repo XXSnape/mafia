@@ -12,7 +12,7 @@ from database.schemas.common import TgIdSchema
 from general.collection_of_roles import get_data_with_roles
 from general.commands import PrivateCommands
 from general.groupings import Groupings
-from general.text import NUMBER_OF_DAY
+from general.text import NUMBER_OF_DAY, NUMBER_OF_NIGHT
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
@@ -25,6 +25,7 @@ from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_data_and_user_id,
     get_game_state_by_user_state,
+    remove_from_expected,
 )
 from states.game import GameFsm
 from utils.common import get_criminals_ids
@@ -35,6 +36,28 @@ from utils.tg import delete_message, resending_message
 
 
 class UserManager(RouterHelper):
+    async def refuse_movie(self):
+        await delete_message(
+            message=self.callback.message, raise_exception=True
+        )
+        game_state = await get_game_state_by_user_state(
+            tg_obj=self.callback,
+            user_state=self.state,
+            dispatcher=self.dispatcher,
+        )
+        async with lock_state(game_state):
+            game_data: GameCache = await game_state.get_data()
+            remove_from_expected(
+                callback=self.callback, game_data=game_data
+            )
+            await game_state.set_data(game_data)
+        await self.callback.message.answer(
+            make_build(
+                NUMBER_OF_NIGHT.format(game_data["number_of_night"])
+                + "Ты отказался делать свой ход."
+            )
+        )
+
     async def send_latest_message(self):
         game_state = await get_game_state_by_user_state(
             tg_obj=self.message,

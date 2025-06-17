@@ -10,6 +10,7 @@ from keyboards.inline.cb.cb_text import (
     HELP_CB,
     PLAYER_BACKS_CB,
     SHOP_CB,
+    REFUSE_MOVE_CB,
 )
 
 
@@ -57,4 +58,7 @@ ADD_BOT_TO_GROUP = InlineKeyboardButton(
 
 SHOP_BTN = InlineKeyboardButton(
     text="🏪Магазин", callback_data=SHOP_CB
+)
+REFUSE_MOVE_BTN = InlineKeyboardButton(
+    text="❌Отказать от хода", callback_data=REFUSE_MOVE_CB
 )
