@@ -32,6 +32,7 @@ class SuicideBomber(SuicideRoleMixin, RoleABC):
         self, game_data: GameCache, at_night: bool, user_id: int
     ):
         if at_night is True:
+            self._winners.append(user_id)
             message = make_build(
                 "🥳Поздравляем! Тебя убили ночью, как ты и хотел. Обязательно поглумись над мафией"
             )
@@ -42,7 +43,7 @@ class SuicideBomber(SuicideRoleMixin, RoleABC):
                     "protect_content"
                 ],
             )
-            self._winners.append(user_id)
+
             return
         await super().report_death(
             game_data=game_data, at_night=at_night, user_id=user_id

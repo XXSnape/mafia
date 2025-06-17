@@ -1,4 +1,4 @@
-from cache.cache_types import GameCache, RolesLiteral
+from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general.groupings import Groupings
 from mafia.roles.base import RoleABC
 from mafia.roles.base.mixins import SuicideRoleMixin
@@ -29,9 +29,13 @@ class Masochist(SuicideRoleMixin, RoleABC):
         )
 
     async def report_death(
-        self, game_data: GameCache, at_night: bool, user_id: int
+        self,
+        game_data: GameCache,
+        at_night: bool,
+        user_id: UserIdInt,
     ):
         if at_night is False:
+            self._winners.append(user_id)
             message = make_build(
                 "🥳Поздравляем! Тебя линчевали на голосовании, как ты и хотел!"
             )
@@ -42,7 +46,6 @@ class Masochist(SuicideRoleMixin, RoleABC):
                     "protect_content"
                 ],
             )
-            self._winners.append(user_id)
             return
         await super().report_death(
             game_data=game_data, at_night=at_night, user_id=user_id
