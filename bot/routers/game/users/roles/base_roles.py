@@ -29,6 +29,7 @@ router = Router(name=__name__)
         UserFsm.PROSECUTOR_ARRESTS,
         UserFsm.LUCIFER_BLOCKS,
         UserFsm.BRIDE_CHOOSES,
+        UserFsm.MARTYR_LEARNS_ROLE,
     ),
     UserActionIndexCbData.filter(),
 )

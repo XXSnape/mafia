@@ -32,4 +32,5 @@ class UserFsm(StatesGroup):
     TRAITOR_FINDS_OUT = State()
     LUCIFER_BLOCKS = State()
     BRIDE_CHOOSES = State()
+    MARTYR_LEARNS_ROLE = State()
     WAIT_FOR_LATEST_LETTER = State()
