@@ -133,7 +133,6 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
         if processed_user_id == removed_user:
             self.number_of_predictions += 1
             money = 10
-            to_group = "Все, кто читал прогнозы на день, были готовы к дневным событиям!"
             achievement = (
                 "Удача! Действительно никого не повесили"
                 if url is None
@@ -141,16 +140,10 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
             )
         else:
             money = 0
-            to_group = "Обман или чёрный лебедь? Аналитические прогнозы не сбылись!"
             achievement = (
                 "Неудача! Никого не повесили"
                 if url is None
                 else f"Неудачный прогноз! Был повешен {url} ({role})"
-            )
-        if game_data["settings"]["show_roles_after_death"]:
-            await self.bot.send_message(
-                chat_id=game_data["game_chat"],
-                text=to_group,
             )
         self.add_money_to_all_allies(
             game_data=game_data,

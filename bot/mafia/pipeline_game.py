@@ -54,7 +54,11 @@ from utils.state import (
     lock_state,
     reset_user_state_if_in_game,
 )
-from utils.tg import delete_messages_from_to_delete, unban_users
+from utils.tg import (
+    delete_messages_from_to_delete,
+    unban_users,
+    resending_message,
+)
 
 
 class Game:
@@ -142,7 +146,8 @@ class Game:
                 game_data = await self.select_roles()
             self.init_existing_roles(game_data)
             await self.familiarize_players(game_data)
-            await self.bot.send_message(
+            await resending_message(
+                bot=self.bot,
                 chat_id=self.group_chat_id,
                 text=make_build(
                     "🎲Игра начинается!\n\n⚙️Текущие настройки:\n\n"
@@ -333,7 +338,8 @@ class Game:
             end=int(end_of_game.timestamp()),
             message="⏰Игра длилась ",
         )
-        await self.bot.send_message(
+        await resending_message(
+            bot=self.bot,
             chat_id=self.group_chat_id,
             text=result
             + winners_text

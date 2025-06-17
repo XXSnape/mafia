@@ -140,12 +140,6 @@ class Controller:
             photo="https://i.pinimg.com/originals/f0/43/ed/f043edcac9690fdec845925508006459.jpg",
             reply_markup=get_to_bot_kb("Действовать!"),
         )
-        # await self.bot.send_photo(
-        #     chat_id=self.group_chat_id,
-        #     photo="https://i.pinimg.com/originals/f0/43/ed/f043edcac9690fdec845925508006459.jpg",
-        #     caption=f"{night_starts_text}\n\n{players}",
-        #     reply_markup=get_to_bot_kb("Действовать!"),
-        # )
 
     async def start_discussions(self, game_data: GameCache):
         players_after_night, _ = get_live_players(
@@ -160,13 +154,6 @@ class Controller:
             photo="https://i.pinimg.com/originals/b1/80/98/b18098074864e4b1bf5cc8412ced6421.jpg",
             reply_markup=get_to_bot_kb("Пища для размышлений тут"),
         )
-        # await self.bot.send_photo(
-        #     chat_id=self.group_chat_id,
-        #     photo="https://i.pinimg.com/originals/b1/80/98/b18098074864e4b1bf5cc8412ced6421.jpg",
-        #     caption=f"{make_build('💬Пришло время провести следственные мероприятия жителям города!')}\n\n"
-        #     f"{players_after_night}",
-        #     reply_markup=get_to_bot_kb("Пища для размышлений тут"),
-        # )
 
     async def send_delay_messages(
         self, game_data: GameCache, at_night: bool
@@ -323,10 +310,6 @@ class Controller:
                 chat_id=self.group_chat_id,
                 text=result_text,
             )
-            # await self.bot.send_message(
-            #     chat_id=self.group_chat_id,
-            #     text=result_text,
-            # )
             return
 
         if is_not_there_removed:
@@ -338,10 +321,6 @@ class Controller:
                 chat_id=self.group_chat_id,
                 text=result_text,
             )
-            # await self.bot.send_message(
-            #     chat_id=self.group_chat_id,
-            #     text=result_text,
-            # )
             return
         if removed_user_id != removed_user[0]:
             return
@@ -380,14 +359,6 @@ class Controller:
                 f'{user_info["url"]} с ролью {role}!'
             ),
         )
-        # await self.bot.send_message(
-        #     chat_id=self.group_chat_id,
-        #     text=result_text
-        #     + make_build(
-        #         f"❗️❗️❗️Сегодня народ принял тяжелое решение и повесил "
-        #         f'{user_info["url"]} с ролью {role}!'
-        #     ),
-        # )
         await asyncio.gather(*other_tasks, return_exceptions=True)
         await asyncio.gather(
             *boss_is_dead_tasks, return_exceptions=True
@@ -460,10 +431,6 @@ class Controller:
             chat_id=self.group_chat_id,
             text=make_build(text_about_dead),
         )
-        # await self.bot.send_message(
-        #     chat_id=self.group_chat_id,
-        #     text=make_build(text_about_dead),
-        # )
         await send_messages_after_night(
             game_data=game_data,
             bot=self.bot,
@@ -490,9 +457,8 @@ class Controller:
             counterweight=len(game_data["refused_to_vote"]),
         )
         await self.state.set_data(game_data)
-        await self.bot.send_message(
-            chat_id=self.group_chat_id,
-            text=text,
+        await resending_message(
+            bot=self.bot, chat_id=self.group_chat_id, text=text
         )
         if self.aim_id is None:
             return False
@@ -508,15 +474,6 @@ class Controller:
                 cons=game_data["cons"],
             ),
         )
-        # sent_survey = await self.bot.send_message(
-        #     chat_id=self.group_chat_id,
-        #     text=make_build(f"На кону судьба {url}!"),
-        #     reply_markup=get_vote_for_aim_kb(
-        #         user_id=self.aim_id,
-        #         pros=game_data["pros"],
-        #         cons=game_data["cons"],
-        #     ),
-        # )
         await sent_survey.pin()
         add_message_to_delete(
             game_data=game_data,
@@ -606,12 +563,6 @@ class Controller:
             photo="https://studychinese.ru/content/dictionary/pictures/25/12774.jpg",
             reply_markup=participate_in_social_life(),
         )
-        # await self.bot.send_photo(
-        #     chat_id=self.group_chat_id,
-        #     photo="https://studychinese.ru/content/dictionary/pictures/25/12774.jpg",
-        #     caption="Кого обвиним во всем и повесим?",
-        #     reply_markup=participate_in_social_life(),
-        # )
         async with lock_state(self.state):
             game_data: GameCache = await self.state.get_data()
             live_players_ids = game_data["live_players_ids"]
@@ -696,11 +647,6 @@ class Controller:
             text=text,
             photo="https://media.zenfs.com/en/nerdist_761/342f5f2b17659cb424aaabef1951a1a1",
         )
-        # await self.bot.send_photo(
-        #     chat_id=self.group_chat_id,
-        #     photo="https://media.zenfs.com/en/nerdist_761/342f5f2b17659cb424aaabef1951a1a1",
-        #     caption=text,
-        # )
         await asyncio.gather(*other_tasks, return_exceptions=True)
         await asyncio.gather(
             *boss_is_dead_tasks, return_exceptions=True

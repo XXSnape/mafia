@@ -31,7 +31,7 @@ from utils.common import get_criminals_ids
 from utils.informing import send_a_lot_of_messages_safely
 from utils.pretty_text import make_build
 from utils.state import lock_state
-from utils.tg import delete_message
+from utils.tg import delete_message, resending_message
 
 
 class UserManager(RouterHelper):
@@ -53,8 +53,8 @@ class UserManager(RouterHelper):
         url = game_data["players"][str(self.message.from_user.id)][
             "url"
         ]
-
-        await self.message.bot.send_message(
+        await resending_message(
+            bot=self.message.bot,
             chat_id=game_data["game_chat"],
             text=f"⚡️⚡️⚡️По слухам, {role} {url} перед смертью "
             f"проглаголил такие слова:\n\n{escape(self.message.text)}"[
@@ -115,7 +115,8 @@ class UserManager(RouterHelper):
                 reply_markup=to_shop_kb(),
             )
             return
-        await self.message.bot.send_message(
+        await resending_message(
+            bot=self.message.bot,
             chat_id=game_data["game_chat"],
             text=f"😱😱😱НЕИЗВЕСТНЫЙ ОТПРАВИТЕЛЬ\n\n{escape(anonym_message)}"[
                 :3900

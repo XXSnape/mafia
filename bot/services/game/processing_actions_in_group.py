@@ -13,7 +13,7 @@ from services.base import RouterHelper
 from utils.informing import get_profiles
 from utils.pretty_text import make_build
 from utils.state import lock_state
-from utils.tg import ban_user, delete_message
+from utils.tg import ban_user, delete_message, resending_message
 
 
 class GroupManager(RouterHelper):
@@ -140,4 +140,8 @@ class GroupManager(RouterHelper):
         )
         if number_of_people_to_leave == total_number_of_players:
             text += "\n\n🏁Игра скоро завершится"
-        await self.message.answer(text=make_build(text))
+        await resending_message(
+            bot=self.message.bot,
+            chat_id=self.message.chat.id,
+            text=make_build(text),
+        )

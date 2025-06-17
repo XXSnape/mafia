@@ -12,6 +12,7 @@ from mafia.roles.descriptions.texts import (
 from states.game import UserFsm
 from utils.pretty_text import make_build
 from utils.roles import get_processed_role_and_user_if_exists
+from utils.tg import resending_message
 
 
 class Lawyer(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
@@ -60,8 +61,8 @@ class Lawyer(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
             money = processed_role.payment_for_treatment * 2
         else:
             money = 0
-
-        await self.bot.send_message(
+        await resending_message(
+            bot=self.bot,
             chat_id=game_data["game_chat"],
             text=make_build(
                 f"😯У {user_url} есть алиби, поэтому местные жители отпустили гвоздя программы"

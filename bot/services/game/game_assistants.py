@@ -1,6 +1,7 @@
 from contextlib import suppress
 
 from aiogram import Dispatcher
+from aiogram.exceptions import TelegramAPIError
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from cache.cache_types import GameCache, UserCache, UserIdInt
@@ -46,10 +47,11 @@ async def send_messages_to_user_and_group(
             current_role.message_to_group_after_action
         )
     if message_to_group_after_action:
-        await callback.bot.send_message(
-            chat_id=game_data["game_chat"],
-            text=make_build(message_to_group_after_action),
-        )
+        with suppress(TelegramAPIError):
+            await callback.bot.send_message(
+                chat_id=game_data["game_chat"],
+                text=make_build(message_to_group_after_action),
+            )
     message_to_user_after_action = None
     if isinstance(message_to_user, str):
         message_to_user_after_action = message_to_user

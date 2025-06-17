@@ -8,6 +8,7 @@ from mafia.roles.descriptions.texts import (
 )
 from utils.pretty_text import make_build
 from utils.roles import get_user_role_and_url
+from utils.tg import resending_message
 
 
 class PrimeMinister(ProcedureAfterVotingABC, RoleABC):
@@ -46,7 +47,8 @@ class PrimeMinister(ProcedureAfterVotingABC, RoleABC):
         **kwargs,
     ):
         if removed_user[0] in game_data[self.roles_key]:
-            await self.bot.send_message(
+            await resending_message(
+                bot=self.bot,
                 chat_id=game_data["game_chat"],
                 text=make_build(
                     "🤨Крайне странно вешать лидеров мнений.\n"
