@@ -76,7 +76,6 @@ class Bride(
         processed_user_id: UserIdInt,
         **kwargs
     ):
-        self.my_id = game_data[self.roles_key][0]
         self.groom_id = processed_user_id
 
     @staticmethod
@@ -91,7 +90,14 @@ class Bride(
         game_data: GameCache,
         current_inactive_users: list[UserIdInt],
     ) -> tuple[UserIdInt, str] | None:
-        if self.dropped_out or self.my_id in current_inactive_users:
+
+        if self.dropped_out or (
+            len(current_inactive_users) != 0
+            and (
+                player["role_id"] == self.role_id
+                for player in game_data["players"].values()
+            )
+        ):
             return None
         if self.groom_id is None and game_data[self.roles_key]:
             return (
@@ -132,4 +138,3 @@ class Bride(
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.BRIDE_CHOOSES
         self.groom_id: UserIdInt | None = None
-        self.my_id: UserIdInt | None = None
