@@ -138,6 +138,7 @@ class Poisoner(
     def leave_notification_message(
         self,
         game_data: GameCache,
+        context_message: str | None = None,
     ):
         return
 

@@ -159,13 +159,13 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     def leave_notification_message(
         self,
         game_data: GameCache,
+        context_message: str | None = None,
     ):
         if game_data["disclosed_roles"]:
-            user_id = game_data["disclosed_roles"][0]
-            game_data["messages_after_night"].append(
-                [user_id, ROLE_IS_KNOWN]
+            context_message = ROLE_IS_KNOWN
+            return super().leave_notification_message(
+                game_data=game_data, context_message=context_message
             )
-            return
         return super().leave_notification_message(game_data)
 
     def cancel_actions(self, game_data: GameCache, user_id: int):

@@ -627,12 +627,14 @@ class ActiveRoleAtNightABC(RoleABC):
     def leave_notification_message(
         self,
         game_data: GameCache,
+        context_message: str | None = None,
     ):
-        if self.notification_message:
+        message = context_message or self.notification_message
+        if message:
             processed_user_id = self.get_processed_user_id(game_data)
             if processed_user_id:
                 game_data["messages_after_night"].append(
-                    [processed_user_id, self.notification_message]
+                    [processed_user_id, message]
                 )
 
     def _remove_data_from_tracking(

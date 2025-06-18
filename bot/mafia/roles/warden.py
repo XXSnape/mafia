@@ -136,8 +136,7 @@ class Warden(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         )
 
     def leave_notification_message(
-        self,
-        game_data: GameCache,
+        self, game_data: GameCache, context_message=None
     ):
         users = game_data["checked_for_the_same_groups"]
         if len(users) != 2:
