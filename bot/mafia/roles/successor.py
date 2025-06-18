@@ -59,17 +59,16 @@ class Successor(
     def role_description(self) -> RoleDescription:
         from .poisoner import Poisoner
         from .analyst import Analyst
+        from .bride import Bride
 
         return RoleDescription(
             skill="Может убить любого игрока и получить его роль, если он не умрёт раньше: после ночи или голосования. "
             "Потом фактически доигрывает за него. "
             f"Если роль погибшего игрока побеждает в зависимости от прогресса, "
-            f"({Poisoner.pretty_role}, {Analyst.pretty_role}), "
+            f"({Poisoner.pretty_role}, {Analyst.pretty_role}, {Bride.pretty_role}), "
             f"то он не сбрасывается и продолжает расти у погибшего.",
             pay_for=[PAYMENT_FOR_NIGHTS],
             features=[
-                "Если погибший игрок, например Доктор, выбрал прошлой ночью вылечить игрока А, "
-                "то после смены ролей Тенепреемник (новый врач) также сможет вылечить игрока А",
                 "Убийство происходит гарантированно после голосования",
             ],
             limitations=[
@@ -116,11 +115,14 @@ class Successor(
         )
 
     async def end_night(self, game_data: GameCache):
+        from .bride import Bride
+
         if (
             self.new_role is None
             or self.user_id not in game_data["live_players_ids"]
         ):
             return
+        self.new_role = None
         updated_new_role = self.all_roles[
             game_data["players"][str(self.user_id)]["role_id"]
         ]
@@ -133,12 +135,15 @@ class Successor(
                 new_state=updated_new_role.state_for_waiting_for_action,
             )
         with suppress(TelegramAPIError):
+            message = f"❗️Отныне твоя новая роль — {updated_new_role.pretty_role}"
+            if isinstance(updated_new_role, Bride):
+                groom_id = self.all_roles[Bride.role_id].groom_id
+                url = game_data["players"][str(groom_id)]["url"]
+                message += f"\n\nТвой муж — {url}"
             await self.bot.send_photo(
                 chat_id=self.user_id,
                 photo=updated_new_role.photo,
-                caption=make_build(
-                    f"❗️Отныне твоя новая роль — {updated_new_role.pretty_role}"
-                ),
+                caption=make_build(message),
             )
 
         if (updated_new_role.grouping == Groupings.criminals) or (
