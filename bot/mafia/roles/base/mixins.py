@@ -17,6 +17,7 @@ from general.groupings import Groupings
 from general.text import ATTEMPT_TO_KILL
 from mafia.roles.base import ActiveRoleAtNightABC
 from utils.informing import notify_aliases_about_transformation
+from utils.state import get_state_and_assign
 from utils.tg import resending_message
 
 if TYPE_CHECKING:
@@ -125,8 +126,8 @@ class MafiaConverterABC(FinisherOfNight):
         if not roles:
             return
         user_id = roles[0]
+        mafia = MafiaAlias()
         if MafiaAlias.role_id not in self.all_roles:
-            mafia = MafiaAlias()
             mafia(
                 all_roles=self.all_roles,
                 dispatcher=self.dispatcher,
@@ -139,6 +140,12 @@ class MafiaConverterABC(FinisherOfNight):
             previous_role=self,
             new_role=MafiaAlias(),
             user_id=user_id,
+        )
+        await get_state_and_assign(
+            dispatcher=self.dispatcher,
+            chat_id=user_id,
+            bot_id=self.bot.id,
+            new_state=mafia.state_for_waiting_for_action,
         )
         await notify_aliases_about_transformation(
             game_data=game_data,
