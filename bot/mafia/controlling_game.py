@@ -495,7 +495,10 @@ class Controller:
         role: RoleABC = self.all_roles[user_role]
         boss_is_dead_tasks = []
         other_tasks = []
-        if at_night is True:
+        if at_night is True or (
+            at_night is None
+            and message_if_died_especially is not None
+        ):
             other_tasks.append(
                 get_state_and_assign(
                     dispatcher=self.dispatcher,
