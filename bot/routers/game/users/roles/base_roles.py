@@ -31,6 +31,7 @@ router = Router(name=__name__)
         UserFsm.BRIDE_CHOOSES,
         UserFsm.MARTYR_LEARNS_ROLE,
         UserFsm.PHOENIX_RANDOMLY_ACTS,
+        UserFsm.HEIR_CHOOSES_TARGET,
     ),
     UserActionIndexCbData.filter(),
 )

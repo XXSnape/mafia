@@ -34,4 +34,5 @@ class UserFsm(StatesGroup):
     BRIDE_CHOOSES = State()
     MARTYR_LEARNS_ROLE = State()
     PHOENIX_RANDOMLY_ACTS = State()
+    HEIR_CHOOSES_TARGET = State()
     WAIT_FOR_LATEST_LETTER = State()

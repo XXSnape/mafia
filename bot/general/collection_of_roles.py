@@ -53,6 +53,7 @@ def get_data_with_roles(
         roles.Bride(),
         roles.Martyr(),
         roles.Phoenix(),
+        roles.Successor(),
     ]
     all_roles = {role.role_id: role for role in roles_data}
     if role_id:

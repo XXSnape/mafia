@@ -24,6 +24,7 @@ from .prime_minister import PrimeMinister
 from .prosecutor import Prosecutor
 from .punisher import Punisher
 from .sleeper import Sleeper
+from .successor import Successor
 from .suicide_bomber import SuicideBomber
 from .traitor import Traitor
 from .warden import Warden

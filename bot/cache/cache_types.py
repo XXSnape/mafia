@@ -47,6 +47,7 @@ RolesLiteral = Literal[
     "bride",
     "martyr",
     "phoenix",
+    "successor",
 ]
 RolesAndUsersMoney: TypeAlias = dict[RolesLiteral, UsersMoney]
 RoleAndUserMoney: TypeAlias = dict[RolesLiteral, UserAndMoney]

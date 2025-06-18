@@ -108,6 +108,7 @@ class Martyr(
         current_inactive_users: list[UserIdInt],
     ) -> tuple[UserIdInt, str] | None:
         if self.need_to_die and game_data[self.roles_key]:
+            self.need_to_die = False
             return (
                 game_data[self.roles_key][0],
                 "🫡Ты погиб во имя информации для своих союзников. Напиши последнее слово.",

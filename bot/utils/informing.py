@@ -255,6 +255,7 @@ async def notify_aliases_about_transformation(
     bot: Bot,
     new_role: "RoleABC",
     user_id: int,
+    exclude_user: bool = False,
 ):
     url = game_data["players"][str(user_id)]["url"]
     initial_role = game_data["players"][str(user_id)]["initial_role"]
@@ -268,6 +269,12 @@ async def notify_aliases_about_transformation(
         show_current_roles=True,
         sorting_factory=sorting_by_rank,
     )
+    users_to_send = []
+    for player_id in users:
+        if exclude_user and player_id == user_id:
+            continue
+        users_to_send.append(player_id)
+
     await asyncio.gather(
         *(
             bot.send_photo(
@@ -279,8 +286,11 @@ async def notify_aliases_about_transformation(
                 + f"{initial_role} {url} превратился в "
                 f"{new_role.pretty_role}\n\n"
                 f"Все текущие союзники и сокомандники:\n{profiles}",
+                protect_content=game_data["settings"][
+                    "protect_content"
+                ],
             )
-            for player_id in users
+            for player_id in users_to_send
         ),
         return_exceptions=True,
     )
