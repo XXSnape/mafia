@@ -17,6 +17,7 @@ from general.groupings import Groupings
 from general.text import ATTEMPT_TO_KILL
 from mafia.roles.base import ActiveRoleAtNightABC
 from utils.informing import notify_aliases_about_transformation
+from utils.tg import resending_message
 
 if TYPE_CHECKING:
     from mafia.roles import RoleABC
@@ -146,10 +147,11 @@ class MafiaConverterABC(FinisherOfNight):
             user_id=user_id,
         )
         if game_data["settings"]["show_roles_after_death"]:
-            await self.bot.send_photo(
+            await resending_message(
+                bot=self.bot,
                 chat_id=game_data["game_chat"],
+                text=f"{self.pretty_role} превращается в {MafiaAlias.pretty_role}",
                 photo=MafiaAlias.photo,
-                caption=f"{self.pretty_role} превращается в {MafiaAlias.pretty_role}",
             )
 
 

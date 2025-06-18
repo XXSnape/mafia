@@ -42,6 +42,7 @@ from utils.pretty_text import (
 )
 from utils.sorting import sorting_by_rank
 from utils.state import get_state_and_assign
+from utils.tg import resending_message
 
 if TYPE_CHECKING:
     from general.collection_of_roles import DataWithRoles
@@ -261,10 +262,11 @@ class RoleABC(ABC):
             )
         else:
             message = f"😎Встречайте нового {self.pretty_role}!"
-        await self.bot.send_photo(
+        await resending_message(
+            bot=self.bot,
             chat_id=game_data["game_chat"],
+            text=make_build(message),
             photo=self.photo,
-            caption=make_build(message),
         )
 
     @classmethod

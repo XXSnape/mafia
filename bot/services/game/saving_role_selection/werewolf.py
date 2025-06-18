@@ -22,7 +22,7 @@ from utils.informing import (
 )
 from utils.roles import change_role
 from utils.state import lock_state
-from utils.tg import delete_message
+from utils.tg import delete_message, resending_message
 
 
 class WerewolfSaver(RouterHelper):
@@ -80,12 +80,13 @@ class WerewolfSaver(RouterHelper):
             protect_content=game_data["settings"]["protect_content"],
         )
         if game_data["settings"]["show_roles_after_death"]:
-            await self.callback.bot.send_photo(
+            await resending_message(
+                bot=self.callback.bot,
                 chat_id=game_data["game_chat"],
-                photo=new_role.photo,
-                caption=f"{Werewolf.pretty_role} принял "
+                text=f"{Werewolf.pretty_role} принял "
                 f"решение превратиться в {new_role.pretty_role}. "
                 f"Уже со следующего дня изменения в миропорядке вступят в силу.",
+                photo=new_role.photo,
             )
         if are_there_many_senders and (
             self.callback.data == WEREWOLF_TO_MAFIA_CB
