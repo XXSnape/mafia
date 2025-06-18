@@ -82,7 +82,6 @@ class Phoenix(
     ):
         pass
 
-
     @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(
         self,
@@ -93,4 +92,3 @@ class Phoenix(
         **kwargs,
     ):
         pass
-
