@@ -150,5 +150,5 @@ class Successor(
                 bot=self.bot,
                 new_role=updated_new_role,
                 user_id=self.user_id,
-                exclude_user=True
+                exclude_user=True,
             )
