@@ -30,6 +30,7 @@ router = Router(name=__name__)
         UserFsm.LUCIFER_BLOCKS,
         UserFsm.BRIDE_CHOOSES,
         UserFsm.MARTYR_LEARNS_ROLE,
+        UserFsm.PHOENIX_RANDOMLY_ACTS,
     ),
     UserActionIndexCbData.filter(),
 )

@@ -17,6 +17,7 @@ from .lucky_gay import LuckyGay
 from .mafia import Mafia, MafiaAlias
 from .martyr import Martyr
 from .masochist import Masochist
+from .phoenix import Phoenix
 from .poisoner import Poisoner
 from .policeman import Policeman, PolicemanAlias
 from .prime_minister import PrimeMinister

@@ -33,4 +33,5 @@ class UserFsm(StatesGroup):
     LUCIFER_BLOCKS = State()
     BRIDE_CHOOSES = State()
     MARTYR_LEARNS_ROLE = State()
+    PHOENIX_RANDOMLY_ACTS = State()
     WAIT_FOR_LATEST_LETTER = State()
