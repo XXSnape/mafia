@@ -206,12 +206,6 @@ class RoleABC(ABC):
             "pretty_role"
         ] = self.pretty_role
         game_data["players"][str(new_boss_id)]["role_id"] = role_id
-        await get_state_and_assign(
-            dispatcher=self.dispatcher,
-            chat_id=new_boss_id,
-            bot_id=self.bot.id,
-            new_state=self.state_for_waiting_for_action,
-        )
         if (
             self.grouping == Groupings.criminals
             or game_data["settings"]["show_peaceful_allies"]
@@ -727,11 +721,29 @@ class ActiveRoleAtNightABC(RoleABC):
                     "protect_content"
                 ],
             )
-            add_message_to_delete(
+            await self.save_information_about_mail_and_change_state(
                 game_data=game_data,
-                chat_id=player_id,
+                player_id=player_id,
                 message_id=sent_survey.message_id,
             )
+
+    async def save_information_about_mail_and_change_state(
+        self,
+        game_data: GameCache,
+        player_id: UserIdInt,
+        message_id: int,
+    ):
+        add_message_to_delete(
+            game_data=game_data,
+            chat_id=player_id,
+            message_id=message_id,
+        )
+        await get_state_and_assign(
+            dispatcher=self.dispatcher,
+            chat_id=player_id,
+            bot_id=self.bot.id,
+            new_state=self.state_for_waiting_for_action,
+        ) # Так как некоторые роли могут менять состояние, приводим все к изначальному
 
     async def send_survey_to_aliases(
         self,

@@ -138,27 +138,20 @@ class MafiaConverterABC(FinisherOfNight):
         change_role(
             game_data=game_data,
             previous_role=self,
-            new_role=MafiaAlias(),
+            new_role=mafia,
             user_id=user_id,
-        )
-        await get_state_and_assign(
-            dispatcher=self.dispatcher,
-            chat_id=user_id,
-            bot_id=self.bot.id,
-            new_state=mafia.state_for_waiting_for_action,
         )
         await notify_aliases_about_transformation(
             game_data=game_data,
             bot=self.bot,
-            new_role=MafiaAlias(),
+            new_role=mafia,
             user_id=user_id,
         )
         if game_data["settings"]["show_roles_after_death"]:
-            await resending_message(
-                bot=self.bot,
+            await self.bot.send_photo(
                 chat_id=game_data["game_chat"],
-                text=f"{self.pretty_role} превращается в {MafiaAlias.pretty_role}",
-                photo=MafiaAlias.photo,
+                photo=mafia.photo,
+                caption=f"{self.pretty_role} превращается в {mafia.pretty_role}",
             )
 
 
