@@ -743,7 +743,7 @@ class ActiveRoleAtNightABC(RoleABC):
             chat_id=player_id,
             bot_id=self.bot.id,
             new_state=self.state_for_waiting_for_action,
-        ) # Так как некоторые роли могут менять состояние, приводим все к изначальному
+        )  # Так как некоторые роли могут менять состояние, приводим все к изначальному
 
     async def send_survey_to_aliases(
         self,
