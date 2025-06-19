@@ -8,6 +8,7 @@ from .poisoners import router as poisoners_router
 from .policeman import router as policeman_router
 from .wardens import router as wardens_router
 from .werewolves import router as werewolves_router
+from .pirates import router as pirates_router
 
 router = Router(name=__name__)
 router.include_routers(
@@ -19,4 +20,5 @@ router.include_routers(
     forgers_router,
     werewolves_router,
     instigators_router,
+    pirates_router,
 )

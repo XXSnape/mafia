@@ -47,6 +47,7 @@ RolesLiteral = Literal[
     "bride",
     "martyr",
     "phoenix",
+    "pirate",
     "successor",
 ]
 RolesAndUsersMoney: TypeAlias = dict[RolesLiteral, UsersMoney]
@@ -140,6 +141,7 @@ class GameCache(TypedDict, total=False):
     checked_for_the_same_groups: PlayersIds
     mafias_are_shown: PlayersIds
     deceived: PlayersIds
+    marked: PlayersIds
     poisoned: list[list[UserIdInt] | bool]
     pros: PlayersIds
     cons: PlayersIds

@@ -53,6 +53,7 @@ def get_data_with_roles(
         roles.Bride(),
         roles.Martyr(),
         roles.Phoenix(),
+        roles.Pirate(),
         roles.Successor(),  # Наследник должен находиться в списке ниже всех,
         # потому что должен действовать последним во время удаления игроков
     ]
@@ -66,7 +67,7 @@ BASES_ROLES: Final[tuple[RolesLiteral, ...]] = (
     roles.Civilian.role_id,
     roles.Doctor.role_id,
     roles.Mafia.role_id,
-    roles.Policeman.role_id,
+    roles.Pirate.role_id,
 )
 
 REQUIRED_ROLES: Final[tuple[RolesLiteral, ...]] = BASES_ROLES + (

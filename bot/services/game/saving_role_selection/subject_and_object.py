@@ -1,3 +1,5 @@
+from aiogram.fsm.state import State
+
 from keyboards.inline.buttons.common import BACK_BTN
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
@@ -19,11 +21,22 @@ from utils.tg import delete_message
 
 class ChoosingSubjectAndObject(RouterHelper):
     key_for_saving_data = None
-    state_when_selecting_object = None
     message_when_selecting_subject: str | None = None
     message_after_selecting_object: str | None = None
-    role: type[ActiveRoleAtNightABC] | None = None
     exclude_user_when_selecting_object: bool | None = None
+
+    def __init__(
+        self,
+        role: type[ActiveRoleAtNightABC],
+        state_when_selecting_object: State | None = None,
+        *args,
+        **kwargs
+    ):
+        super().__init__(*args, **kwargs)
+        self.role = role
+        self.state_when_selecting_object = (
+            state_when_selecting_object
+        )
 
     async def chooses_subject(
         self, callback_data: UserActionIndexCbData

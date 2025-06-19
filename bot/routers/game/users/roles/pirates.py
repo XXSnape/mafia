@@ -5,28 +5,27 @@ from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from keyboards.inline.cb.cb_text import PLAYER_BACKS_CB
-from mafia.roles import Instigator
-from services.game.saving_role_selection.instigator import (
-    InstigatorSaver,
-)
+from mafia.roles import Pirate
+from services.game.saving_role_selection.pirate import PirateSaver
+
 from states.game import UserFsm
 
 router = Router(name=__name__)
 
 
 @router.callback_query(
-    UserFsm.INSTIGATOR_CHOOSES_SUBJECT,
+    UserFsm.PIRATE_CHOOSES_SUBJECT,
     UserActionIndexCbData.filter(),
 )
-async def instigator_chooses_subject(
+async def pirate_chooses_subject(
     callback: CallbackQuery,
     callback_data: UserActionIndexCbData,
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    saver = InstigatorSaver(
-        role=Instigator,
-        state_when_selecting_object=UserFsm.INSTIGATOR_CHOOSES_OBJECT,
+    saver = PirateSaver(
+        role=Pirate,
+        state_when_selecting_object=UserFsm.PIRATE_CHOOSES_OBJECT,
         callback=callback,
         state=state,
         dispatcher=dispatcher,
@@ -35,15 +34,15 @@ async def instigator_chooses_subject(
 
 
 @router.callback_query(
-    UserFsm.INSTIGATOR_CHOOSES_OBJECT, F.data == PLAYER_BACKS_CB
+    UserFsm.PIRATE_CHOOSES_OBJECT, F.data == PLAYER_BACKS_CB
 )
-async def instigator_cancels_selection(
+async def pirate_cancels_selection(
     callback: CallbackQuery,
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    saver = InstigatorSaver(
-        role=Instigator,
+    saver = PirateSaver(
+        role=Pirate,
         callback=callback,
         state=state,
         dispatcher=dispatcher,
@@ -52,16 +51,16 @@ async def instigator_cancels_selection(
 
 
 @router.callback_query(
-    UserFsm.INSTIGATOR_CHOOSES_OBJECT, UserActionIndexCbData.filter()
+    UserFsm.PIRATE_CHOOSES_OBJECT, UserActionIndexCbData.filter()
 )
-async def instigator_chooses_object(
+async def pirate_chooses_object(
     callback: CallbackQuery,
     callback_data: UserActionIndexCbData,
     state: FSMContext,
     dispatcher: Dispatcher,
 ):
-    saver = InstigatorSaver(
-        role=Instigator,
+    saver = PirateSaver(
+        role=Pirate,
         callback=callback,
         state=state,
         dispatcher=dispatcher,
