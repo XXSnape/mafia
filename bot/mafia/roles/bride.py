@@ -4,21 +4,14 @@ from random import choice
 from aiogram.exceptions import TelegramAPIError
 
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
-from cache.extra import ExtraCache
 from general.groupings import Groupings
-from general.text import (
-    ROLE_IS_KNOWN,
-)
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
-    MafiaConverterABC,
     ProcedureAfterNightABC,
     ObligatoryKillerABC,
 )
 from mafia.roles.descriptions.description import RoleDescription
-from mafia.roles.descriptions.texts import (
-    CAN_CHOOSE_YOURSELF,
-)
+
 from states.game import UserFsm
 from utils.pretty_text import make_build
 from utils.roles import get_processed_user_id_if_exists
@@ -108,9 +101,9 @@ class Bride(
 
         if self.dropped_out or (
             len(current_inactive_users) != 0
-            and (
-                player["role_id"] == self.role_id
-                for player in game_data["players"].values()
+            and any(
+                game_data['players'][str(player_id)]['role_id'] == self.role_id
+                for player_id in current_inactive_users
             )
         ):
             return None

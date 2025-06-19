@@ -55,6 +55,11 @@ class Successor(
             extra_buttons=extra_buttons,
         )
 
+    @staticmethod
+    def allow_sending_mailing(game_data: GameCache) -> bool:
+        return game_data['number_of_night'] > 1
+
+
     @property
     def role_description(self) -> RoleDescription:
         from .poisoner import Poisoner
@@ -62,7 +67,8 @@ class Successor(
         from .bride import Bride
 
         return RoleDescription(
-            skill="Может убить любого игрока и получить его роль, если он не умрёт раньше: после ночи или голосования. "
+            skill="Может убить любого игрока и получить его роль, "
+                  "если он не умрёт раньше: после ночи или голосования или из-за неактивности. "
             "Потом фактически доигрывает за него. "
             f"Если роль погибшего игрока побеждает в зависимости от прогресса, "
             f"({Poisoner.pretty_role}, {Analyst.pretty_role}, {Bride.pretty_role}), "

@@ -53,7 +53,8 @@ def get_data_with_roles(
         roles.Bride(),
         roles.Martyr(),
         roles.Phoenix(),
-        roles.Successor(),
+        roles.Successor(), # Наследник должен находиться в списке ниже всех,
+        # потому что должен действовать последним во время удаления игроков
     ]
     all_roles = {role.role_id: role for role in roles_data}
     if role_id:
