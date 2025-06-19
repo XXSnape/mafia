@@ -24,6 +24,7 @@ class PrimeMinister(ProcedureAfterVotingABC, RoleABC):
     )
     payment_for_treatment = 12
     payment_for_murder = 12
+    number_in_order_after_voting = 2
 
     @property
     def role_description(self) -> RoleDescription:

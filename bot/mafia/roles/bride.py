@@ -10,6 +10,7 @@ from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,
 )
 from mafia.roles.descriptions.description import RoleDescription
+from mafia.roles.descriptions.texts import GUARANTEED_TO_KILL
 from states.game import UserFsm
 from utils.pretty_text import make_build
 from utils.roles import get_processed_user_id_if_exists
@@ -53,6 +54,7 @@ class Bride(
             wins_if="Жених должен выжить",
             features=[
                 "Жених узнает, что у него прошла свадьба, но не будет знать невесту",
+                GUARANTEED_TO_KILL,
                 "Ход не может быть отменён",
             ],
         )

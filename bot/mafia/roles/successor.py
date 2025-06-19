@@ -10,7 +10,10 @@ from mafia.roles.base.mixins import (
     ObligatoryKillerABC,
 )
 from mafia.roles.descriptions.description import RoleDescription
-from mafia.roles.descriptions.texts import PAYMENT_FOR_NIGHTS
+from mafia.roles.descriptions.texts import (
+    PAYMENT_FOR_NIGHTS,
+    GUARANTEED_TO_KILL,
+)
 from states.game import UserFsm
 from utils.informing import notify_aliases_about_transformation
 from utils.pretty_text import make_build
@@ -73,7 +76,7 @@ class Successor(
             f"то он не сбрасывается и продолжает расти у погибшего.",
             pay_for=[PAYMENT_FOR_NIGHTS],
             features=[
-                "Убийство происходит гарантированно после голосования",
+                GUARANTEED_TO_KILL,
             ],
             limitations=[
                 "Может убивать и менять роль только после 1-ой ночи",

@@ -35,7 +35,7 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
     )
     payment_for_treatment = 5
     payment_for_murder = 5
-    number_in_order_after_voting = 2
+    number_in_order_after_voting = 3
 
     @property
     def role_description(self) -> RoleDescription:

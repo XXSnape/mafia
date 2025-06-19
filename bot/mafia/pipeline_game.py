@@ -242,9 +242,7 @@ class Game:
         result = await self.controller.confirm_final_aim()
         if result:
             await self.background_scanning(
-                seconds=game_data["settings"][
-                    "time_for_confirmation"
-                ],
+                seconds=10,
             )
         await delete_messages_from_to_delete(
             bot=self.bot,
