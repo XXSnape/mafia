@@ -5,7 +5,6 @@ from services.game.saving_role_selection.subject_and_object import (
 from states.game import UserFsm
 
 
-
 class InstigatorSaver(ChoosingSubjectAndObject):
     key_for_saving_data = "deceived"
     message_when_selecting_subject = (
@@ -23,4 +22,3 @@ class InstigatorSaver(ChoosingSubjectAndObject):
         self.state_when_selecting_object = (
             UserFsm.INSTIGATOR_CHOOSES_OBJECT
         )
-
