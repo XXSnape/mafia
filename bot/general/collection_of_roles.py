@@ -67,7 +67,7 @@ BASES_ROLES: Final[tuple[RolesLiteral, ...]] = (
     roles.Civilian.role_id,
     roles.Doctor.role_id,
     roles.Mafia.role_id,
-    roles.Pirate.role_id,
+    roles.Policeman.role_id,
 )
 
 REQUIRED_ROLES: Final[tuple[RolesLiteral, ...]] = BASES_ROLES + (

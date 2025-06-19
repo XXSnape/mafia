@@ -1,9 +1,8 @@
 from aiogram.types import InlineKeyboardButton
-
-from cache.cache_types import RolesLiteral, GameCache, UserIdInt
+from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general import settings
 from general.groupings import Groupings
-from general.text import ROLE_IS_KNOWN, NUMBER_OF_NIGHT
+from general.text import NUMBER_OF_NIGHT, ROLE_IS_KNOWN
 from keyboards.inline.buttons.common import REFUSE_MOVE_BTN
 from mafia.roles import ActiveRoleAtNightABC, RoleABC
 from mafia.roles.base.mixins import (

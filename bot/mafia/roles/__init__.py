@@ -2,8 +2,8 @@ from .agent import Agent
 from .analyst import Analyst
 from .angel_of_death import AngelOfDeath
 from .base import ActiveRoleAtNightABC, AliasRoleABC, RoleABC
-from .bride import Bride
 from .bodyguard import Bodyguard
+from .bride import Bride
 from .civilian import Civilian
 from .doctor import Doctor, DoctorAlias
 from .forger import Forger

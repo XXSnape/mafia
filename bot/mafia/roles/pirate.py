@@ -3,8 +3,8 @@ from cache.extra import ExtraCache
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
-    ProcedureAfterVotingABC,
     ObligatoryKillerABC,
+    ProcedureAfterVotingABC,
 )
 from mafia.roles.descriptions.description import RoleDescription
 from states.game import UserFsm

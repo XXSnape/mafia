@@ -5,7 +5,6 @@ from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from keyboards.inline.cb.cb_text import PLAYER_BACKS_CB
-from mafia.roles import Instigator
 from services.game.saving_role_selection.instigator import (
     InstigatorSaver,
 )
@@ -25,8 +24,6 @@ async def instigator_chooses_subject(
     dispatcher: Dispatcher,
 ):
     saver = InstigatorSaver(
-        role=Instigator,
-        state_when_selecting_object=UserFsm.INSTIGATOR_CHOOSES_OBJECT,
         callback=callback,
         state=state,
         dispatcher=dispatcher,
@@ -43,7 +40,6 @@ async def instigator_cancels_selection(
     dispatcher: Dispatcher,
 ):
     saver = InstigatorSaver(
-        role=Instigator,
         callback=callback,
         state=state,
         dispatcher=dispatcher,
@@ -61,7 +57,6 @@ async def instigator_chooses_object(
     dispatcher: Dispatcher,
 ):
     saver = InstigatorSaver(
-        role=Instigator,
         callback=callback,
         state=state,
         dispatcher=dispatcher,

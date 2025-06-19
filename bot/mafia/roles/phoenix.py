@@ -1,27 +1,26 @@
 from random import randint
 
 from aiogram.types import InlineKeyboardButton
-
 from cache.cache_types import (
     GameCache,
+    PlayersIds,
     RolesLiteral,
     UserIdInt,
-    PlayersIds,
 )
 from general import settings
 from general.groupings import Groupings
-from general.text import NUMBER_OF_NIGHT, ATTEMPT_TO_KILL
+from general.text import ATTEMPT_TO_KILL, NUMBER_OF_NIGHT
 from keyboards.inline.buttons.common import REFUSE_MOVE_BTN
 from mafia.roles.base import ActiveRoleAtNightABC, RoleABC
 from mafia.roles.base.mixins import (
-    ProcedureAfterNightABC,
     MurderAfterNightABC,
+    ProcedureAfterNightABC,
     ProcedureAfterVotingABC,
 )
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
-    CANT_CHOOSE_IN_ROW,
     CAN_CHOOSE_YOURSELF,
+    CANT_CHOOSE_IN_ROW,
 )
 from states.game import UserFsm
 from utils.informing import send_a_lot_of_messages_safely

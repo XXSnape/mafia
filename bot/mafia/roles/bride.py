@@ -2,16 +2,14 @@ from contextlib import suppress
 from random import choice
 
 from aiogram.exceptions import TelegramAPIError
-
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
-    ProcedureAfterNightABC,
     ObligatoryKillerABC,
+    ProcedureAfterNightABC,
 )
 from mafia.roles.descriptions.description import RoleDescription
-
 from states.game import UserFsm
 from utils.pretty_text import make_build
 from utils.roles import get_processed_user_id_if_exists
@@ -47,14 +45,16 @@ class Bride(
             "и оставшееся время делает всё возможное, чтобы суженый выжил. "
             "Если его убьют, Невеста так же умирает до наступления следующей ночи. "
             "Если Невесту убьют раньше, каждую чётную ночь случайным образом будут "
-                  "умирать жители города, но не жених. "
+            "умирать жители города, но не жених. "
             "Это прекратится, когда погибнет избранник.",
             pay_for=[
                 "Количество ночей, прожитых женихом, если он выжил"
             ],
             wins_if="Жених должен выжить",
-            features=['Жених узнает, что у него прошла свадьба, но не будет знать невесту',
-                      'Ход не может быть отменён']
+            features=[
+                "Жених узнает, что у него прошла свадьба, но не будет знать невесту",
+                "Ход не может быть отменён",
+            ],
         )
 
     def get_money_for_victory_and_nights(
@@ -80,10 +80,14 @@ class Bride(
         with suppress(TelegramAPIError):
             await self.bot.send_message(
                 chat_id=self.groom_id,
-                text=make_build('😅Тили-тили тесто, жених и невеста\n\n'
-                                'У тебя появилась замечательная жена, '
-                                'готовая оберегать тебя от всех бед!'),
-                protect_content=game_data['settings']['protect_content']
+                text=make_build(
+                    "😅Тили-тили тесто, жених и невеста\n\n"
+                    "У тебя появилась замечательная жена, "
+                    "готовая оберегать тебя от всех бед!"
+                ),
+                protect_content=game_data["settings"][
+                    "protect_content"
+                ],
             )
 
     @staticmethod
@@ -102,7 +106,8 @@ class Bride(
         if self.dropped_out or (
             len(current_inactive_users) != 0
             and any(
-                game_data['players'][str(player_id)]['role_id'] == self.role_id
+                game_data["players"][str(player_id)]["role_id"]
+                == self.role_id
                 for player_id in current_inactive_users
             )
         ):

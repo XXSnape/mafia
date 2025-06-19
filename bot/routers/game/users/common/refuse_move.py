@@ -4,7 +4,6 @@ from aiogram.types import CallbackQuery
 from keyboards.inline.cb.cb_text import REFUSE_MOVE_CB
 from services.game.processing_user_actions import UserManager
 
-
 router = Router(name=__name__)
 
 

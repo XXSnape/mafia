@@ -5,9 +5,7 @@ from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from keyboards.inline.cb.cb_text import PLAYER_BACKS_CB
-from mafia.roles import Pirate
 from services.game.saving_role_selection.pirate import PirateSaver
-
 from states.game import UserFsm
 
 router = Router(name=__name__)
@@ -24,8 +22,6 @@ async def pirate_chooses_subject(
     dispatcher: Dispatcher,
 ):
     saver = PirateSaver(
-        role=Pirate,
-        state_when_selecting_object=UserFsm.PIRATE_CHOOSES_OBJECT,
         callback=callback,
         state=state,
         dispatcher=dispatcher,
@@ -42,7 +38,6 @@ async def pirate_cancels_selection(
     dispatcher: Dispatcher,
 ):
     saver = PirateSaver(
-        role=Pirate,
         callback=callback,
         state=state,
         dispatcher=dispatcher,
@@ -60,7 +55,6 @@ async def pirate_chooses_object(
     dispatcher: Dispatcher,
 ):
     saver = PirateSaver(
-        role=Pirate,
         callback=callback,
         state=state,
         dispatcher=dispatcher,

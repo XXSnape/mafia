@@ -1,5 +1,3 @@
-from aiogram.fsm.state import State
-
 from keyboards.inline.buttons.common import BACK_BTN
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
@@ -10,33 +8,24 @@ from keyboards.inline.keypads.mailing import (
 from mafia.roles import ActiveRoleAtNightABC
 from services.base import RouterHelper
 from services.game.game_assistants import (
-    get_game_state_by_user_state,
     get_game_data_and_user_id,
-    trace_all_actions,
+    get_game_state_by_user_state,
     send_messages_to_user_and_group,
+    trace_all_actions,
 )
 from utils.state import lock_state
 from utils.tg import delete_message
 
 
 class ChoosingSubjectAndObject(RouterHelper):
+    role: type[ActiveRoleAtNightABC] = None
     key_for_saving_data = None
     message_when_selecting_subject: str | None = None
     message_after_selecting_object: str | None = None
-    exclude_user_when_selecting_object: bool | None = None
 
-    def __init__(
-        self,
-        role: type[ActiveRoleAtNightABC],
-        state_when_selecting_object: State | None = None,
-        *args,
-        **kwargs
-    ):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.role = role
-        self.state_when_selecting_object = (
-            state_when_selecting_object
-        )
+        self.state_when_selecting_object = None
 
     async def chooses_subject(
         self, callback_data: UserActionIndexCbData
@@ -56,15 +45,11 @@ class ChoosingSubjectAndObject(RouterHelper):
             )
             await game_state.set_data(game_data)
         url = game_data["players"][str(user_id)]["url"]
-        if self.exclude_user_when_selecting_object:
-            exclude = user_id
-        else:
-            exclude = ()
         markup = send_selection_to_players_kb(
             players_ids=game_data["live_players_ids"],
             players=game_data["players"],
             extra_buttons=(BACK_BTN,),
-            exclude=exclude,
+            exclude=user_id,
         )
         await self.callback.message.edit_text(
             text=self.message_when_selecting_subject.format(url=url),

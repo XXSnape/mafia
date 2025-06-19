@@ -2,6 +2,7 @@ from mafia.roles import Instigator
 from services.game.saving_role_selection.subject_and_object import (
     ChoosingSubjectAndObject,
 )
+from states.game import UserFsm
 
 
 class InstigatorSaver(ChoosingSubjectAndObject):
@@ -14,4 +15,9 @@ class InstigatorSaver(ChoosingSubjectAndObject):
         "{object_url}, если попытается голосовать"
     )
     role = Instigator
-    exclude_user_when_selecting_object = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.state_when_selecting_object = (
+            UserFsm.INSTIGATOR_CHOOSES_OBJECT
+        )

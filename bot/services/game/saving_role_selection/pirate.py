@@ -1,4 +1,4 @@
-from mafia.roles import Instigator, Pirate
+from mafia.roles import Pirate
 from services.game.saving_role_selection.subject_and_object import (
     ChoosingSubjectAndObject,
 )
@@ -12,8 +12,7 @@ class PirateSaver(ChoosingSubjectAndObject):
         "Если {subject_url} подтвердит линчевание "
         "{object_url}, то он погибнет тоже"
     )
-    role = Pirate()
-    exclude_user_when_selecting_object = False
+    role = Pirate
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

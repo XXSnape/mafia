@@ -1,14 +1,13 @@
 from aiogram.exceptions import TelegramAPIError
 from aiogram.types import InlineKeyboardButton
+from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from exceptiongroup import suppress
-
-from cache.cache_types import RolesLiteral, GameCache, UserIdInt
 from general.groupings import Groupings
 from keyboards.inline.buttons.common import REFUSE_MOVE_BTN
 from mafia.roles import ActiveRoleAtNightABC, RoleABC
 from mafia.roles.base.mixins import (
-    ObligatoryKillerABC,
     FinisherOfNight,
+    ObligatoryKillerABC,
 )
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import PAYMENT_FOR_NIGHTS
@@ -57,18 +56,17 @@ class Successor(
 
     @staticmethod
     def allow_sending_mailing(game_data: GameCache) -> bool:
-        return game_data['number_of_night'] > 1
-
+        return game_data["number_of_night"] > 1
 
     @property
     def role_description(self) -> RoleDescription:
-        from .poisoner import Poisoner
         from .analyst import Analyst
         from .bride import Bride
+        from .poisoner import Poisoner
 
         return RoleDescription(
             skill="Может убить любого игрока и получить его роль, "
-                  "если он не умрёт раньше: после ночи или голосования или из-за неактивности. "
+            "если он не умрёт раньше: после ночи или голосования или из-за неактивности. "
             "Потом фактически доигрывает за него. "
             f"Если роль погибшего игрока побеждает в зависимости от прогресса, "
             f"({Poisoner.pretty_role}, {Analyst.pretty_role}, {Bride.pretty_role}), "

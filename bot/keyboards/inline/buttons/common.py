@@ -9,8 +9,8 @@ from keyboards.inline.cb.cb_text import (
     ACTIONS_ON_SETTINGS_CB,
     HELP_CB,
     PLAYER_BACKS_CB,
-    SHOP_CB,
     REFUSE_MOVE_CB,
+    SHOP_CB,
 )
 
 

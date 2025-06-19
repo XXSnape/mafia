@@ -30,9 +30,9 @@ from mafia.roles.base import (
 )
 from mafia.roles.base.mixins import (
     FinisherOfNight,
+    ObligatoryKillerABC,
     ProcedureAfterNightABC,
     ProcedureAfterVotingABC,
-    ObligatoryKillerABC,
 )
 from states.game import UserFsm
 from utils.common import (
