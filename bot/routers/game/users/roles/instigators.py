@@ -26,9 +26,7 @@ async def instigator_chooses_subject(
     saver = InstigatorSaver(
         callback=callback, state=state, dispatcher=dispatcher
     )
-    await saver.instigator_chooses_subject(
-        callback_data=callback_data
-    )
+    await saver.chooses_subject(callback_data=callback_data)
 
 
 @router.callback_query(
@@ -42,7 +40,7 @@ async def instigator_cancels_selection(
     saver = InstigatorSaver(
         callback=callback, state=state, dispatcher=dispatcher
     )
-    await saver.instigator_cancels_selection()
+    await saver.cancels_selection()
 
 
 @router.callback_query(
@@ -57,6 +55,4 @@ async def instigator_chooses_object(
     saver = InstigatorSaver(
         callback=callback, state=state, dispatcher=dispatcher
     )
-    await saver.instigator_chooses_object(
-        callback_data=callback_data
-    )
+    await saver.chooses_object(callback_data=callback_data)
