@@ -3,6 +3,7 @@ from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general import settings
 from general.groupings import Groupings
 from keyboards.inline.cb.cb_text import DRAW_CB
+from mafia.roles import RoleABC
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import ProcedureAfterVotingABC
 from mafia.roles.descriptions.description import RoleDescription
@@ -14,6 +15,8 @@ from mafia.roles.descriptions.texts import (
 from states.game import UserFsm
 from utils.roles import (
     get_processed_user_id_if_exists,
+    get_user_role_and_url,
+    get_processed_role_and_user_if_exists,
 )
 
 
@@ -50,12 +53,33 @@ class Manager(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
             UserFsm.MANAGER_GIVES_RIGHTS
         )
 
-    @get_processed_user_id_if_exists
+    @get_processed_role_and_user_if_exists
     async def take_action_after_voting(
         self,
         game_data: GameCache,
-        removed_user: list[int],
+        processed_role: RoleABC,
         processed_user_id: UserIdInt,
+        user_url: str,
         **kwargs,
     ):
-        pass
+        for user_id, victim_id in game_data["vote_for"]:
+            if user_id == processed_user_id:
+                role, url = get_user_role_and_url(
+                    game_data=game_data,
+                    processed_user_id=victim_id,
+                    all_roles=self.all_roles,
+                )
+                if role.grouping == Groupings.civilians:
+                    money = 0
+                else:
+                    money = role.payment_for_murder // 2
+                self.add_money_to_all_allies(
+                    game_data=game_data,
+                    money=money,
+                    custom_message=f"Помощь {user_url} ({processed_role.pretty_role}) "
+                    f"в голосовании за {url} ({role.pretty_role})",
+                    user_url=url,
+                    processed_role=role,
+                    at_night=False,
+                )
+                return
