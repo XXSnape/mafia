@@ -1,4 +1,7 @@
+from contextlib import suppress
 from random import choice
+
+from aiogram.exceptions import TelegramAPIError
 
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from cache.extra import ExtraCache
@@ -17,6 +20,7 @@ from mafia.roles.descriptions.texts import (
     CAN_CHOOSE_YOURSELF,
 )
 from states.game import UserFsm
+from utils.pretty_text import make_build
 from utils.roles import get_processed_user_id_if_exists
 
 
@@ -49,12 +53,15 @@ class Bride(
             skill="В начале игры выбирает жениха (иначе проигрывает сразу) "
             "и оставшееся время делает всё возможное, чтобы суженый выжил. "
             "Если его убьют, Невеста так же умирает до наступления следующей ночи. "
-            "Если Невесту убьют раньше, каждую 2ую ночь случайным образом будут умирать жители города, но не жених. "
+            "Если Невесту убьют раньше, каждую чётную ночь случайным образом будут "
+                  "умирать жители города, но не жених. "
             "Это прекратится, когда погибнет избранник.",
             pay_for=[
                 "Количество ночей, прожитых женихом, если он выжил"
             ],
             wins_if="Жених должен выжить",
+            features=['Жених узнает, что у него прошла свадьба, но не будет знать невесту',
+                      'Ход не может быть отменён']
         )
 
     def get_money_for_victory_and_nights(
@@ -77,6 +84,14 @@ class Bride(
         **kwargs
     ):
         self.groom_id = processed_user_id
+        with suppress(TelegramAPIError):
+            await self.bot.send_message(
+                chat_id=self.groom_id,
+                text=make_build('😅Тили-тили тесто, жених и невеста\n\n'
+                                'У тебя появилась замечательная жена, '
+                                'готовая оберегать тебя от всех бед!'),
+                protect_content=game_data['settings']['protect_content']
+            )
 
     @staticmethod
     def allow_sending_mailing(game_data: GameCache):
