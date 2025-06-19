@@ -20,7 +20,7 @@ from keyboards.inline.keypads.shop import to_shop_kb
 from keyboards.inline.keypads.to_bot import (
     participate_in_social_life,
 )
-from mafia.roles import Hacker
+from mafia.roles import Hacker, Manager
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_data_and_user_id,
@@ -238,6 +238,16 @@ class UserManager(RouterHelper):
             return deceived_user[1]
         return None
 
+    def _get_repeat_and_text(
+        self, game_data: GameCache
+    ) -> tuple[int, str]:
+        if (
+            Manager().get_processed_user_id(game_data=game_data)
+            == self.callback.from_user.id
+        ):
+            return 2, " (двойной голос😱)"
+        return 1, ""
+
     async def vote_for(
         self, callback_data: UserActionIndexCbData | None
     ):
@@ -274,9 +284,13 @@ class UserManager(RouterHelper):
                 game_data=game_data,
                 user_id=self.callback.from_user.id,
             )
-            game_data["vote_for"].append(
-                [self.callback.from_user.id, voted_user_id]
+            repeat, text = self._get_repeat_and_text(
+                game_data=game_data
             )
+            for _ in range(repeat):
+                game_data["vote_for"].append(
+                    [self.callback.from_user.id, voted_user_id]
+                )
             await game_state.set_data(game_data)
         voting_url = (
             game_data["players"][str(self.callback.from_user.id)][
@@ -289,14 +303,14 @@ class UserManager(RouterHelper):
         await self.callback.message.answer(
             make_build(
                 NUMBER_OF_DAY.format(game_data["number_of_night"])
-                + f"Ты выбрал голосовать за повешение {voted_url}"
+                + f"Ты выбрал голосовать за повешение {voted_url}{text}"
             ),
             protect_content=game_data["settings"]["protect_content"],
         )
         await self.callback.bot.send_message(
             chat_id=game_data["game_chat"],
             text=make_build(
-                f"❗️{voting_url} выступает против {voted_url}!"
+                f"❗️{voting_url} выступает против {voted_url}{text}!"
             ),
             reply_markup=participate_in_social_life(),
         )
@@ -325,9 +339,13 @@ class UserManager(RouterHelper):
                     game_data=game_data,
                     user_id=self.callback.from_user.id,
                 )
-                game_data["refused_to_vote"].append(
-                    self.callback.from_user.id
+                repeat, text = self._get_repeat_and_text(
+                    game_data=game_data
                 )
+                for _ in range(repeat):
+                    game_data["refused_to_vote"].append(
+                        self.callback.from_user.id
+                    )
                 await game_state.set_data(game_data)
         if is_deceived:
             await self.vote_for(callback_data=None)
@@ -342,7 +360,7 @@ class UserManager(RouterHelper):
         await self.callback.message.answer(
             make_build(
                 NUMBER_OF_DAY.format(game_data["number_of_night"])
-                + "Ты решил ни за кого не голосовать"
+                + f"Ты решил ни за кого не голосовать{text}"
             ),
             protect_content=game_data["settings"]["protect_content"],
         )
@@ -350,7 +368,7 @@ class UserManager(RouterHelper):
             chat_id=game_data["game_chat"],
             text=make_build(
                 f"🦄{url} ходит с розовыми очками в мире единорогов, "
-                f"эльфов и великодушных гномов, поэтому всех прощает!\n\n"
+                f"эльфов и великодушных гномов, поэтому всех прощает{text}!\n\n"
                 f"Не приведет ли наивность к новым жертвам?"
             ),
             reply_markup=participate_in_social_life(),

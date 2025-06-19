@@ -37,4 +37,5 @@ class UserFsm(StatesGroup):
     MARTYR_LEARNS_ROLE = State()
     PHOENIX_RANDOMLY_ACTS = State()
     HEIR_CHOOSES_TARGET = State()
+    MANAGER_GIVES_RIGHTS = State()
     WAIT_FOR_LATEST_LETTER = State()

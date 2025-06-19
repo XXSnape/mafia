@@ -32,6 +32,7 @@ router = Router(name=__name__)
         UserFsm.MARTYR_LEARNS_ROLE,
         UserFsm.PHOENIX_RANDOMLY_ACTS,
         UserFsm.HEIR_CHOOSES_TARGET,
+        UserFsm.MANAGER_GIVES_RIGHTS,
     ),
     UserActionIndexCbData.filter(),
 )

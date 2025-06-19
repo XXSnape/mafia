@@ -15,6 +15,7 @@ from .lawyer import Lawyer
 from .lucifer import Lucifer
 from .lucky_gay import LuckyGay
 from .mafia import Mafia, MafiaAlias
+from .manager import Manager
 from .martyr import Martyr
 from .masochist import Masochist
 from .phoenix import Phoenix
