@@ -1,4 +1,5 @@
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
+from general.groupings import Groupings
 from mafia.roles.base import RoleABC
 from mafia.roles.base.mixins import ProcedureAfterVotingABC
 from mafia.roles.descriptions.description import RoleDescription
@@ -69,9 +70,13 @@ class PrimeMinister(ProcedureAfterVotingABC, RoleABC):
                 processed_user_id=initial_removed_user_id,
                 all_roles=self.all_roles,
             )
+            if role.grouping != Groupings.civilians:
+                money = 0
+            else:
+                money = int(role.payment_for_treatment * 1.5)
             self.add_money_to_all_allies(
                 game_data=game_data,
-                money=int(role.payment_for_treatment * 1.5),
+                money=money,
                 beginning_message="Спасение от повешения",
                 user_url=url,
                 processed_role=role,
