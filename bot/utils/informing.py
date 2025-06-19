@@ -12,7 +12,12 @@ from cache.cache_types import (
     UsersInGame,
 )
 from general.groupings import Groupings
-from general.text import MONEY_SYM, NUMBER_OF_NIGHT, SKIP
+from general.text import (
+    MONEY_SYM,
+    NUMBER_OF_NIGHT,
+    SKIP,
+    DOUBLE_VOICE,
+)
 from keyboards.inline.callback_factory.recognize_user import (
     UserVoteIndexCbData,
 )
@@ -20,7 +25,11 @@ from keyboards.inline.cb.cb_text import DONT_VOTE_FOR_ANYONE_CB
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
-from utils.common import add_message_to_delete, get_criminals_ids
+from utils.common import (
+    add_message_to_delete,
+    get_criminals_ids,
+    get_the_most_frequently_encountered_id,
+)
 from utils.pretty_text import (
     cut_off_old_text,
     make_build,
@@ -109,9 +118,16 @@ def get_profiles(
     show_current_roles: bool = False,
     show_initial_roles: bool = False,
     show_money: bool = False,
+    show_voted_twice: bool = False,
     sorting_factory: Callable | None = sorting_by_number,
     if_there_are_no_players: str = "\nПока нет участников!",
 ) -> str:
+    voted_twice_id = None
+    if show_voted_twice:
+        voted_twice_id = get_the_most_frequently_encountered_id(
+            ids=players_ids, counterweight=1
+        )
+        players_ids = list(set(players_ids))
     if sorting_factory:
         sorting_func = sorting_factory(players=players)
         users = sorted(players_ids, key=sorting_func)
@@ -139,6 +155,8 @@ def get_profiles(
                 result += f"\n{number}) {url} — {show_current_roles}"
         else:
             result += f"\n{number}) {url}"
+            if voted_twice_id == user_id:
+                result += DOUBLE_VOICE
     return make_build(result)
 
 
@@ -178,6 +196,7 @@ def get_results_of_goal_identification(game_data: GameCache):
             refused_result += get_profiles(
                 players_ids=game_data["refused_to_vote"],
                 players=game_data["players"],
+                show_voted_twice=True,
             )
         else:
             refused_result += "\n???"
@@ -194,6 +213,7 @@ def get_results_of_goal_identification(game_data: GameCache):
             text = get_profiles(
                 players_ids=voting_people,
                 players=game_data["players"],
+                show_voted_twice=True,
             )
         else:
             text = "\n???"

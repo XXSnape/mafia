@@ -12,7 +12,7 @@ from database.schemas.common import TgIdSchema
 from general.collection_of_roles import get_data_with_roles
 from general.commands import PrivateCommands
 from general.groupings import Groupings
-from general.text import NUMBER_OF_DAY, NUMBER_OF_NIGHT
+from general.text import NUMBER_OF_DAY, NUMBER_OF_NIGHT, DOUBLE_VOICE
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
@@ -245,7 +245,7 @@ class UserManager(RouterHelper):
             Manager().get_processed_user_id(game_data=game_data)
             == self.callback.from_user.id
         ):
-            return 2, " (двойной голос😱)"
+            return 2, DOUBLE_VOICE
         return 1, ""
 
     async def vote_for(
