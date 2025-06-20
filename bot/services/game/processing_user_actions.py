@@ -1,7 +1,10 @@
 from contextlib import suppress
+from datetime import timedelta
 from html import escape
 
 from aiogram.filters import CommandObject
+from aiogram.fsm.context import FSMContext
+
 from cache.cache_types import (
     GameCache,
     UserIdInt,
@@ -29,14 +32,49 @@ from services.game.game_assistants import (
 )
 from states.game import GameFsm
 from utils.common import get_criminals_ids
-from utils.informing import send_a_lot_of_messages_safely
+from utils.informing import (
+    send_a_lot_of_messages_safely,
+    get_profiles,
+)
 from utils.pretty_text import make_build
 from utils.state import lock_state
-from utils.tg import delete_message, resending_message
+from utils.tg import delete_message, resending_message, ban_user
 
 
 class UserManager(RouterHelper):
-    async def refuse_movie(self):
+
+    async def _check_running_game(
+        self, if_not_in_game_message: str, if_not_alive_message: str
+    ) -> tuple[FSMContext, GameCache] | None:
+        try:
+            game_state = await get_game_state_by_user_state(
+                tg_obj=self.message,
+                user_state=self.state,
+                dispatcher=self.dispatcher,
+            )
+        except KeyError:
+            await self.message.reply(
+                text=make_build(if_not_in_game_message)
+            )
+            return None
+        state = await game_state.get_state()
+        if state != GameFsm.STARTED.state:
+            await self.message.reply(
+                text=make_build("Игра еще не началась!")
+            )
+            return None
+        game_data: GameCache = await game_state.get_data()
+        if (
+            self.message.from_user.id
+            not in game_data["live_players_ids"]
+        ):
+            await self.message.reply(
+                text=make_build(if_not_alive_message)
+            )
+            return None
+        return game_state, game_data
+
+    async def refuse_move(self):
         await delete_message(
             message=self.callback.message, raise_exception=True
         )
@@ -101,34 +139,14 @@ class UserManager(RouterHelper):
                 + f"/{PrivateCommands.anon.name} Всем хорошей игры!"
             )
             return
-        try:
-            game_state = await get_game_state_by_user_state(
-                tg_obj=self.message,
-                user_state=self.state,
-                dispatcher=self.dispatcher,
-            )
-        except KeyError:
-            await self.message.reply(
-                text=make_build(
-                    "Анонимные сообщения можно отправлять только во время игры"
-                )
-            )
+        result = await self._check_running_game(
+            if_not_in_game_message="Анонимные сообщения можно отправлять только во время игры",
+            if_not_alive_message="Отправлять сообщения анонимно можно только будучи в игре!",
+        )
+        if result is None:
             return
-        state = await game_state.get_state()
-        if state != GameFsm.STARTED.state:
-            await self.message.reply(
-                text=make_build("Игра еще не началась!")
-            )
-            return
+        _, game_data = result
         user_id = self.message.from_user.id
-        game_data: GameCache = await game_state.get_data()
-        if user_id not in game_data["live_players_ids"]:
-            await self.message.reply(
-                text=make_build(
-                    "Отправлять сообщения анонимно можно только будучи в игре!"
-                )
-            )
-            return
         user_tg_id = TgIdSchema(tg_id=user_id)
         users_dao = UsersDao(session=self.session)
         user = await users_dao.get_user_or_create(user_tg_id)
@@ -372,4 +390,54 @@ class UserManager(RouterHelper):
                 f"Не приведет ли наивность к новым жертвам?"
             ),
             reply_markup=participate_in_social_life(),
+        )
+
+    async def want_to_leave_game(self):
+        result = await self._check_running_game(
+            if_not_in_game_message="Команда работает только во время игры!",
+            if_not_alive_message="Ты не в игре!",
+        )
+        if result is None:
+            return
+        game_state, _ = result
+        user_id = self.message.from_user.id
+        async with lock_state(game_state):
+            game_data: GameCache = await game_state.get_data()
+            if user_id in game_data["wish_to_leave_game"]:
+                await self.message.reply(
+                    make_build(
+                        "Ты уже в списках с желающими покинуть игру"
+                    )
+                )
+                return
+            game_data["wish_to_leave_game"] = [
+                wish_to_leave_id
+                for wish_to_leave_id in game_data[
+                    "wish_to_leave_game"
+                ]
+                if wish_to_leave_id in game_data["live_players_ids"]
+            ] + [user_id]
+            await game_state.set_data(game_data)
+        users = get_profiles(
+            players_ids=game_data["wish_to_leave_game"],
+            players=game_data["players"],
+            sorting_factory=None,
+        )
+        number_of_people_to_leave = len(
+            game_data["wish_to_leave_game"]
+        )
+        total_number_of_players = len(game_data["live_players_ids"])
+        text = (
+            f"❗️Игроки, желающие завершить игру досрочно "
+            f"({number_of_people_to_leave} из {total_number_of_players}):\n{users}"
+        )
+        if number_of_people_to_leave == total_number_of_players:
+            text += "\n\n🏁Игра скоро завершится"
+        await resending_message(
+            bot=self.message.bot,
+            chat_id=game_data["game_chat"],
+            text=make_build(text),
+        )
+        await self.message.reply(
+            make_build("😐Твое желание покинуть игру учтено")
         )

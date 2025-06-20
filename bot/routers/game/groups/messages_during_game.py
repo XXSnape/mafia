@@ -9,14 +9,6 @@ from states.game import GameFsm
 router = Router(name=__name__)
 
 
-@router.message(
-    StateFilter(GameFsm.STARTED), Command(GroupCommands.leave.name)
-)
-async def want_to_exit_game(message: Message, state: FSMContext):
-    group_manager = GroupManager(message=message, state=state)
-    await group_manager.want_to_exit_game()
-
-
 @router.message(StateFilter(GameFsm.STARTED))
 async def delete_message_from_non_players(
     message: Message, state: FSMContext
