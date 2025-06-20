@@ -33,6 +33,7 @@ router = Router(name=__name__)
         UserFsm.PHOENIX_RANDOMLY_ACTS,
         UserFsm.HEIR_CHOOSES_TARGET,
         UserFsm.MANAGER_GIVES_RIGHTS,
+        UserFsm.RESURRECTOR_REVIVES,
     ),
     UserActionIndexCbData.filter(),
 )

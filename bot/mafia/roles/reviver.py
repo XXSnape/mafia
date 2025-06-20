@@ -1,3 +1,7 @@
+from contextlib import suppress
+
+from aiogram.exceptions import TelegramAPIError
+
 from cache.cache_types import RolesLiteral, UserIdInt, GameCache
 from general.groupings import Groupings
 from mafia.roles import ActiveRoleAtNightABC
@@ -7,7 +11,11 @@ from mafia.roles.base.mixins import (
 )
 from mafia.roles.descriptions.description import RoleDescription
 from states.game import UserFsm
-from utils.roles import get_processed_user_id_if_exists
+from utils.roles import (
+    get_processed_user_id_if_exists,
+    get_user_role_and_url,
+    change_role,
+)
 
 
 class Reviver(
@@ -31,6 +39,9 @@ class Reviver(
         "/images/size/w1440h1080/2024/03/megamiiiiiindtwocoveeeer.jpg"
     )
     mail_message = "Кого попытаешься превратить в маршала или врача?"
+    message_to_user_after_action = (
+        "Ты выбрал превратить {url} в маршала или врача"
+    )
     need_to_monitor_interaction = False
     payment_for_treatment = 12
     payment_for_murder = 14
@@ -73,9 +84,58 @@ class Reviver(
         from .policeman import Policeman
         from .doctor import Doctor
 
-        return (not game_data[Policeman.roles_key]) and (
+        return (not game_data[Policeman.roles_key]) or (
             not game_data[Doctor.roles_key]
         )
 
     async def end_night(self, game_data: GameCache):
-        pass
+        from .policeman import Policeman
+        from .doctor import Doctor
+
+        user_id = self.reborn_id
+        self.reborn_id = None
+        if (
+            user_id is None
+            or user_id not in game_data["live_players_ids"]
+        ):
+            return
+
+        current_role, url = get_user_role_and_url(
+            game_data=game_data,
+            processed_user_id=user_id,
+            all_roles=self.all_roles,
+        )
+        if (
+            current_role.grouping != Groupings.civilians
+            or current_role.role_id
+            in (Policeman.role_id, Doctor.role_id)
+        ):
+            return
+        if not game_data[Policeman.roles_key]:
+            new_role = Policeman()
+        elif not game_data[Doctor.roles_key]:
+            new_role = Doctor()
+        else:
+            return
+        change_role(
+            game_data=game_data,
+            previous_role=current_role,
+            new_role=new_role,
+            user_id=user_id,
+        )
+        self.add_money_to_all_allies(
+            game_data=game_data,
+            money=30,
+            user_url=url,
+            custom_message=f"Перевоплощение {url} "
+            f"({current_role.pretty_role}) в ({new_role.pretty_role})",
+            at_night=False,
+        )
+        with suppress(TelegramAPIError):
+            await self.bot.send_photo(
+                chat_id=user_id,
+                photo=new_role.photo,
+                caption=f"Ты снят с предыдущей должности, и "
+                f"теперь твоя роль — {new_role.pretty_role}. "
+                f"Выполняй свои обязанности достойно🫡",
+            )
