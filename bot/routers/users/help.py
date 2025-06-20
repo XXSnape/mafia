@@ -12,6 +12,7 @@ from keyboards.inline.cb.cb_text import (
     HOW_TO_START_GAME_CB,
     VIEW_ROLES_CB,
     WHAT_ARE_BIDS_CB,
+    WHAT_ARE_ADVANCED_SETTINGS_CB,
 )
 from services.users.base import BaseRouter
 
@@ -58,6 +59,12 @@ async def how_to_play(callback: CallbackQuery):
 async def how_to_set_up_game(callback: CallbackQuery):
     base = BaseRouter(callback=callback)
     await base.how_to_set_up_game()
+
+
+@router.callback_query(F.data == WHAT_ARE_ADVANCED_SETTINGS_CB)
+async def what_are_advanced_settings(callback: CallbackQuery):
+    base = BaseRouter(callback=callback)
+    await base.what_are_advanced_settings()
 
 
 @router.callback_query(F.data == HOW_TO_SET_UP_GROUP_CB)
