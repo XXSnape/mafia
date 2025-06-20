@@ -55,6 +55,7 @@ def get_data_with_roles(
         roles.Martyr(),
         roles.Phoenix(),
         roles.Pirate(),
+        roles.Reviver(),
         roles.Successor(),  # Наследник должен находиться в списке ниже всех,
         # потому что должен действовать последним во время удаления игроков
     ]

@@ -38,4 +38,5 @@ class UserFsm(StatesGroup):
     PHOENIX_RANDOMLY_ACTS = State()
     HEIR_CHOOSES_TARGET = State()
     MANAGER_GIVES_RIGHTS = State()
+    RESURRECTOR_REVIVES = State()
     WAIT_FOR_LATEST_LETTER = State()
