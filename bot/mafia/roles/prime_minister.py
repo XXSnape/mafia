@@ -14,7 +14,7 @@ from utils.tg import resending_message
 
 class PrimeMinister(ProcedureAfterVotingABC, RoleABC):
     role = "Премьер-министр"
-    role_id: RolesLiteral = "prime_minister"
+    role_id: RolesLiteral = "emperor"
     photo = (
         "https://avatars.mds.yandex.net/i?id=fb2e5e825d183d5344d93bc563"
         "6bc4c4_l-5084109-images-thumbs&n=13"

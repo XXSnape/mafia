@@ -36,7 +36,7 @@ class AngelOfDeath(
     ActiveRoleAtNightABC,
 ):
     role = "Ангел-Хранитель"
-    role_id: RolesLiteral = "angel_of_death"
+    role_id: RolesLiteral = "angel"
     mail_message = "Ты здесь, чтобы помочь человечеству исправить ошибки! Кого ты излечишь?"
     need_to_monitor_interaction = False
     photo = "https://avatars.mds.yandex.net/get-entity_search/10844899/935958285/S600xU_2x"
