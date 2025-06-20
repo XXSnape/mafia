@@ -52,6 +52,9 @@ class SettingModel(IdMixin, BaseModel):
     can_marshal_kill: Mapped[bool] = mapped_column(
         default=True, server_default="1"
     )
+    can_talk_at_night: Mapped[bool] = mapped_column(
+        default=True, server_default="1"
+    )
     mafia_every_3: Mapped[bool] = mapped_column(
         default=False, server_default="0"
     )
