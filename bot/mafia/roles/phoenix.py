@@ -50,6 +50,7 @@ class Phoenix(
     payment_for_treatment = 10
     payment_for_murder = 10
     salary = 30
+    is_possible_to_skip_move = True
 
     @property
     def role_description(self) -> RoleDescription:
@@ -96,19 +97,6 @@ class Phoenix(
             // settings.mafia.minimum_number_of_players
             * 40,
             self.payment_for_night_spent * nights_lived,
-        )
-
-    def generate_markup(
-        self,
-        player_id: UserIdInt,
-        game_data: GameCache,
-        extra_buttons: tuple[InlineKeyboardButton, ...] = (),
-    ):
-        extra_buttons = (REFUSE_MOVE_BTN,)
-        return super().generate_markup(
-            player_id=player_id,
-            game_data=game_data,
-            extra_buttons=extra_buttons,
         )
 
     @get_processed_role_and_user_if_exists

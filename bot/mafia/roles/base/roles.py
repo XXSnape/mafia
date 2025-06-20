@@ -22,6 +22,7 @@ from database.schemas.results import PersonalResultSchema
 from general import settings
 from general.groupings import Groupings
 from general.text import MONEY_SYM, NUMBER_OF_NIGHT
+from keyboards.inline.buttons.common import REFUSE_MOVE_BTN
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
@@ -619,6 +620,8 @@ class ActiveRoleAtNightABC(RoleABC):
     do_not_choose_self: int = 1
     payment_for_treatment = 10
     payment_for_murder = 10
+    extra_buttons: tuple[InlineKeyboardButton] = ()
+    is_possible_to_skip_move: bool = False
 
     @classmethod
     @property
@@ -769,7 +772,6 @@ class ActiveRoleAtNightABC(RoleABC):
         self,
         player_id: int,
         game_data: GameCache,
-        extra_buttons: tuple[InlineKeyboardButton, ...] = (),
     ):
         exclude = []
         current_number = game_data["number_of_night"]
@@ -795,11 +797,14 @@ class ActiveRoleAtNightABC(RoleABC):
 
         if game_data["live_players_ids"] == exclude:
             return
+        buttons = self.extra_buttons
+        if self.is_possible_to_skip_move:
+            buttons += (REFUSE_MOVE_BTN,)
         return send_selection_to_players_kb(
             players_ids=game_data["live_players_ids"],
             players=game_data["players"],
             exclude=exclude,
-            extra_buttons=extra_buttons,
+            extra_buttons=buttons,
         )
 
     @staticmethod

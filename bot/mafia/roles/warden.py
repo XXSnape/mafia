@@ -3,6 +3,7 @@ from cache.cache_types import (
     GameCache,
     PlayersIds,
     RolesLiteral,
+    UserIdInt,
 )
 from cache.extra import ExtraCache
 from general.text import ROLE_IS_KNOWN
@@ -154,9 +155,8 @@ class Warden(ProcedureAfterNightABC, ActiveRoleAtNightABC):
 
     def generate_markup(
         self,
-        player_id: int,
+        player_id: UserIdInt,
         game_data: GameCache,
-        extra_buttons: tuple[InlineKeyboardButton, ...] = (),
     ):
         return selection_to_warden_kb(
             game_data=game_data, user_id=player_id

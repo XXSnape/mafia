@@ -3,7 +3,7 @@ from operator import attrgetter
 
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
-from cache.cache_types import GameCache, UsersInGame
+from cache.cache_types import GameCache, UsersInGame, UserIdInt
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import BACK_BTN
 from keyboards.inline.callback_factory.recognize_user import (
@@ -50,13 +50,13 @@ def send_transformation_kb(game_data: GameCache):
 
 
 def send_selection_to_players_kb(
-    players_ids: list[int],
+    players_ids: list[UserIdInt],
     players: UsersInGame,
     extra_buttons: tuple[InlineKeyboardButton, ...] = (),
-    exclude: Iterable[int] | int = (),
+    exclude: Iterable[UserIdInt] | UserIdInt = (),
     user_index_cb: type[CallbackData] = UserActionIndexCbData,
 ):
-    if isinstance(exclude, int):
+    if isinstance(exclude, UserIdInt):
         exclude = [exclude]
     buttons = [
         InlineKeyboardButton(
@@ -71,7 +71,7 @@ def send_selection_to_players_kb(
     return generate_inline_kb(data_with_buttons=buttons)
 
 
-def selection_to_warden_kb(game_data: GameCache, user_id: int):
+def selection_to_warden_kb(game_data: GameCache, user_id: UserIdInt):
     checked = game_data["checked_for_the_same_groups"]
     buttons = []
     for player_id in game_data["live_players_ids"]:

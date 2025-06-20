@@ -34,6 +34,7 @@ class Martyr(
     notification_message = ROLE_IS_KNOWN
     payment_for_treatment = 10
     payment_for_murder = 14
+    is_possible_to_skip_move = True
 
     @property
     def role_description(self) -> RoleDescription:
@@ -60,19 +61,6 @@ class Martyr(
             text=NUMBER_OF_NIGHT.format(game_data["number_of_night"])
             + f"{user_url} — {processed_role.pretty_role}",
             protect_content=game_data["settings"]["protect_content"],
-        )
-
-    def generate_markup(
-        self,
-        player_id: UserIdInt,
-        game_data: GameCache,
-        extra_buttons: tuple[InlineKeyboardButton, ...] = (),
-    ):
-        extra_buttons = (REFUSE_MOVE_BTN,)
-        return super().generate_markup(
-            player_id=player_id,
-            game_data=game_data,
-            extra_buttons=extra_buttons,
         )
 
     @get_processed_role_and_user_if_exists

@@ -43,19 +43,7 @@ class Successor(
     payment_for_murder = 11
     payment_for_night_spent = 8
     notification_message = None
-
-    def generate_markup(
-        self,
-        player_id: UserIdInt,
-        game_data: GameCache,
-        extra_buttons: tuple[InlineKeyboardButton, ...] = (),
-    ):
-        extra_buttons = (REFUSE_MOVE_BTN,)
-        return super().generate_markup(
-            player_id=player_id,
-            game_data=game_data,
-            extra_buttons=extra_buttons,
-        )
+    is_possible_to_skip_move = True
 
     @staticmethod
     def allow_sending_mailing(game_data: GameCache) -> bool:

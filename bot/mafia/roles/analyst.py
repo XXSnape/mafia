@@ -36,6 +36,12 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
     payment_for_treatment = 5
     payment_for_murder = 5
     number_in_order_after_voting = 3
+    extra_buttons = (
+        InlineKeyboardButton(
+            text="Никого не повесят",
+            callback_data=DRAW_CB,
+        ),
+    )
 
     @property
     def role_description(self) -> RoleDescription:
@@ -64,24 +70,6 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
         self.purpose = f"{self.purpose}\n\nДля победы нужно угадать {self.necessary_to_win} раз(а)"
         return super().introducing_users_to_roles(
             game_data=game_data
-        )
-
-    def generate_markup(
-        self,
-        player_id: int,
-        game_data: GameCache,
-        extra_buttons: tuple[InlineKeyboardButton, ...] = (),
-    ):
-        extra_buttons = (
-            InlineKeyboardButton(
-                text="Никого не повесят",
-                callback_data=DRAW_CB,
-            ),
-        )
-        return super().generate_markup(
-            player_id=player_id,
-            game_data=game_data,
-            extra_buttons=extra_buttons,
         )
 
     def cancel_actions(self, game_data: GameCache, user_id: int):

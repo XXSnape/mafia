@@ -109,15 +109,13 @@ class Lucifer(ProcedureAfterNightABC, ActiveRoleAtNightABC):
 
     def generate_markup(
         self,
-        player_id: int,
+        player_id: UserIdInt,
         game_data: GameCache,
-        extra_buttons: tuple[InlineKeyboardButton, ...] = (),
     ):
         return send_selection_to_players_kb(
             players_ids=game_data["live_players_ids"],
             players=game_data["players"],
             exclude=get_criminals_ids(game_data),
-            extra_buttons=extra_buttons,
         )
 
     @get_processed_role_and_user_if_exists

@@ -178,7 +178,6 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         self,
         player_id: int,
         game_data: GameCache,
-        extra_buttons: tuple[InlineKeyboardButton, ...] = (),
     ):
         return kill_or_check_on_policeman(game_data=game_data)
 

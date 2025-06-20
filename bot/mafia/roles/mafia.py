@@ -97,7 +97,6 @@ class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
         self,
         player_id: int,
         game_data: GameCache,
-        extra_buttons: tuple[InlineKeyboardButton, ...] = (),
     ):
         if game_data["settings"]["can_kill_teammates"]:
             exclude = [player_id]
@@ -107,7 +106,6 @@ class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
             players_ids=game_data["live_players_ids"],
             players=game_data["players"],
             exclude=exclude,
-            extra_buttons=extra_buttons,
         )
 
     @get_processed_role_and_user_if_exists
