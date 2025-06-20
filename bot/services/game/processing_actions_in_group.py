@@ -35,9 +35,16 @@ class GroupManager(RouterHelper):
     async def delete_message_from_non_players(self):
         game_data: GameCache = await self.state.get_data()
         if (
-            self.message.from_user.id
-            not in game_data["live_players_ids"]
-        ) or self.message.from_user.id in game_data["cant_talk"]:
+            (
+                self.message.from_user.id
+                not in game_data["live_players_ids"]
+            )
+            or self.message.from_user.id in game_data["cant_talk"]
+            or (
+                game_data["settings"]["can_talk_at_night"] is False
+                and game_data["at_night"]
+            )
+        ):
             await delete_message(message=self.message)
             await ban_user(
                 bot=self.message.bot,

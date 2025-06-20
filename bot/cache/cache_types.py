@@ -134,6 +134,7 @@ class UserCache(TypedDict, total=False):
 class GameCache(TypedDict, total=False):
     settings: GameSettingsCache
     bids: RolesAndUsersMoney
+    at_night: bool
     game_chat: int
     start_message_id: int
     waiting_for_action_at_night: PlayersIds

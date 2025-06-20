@@ -602,6 +602,7 @@ class Registration(RouterHelper):
         }
         game_data: GameCache = {
             "game_chat": self.message.chat.id,
+            "at_night": True,
             "settings": game_settings,
             "pros": [],
             "cons": [],

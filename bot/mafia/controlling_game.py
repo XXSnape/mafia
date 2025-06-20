@@ -115,6 +115,7 @@ class Controller:
     async def start_new_night(self):
         game_data: GameCache = await self.state.get_data()
         game_data["number_of_night"] += 1
+        game_data["at_night"] = True
         await self.state.set_data(game_data)
         if (
             game_data["number_of_night"] == 1
@@ -148,6 +149,8 @@ class Controller:
             all_roles=self.original_roles_in_fog_of_war
             or self.all_roles,
         )
+        game_data["at_night"] = False
+        await self.state.set_data(game_data)
         await resending_message(
             bot=self.bot,
             chat_id=self.group_chat_id,
