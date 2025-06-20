@@ -30,7 +30,7 @@ from utils.roles import (
 
 
 class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
-    role = "Дон. Высшее звание в преступных группировках"
+    role = "Дон"
     role_id: RolesLiteral = "don"
     photo = "https://proza.ru/pics/2021/02/21/523.jpg"
     grouping = Groupings.criminals

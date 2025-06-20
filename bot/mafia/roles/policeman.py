@@ -35,7 +35,7 @@ from utils.roles import (
 
 
 class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
-    role = "Маршал. Верховный главнокомандующий армии"
+    role = "Маршал"
     role_id: RolesLiteral = "policeman"
     photo = "https://avatars.mds.yandex.net/get-kinopoisk-image/1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x"
     need_to_monitor_interaction = False
