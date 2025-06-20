@@ -8,7 +8,7 @@ from keyboards.inline.callback_factory.recognize_user import (
     ProsAndCons,
 )
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
-from mafia.roles import PrimeMinister
+from mafia.roles import Emperor
 from services.base import RouterHelper
 from utils.informing import get_profiles
 from utils.pretty_text import make_build
@@ -22,9 +22,9 @@ class GroupManager(RouterHelper):
         user_id: int,
         add_to: PlayersIds,
         delete_from: PlayersIds,
-        prime_ministers: PlayersIds,
+        have_2_votes: PlayersIds,
     ):
-        repeat = 2 if user_id in prime_ministers else 1
+        repeat = 2 if user_id in have_2_votes else 1
         for _ in range(repeat):
             with suppress(ValueError):
                 delete_from.remove(user_id)
@@ -82,8 +82,8 @@ class GroupManager(RouterHelper):
                     user_id=self.callback.from_user.id,
                     add_to=game_data["pros"],
                     delete_from=game_data["cons"],
-                    prime_ministers=game_data.get(
-                        PrimeMinister.roles_key, []
+                    have_2_votes=game_data.get(
+                        Emperor.roles_key, []
                     ),
                 )
             elif callback_data.action == ProsAndCons.cons:
@@ -91,8 +91,8 @@ class GroupManager(RouterHelper):
                     user_id=self.callback.from_user.id,
                     add_to=game_data["cons"],
                     delete_from=game_data["pros"],
-                    prime_ministers=game_data.get(
-                        PrimeMinister.roles_key, []
+                    have_2_votes=game_data.get(
+                        Emperor.roles_key, []
                     ),
                 )
             await self.state.set_data(game_data)

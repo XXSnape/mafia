@@ -40,8 +40,10 @@ class Angel(
     mail_message = "Ты здесь, чтобы помочь человечеству исправить ошибки! Кого ты излечишь?"
     need_to_monitor_interaction = False
     photo = "https://i.pinimg.com/736x/04/76/cd/0476cd1eb81fa8d31938bfb821f3b975.jpg"
-    purpose = ("Если тебя линчуют на голосовании, "
-               "сможешь следующей ночью кого-нибудь вылечить")
+    purpose = (
+        "Если тебя линчуют на голосовании, "
+        "сможешь следующей ночью кого-нибудь вылечить"
+    )
     grouping = Groupings.civilians
     extra_data = [ExtraCache(key="angels_died", need_to_clear=False)]
     message_to_user_after_action = "Ты выбрал спасти {url}"

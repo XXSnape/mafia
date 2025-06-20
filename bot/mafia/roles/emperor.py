@@ -12,12 +12,12 @@ from utils.roles import get_user_role_and_url
 from utils.tg import resending_message
 
 
-class PrimeMinister(ProcedureAfterVotingABC, RoleABC):
-    role = "Премьер-министр"
+class Emperor(ProcedureAfterVotingABC, RoleABC):
+    role = "Император"
     role_id: RolesLiteral = "emperor"
     photo = (
-        "https://avatars.mds.yandex.net/i?id=fb2e5e825d183d5344d93bc563"
-        "6bc4c4_l-5084109-images-thumbs&n=13"
+        "https://masterpiecer-images.s3.yandex.net/"
+        "df0ee8d8808611ee8e947a2f0d1382ba:upscaled"
     )
     purpose = (
         "Тебе доверился народ, поэтому твой голос на "

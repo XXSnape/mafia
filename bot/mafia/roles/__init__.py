@@ -22,7 +22,7 @@ from .phoenix import Phoenix
 from .pirate import Pirate
 from .poisoner import Poisoner
 from .policeman import Policeman, PolicemanAlias
-from .prime_minister import PrimeMinister
+from .emperor import Emperor
 from .prosecutor import Prosecutor
 from .punisher import Punisher
 from .reviver import Reviver
