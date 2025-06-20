@@ -85,6 +85,7 @@ async def show_common_settings_options(
             cb_text.ALLOW_BETTING_CB,
             cb_text.CAN_KILL_TEAMMATES_CB,
             cb_text.CAN_MARSHAL_KILL_CB,
+            cb_text.CAN_TALK_AT_NIGHT_CB,
             cb_text.SPEED_UP_NIGHTS_AND_VOTING_CB,
             cb_text.PROTECT_CONTENT_CB,
         )

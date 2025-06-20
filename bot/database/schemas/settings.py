@@ -18,6 +18,7 @@ class DifferentSettingsSchema(TimeOfDaySchema):
     show_usernames_after_confirmation: bool = False
     can_kill_teammates: bool = True
     can_marshal_kill: bool = True
+    can_talk_at_night: bool = True
     mafia_every_3: bool = False
     allow_betting: bool = True
     speed_up_nights_and_voting: bool = False

@@ -80,6 +80,7 @@ class DifferentSettingsCache(TypedDict):
     show_usernames_after_confirmation: bool
     can_kill_teammates: bool
     can_marshal_kill: bool
+    can_talk_at_night: bool
     mafia_every_3: bool
     allow_betting: bool
     speed_up_nights_and_voting: bool

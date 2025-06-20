@@ -62,6 +62,10 @@ def get_different_settings_buttons():
             callback_data=cb_text.CAN_MARSHAL_KILL_CB,
         ),
         InlineKeyboardButton(
+            text="Можно разговаривать ночью",
+            callback_data=cb_text.CAN_TALK_AT_NIGHT_CB,
+        ),
+        InlineKeyboardButton(
             text="Мафией будет каждый 3-ий игрок",
             callback_data=cb_text.MAFIA_EVERY_3_CB,
         ),
