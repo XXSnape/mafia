@@ -44,7 +44,7 @@ def get_data_with_roles(
         roles.Bodyguard(),
         roles.Masochist(),
         roles.Lawyer(),
-        roles.AngelOfDeath(),
+        roles.Angel(),
         roles.Prosecutor(),
         roles.LuckyGay(),
         roles.DoctorAlias(),

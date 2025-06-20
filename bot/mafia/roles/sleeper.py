@@ -39,7 +39,7 @@ class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
 
     @property
     def role_description(self) -> RoleDescription:
-        from .angel_of_death import AngelOfDeath
+        from .angel import Angel
         from .mafia import Mafia
 
         return RoleDescription(
@@ -48,7 +48,7 @@ class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
             limitations=[
                 CANT_CHOOSE_IN_ROW,
                 "Если жертва может делать ходы ночью после смерти, "
-                f"то она не может быть усыплена ({AngelOfDeath.pretty_role})",
+                f"то она не может быть усыплена ({Angel.pretty_role})",
             ],
             features=[
                 "Ход жертвы отменяется полностью, поэтому она "

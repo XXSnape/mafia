@@ -1,6 +1,6 @@
 from .agent import Agent
 from .analyst import Analyst
-from .angel_of_death import AngelOfDeath
+from .angel import Angel
 from .base import ActiveRoleAtNightABC, AliasRoleABC, RoleABC
 from .bodyguard import Bodyguard
 from .bride import Bride

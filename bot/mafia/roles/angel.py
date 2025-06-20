@@ -29,23 +29,24 @@ from utils.roles import (
 from utils.state import reset_user_state
 
 
-class AngelOfDeath(
+class Angel(
     FinisherOfNight,
     ProcedureAfterVotingABC,
     ProcedureAfterNightABC,
     ActiveRoleAtNightABC,
 ):
-    role = "Ангел-Хранитель"
+    role = "Ангел Хранитель"
     role_id: RolesLiteral = "angel"
     mail_message = "Ты здесь, чтобы помочь человечеству исправить ошибки! Кого ты излечишь?"
     need_to_monitor_interaction = False
-    photo = "https://avatars.mds.yandex.net/get-entity_search/10844899/935958285/S600xU_2x"
-    purpose = "Если ты умрешь на голосовании, сможешь следующей ночью кого-нибудь вылечить"
+    photo = "https://i.pinimg.com/736x/04/76/cd/0476cd1eb81fa8d31938bfb821f3b975.jpg"
+    purpose = ("Если тебя линчуют на голосовании, "
+               "сможешь следующей ночью кого-нибудь вылечить")
     grouping = Groupings.civilians
     extra_data = [ExtraCache(key="angels_died", need_to_clear=False)]
     message_to_user_after_action = "Ты выбрал спасти {url}"
     message_to_group_after_action = (
-        "Во имя добра пойдешь и не думаешь о мести..."
+        "Во имя добра и не думаешь о мести..."
     )
     payment_for_night_spent = 7
     clearing_state_after_death = False
