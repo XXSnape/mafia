@@ -8,7 +8,7 @@ router = Router(name=__name__)
 
 
 @router.callback_query(F.data == REFUSE_MOVE_CB)
-async def refuse_movie(
+async def refuse_move(
     callback: CallbackQuery,
     state: FSMContext,
     dispatcher: Dispatcher,
@@ -16,4 +16,4 @@ async def refuse_movie(
     user_manager = UserManager(
         callback=callback, state=state, dispatcher=dispatcher
     )
-    await user_manager.refuse_movie()
+    await user_manager.refuse_move()
