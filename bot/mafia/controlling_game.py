@@ -154,7 +154,8 @@ class Controller:
         await resending_message(
             bot=self.bot,
             chat_id=self.group_chat_id,
-            text=f"{make_build('💬Пришло время провести следственные мероприятия жителям города!')}\n\n",
+            text=f"{make_build('💬Пришло время провести следственные мероприятия жителям города!')}\n\n"
+            f"{players_after_night}",
             photo="https://i.pinimg.com/originals/b1/80/98/b18098074864e4b1bf5cc8412ced6421.jpg",
             reply_markup=get_to_bot_kb("Пища для размышлений тут"),
         )
