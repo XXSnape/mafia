@@ -400,13 +400,13 @@ class RoleABC(ABC):
         beginning_message: str | None = None,
         user_url: str | None = None,
         processed_role: Optional["RoleABC"] = None,
-        at_night: bool = True,
+        at_night: bool | None = True,
         additional_players: PlayersIds | None = None,
     ):
         if self.temporary_roles:
             money = 0
         players = game_data[self.roles_key][:]
-        if at_night is False:
+        if not at_night:
             dead_players = set(
                 int(user_id) for user_id in game_data["players"]
             ) - set(game_data["live_players_ids"])
@@ -442,9 +442,12 @@ class RoleABC(ABC):
             message += " - {money}" + MONEY_SYM
             if self.temporary_roles:
                 message += " (🚫ОБМАНУТ ВО ВРЕМЯ ИГРЫ)"
-            time_of_day = (
-                "🌃Ночь" if at_night else "🌟Голосование дня"
-            )
+            if at_night:
+                time_of_day = "🌃Ночь"
+            elif at_night is None:
+                time_of_day = "🌆Завершение дня"
+            else:
+                time_of_day = "🌟Голосование дня"
             game_data["players"][str(player_id)][
                 "achievements"
             ].append(

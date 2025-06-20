@@ -129,13 +129,16 @@ class Reviver(
             user_url=url,
             custom_message=f"Перевоплощение {url} "
             f"({current_role.pretty_role}) в ({new_role.pretty_role})",
-            at_night=False,
+            at_night=None,
         )
         with suppress(TelegramAPIError):
             await self.bot.send_photo(
                 chat_id=user_id,
                 photo=new_role.photo,
                 caption=f"Ты снят с предыдущей должности, и "
-                f"теперь твоя роль — {new_role.pretty_role}. "
+                f"теперь твоя роль — {new_role.pretty_role}.\n\n"
                 f"Выполняй свои обязанности достойно🫡",
+                protect_content=game_data["settings"][
+                    "protect_content"
+                ],
             )
