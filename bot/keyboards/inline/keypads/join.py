@@ -31,7 +31,8 @@ async def offer_to_place_bet(banned_roles: list[RolesLiteral]):
         if key not in banned_roles:
             buttons.append(
                 InlineKeyboardButton(
-                    text=role.role, callback_data=key
+                    text=role.role + role.grouping.value.name[-1],
+                    callback_data=key,
                 )
             )
     buttons.sort(key=attrgetter("text"))
