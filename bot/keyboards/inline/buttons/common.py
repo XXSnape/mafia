@@ -42,10 +42,6 @@ BACK_TO_SELECTING_ACTIONS_ON_SETTINGS_BTN = InlineKeyboardButton(
 CANCEL_BTN = InlineKeyboardButton(
     text="❌Отменить", callback_data=ACTIONS_ON_SETTINGS_CB
 )
-TO_BOT_BTN = InlineKeyboardButton(
-    text="Сделать ставку!",
-    url=settings.bot.url,
-)
 HELP_BTN = InlineKeyboardButton(
     text="🆘Помощь", callback_data=HELP_CB
 )
