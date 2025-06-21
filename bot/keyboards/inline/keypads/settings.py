@@ -55,7 +55,7 @@ def select_setting_kb():
             text="Туман войны😶‍🌫️", callback_data=FOG_OF_WAR_CB
         ),
         InlineKeyboardButton(
-            text="Больше настроек, хороших и разных‍⚙️",
+            text="Продвинутые настройки⚙️",
             callback_data=DIFFERENT_SETTINGS_CB,
         ),
         HELP_BTN,

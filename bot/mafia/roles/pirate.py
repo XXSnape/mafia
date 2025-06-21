@@ -33,7 +33,7 @@ class Pirate(
         "а меченый голосовал за повешение, меченый погибнет"
     )
     message_to_group_after_action = "На ком-то поставили чёрную метку! Будьте предельно осторожны!"
-    mail_message = "Кого пометишь и убьешь в случае ошибки жертвы?"
+    mail_message = "Кого пометишь и убьешь в случае ошибки?"
     notification_message = None
     need_to_monitor_interaction = False
     need_to_process = False
