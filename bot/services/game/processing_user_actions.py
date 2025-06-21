@@ -12,6 +12,7 @@ from cache.cache_types import (
 from database.dao.users import UsersDao
 from database.schemas.assets import NumberOfAssetsSchema
 from database.schemas.common import TgIdSchema
+from general import settings
 from general.collection_of_roles import get_data_with_roles
 from general.commands import PrivateCommands
 from general.groupings import Groupings
@@ -119,7 +120,7 @@ class UserManager(RouterHelper):
             chat_id=game_data["game_chat"],
             text=f"⚡️⚡️⚡️По слухам, {role} {url} перед смертью "
             f"проглаголил такие слова:\n\n{escape(self.message.text)}"[
-                :3900
+                :settings.mafia.number_of_characters_in_message
             ],
         )
         await self.message.reply(
@@ -160,7 +161,7 @@ class UserManager(RouterHelper):
             bot=self.message.bot,
             chat_id=game_data["game_chat"],
             text=f"😱😱😱НЕИЗВЕСТНЫЙ ОТПРАВИТЕЛЬ\n\n{escape(anonym_message)}"[
-                :3900
+                :settings.mafia.number_of_characters_in_message
             ],
         )
         await users_dao.update(
@@ -220,7 +221,7 @@ class UserManager(RouterHelper):
             bot=self.message.bot,
             users=aliases,
             text=f"{role} {url} передает:\n\n{escape(self.message.text)}"[
-                :3900
+                :settings.mafia.number_of_characters_in_message
             ],
             exclude=[self.message.from_user.id],
             protect_content=game_data["settings"]["protect_content"],
@@ -232,7 +233,7 @@ class UserManager(RouterHelper):
             await send_a_lot_of_messages_safely(
                 bot=self.message.bot,
                 text=f"{role} ??? передает:\n\n{escape(self.message.text)}"[
-                    :3900
+                    :settings.mafia.number_of_characters_in_message
                 ],
                 users=game_data[Hacker.roles_key],
                 protect_content=game_data["settings"][

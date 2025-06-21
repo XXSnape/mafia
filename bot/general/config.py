@@ -47,6 +47,7 @@ class MafiaSettings(BaseSettings):
     minimum_number_of_players: int
     maximum_registration_time: int
     init_db: bool
+    number_of_characters_in_message: int = 4064
     time_for_night: int = 45
     time_for_day: int = 45
     time_for_voting: int = 35

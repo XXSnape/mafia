@@ -11,6 +11,7 @@ from cache.cache_types import (
     UserIdInt,
     UsersInGame,
 )
+from general import settings
 from general.groupings import Groupings
 from general.text import (
     MONEY_SYM,
@@ -447,7 +448,7 @@ def show_information_from_previous_nights(
         return if_there_is_no_information
 
     text = game_data[key]
-    if len(text) > 3700:
+    if len(text) > settings.mafia.number_of_characters_in_message:
         text = cut_off_old_text(text)
         game_data[key] = text
     return "По результатам прошлых проверок выяснено:\n\n" + text
@@ -482,4 +483,3 @@ remind_commissioner_about_inspections = partial(
     key="text_about_checks",
     if_there_is_no_information="Роли ещё неизвестны",
 )
-
