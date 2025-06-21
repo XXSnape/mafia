@@ -239,6 +239,7 @@ class SpecialMoneyManagerMixin:
     def get_money_for_victory_and_nights(
         self,
         game_data: GameCache,
+        nights_lived: int,
         **kwargs,
     ):
         if (
@@ -254,4 +255,4 @@ class SpecialMoneyManagerMixin:
                 * self.successful_actions
             )
             return payment, 0
-        return 0, 0
+        return 0, self.payment_for_night_spent * nights_lived
