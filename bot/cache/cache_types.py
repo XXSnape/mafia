@@ -162,7 +162,6 @@ class GameCache(TypedDict, total=False):
     number_of_night: NumberOfNight
     start_of_registration: int
     end_of_registration: int
-    angels_died: PlayersIds
     cant_vote: PlayersIds
     cant_talk: PlayersIds
     wish_to_leave_game: PlayersIds
