@@ -81,22 +81,16 @@ class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         )
         if send_message:
             self.was_euthanized = True
-            if (
-                game_data["settings"]["show_roles_after_death"]
-                and game_data["settings"][
-                    "show_information_about_guests_at_night"
-                ]
-            ):
-                with suppress(TelegramAPIError):
-                    await self.bot.send_message(
-                        chat_id=processed_user_id,
-                        text=make_build(
-                            "😴Сложно поверить, но все твои действия ночью были лишь сном!"
-                        ),
-                        protect_content=game_data["settings"][
-                            "protect_content"
-                        ],
-                    )
+            with suppress(TelegramAPIError):
+                await self.bot.send_message(
+                    chat_id=processed_user_id,
+                    text=make_build(
+                        "😴Сложно поверить, но все твои действия ночью были лишь сном!"
+                    ),
+                    protect_content=game_data["settings"][
+                        "protect_content"
+                    ],
+                )
 
     @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(

@@ -95,7 +95,8 @@ class Lucifer(ProcedureAfterNightABC, ActiveRoleAtNightABC):
                     NUMBER_OF_DAY.format(
                         game_data["number_of_night"]
                     )
-                    + "🚫Тебе запретили общаться и принимать участие в выборах на 1 день"
+                    + "🚫Тебе запретили общаться и принимать участие в выборах на 1 день, "
+                      "а потенциальные действия ночью отменены"
                 ),
                 protect_content=game_data["settings"][
                     "protect_content"
@@ -130,7 +131,7 @@ class Lucifer(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         if processed_role.grouping == Groupings.criminals:
             money = 0
         else:
-            money = processed_role.payment_for_murder * 2 + 10
+            money = processed_role.payment_for_murder * 2
         self.add_money_to_all_allies(
             game_data=game_data,
             money=money,

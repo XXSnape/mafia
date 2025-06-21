@@ -276,7 +276,11 @@ class Registration(RouterHelper):
             game_chat=game_data["game_chat"],
             need_to_clean_start=True,
         )
-        await self.message.answer(make_build("⚠️Игра отменена!"))
+        await self.message.answer(
+            make_build(
+                "⚠️Игра отменена администратором или создателем!"
+            )
+        )
 
     async def _offer_bet(self, game_data: GameCache, balance: int):
         to_user_markup = None
