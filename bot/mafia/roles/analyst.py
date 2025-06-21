@@ -50,7 +50,7 @@ class Analyst(
     )
     final_mission = "Угадать {count} раз(а)"
     divider = 2
-    payment_for_successful_operation = 15
+    payment_for_successful_operation = 8
 
     @property
     def role_description(self) -> RoleDescription:

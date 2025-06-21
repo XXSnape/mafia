@@ -212,7 +212,6 @@ class ObligatoryKillerABC(ABC):
 
 class SpecialMoneyManagerMixin:
     successful_actions: int
-    number_of_necessary_actions: int | None
     final_mission: str | None = None
     divider: int | None = None
     payment_for_successful_operation: int | None = None
@@ -220,17 +219,17 @@ class SpecialMoneyManagerMixin:
     def __call__(self, *args, **kwargs):
         super().__call__(*args, **kwargs)
         self.successful_actions: int = 0
-        self.number_of_necessary_actions: int | None = None
+        self._number_of_necessary_actions: int | None = None
 
     def introducing_users_to_roles(self, game_data: GameCache):
-        self.number_of_necessary_actions = (
+        self._number_of_necessary_actions = (
             len(game_data["live_players_ids"]) // self.divider
         )
         self.purpose = (
             f"{self.purpose}\n\n"
             "Для победы нужно "
             + self.final_mission.format(
-                count=self.number_of_necessary_actions
+                count=self._number_of_necessary_actions
             ).lower()
         )
         return super().introducing_users_to_roles(
@@ -244,7 +243,7 @@ class SpecialMoneyManagerMixin:
     ):
         if (
             self.successful_actions
-            >= self.number_of_necessary_actions
+            >= self._number_of_necessary_actions
         ):
             payment = (
                 self.payment_for_successful_operation
