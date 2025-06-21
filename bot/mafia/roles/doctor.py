@@ -9,7 +9,10 @@ from mafia.roles.base import (
     ActiveRoleAtNightABC,
     AliasRoleABC,
 )
-from mafia.roles.base.mixins import ProcedureAfterNightABC
+from mafia.roles.base.mixins import (
+    ProcedureAfterNightABC,
+    HealerAfterNightABC,
+)
 from mafia.roles.base.roles import RoleABC
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
@@ -25,7 +28,7 @@ from utils.roles import (
 )
 
 
-class Doctor(ProcedureAfterNightABC, ActiveRoleAtNightABC):
+class Doctor(HealerAfterNightABC, ActiveRoleAtNightABC):
     role = "Главный врач"
     role_id: RolesLiteral = "doctor"
     mail_message = "Кого вылечить этой ночью?"
@@ -52,40 +55,6 @@ class Doctor(ProcedureAfterNightABC, ActiveRoleAtNightABC):
                 CAN_CHOOSE_YOURSELF_AFTER_2_NIGHTS,
             ],
             features=[CAN_CHOOSE_YOURSELF],
-        )
-
-    @get_processed_user_id_if_exists
-    async def procedure_after_night(
-        self,
-        game_data: GameCache,
-        processed_user_id: UserIdInt,
-        recovered: PlayersIds,
-        **kwargs,
-    ):
-        recovered.append(processed_user_id)
-
-    @get_processed_role_and_user_if_exists
-    async def accrual_of_overnight_rewards(
-        self,
-        game_data: GameCache,
-        murdered: PlayersIds,
-        processed_role: RoleABC,
-        user_url: str,
-        processed_user_id: UserIdInt,
-        **kwargs,
-    ):
-        if processed_user_id not in murdered:
-            return
-        if processed_role.grouping != Groupings.civilians:
-            money = 0
-        else:
-            money = processed_role.payment_for_treatment
-        self.add_money_to_all_allies(
-            game_data=game_data,
-            money=money,
-            beginning_message="Лечение",
-            user_url=user_url,
-            processed_role=processed_role,
         )
 
     def __init__(self):

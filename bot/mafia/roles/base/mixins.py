@@ -17,13 +17,15 @@ from general.groupings import Groupings
 from general.text import ATTEMPT_TO_KILL
 from mafia.roles.base import ActiveRoleAtNightABC
 from utils.informing import notify_aliases_about_transformation
-from utils.state import get_state_and_assign
-from utils.tg import resending_message
 
 if TYPE_CHECKING:
     from mafia.roles import RoleABC
 
-from utils.roles import change_role, get_processed_user_id_if_exists
+from utils.roles import (
+    change_role,
+    get_processed_user_id_if_exists,
+    get_processed_role_and_user_if_exists,
+)
 
 KillersOf: TypeAlias = dict[UserIdInt, list[ActiveRoleAtNightABC]]
 
@@ -95,6 +97,50 @@ class MurderAfterNightABC(ProcedureAfterNightABC):
     ):
         killers_of[processed_user_id].append(self)
         murdered.append(processed_user_id)
+
+
+class HealerAfterNightABC(ProcedureAfterNightABC):
+    coefficient: int = 1
+    additional_players_attr: str | None = None
+
+    @get_processed_user_id_if_exists
+    async def procedure_after_night(
+        self,
+        game_data: GameCache,
+        processed_user_id: UserIdInt,
+        recovered: PlayersIds,
+        **kwargs,
+    ):
+        recovered.append(processed_user_id)
+
+    @get_processed_role_and_user_if_exists
+    async def accrual_of_overnight_rewards(
+        self,
+        game_data: GameCache,
+        murdered: PlayersIds,
+        processed_role: "RoleABC",
+        user_url: str,
+        processed_user_id: UserIdInt,
+        **kwargs,
+    ):
+        if processed_user_id not in murdered:
+            return
+        money = int(
+            processed_role.payment_for_treatment * self.coefficient
+        )
+        additional_players = None
+        if self.additional_players_attr:
+            additional_players = getattr(
+                self, self.additional_players_attr
+            )
+        self.add_money_to_all_allies(
+            game_data=game_data,
+            money=money,
+            beginning_message="Лечение",
+            user_url=user_url,
+            processed_role=processed_role,
+            additional_players=additional_players,
+        )
 
 
 class ProcedureAfterVotingABC(ABC):
