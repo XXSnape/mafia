@@ -33,6 +33,7 @@ class Pirate(
     mail_message = "Кого пометишь и убьешь в случае ошибки жертвы?"
     notification_message = None
     need_to_monitor_interaction = False
+    need_to_process = False
     payment_for_treatment = 4
     payment_for_murder = 12
     number_in_order_after_voting = 3

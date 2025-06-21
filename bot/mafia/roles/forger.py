@@ -39,6 +39,7 @@ class Forger(
     mail_message = "Кому сегодня подделаешь документы?"
     extra_data = [ExtraCache(key="forged_roles")]
     need_to_monitor_interaction = False
+    need_to_process = False
     is_self_selecting = True
     notification_message = ROLE_IS_KNOWN
     payment_for_treatment = 0

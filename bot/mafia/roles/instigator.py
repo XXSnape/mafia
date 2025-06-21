@@ -22,6 +22,7 @@ class Instigator(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
         "Кажется, кому-то вправляют мозги!"
     )
     need_to_monitor_interaction = False
+    need_to_process = False
     mail_message = "Кого направить на правильный путь?"
     notification_message = None
     payment_for_treatment = 7

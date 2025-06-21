@@ -1,6 +1,5 @@
 from random import randint
 
-from aiogram.types import InlineKeyboardButton
 from cache.cache_types import (
     GameCache,
     PlayersIds,
@@ -10,7 +9,6 @@ from cache.cache_types import (
 from general import settings
 from general.groupings import Groupings
 from general.text import ATTEMPT_TO_KILL, NUMBER_OF_NIGHT
-from keyboards.inline.buttons.common import REFUSE_MOVE_BTN
 from mafia.roles.base import ActiveRoleAtNightABC, RoleABC
 from mafia.roles.base.mixins import (
     MurderAfterNightABC,
