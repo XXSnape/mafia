@@ -120,7 +120,7 @@ class UserManager(RouterHelper):
             chat_id=game_data["game_chat"],
             text=f"⚡️⚡️⚡️По слухам, {role} {url} перед смертью "
             f"проглаголил такие слова:\n\n{escape(self.message.text)}"[
-                :settings.mafia.number_of_characters_in_message
+                : settings.mafia.number_of_characters_in_message
             ],
         )
         await self.message.reply(
@@ -161,7 +161,7 @@ class UserManager(RouterHelper):
             bot=self.message.bot,
             chat_id=game_data["game_chat"],
             text=f"😱😱😱НЕИЗВЕСТНЫЙ ОТПРАВИТЕЛЬ\n\n{escape(anonym_message)}"[
-                :settings.mafia.number_of_characters_in_message
+                : settings.mafia.number_of_characters_in_message
             ],
         )
         await users_dao.update(
@@ -221,7 +221,7 @@ class UserManager(RouterHelper):
             bot=self.message.bot,
             users=aliases,
             text=f"{role} {url} передает:\n\n{escape(self.message.text)}"[
-                :settings.mafia.number_of_characters_in_message
+                : settings.mafia.number_of_characters_in_message
             ],
             exclude=[self.message.from_user.id],
             protect_content=game_data["settings"]["protect_content"],
@@ -233,7 +233,7 @@ class UserManager(RouterHelper):
             await send_a_lot_of_messages_safely(
                 bot=self.message.bot,
                 text=f"{role} ??? передает:\n\n{escape(self.message.text)}"[
-                    :settings.mafia.number_of_characters_in_message
+                    : settings.mafia.number_of_characters_in_message
                 ],
                 users=game_data[Hacker.roles_key],
                 protect_content=game_data["settings"][
@@ -264,7 +264,7 @@ class UserManager(RouterHelper):
             Manager().get_processed_user_id(game_data=game_data)
             == self.callback.from_user.id
         ):
-            return 2, DOUBLE_VOICE
+            return 2, DOUBLE_VOICE + "\n\n"
         return 1, ""
 
     async def vote_for(
@@ -322,14 +322,14 @@ class UserManager(RouterHelper):
         await self.callback.message.answer(
             make_build(
                 NUMBER_OF_DAY.format(game_data["number_of_night"])
-                + f"Ты выбрал голосовать за повешение {voted_url}{text}"
+                + f"{text}Ты выбрал голосовать за повешение {voted_url}"
             ),
             protect_content=game_data["settings"]["protect_content"],
         )
         await self.callback.bot.send_message(
             chat_id=game_data["game_chat"],
             text=make_build(
-                f"❗️{voting_url} выступает против {voted_url}{text}!"
+                f"{text}❗️{voting_url} выступает против {voted_url}!"
             ),
             reply_markup=participate_in_social_life(),
         )
@@ -379,15 +379,15 @@ class UserManager(RouterHelper):
         await self.callback.message.answer(
             make_build(
                 NUMBER_OF_DAY.format(game_data["number_of_night"])
-                + f"Ты решил ни за кого не голосовать{text}"
+                + f"{text}Ты решил ни за кого не голосовать"
             ),
             protect_content=game_data["settings"]["protect_content"],
         )
         await self.callback.bot.send_message(
             chat_id=game_data["game_chat"],
             text=make_build(
-                f"🦄{url} ходит с розовыми очками в мире единорогов, "
-                f"эльфов и великодушных гномов, поэтому всех прощает{text}!\n\n"
+                f"{text}🦄{url} ходит с розовыми очками в мире единорогов, "
+                f"эльфов и великодушных гномов, поэтому всех прощает!\n\n"
                 f"Не приведет ли наивность к новым жертвам?"
             ),
             reply_markup=participate_in_social_life(),

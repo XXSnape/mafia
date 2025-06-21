@@ -157,7 +157,7 @@ def get_profiles(
         else:
             result += f"\n{number}) {url}"
             if voted_twice_id == user_id:
-                result += DOUBLE_VOICE
+                result += f" ({DOUBLE_VOICE.lower()})"
     return make_build(result)
 
 
