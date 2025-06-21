@@ -208,3 +208,51 @@ class ObligatoryKillerABC(ABC):
         game_data: GameCache,
         current_inactive_users: list[UserIdInt],
     ) -> tuple[UserIdInt, str] | None: ...
+
+
+class SpecialMoneyManagerMixin:
+    successful_actions: int
+    number_of_necessary_actions: int | None
+    final_mission: str | None = None
+    divider: int | None = None
+    payment_for_successful_operation: int | None = None
+
+    def __call__(self, *args, **kwargs):
+        super().__call__(*args, **kwargs)
+        self.successful_actions: int = 0
+        self.number_of_necessary_actions: int | None = None
+
+    def introducing_users_to_roles(self, game_data: GameCache):
+        self.number_of_necessary_actions = (
+            len(game_data["live_players_ids"]) // self.divider
+        )
+        self.purpose = (
+            f"{self.purpose}\n\n"
+            "Для победы нужно "
+            + self.final_mission.format(
+                count=self.number_of_necessary_actions
+            ).lower()
+        )
+        return super().introducing_users_to_roles(
+            game_data=game_data
+        )
+
+    def get_money_for_victory_and_nights(
+        self,
+        game_data: GameCache,
+        **kwargs,
+    ):
+        if (
+            self.successful_actions
+            >= self.number_of_necessary_actions
+        ):
+            payment = (
+                self.payment_for_successful_operation
+                * (
+                    len(game_data["players"])
+                    // settings.mafia.minimum_number_of_players
+                )
+                * self.successful_actions
+            )
+            return payment, 0
+        return 0, 0

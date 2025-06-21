@@ -139,7 +139,9 @@ class Successor(
                 chat_id=self.user_id,
                 photo=updated_new_role.photo,
                 caption=make_build(message),
-                protect_content=game_data['settings']['protect_content']
+                protect_content=game_data["settings"][
+                    "protect_content"
+                ],
             )
 
         if (updated_new_role.grouping == Groupings.criminals) or (

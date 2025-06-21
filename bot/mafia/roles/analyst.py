@@ -1,10 +1,12 @@
 from aiogram.types import InlineKeyboardButton
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
-from general import settings
 from general.groupings import Groupings
 from keyboards.inline.cb.cb_text import DRAW_CB
 from mafia.roles.base import ActiveRoleAtNightABC
-from mafia.roles.base.mixins import ProcedureAfterVotingABC
+from mafia.roles.base.mixins import (
+    ProcedureAfterVotingABC,
+    SpecialMoneyManagerMixin,
+)
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CAN_CHOOSE_YOURSELF,
@@ -16,7 +18,11 @@ from utils.roles import (
 )
 
 
-class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
+class Analyst(
+    SpecialMoneyManagerMixin,
+    ProcedureAfterVotingABC,
+    ActiveRoleAtNightABC,
+):
     role = "Политический аналитик"
     role_id: RolesLiteral = "analyst"
     grouping = Groupings.other
@@ -42,6 +48,9 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
             callback_data=DRAW_CB,
         ),
     )
+    final_mission = "Угадать {count} раз(а)"
+    divider = 2
+    payment_for_successful_operation = 15
 
     @property
     def role_description(self) -> RoleDescription:
@@ -54,23 +63,13 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
             ],
             limitations=[DONT_PAY_FOR_VOTING],
             wins_if="Сделать столько прогнозов, сколько равняется количество игроков "
-            "всего, деленное на 2. "
-            "Например, если играют 5 человек, нужно сделать 2 верных прогноза, если 8, тогда 4 и т.д.",
+            f"всего, деленное на {self.divider}. "
+            f"Например, если играют 5 человек, нужно сделать {5 // self.divider} "
+            f"верных прогноза, если 8, тогда {8 // self.divider} и т.д.",
         )
 
     def __init__(self):
         self.state_for_waiting_for_action = UserFsm.ANALYST_ASSUMES
-        self.number_of_predictions = 0
-        self.necessary_to_win: int | None = None
-
-    def introducing_users_to_roles(self, game_data: GameCache):
-        self.necessary_to_win = (
-            len(game_data["live_players_ids"]) // 2
-        )
-        self.purpose = f"{self.purpose}\n\nДля победы нужно угадать {self.necessary_to_win} раз(а)"
-        return super().introducing_users_to_roles(
-            game_data=game_data
-        )
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
         if self.get_processed_user_id(game_data) == 0:
@@ -79,23 +78,6 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
         return super().cancel_actions(
             game_data=game_data, user_id=user_id
         )
-
-    def get_money_for_victory_and_nights(
-        self,
-        game_data: GameCache,
-        **kwargs,
-    ):
-        if self.number_of_predictions >= self.necessary_to_win:
-            payment = (
-                15
-                * (
-                    len(game_data["players"])
-                    // settings.mafia.minimum_number_of_players
-                )
-                * self.number_of_predictions
-            )
-            return payment, 0
-        return 0, 0
 
     @get_processed_user_id_if_exists
     async def take_action_after_voting(
@@ -119,7 +101,7 @@ class Analyst(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
             ]
         )
         if processed_user_id == removed_user:
-            self.number_of_predictions += 1
+            self.successful_actions += 1
             money = 10
             achievement = (
                 "Удача! Действительно никого не повесили"
