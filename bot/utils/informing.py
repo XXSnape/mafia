@@ -1,8 +1,8 @@
 import asyncio
 from collections import defaultdict
 from collections.abc import Callable, Iterable
-from typing import TYPE_CHECKING, Union
-
+from typing import TYPE_CHECKING, Union, Literal
+from functools import partial
 from aiogram import Bot
 from aiogram.types import InlineKeyboardButton
 from cache.cache_types import (
@@ -435,14 +435,21 @@ async def send_a_lot_of_messages_safely(
     )
 
 
-def remind_worden_about_inspections(game_data: GameCache):
-    if not game_data["text_about_checked_for_the_same_groups"]:
-        return "Нет информации о совместных группах"
+def show_information_from_previous_nights(
+    game_data: GameCache,
+    key: Literal[
+        "text_about_checked_for_the_same_groups", "text_about_checks"
+    ],
+    if_there_is_no_information: str,
+):
+    """Если сообщение слишком длинное, срезает часть"""
+    if not game_data[key]:
+        return if_there_is_no_information
 
-    text = game_data["text_about_checked_for_the_same_groups"]
+    text = game_data[key]
     if len(text) > 3700:
         text = cut_off_old_text(text)
-        game_data["text_about_checked_for_the_same_groups"] = text
+        game_data[key] = text
     return "По результатам прошлых проверок выяснено:\n\n" + text
 
 
@@ -461,16 +468,18 @@ def remind_criminals_about_inspections(
         players=game_data["players"],
         show_current_roles=True,
     )
-    return "По результатам прошлых проверок выяснено:\n" + profiles
+    return "По результатам прошлых проверок выяснено:\n\n" + profiles
 
 
-def remind_commissioner_about_inspections(
-    game_data: GameCache,
-) -> str:
-    if not game_data["text_about_checks"]:
-        return "Роли ещё неизвестны"
-    text = game_data["text_about_checks"]
-    if len(text) > 3700:
-        text = cut_off_old_text(text)
-        game_data["text_about_checks"] = text
-    return "По результатам прошлых проверок выяснено:\n\n" + text
+remind_worden_about_inspections = partial(
+    show_information_from_previous_nights,
+    key="text_about_checked_for_the_same_groups",
+    if_there_is_no_information="Нет информации о совместных группах",
+)
+
+remind_commissioner_about_inspections = partial(
+    show_information_from_previous_nights,
+    key="text_about_checks",
+    if_there_is_no_information="Роли ещё неизвестны",
+)
+
