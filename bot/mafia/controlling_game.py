@@ -208,6 +208,8 @@ class Controller:
         tasks = []
         for role in self.all_roles:
             current_role: RoleABC = self.all_roles[role]
+            if current_role.is_alias:
+                continue
             if isinstance(current_role, ActiveRoleAtNightABC):
                 if current_role.need_to_monitor_interaction:
                     current_role.track_recent_interactions(
