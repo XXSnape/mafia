@@ -462,22 +462,6 @@ class RoleABC(ABC):
         )
         achievements.append([message, earned_money])
 
-    def get_processed_user_id(self, game_data: GameCache):
-        if self.processed_by_boss:
-            processed_id = get_the_most_frequently_encountered_id(
-                game_data[self.processed_users_key]
-            )
-            if processed_id is None:
-                if not game_data[self.processed_users_key]:
-                    return None
-                if not game_data[self.processed_by_boss]:
-                    return None
-                return game_data[self.processed_by_boss][0]
-            return processed_id
-        if game_data.get(self.processed_users_key):
-            return game_data[self.processed_users_key][0]
-        return None
-
     async def report_death(
         self,
         game_data: GameCache,
@@ -592,6 +576,22 @@ class ActiveRoleAtNightABC(RoleABC):
                     "sufferers"
                 ].remove(sufferer)
         return sufferers
+
+    def get_processed_user_id(self, game_data: GameCache):
+        if self.processed_by_boss:
+            processed_id = get_the_most_frequently_encountered_id(
+                game_data[self.processed_users_key]
+            )
+            if processed_id is None:
+                if not game_data[self.processed_users_key]:
+                    return None
+                if not game_data[self.processed_by_boss]:
+                    return None
+                return game_data[self.processed_by_boss][0]
+            return processed_id
+        if game_data.get(self.processed_users_key):
+            return game_data[self.processed_users_key][0]
+        return None
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
         if (
