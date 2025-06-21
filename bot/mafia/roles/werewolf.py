@@ -97,3 +97,6 @@ class Werewolf(ProcedureAfterNightABC, ActiveRoleAtNightABC):
             == self.number_of_night_for_transformation
         ):
             return True
+
+    def cancel_actions(self, *args, **kwargs):
+        return False

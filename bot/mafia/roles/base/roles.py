@@ -83,9 +83,9 @@ class RoleABC(ABC):
         self.dispatcher = dispatcher
         self.bot = bot
         self.state = state
-        self.temporary_roles = {}
-        self.dropped_out: set[UserIdInt] = set()
-        self.killed_in_afternoon: set[UserIdInt] = set()
+        self.temporary_roles = dict[RolesLiteral, RolesLiteral]()
+        self.dropped_out = set[UserIdInt]()
+        self.killed_in_afternoon = set[UserIdInt]()
 
     @property
     @abstractmethod
@@ -287,27 +287,6 @@ class RoleABC(ABC):
     @property
     def roles_key(cls):
         return cls.__name__.lower() + "s"
-
-    @classmethod
-    @property
-    def processed_users_key(cls):
-        if cls.need_to_process:
-            return f"processed_by_{cls.__name__.lower()}"
-
-    @classmethod
-    @property
-    def last_interactive_key(cls):
-        if (
-            issubclass(cls, ActiveRoleAtNightABC)
-            and cls.need_to_monitor_interaction
-        ):
-            return f"{cls.__name__}_history"
-
-    @classmethod
-    @property
-    def processed_by_boss(cls):
-        if cls.alias and cls.alias.is_mass_mailing_list:
-            return f"processed_boss_{cls.__name__}"
 
     def get_money_for_victory_and_nights(
         self,
@@ -552,59 +531,6 @@ class RoleABC(ABC):
         )
 
 
-class AliasRoleABC(ABC):
-    is_alias = True
-    is_mass_mailing_list: bool = False
-    there_may_be_several: bool = True
-
-    async def alias_is_dead(
-        self, current_id: int, game_data: GameCache
-    ):
-        if (
-            self.grouping == Groupings.criminals
-            or game_data["settings"]["show_peaceful_allies"] is False
-        ):
-            return
-        url = game_data["players"][str(current_id)]["url"]
-        role = game_data["players"][str(current_id)]["pretty_role"]
-        profiles = get_profiles(
-            players_ids=game_data[self.roles_key],
-            players=game_data["players"],
-            show_current_roles=True,
-        )
-        text = f"❗️Погиб {role} — {url}\n\nТекущие сокомандники:\n{profiles}"
-        await send_a_lot_of_messages_safely(
-            bot=self.bot,
-            users=game_data[self.roles_key],
-            text=text,
-            protect_content=game_data["settings"]["protect_content"],
-        )
-
-    @classmethod
-    @property
-    def roles_key(cls):
-        super_classes = cls.__bases__
-        return super_classes[1].roles_key
-
-    @classmethod
-    @property
-    def processed_users_key(cls):
-        super_classes = cls.__bases__
-        return super_classes[1].processed_users_key
-
-    @classmethod
-    @property
-    def last_interactive_key(cls):
-        super_classes = cls.__bases__
-        return super_classes[1].last_interactive_key
-
-    @classmethod
-    @property
-    def boss_name(cls):
-        super_classes = cls.__bases__
-        return super_classes[1].pretty_role
-
-
 class ActiveRoleAtNightABC(RoleABC):
     message_to_user_after_action: str | None = None
     message_to_group_after_action: str | None = None
@@ -612,8 +538,8 @@ class ActiveRoleAtNightABC(RoleABC):
     state_for_waiting_for_action: State
     was_deceived: bool
     need_to_process: bool = True
-    mail_message: str
     need_to_monitor_interaction: bool = True
+    mail_message: str
     is_self_selecting: bool = False
     send_weekend_alerts: bool = True
     do_not_choose_others: int = 1
@@ -697,15 +623,21 @@ class ActiveRoleAtNightABC(RoleABC):
             is_sedated = bool(sufferers)
         if not is_sedated:
             return False
-        if self.last_interactive_key:
-            data: LastInteraction = game_data[
-                self.last_interactive_key
-            ]
-            if self.is_alias is False:
-                for sufferer in sufferers:
-                    sufferer_interaction = data[str(sufferer)]
-                    sufferer_interaction.pop()
         return True
+
+    def track_recent_interactions(self, game_data: GameCache):
+        if not self.need_to_monitor_interaction:
+            return
+        processed_user_id = self.get_processed_user_id(
+            game_data=game_data
+        )
+        if processed_user_id is None:
+            return
+        current_night = game_data["number_of_night"]
+        nights = game_data[self.last_interactive_key].setdefault(
+            str(processed_user_id), []
+        )
+        nights.append(current_night)
 
     async def send_survey(
         self,
@@ -859,3 +791,77 @@ class ActiveRoleAtNightABC(RoleABC):
             roles=roles,
             game_data=game_data,
         )
+
+    @classmethod
+    @property
+    def processed_users_key(cls) -> str | None:
+        if cls.need_to_process:
+            return f"processed_by_{cls.__name__.lower()}"
+        return None
+
+    @classmethod
+    @property
+    def last_interactive_key(cls) -> str | None:
+        if cls.need_to_monitor_interaction:
+            return f"{cls.__name__}_history"
+        return None
+
+    @classmethod
+    @property
+    def processed_by_boss(cls) -> str | None:
+        if cls.alias and cls.alias.is_mass_mailing_list:
+            return f"processed_boss_{cls.__name__}"
+        return None
+
+
+class AliasRoleABC(ABC):
+    is_alias = True
+    is_mass_mailing_list: bool = False
+    there_may_be_several: bool = True
+
+    async def alias_is_dead(
+        self, current_id: int, game_data: GameCache
+    ):
+        if (
+            self.grouping == Groupings.criminals
+            or game_data["settings"]["show_peaceful_allies"] is False
+        ):
+            return
+        url = game_data["players"][str(current_id)]["url"]
+        role = game_data["players"][str(current_id)]["pretty_role"]
+        profiles = get_profiles(
+            players_ids=game_data[self.roles_key],
+            players=game_data["players"],
+            show_current_roles=True,
+        )
+        text = f"❗️Погиб {role} — {url}\n\nТекущие сокомандники:\n{profiles}"
+        await send_a_lot_of_messages_safely(
+            bot=self.bot,
+            users=game_data[self.roles_key],
+            text=text,
+            protect_content=game_data["settings"]["protect_content"],
+        )
+
+    @classmethod
+    @property
+    def roles_key(cls):
+        super_classes = cls.__bases__
+        return super_classes[1].roles_key
+
+    @classmethod
+    @property
+    def processed_users_key(cls):
+        super_classes = cls.__bases__
+        return super_classes[1].processed_users_key
+
+    @classmethod
+    @property
+    def last_interactive_key(cls):
+        super_classes = cls.__bases__
+        return super_classes[1].last_interactive_key
+
+    @classmethod
+    @property
+    def boss_name(cls):
+        super_classes = cls.__bases__
+        return super_classes[1].pretty_role

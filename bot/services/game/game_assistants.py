@@ -238,13 +238,6 @@ async def take_action_and_save_data(
             game_data[current_role.processed_users_key].append(
                 user_id
             )
-        if current_role.last_interactive_key:
-            current_night = game_data["number_of_night"]
-            nights = game_data[
-                current_role.last_interactive_key
-            ].setdefault(str(user_id), [])
-            if current_night not in nights:
-                nights.append(current_night)
         if (
             current_role.processed_by_boss
             and callback.from_user.id

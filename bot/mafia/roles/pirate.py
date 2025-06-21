@@ -32,6 +32,7 @@ class Pirate(
     message_to_group_after_action = "На ком-то поставили чёрную метку! Будьте предельно осторожны!"
     mail_message = "Кого пометишь и убьешь в случае ошибки жертвы?"
     notification_message = None
+    need_to_monitor_interaction = False
     payment_for_treatment = 4
     payment_for_murder = 12
     number_in_order_after_voting = 3

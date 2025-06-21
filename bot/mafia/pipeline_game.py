@@ -37,7 +37,7 @@ from general.text import MONEY_SYM
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
 from loguru import logger
 from mafia.controlling_game import Controller
-from mafia.roles import RoleABC
+from mafia.roles import RoleABC, ActiveRoleAtNightABC
 from services.common.settings import SettingsRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 from states.game import GameFsm
@@ -433,12 +433,13 @@ class Game:
             and role.roles_key not in game_data
         ):
             game_data[role.roles_key] = []
-            if role.processed_users_key:
-                game_data[role.processed_users_key] = []
-            if role.last_interactive_key:
-                game_data[role.last_interactive_key] = {}
-            if role.processed_by_boss:
-                game_data[role.processed_by_boss] = []
+            if isinstance(role, ActiveRoleAtNightABC):
+                if role.processed_users_key:
+                    game_data[role.processed_users_key] = []
+                if role.last_interactive_key:
+                    game_data[role.last_interactive_key] = {}
+                if role.processed_by_boss:
+                    game_data[role.processed_by_boss] = []
             if role.extra_data:
                 for extra in role.extra_data:
                     game_data[extra.key] = extra.data_type()

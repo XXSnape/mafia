@@ -9,11 +9,11 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
 from cache.cache_types import (
     GameCache,
-    LastInteraction,
     PlayersIds,
     UserGameCache,
     UserIdInt,
 )
+from general.collection_of_roles import DataWithRoles
 from general.exceptions import GameIsOver
 from general.groupings import Groupings
 from general.text import NUMBER_OF_DAY, NUMBER_OF_NIGHT
@@ -106,7 +106,7 @@ class Controller:
         self.dispatcher = dispatcher
         self.bot = bot
         self.group_chat_id = group_chat_id
-        self.all_roles = {}
+        self.all_roles: DataWithRoles = {}
         self.aim_id: UserIdInt | None = None
         self.original_roles_in_fog_of_war: str | None = None
         self.waiting_for_action_at_night = []
@@ -208,33 +208,17 @@ class Controller:
         tasks = []
         for role in self.all_roles:
             current_role: RoleABC = self.all_roles[role]
-            if (
-                current_role.alias
-                and current_role.alias.is_mass_mailing_list
-                and current_role.last_interactive_key
-            ):
-                current_night = game_data["number_of_night"]
-                processed_user_id = (
-                    current_role.get_processed_user_id(game_data)
-                )
-                if processed_user_id:
-                    last_interactive: LastInteraction = game_data[
-                        current_role.last_interactive_key
-                    ]
-                    excess_players = [
-                        user_id_str
-                        for user_id_str, nights in last_interactive.items()
-                        if nights
-                        and nights[-1] == current_night
-                        and str(processed_user_id) != user_id_str
-                    ]
-                    for user_id_str in excess_players:
-                        last_interactive[user_id_str].pop()
-
-            if current_role.processed_users_key in game_data:
-                game_data[current_role.processed_users_key].clear()
-            if current_role.processed_by_boss:
-                game_data[current_role.processed_by_boss].clear()
+            if isinstance(current_role, ActiveRoleAtNightABC):
+                if current_role.need_to_monitor_interaction:
+                    current_role.track_recent_interactions(
+                        game_data=game_data
+                    )
+                if current_role.processed_users_key:
+                    game_data[
+                        current_role.processed_users_key
+                    ].clear()
+                if current_role.processed_by_boss:
+                    game_data[current_role.processed_by_boss].clear()
             if current_role.extra_data:
                 for extra in current_role.extra_data:
                     if (
