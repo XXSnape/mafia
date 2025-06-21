@@ -19,6 +19,7 @@ from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CAN_CHOOSE_YOURSELF,
     CANT_CHOOSE_IN_ROW,
+    DONT_PAY_FOR_VOTING,
 )
 from states.game import UserFsm
 from utils.informing import send_a_lot_of_messages_safely
@@ -55,9 +56,7 @@ class Phoenix(
         return RoleDescription(
             skill="С одинаковой вероятностью спасает игрока от смерти ночью и на голосовании или убивает",
             pay_for=["Любое действие ночью"],
-            limitations=[
-                CANT_CHOOSE_IN_ROW,
-            ],
+            limitations=[CANT_CHOOSE_IN_ROW, DONT_PAY_FOR_VOTING],
             features=[
                 CAN_CHOOSE_YOURSELF,
             ],

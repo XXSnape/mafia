@@ -10,7 +10,10 @@ from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,
 )
 from mafia.roles.descriptions.description import RoleDescription
-from mafia.roles.descriptions.texts import GUARANTEED_TO_KILL
+from mafia.roles.descriptions.texts import (
+    GUARANTEED_TO_KILL,
+    DONT_PAY_FOR_VOTING,
+)
 from states.game import UserFsm
 from utils.pretty_text import make_build
 from utils.roles import get_processed_user_id_if_exists
@@ -57,6 +60,7 @@ class Bride(
                 GUARANTEED_TO_KILL,
                 "Ход не может быть отменён",
             ],
+            limitations=[DONT_PAY_FOR_VOTING],
         )
 
     def get_money_for_victory_and_nights(

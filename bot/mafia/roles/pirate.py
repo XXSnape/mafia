@@ -8,7 +8,10 @@ from mafia.roles.base.mixins import (
     ProcedureAfterVotingABC,
 )
 from mafia.roles.descriptions.description import RoleDescription
-from mafia.roles.descriptions.texts import GUARANTEED_TO_KILL
+from mafia.roles.descriptions.texts import (
+    GUARANTEED_TO_KILL,
+    DONT_PAY_FOR_VOTING,
+)
 from states.game import UserFsm
 from utils.roles import get_user_role_and_url
 
@@ -49,6 +52,7 @@ class Pirate(
             features=[
                 GUARANTEED_TO_KILL,
             ],
+            limitations=[DONT_PAY_FOR_VOTING],
             wins_if="Убить столько меченых, сколько равняется количество игроков "
             "всего, деленное на 4. "
             "Например, если играют 5 человек, нужно убить одного, если 8, тогда двух и т.д.",

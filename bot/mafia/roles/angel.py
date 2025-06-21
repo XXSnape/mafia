@@ -37,7 +37,6 @@ class Angel(
         "сможешь следующей ночью кого-нибудь вылечить"
     )
     grouping = Groupings.civilians
-    extra_data = [ExtraCache(key="angels_died", need_to_clear=False)]
     message_to_user_after_action = "Ты выбрал спасти {url}"
     message_to_group_after_action = (
         "Во имя добра и не думаешь о мести..."
