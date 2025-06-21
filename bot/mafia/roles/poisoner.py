@@ -16,6 +16,7 @@ from mafia.roles.base.mixins import (
     FinisherOfNight,
     KillersOf,
     ProcedureAfterNightABC,
+    SpecialMoneyManagerMixin,
 )
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
@@ -27,7 +28,10 @@ from utils.roles import get_user_role_and_url
 
 
 class Poisoner(
-    FinisherOfNight, ProcedureAfterNightABC, ActiveRoleAtNightABC
+    SpecialMoneyManagerMixin,
+    FinisherOfNight,
+    ProcedureAfterNightABC,
+    ActiveRoleAtNightABC,
 ):
     role = "Отравитель"
     role_id: RolesLiteral = "poisoner"
@@ -45,6 +49,9 @@ class Poisoner(
     payment_for_treatment = 0
     payment_for_murder = 15
     extra_data = [ExtraCache(key="poisoned", need_to_clear=False)]
+    final_mission = "Убить {count} человек"
+    divider = 4
+    payment_for_successful_operation = 12
 
     @property
     def role_description(self) -> RoleDescription:
@@ -55,39 +62,14 @@ class Poisoner(
             wins_if="Побеждает, если убьет столько игроков, "
             "сколько равняется количество игроков всего, "
             "делённое нацело на 4 и еще одного. "
-            "Например, если в игре 5 человек, то нужно убить двоих, если 8, то троих и т.д.",
+            f"Например, если в игре 5 человек, то нужно убить {5 // self.divider}, "
+            f"если 8, то {8 // self.divider} и т.д.",
         )
 
     def __init__(self):
         self.state_for_waiting_for_action = (
             UserFsm.POISONER_CHOOSES_ACTION
         )
-        self.victims = 0
-        self.necessary_to_win: int | None = None
-
-    def introducing_users_to_roles(self, game_data: GameCache):
-        self.necessary_to_win = (
-            len(game_data["live_players_ids"]) // 4
-        ) + 1
-        self.purpose = f"{self.purpose}\n\nДля победы нужно убить {self.necessary_to_win} человек"
-        return super().introducing_users_to_roles(
-            game_data=game_data
-        )
-
-    def get_money_for_victory_and_nights(
-        self, game_data: GameCache, **kwargs
-    ):
-        if self.victims >= self.necessary_to_win:
-            return (
-                self.victims
-                * 40
-                * (
-                    len(game_data["players"])
-                    // settings.mafia.minimum_number_of_players
-                ),
-                0,
-            )
-        return 0, 0
 
     async def procedure_after_night(
         self,
@@ -120,7 +102,7 @@ class Poisoner(
             )
             if victim_id not in victims:
                 continue
-            self.victims += 1
+            self.successful_actions += 1
             user_role, user_url = get_user_role_and_url(
                 game_data=game_data,
                 processed_user_id=victim_id,
@@ -154,6 +136,10 @@ class Poisoner(
             ]
             for murdered_id in murdered:
                 poisoned[0].remove(murdered_id)
+            # После превращания новый отравитель может оказаться в списке потенциально убитых
+            for user_id in game_data[self.roles_key]:
+                if user_id in poisoned[0]:
+                    poisoned[0].remove(user_id)
             return
         poisoned.clear()
 
