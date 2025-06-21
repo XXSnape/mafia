@@ -65,9 +65,7 @@ class Reviver(
         )
 
     def __init__(self):
-        self.state_for_waiting_for_action = (
-            UserFsm.RESURRECTOR_REVIVES
-        )
+        super().__init__()
         self.reborn_id: UserIdInt | None = None
 
     @get_processed_user_id_if_exists

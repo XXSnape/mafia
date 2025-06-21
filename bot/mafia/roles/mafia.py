@@ -54,9 +54,6 @@ class Mafia(MurderAfterNightABC, ActiveRoleAtNightABC):
             ],
         )
 
-    def __init__(self):
-        self.state_for_waiting_for_action = UserFsm.MAFIA_ATTACKS
-
     def _get_players(self, game_data: GameCache):
         mafias = super()._get_players(game_data)
         if mafias:

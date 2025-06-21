@@ -15,7 +15,7 @@ router = Router(name=__name__)
 
 
 @router.callback_query(
-    UserFsm.WEREWOLF_TURNS_INTO,
+    UserFsm.WEREWOLF,
     F.data.in_(
         [
             WEREWOLF_TO_MAFIA_CB,

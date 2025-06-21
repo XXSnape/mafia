@@ -10,13 +10,9 @@ router = Router(name=__name__)
 
 @router.message(
     StateFilter(
-        UserFsm.DON_ATTACKS,
-        UserFsm.MAFIA_ATTACKS,
-        UserFsm.TRAITOR_FINDS_OUT,
-        UserFsm.FORGER_FAKES,
-        UserFsm.LUCIFER_BLOCKS,
-        UserFsm.POLICEMAN_CHECKS,
-        UserFsm.DOCTOR_TREATS,
+        UserFsm.BASIC_ROLE_WITH_ALLIES,
+        UserFsm.POLICEMAN,
+        UserFsm.FORGER,
     ),
     F.text,
 )

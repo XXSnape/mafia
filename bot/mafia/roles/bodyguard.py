@@ -51,11 +51,6 @@ class Bodyguard(ProcedureAfterNightABC, ActiveRoleAtNightABC):
             ],
         )
 
-    def __init__(self):
-        self.state_for_waiting_for_action = (
-            UserFsm.BODYGUARD_PROTECTS
-        )
-
     async def procedure_after_night(
         self,
         game_data: GameCache,

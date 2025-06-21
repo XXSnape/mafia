@@ -76,6 +76,3 @@ class Lawyer(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
             processed_role=processed_role,
             at_night=False,
         )
-
-    def __init__(self):
-        self.state_for_waiting_for_action = UserFsm.LAWYER_PROTECTS

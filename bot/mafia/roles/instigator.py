@@ -41,6 +41,7 @@ class Instigator(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
         )
 
     def __init__(self):
+        super().__init__()
         self.state_for_waiting_for_action = (
             UserFsm.INSTIGATOR_CHOOSES_SUBJECT
         )

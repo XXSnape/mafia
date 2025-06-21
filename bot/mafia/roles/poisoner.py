@@ -67,6 +67,7 @@ class Poisoner(
         )
 
     def __init__(self):
+        super().__init__()
         self.state_for_waiting_for_action = (
             UserFsm.POISONER_CHOOSES_ACTION
         )

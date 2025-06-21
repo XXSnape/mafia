@@ -66,9 +66,6 @@ class Lucifer(ProcedureAfterNightABC, ActiveRoleAtNightABC):
             ],
         )
 
-    def __init__(self):
-        self.state_for_waiting_for_action = UserFsm.LUCIFER_BLOCKS
-
     @get_processed_role_and_user_if_exists
     async def procedure_after_night(
         self,

@@ -103,7 +103,5 @@ class Martyr(
         return None
 
     def __init__(self):
-        self.state_for_waiting_for_action = (
-            UserFsm.MARTYR_LEARNS_ROLE
-        )
+        super().__init__()
         self.need_to_die: bool = False

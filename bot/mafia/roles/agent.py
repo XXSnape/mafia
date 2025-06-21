@@ -93,5 +93,5 @@ class Agent(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         self.number_of_visitors = 0
 
     def __init__(self):
-        self.state_for_waiting_for_action = UserFsm.AGENT_WATCHES
+        super().__init__()
         self.number_of_visitors = 0

@@ -7,9 +7,7 @@ from states.game import UserFsm
 router = Router(name=__name__)
 
 
-@router.callback_query(
-    UserFsm.SUPERVISOR_COLLECTS_INFORMATION, F.data.isdigit()
-)
+@router.callback_query(UserFsm.WARDEN, F.data.isdigit())
 async def supervisor_collects_information(
     callback: CallbackQuery,
     state: FSMContext,

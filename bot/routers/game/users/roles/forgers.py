@@ -12,7 +12,7 @@ router = Router(name=__name__)
 
 
 @router.callback_query(
-    UserFsm.FORGER_FAKES, UserActionIndexCbData.filter()
+    UserFsm.FORGER, UserActionIndexCbData.filter()
 )
 async def forger_fakes(
     callback: CallbackQuery,
@@ -26,9 +26,7 @@ async def forger_fakes(
     await saver.forger_fakes(callback_data=callback_data)
 
 
-@router.callback_query(
-    UserFsm.FORGER_FAKES, F.data == PLAYER_BACKS_CB
-)
+@router.callback_query(UserFsm.FORGER, F.data == PLAYER_BACKS_CB)
 async def forger_cancels_selection(
     callback: CallbackQuery,
     state: FSMContext,
@@ -40,7 +38,7 @@ async def forger_cancels_selection(
     await saver.forger_cancels_selection()
 
 
-@router.callback_query(UserFsm.FORGER_FAKES, F.data)
+@router.callback_query(UserFsm.FORGER, F.data)
 async def forger_selects_documents(
     callback: CallbackQuery,
     state: FSMContext,

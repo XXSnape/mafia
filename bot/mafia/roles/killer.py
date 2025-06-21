@@ -47,9 +47,6 @@ class Killer(MurderAfterNightABC, ActiveRoleAtNightABC):
             ],
         )
 
-    def __init__(self):
-        self.state_for_waiting_for_action = UserFsm.KILLER_ATTACKS
-
     @get_processed_role_and_user_if_exists
     async def accrual_of_overnight_rewards(
         self,

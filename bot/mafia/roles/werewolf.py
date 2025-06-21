@@ -78,9 +78,8 @@ class Werewolf(ProcedureAfterNightABC, ActiveRoleAtNightABC):
                     self.all_roles[player_data["role_id"]] = new_role
 
     def __init__(self):
-        self.state_for_waiting_for_action = (
-            UserFsm.WEREWOLF_TURNS_INTO
-        )
+        super().__init__()
+        self.state_for_waiting_for_action = UserFsm.WEREWOLF
 
     async def accrual_of_overnight_rewards(
         self,

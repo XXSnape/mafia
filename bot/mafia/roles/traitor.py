@@ -67,7 +67,9 @@ class Traitor(
         )
 
     def __init__(self):
-        self.state_for_waiting_for_action = UserFsm.TRAITOR_FINDS_OUT
+        self.state_for_waiting_for_action = (
+            UserFsm.BASIC_ROLE_WITH_ALLIES
+        )
 
     @get_processed_role_and_user_if_exists
     async def procedure_after_night(

@@ -99,9 +99,7 @@ class Journalist(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         self.number_of_visitors = 0
 
     def __init__(self):
-        self.state_for_waiting_for_action = (
-            UserFsm.JOURNALIST_TAKES_INTERVIEW
-        )
+        super().__init__()
         self.number_of_visitors = 0
 
     def allow_sending_mailing(self, game_data: GameCache):

@@ -110,7 +110,5 @@ class Angel(
         )
 
     def __init__(self):
-        self.state_for_waiting_for_action = (
-            UserFsm.ANGEL_TAKES_REVENGE
-        )
+        super().__init__()
         self.dead_angels = list[UserIdInt]()

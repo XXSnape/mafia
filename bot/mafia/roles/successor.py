@@ -73,9 +73,7 @@ class Successor(
         )
 
     def __init__(self):
-        self.state_for_waiting_for_action = (
-            UserFsm.HEIR_CHOOSES_TARGET
-        )
+        super().__init__()
         self.new_role: RoleABC | None = None
         self.user_id: UserIdInt | None = None
 

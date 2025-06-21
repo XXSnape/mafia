@@ -27,6 +27,7 @@ from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
 from mafia.roles.descriptions.description import RoleDescription
+from states.game import UserFsm
 from utils.common import (
     add_message_to_delete,
     get_criminals_ids,
@@ -532,6 +533,16 @@ class ActiveRoleAtNightABC(RoleABC):
     payment_for_murder = 10
     extra_buttons: tuple[InlineKeyboardButton] = ()
     is_possible_to_skip_move: bool = False
+
+    def __init__(self):
+        if self.alias or self.is_alias:
+            self.state_for_waiting_for_action = (
+                UserFsm.BASIC_ROLE_WITH_ALLIES
+            )
+        else:
+            self.state_for_waiting_for_action = (
+                UserFsm.BASIC_NIGHT_ROLE
+            )
 
     @classmethod
     @property

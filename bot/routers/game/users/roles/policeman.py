@@ -19,7 +19,7 @@ router = Router(name=__name__)
 
 
 @router.callback_query(
-    UserFsm.POLICEMAN_CHECKS,
+    UserFsm.POLICEMAN,
     F.data.in_([POLICEMAN_KILLS_CB, POLICEMAN_CHECKS_CB]),
 )
 async def policeman_makes_choice(
@@ -33,9 +33,7 @@ async def policeman_makes_choice(
     await saver.policeman_makes_choice()
 
 
-@router.callback_query(
-    UserFsm.POLICEMAN_CHECKS, F.data == PLAYER_BACKS_CB
-)
+@router.callback_query(UserFsm.POLICEMAN, F.data == PLAYER_BACKS_CB)
 async def policeman_cancels_selection(
     callback: CallbackQuery,
     state: FSMContext,
@@ -48,7 +46,7 @@ async def policeman_cancels_selection(
 
 
 @router.callback_query(
-    UserFsm.POLICEMAN_CHECKS,
+    UserFsm.POLICEMAN,
     PoliceActionIndexCbData.filter(
         F.check_or_kill == CheckOrKill.kill
     ),
@@ -66,7 +64,7 @@ async def policeman_chose_to_kill(
 
 
 @router.callback_query(
-    UserFsm.POLICEMAN_CHECKS,
+    UserFsm.POLICEMAN,
     PoliceActionIndexCbData.filter(
         F.check_or_kill == CheckOrKill.check
     ),

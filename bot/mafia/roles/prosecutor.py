@@ -100,8 +100,3 @@ class Prosecutor(
             processed_role=processed_role,
             beginning_message="Арест",
         )
-
-    def __init__(self):
-        self.state_for_waiting_for_action = (
-            UserFsm.PROSECUTOR_ARRESTS
-        )

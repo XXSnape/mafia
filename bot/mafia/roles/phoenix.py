@@ -64,9 +64,7 @@ class Phoenix(
         )
 
     def __init__(self):
-        self.state_for_waiting_for_action = (
-            UserFsm.PHOENIX_RANDOMLY_ACTS
-        )
+        super().__init__()
         self.kills: bool = False
         self.heals: bool = False
 

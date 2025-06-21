@@ -57,9 +57,6 @@ class Doctor(HealerAfterNightABC, ActiveRoleAtNightABC):
             features=[CAN_CHOOSE_YOURSELF],
         )
 
-    def __init__(self):
-        self.state_for_waiting_for_action = UserFsm.DOCTOR_TREATS
-
 
 class DoctorAlias(AliasRoleABC, Doctor):
     role = "Медсестра"

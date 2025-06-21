@@ -65,6 +65,7 @@ class Pirate(
         )
 
     def __init__(self):
+        super().__init__()
         self.state_for_waiting_for_action = (
             UserFsm.PIRATE_CHOOSES_SUBJECT
         )

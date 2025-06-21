@@ -155,5 +155,5 @@ class Bride(
         return False
 
     def __init__(self):
-        self.state_for_waiting_for_action = UserFsm.BRIDE_CHOOSES
+        super().__init__()
         self.groom_id: UserIdInt | None = None

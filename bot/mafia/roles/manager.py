@@ -48,11 +48,6 @@ class Manager(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
             limitations=[CANT_CHOOSE_IN_ROW],
         )
 
-    def __init__(self):
-        self.state_for_waiting_for_action = (
-            UserFsm.MANAGER_GIVES_RIGHTS
-        )
-
     @get_processed_role_and_user_if_exists
     async def take_action_after_voting(
         self,

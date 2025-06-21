@@ -69,7 +69,8 @@ class Analyst(
         )
 
     def __init__(self):
-        self.state_for_waiting_for_action = UserFsm.ANALYST_ASSUMES
+        super().__init__()
+        self.state_for_waiting_for_action = UserFsm.ANALYST
 
     def cancel_actions(self, game_data: GameCache, user_id: int):
         if self.get_processed_user_id(game_data) == 0:

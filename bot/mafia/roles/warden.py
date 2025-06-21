@@ -52,9 +52,8 @@ class Warden(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         )
 
     def __init__(self):
-        self.state_for_waiting_for_action = (
-            UserFsm.SUPERVISOR_COLLECTS_INFORMATION
-        )
+        super().__init__()
+        self.state_for_waiting_for_action = UserFsm.WARDEN
         self.temporary_roles = {}
 
     def _get_user_roles_and_url(

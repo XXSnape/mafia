@@ -58,9 +58,7 @@ class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         )
 
     def __init__(self):
-        self.state_for_waiting_for_action = (
-            UserFsm.CLOFFELINE_GIRL_PUTS_TO_SLEEP
-        )
+        super().__init__()
         self.was_euthanized: bool = False
 
     @get_processed_user_id_if_exists

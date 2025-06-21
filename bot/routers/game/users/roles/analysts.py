@@ -8,7 +8,7 @@ from states.game import UserFsm
 router = Router(name=__name__)
 
 
-@router.callback_query(UserFsm.ANALYST_ASSUMES, F.data == DRAW_CB)
+@router.callback_query(UserFsm.ANALYST, F.data == DRAW_CB)
 async def analyst_assumes_draw(
     callback: CallbackQuery,
     state: FSMContext,

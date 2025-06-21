@@ -70,7 +70,8 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         )
 
     def __init__(self):
-        self.state_for_waiting_for_action = UserFsm.POLICEMAN_CHECKS
+        super().__init__()
+        self.state_for_waiting_for_action = UserFsm.POLICEMAN
         self.temporary_roles = {}
 
     async def accrual_of_overnight_rewards(

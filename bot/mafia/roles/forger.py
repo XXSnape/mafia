@@ -1,3 +1,5 @@
+from typing import override
+
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from cache.extra import ExtraCache
 from general.groupings import Groupings
@@ -154,6 +156,7 @@ class Forger(
         )
 
     def __init__(self):
-        self.state_for_waiting_for_action = UserFsm.FORGER_FAKES
+        super().__init__()
+        self.state_for_waiting_for_action = UserFsm.FORGER
         self.has_policeman_been_deceived = False
         self.has_warden_been_deceived = False

@@ -15,25 +15,8 @@ router = Router(name=__name__)
 
 @router.callback_query(
     StateFilter(
-        UserFsm.AGENT_WATCHES,
-        UserFsm.ANALYST_ASSUMES,
-        UserFsm.ANGEL_TAKES_REVENGE,
-        UserFsm.BODYGUARD_PROTECTS,
-        UserFsm.DOCTOR_TREATS,
-        UserFsm.TRAITOR_FINDS_OUT,
-        UserFsm.JOURNALIST_TAKES_INTERVIEW,
-        UserFsm.KILLER_ATTACKS,
-        UserFsm.LAWYER_PROTECTS,
-        UserFsm.MAFIA_ATTACKS,
-        UserFsm.CLOFFELINE_GIRL_PUTS_TO_SLEEP,
-        UserFsm.PROSECUTOR_ARRESTS,
-        UserFsm.LUCIFER_BLOCKS,
-        UserFsm.BRIDE_CHOOSES,
-        UserFsm.MARTYR_LEARNS_ROLE,
-        UserFsm.PHOENIX_RANDOMLY_ACTS,
-        UserFsm.HEIR_CHOOSES_TARGET,
-        UserFsm.MANAGER_GIVES_RIGHTS,
-        UserFsm.RESURRECTOR_REVIVES,
+        UserFsm.BASIC_NIGHT_ROLE,
+        UserFsm.BASIC_ROLE_WITH_ALLIES,
     ),
     UserActionIndexCbData.filter(),
 )
