@@ -44,7 +44,7 @@ class Pirate(
     extra_data = [ExtraCache(key="marked")]
     final_mission = "Убить {count} меченых"
     divider = 4
-    payment_for_successful_operation = 10
+    payment_for_successful_operation = 17
 
     @property
     def role_description(self) -> RoleDescription:

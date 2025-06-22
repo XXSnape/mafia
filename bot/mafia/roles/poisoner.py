@@ -50,7 +50,7 @@ class Poisoner(
     extra_data = [ExtraCache(key="poisoned", need_to_clear=False)]
     final_mission = "Убить {count} человек"
     divider = 4
-    payment_for_successful_operation = 12
+    payment_for_successful_operation = 16
 
     @property
     def role_description(self) -> RoleDescription:
