@@ -111,7 +111,6 @@ class Registration(RouterHelper):
             group_chat_id=game_data["game_chat"],
             state=game_state,
             dispatcher=self.dispatcher,
-            scheduler=self.scheduler,
             broker=self.broker,
             session=self.session,
         )

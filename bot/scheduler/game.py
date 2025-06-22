@@ -59,7 +59,6 @@ async def start_game(
         group_chat_id=game_data["game_chat"],
         state=state,
         dispatcher=dispatcher,
-        scheduler=scheduler,
         broker=broker,
         session=session,
     )
