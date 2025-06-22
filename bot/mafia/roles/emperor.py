@@ -49,6 +49,7 @@ class Emperor(ProcedureAfterVotingABC, RoleABC):
         **kwargs,
     ):
         if removed_user[0] in game_data[self.roles_key]:
+            removed_user[:] = [0]
             await resending_message(
                 bot=self.bot,
                 chat_id=game_data["game_chat"],
@@ -57,7 +58,6 @@ class Emperor(ProcedureAfterVotingABC, RoleABC):
                     "Жители это осознали и разошлись..."
                 ),
             )
-            removed_user[:] = [0]
             return
         if (
             is_not_there_removed is False

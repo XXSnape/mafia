@@ -86,7 +86,7 @@ class Pirate(
         )
         self.add_money_to_all_allies(
             game_data=game_data,
-            money=10,
+            money=17,
             beginning_message="Возмездное убийство",
             user_url=url,
             processed_role=role,
