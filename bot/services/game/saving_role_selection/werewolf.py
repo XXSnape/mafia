@@ -70,6 +70,9 @@ class WerewolfSaver(RouterHelper):
                 callback=self.callback,
                 game_data=game_data,
             )
+            await self.state.set_state(
+                new_role.state_for_waiting_for_action
+            )
             await game_state.set_data(game_data)
         await self.callback.message.answer_photo(
             photo=new_role.photo,

@@ -58,16 +58,17 @@ class Successor(
 
         return RoleDescription(
             skill="Может убить любого игрока и получить его роль, "
-            "если он не умрёт раньше: после ночи или голосования или из-за неактивности. "
+            "если он не умрёт раньше: после ночи, или голосования, или из-за неактивности. "
             "Потом фактически доигрывает за него. "
             f"Если роль погибшего игрока побеждает в зависимости от прогресса, "
             f"({Poisoner.pretty_role}, {Analyst.pretty_role}, {Bride.pretty_role}), "
             f"то он не сбрасывается и продолжает расти у погибшего.",
             pay_for=[PAYMENT_FOR_NIGHTS],
-            features=[GUARANTEED_TO_KILL, MAY_SKIP_MOVE],
+            features=[MAY_SKIP_MOVE],
             limitations=[
                 "Может убивать и менять роль только после 1-ой ночи",
-                "Если умирает до окончания голосования, действия отменяются",
+                "Если умирает до наступления следующей ночи, действия отменяются",
+                "Не может убить того, кто был излечен врачом или другим персонажем",
             ],
         )
 
@@ -87,14 +88,20 @@ class Successor(
         processed_user_id = self.get_processed_user_id(game_data)
         if processed_user_id is None:
             return None
-        if processed_user_id not in game_data["live_players_ids"]:
+        if (
+            processed_user_id not in game_data["live_players_ids"]
+            or processed_user_id in cured_users
+        ):
             return None
         processed_role, user_url = get_user_role_and_url(
             game_data=game_data,
             processed_user_id=processed_user_id,
             all_roles=self.all_roles,
         )
-        self.new_role = processed_role
+        if processed_role.alias:
+            self.new_role = processed_role.alias
+        else:
+            self.new_role = processed_role
         self.user_id = game_data[self.roles_key][0]
         change_role(
             game_data=game_data,
@@ -119,8 +126,7 @@ class Successor(
         updated_new_role = self.all_roles[
             game_data["players"][str(self.user_id)]["role_id"]
         ]
-
-        if updated_new_role.state_for_waiting_for_action:
+        if isinstance(updated_new_role, ActiveRoleAtNightABC):
             await get_state_and_assign(
                 dispatcher=self.dispatcher,
                 chat_id=self.user_id,
