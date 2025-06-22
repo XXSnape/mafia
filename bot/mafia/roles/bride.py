@@ -40,6 +40,7 @@ class Bride(
     notification_message = None
     payment_for_treatment = 5
     payment_for_murder = 13
+    number_in_order_after_sunset = 2
 
     @property
     def role_description(self) -> RoleDescription:
@@ -56,10 +57,13 @@ class Bride(
             wins_if="Жених должен выжить",
             features=[
                 "Жених узнает, что у него прошла свадьба, но не будет знать невесту",
-                GUARANTEED_TO_KILL,
                 "Ход не может быть отменён",
             ],
-            limitations=[DONT_PAY_FOR_VOTING],
+            limitations=[
+                DONT_PAY_FOR_VOTING,
+                "После смерти невесты ведущий случайным образом убивает только тех, кого не пытались лечить. "
+                "Если все игроки защищены врачом и другими персонажами, убийства не будет.",
+            ],
         )
 
     def get_money_for_victory_and_nights(
@@ -106,6 +110,7 @@ class Bride(
         self,
         game_data: GameCache,
         current_inactive_users: list[UserIdInt],
+        cured_users: list[UserIdInt],
     ) -> tuple[UserIdInt, str] | None:
 
         if self.dropped_out or (
@@ -139,8 +144,10 @@ class Bride(
             players = [
                 user_id
                 for user_id in game_data["live_players_ids"]
-                if user_id != self.groom_id
+                if user_id not in cured_users + [self.groom_id]
             ]
+            if not players:
+                return None
             return (
                 choice(players),
                 "😢К сожалению, тебя убил дух разъярённой невесты. "

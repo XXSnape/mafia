@@ -43,6 +43,7 @@ class Successor(
     payment_for_night_spent = 8
     notification_message = None
     is_possible_to_skip_move = True
+    number_in_order_after_sunset: int = 3
 
     @staticmethod
     def allow_sending_mailing(game_data: GameCache) -> bool:
@@ -80,6 +81,7 @@ class Successor(
         self,
         game_data: GameCache,
         current_inactive_users: list[UserIdInt],
+        cured_users: list[UserIdInt],
     ) -> tuple[UserIdInt, str] | None:
         if not game_data[self.roles_key]:
             return None

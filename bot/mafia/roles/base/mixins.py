@@ -202,11 +202,14 @@ class MafiaConverterABC(FinisherOfNight):
 
 
 class SunsetKillerABC(ABC):
+    number_in_order_after_sunset: int = 1
+
     @abstractmethod
     def kill_after_all_actions(
         self,
         game_data: GameCache,
         current_inactive_users: list[UserIdInt],
+        cured_users: list[UserIdInt],
     ) -> tuple[UserIdInt, str] | None: ...
 
 

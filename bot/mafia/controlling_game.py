@@ -109,8 +109,9 @@ class Controller:
         self.all_roles: DataWithRoles = {}
         self.aim_id: UserIdInt | None = None
         self.original_roles_in_fog_of_war: str | None = None
-        self.waiting_for_action_at_night = []
-        self.waiting_for_action_at_day = []
+        self.waiting_for_action_at_night = list[UserIdInt]()
+        self.waiting_for_action_at_day = list[UserIdInt]()
+        self.current_cured_users = list[UserIdInt]()
 
     async def start_new_night(self):
         game_data: GameCache = await self.state.get_data()
@@ -379,7 +380,7 @@ class Controller:
         victims |= set(murdered) - set(recovered)
         for role in roles:
             await role.accrual_of_overnight_rewards(**kwargs)
-
+        self.current_cured_users = recovered
         active_roles = self._get_roles_if_isinstance(
             parent=ActiveRoleAtNightABC
         )
@@ -631,10 +632,14 @@ class Controller:
         sunset_killers = self._get_roles_if_isinstance(
             SunsetKillerABC
         )
+        sunset_killers.sort(
+            key=attrgetter("number_in_order_after_sunset")
+        )
         for killer in sunset_killers:
             result = killer.kill_after_all_actions(
                 game_data=game_data,
                 current_inactive_users=current_inactive_users,
+                cured_users=self.current_cured_users,
             )
             if result is None:
                 continue

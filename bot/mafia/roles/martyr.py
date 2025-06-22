@@ -32,6 +32,7 @@ class Martyr(
     payment_for_treatment = 10
     payment_for_murder = 14
     is_possible_to_skip_move = True
+    number_in_order_after_sunset = 0
 
     @property
     def role_description(self) -> RoleDescription:
@@ -90,6 +91,7 @@ class Martyr(
         self,
         game_data: GameCache,
         current_inactive_users: list[UserIdInt],
+        cured_users: list[UserIdInt],
     ) -> tuple[UserIdInt, str] | None:
         if self.need_to_die and game_data[self.roles_key]:
             self.need_to_die = False

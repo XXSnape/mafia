@@ -74,6 +74,7 @@ class Pirate(
         self,
         game_data: GameCache,
         current_inactive_users: list[UserIdInt],
+        cured_users: list[UserIdInt],
     ) -> tuple[UserIdInt, str] | None:
         if self.aim_id is None:
             return None
