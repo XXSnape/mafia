@@ -7,7 +7,6 @@ from typing import Literal, cast
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.context import FSMContext
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from cache.cache_types import (
     GameCache,
     RoleAndUserMoney,
@@ -37,7 +36,7 @@ from general.text import MONEY_SYM
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
 from loguru import logger
 from mafia.controlling_game import Controller
-from mafia.roles import ActiveRoleAtNightABC, RoleABC, Emperor
+from mafia.roles import ActiveRoleAtNightABC, Emperor, RoleABC
 from services.common.settings import SettingsRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 from states.game import GameFsm

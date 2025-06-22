@@ -9,9 +9,8 @@ from mafia.roles.base.mixins import (
 )
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
-    GUARANTEED_TO_KILL,
-    PAYMENT_FOR_NIGHTS,
     MAY_SKIP_MOVE,
+    PAYMENT_FOR_NIGHTS,
 )
 from utils.informing import notify_aliases_about_transformation
 from utils.pretty_text import make_build

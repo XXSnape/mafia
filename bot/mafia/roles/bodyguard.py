@@ -15,7 +15,6 @@ from mafia.roles.base.roles import RoleABC
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CANT_CHOOSE_IN_ROW,
-    SAVING_PLAYER,
 )
 from utils.roles import get_processed_role_and_user_if_exists
 

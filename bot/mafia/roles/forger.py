@@ -47,8 +47,8 @@ class Forger(
 
     @property
     def role_description(self) -> RoleDescription:
-        from .policeman import Policeman
         from .martyr import Martyr
+        from .policeman import Policeman
 
         return RoleDescription(
             skill="Может подменить документы любому игроку на любую роль, которая есть в игре",

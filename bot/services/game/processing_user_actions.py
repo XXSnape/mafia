@@ -1,5 +1,3 @@
-from contextlib import suppress
-from datetime import timedelta
 from html import escape
 
 from aiogram.filters import CommandObject
