@@ -37,7 +37,7 @@ from general.text import MONEY_SYM
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
 from loguru import logger
 from mafia.controlling_game import Controller
-from mafia.roles import ActiveRoleAtNightABC, RoleABC
+from mafia.roles import ActiveRoleAtNightABC, RoleABC, Emperor
 from services.common.settings import SettingsRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 from states.game import GameFsm
@@ -443,6 +443,10 @@ class Game:
             if role.extra_data:
                 for extra in role.extra_data:
                     game_data[extra.key] = extra.data_type()
+            if isinstance(role, Emperor):
+                game_data["settings"][
+                    "show_usernames_after_confirmation"
+                ] = False
 
     @staticmethod
     def check_bids(
