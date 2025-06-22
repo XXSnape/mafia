@@ -381,7 +381,11 @@ class Registration(RouterHelper):
         balance = (await self._get_user_or_create()).balance
         async with lock_state(game_state):
             game_data: GameCache = await game_state.get_data()
-            if user_id in game_data["live_players_ids"]:
+            if (
+                user_id in game_data["live_players_ids"]
+                or len(game_data["live_players_ids"])
+                >= settings.mafia.maximum_number_of_players
+            ):
                 return
             user_game_data: UserGameCache = {
                 "full_name": full_name,
@@ -416,13 +420,13 @@ class Registration(RouterHelper):
             await self._change_message_in_group(
                 game_data=game_data, game_chat=game_chat
             )
-            if (
-                len(game_data["live_players_ids"])
-                == settings.mafia.maximum_number_of_players
-            ):
-                await self._start_game(
-                    game_data=game_data, game_state=game_state
-                )
+        if (
+            len(game_data["live_players_ids"])
+            == settings.mafia.maximum_number_of_players
+        ):
+            await self._start_game(
+                game_data=game_data, game_state=game_state
+            )
 
     async def finish_registration_and_start_game(self):
         await self.message.delete()
