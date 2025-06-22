@@ -11,10 +11,10 @@ from mafia.roles import Poisoner
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_state_by_user_state,
-    remove_from_expected,
     send_messages_to_user_and_group,
     take_action_and_save_data,
 )
+from utils.common import remove_from_expected_at_night
 from states.game import UserFsm
 from utils.state import lock_state
 from utils.tg import delete_message
@@ -32,7 +32,7 @@ class PoisonerSaver(RouterHelper):
             game_data = await game_state.get_data()
             poisoned = game_data["poisoned"]
             poisoned[1] = True
-            remove_from_expected(
+            remove_from_expected_at_night(
                 callback=self.callback, game_data=game_data
             )
             await game_state.set_data(game_data)

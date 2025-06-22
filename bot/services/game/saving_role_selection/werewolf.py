@@ -13,8 +13,8 @@ from mafia.roles import (
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_state_by_user_state,
-    remove_from_expected,
 )
+from utils.common import remove_from_expected_at_night
 from utils.informing import (
     notify_aliases_about_transformation,
     remind_commissioner_about_inspections,
@@ -66,7 +66,7 @@ class WerewolfSaver(RouterHelper):
                 new_role=new_role,
                 user_id=user_id,
             )
-            remove_from_expected(
+            remove_from_expected_at_night(
                 callback=self.callback,
                 game_data=game_data,
             )

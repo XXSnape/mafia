@@ -12,23 +12,14 @@ from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from mafia.roles import ActiveRoleAtNightABC, Hacker, Mafia
-from utils.common import get_criminals_ids
+from utils.common import (
+    get_criminals_ids,
+    remove_from_expected_at_night,
+)
 from utils.informing import send_a_lot_of_messages_safely
 from utils.pretty_text import make_build
 from utils.state import get_state_and_assign, lock_state
 from utils.tg import delete_message
-
-
-def remove_from_expected(
-    callback: CallbackQuery,
-    game_data: GameCache,
-    need_to_remove_from_expected: bool = True,
-):
-    if need_to_remove_from_expected:
-        with suppress(ValueError):
-            game_data["waiting_for_action_at_night"].remove(
-                callback.from_user.id
-            )
 
 
 async def send_messages_to_user_and_group(
@@ -87,7 +78,7 @@ def trace_all_actions(
     )
     interacting = interacting_tracking.setdefault("interacting", [])
     interacting.append(callback.from_user.id)
-    remove_from_expected(
+    remove_from_expected_at_night(
         callback=callback,
         game_data=game_data,
         need_to_remove_from_expected=need_to_remove_from_expected,
@@ -214,6 +205,7 @@ async def take_action_and_save_data(
     state: FSMContext,
     dispatcher: Dispatcher,
 ) -> tuple[FSMContext, UserIdInt] | tuple[None, None]:
+    print("message", callback.message.message_id)
     await delete_message(callback.message, raise_exception=True)
     game_state = await get_game_state_by_user_state(
         tg_obj=callback, dispatcher=dispatcher, user_state=state

@@ -3,9 +3,9 @@ from mafia.roles import Analyst
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_state_by_user_state,
-    remove_from_expected,
     send_messages_to_user_and_group,
 )
+from utils.common import remove_from_expected_at_night
 from utils.state import lock_state
 from utils.tg import delete_message
 
@@ -28,7 +28,7 @@ class AnalystSaver(RouterHelper):
             ):
                 return
             game_data[Analyst.processed_users_key] = [0]
-            remove_from_expected(
+            remove_from_expected_at_night(
                 callback=self.callback, game_data=game_data
             )
             await game_state.set_data(game_data)

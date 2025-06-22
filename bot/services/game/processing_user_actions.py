@@ -29,10 +29,13 @@ from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_data_and_user_id,
     get_game_state_by_user_state,
-    remove_from_expected,
 )
 from states.game import GameFsm
-from utils.common import get_criminals_ids
+from utils.common import (
+    get_criminals_ids,
+    remove_from_expected_at_night,
+    remove_from_expected_at_day,
+)
 from utils.informing import (
     send_a_lot_of_messages_safely,
     get_profiles,
@@ -86,7 +89,7 @@ class UserManager(RouterHelper):
         )
         async with lock_state(game_state):
             game_data: GameCache = await game_state.get_data()
-            remove_from_expected(
+            remove_from_expected_at_night(
                 callback=self.callback, game_data=game_data
             )
             await game_state.set_data(game_data)
@@ -177,13 +180,6 @@ class UserManager(RouterHelper):
             ),
             reply_markup=to_shop_kb(),
         )
-
-    @staticmethod
-    def delete_user_from_waiting_for_action_at_day(
-        game_data: GameCache, user_id: UserIdInt
-    ):
-        with suppress(ValueError):
-            game_data["waiting_for_action_at_day"].remove(user_id)
 
     async def allies_communicate(self):
         game_state = await get_game_state_by_user_state(
@@ -299,9 +295,8 @@ class UserManager(RouterHelper):
                 not in game_data["waiting_for_action_at_day"]
             ):
                 return
-            self.delete_user_from_waiting_for_action_at_day(
-                game_data=game_data,
-                user_id=self.callback.from_user.id,
+            remove_from_expected_at_day(
+                game_data=game_data, callback=self.callback
             )
             repeat, text = self._get_repeat_and_text(
                 game_data=game_data
@@ -354,9 +349,8 @@ class UserManager(RouterHelper):
                     not in game_data["waiting_for_action_at_day"]
                 ):
                     return
-                self.delete_user_from_waiting_for_action_at_day(
-                    game_data=game_data,
-                    user_id=self.callback.from_user.id,
+                remove_from_expected_at_day(
+                    game_data=game_data, callback=self.callback
                 )
                 repeat, text = self._get_repeat_and_text(
                     game_data=game_data

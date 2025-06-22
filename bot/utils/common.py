@@ -1,4 +1,9 @@
 from collections import Counter
+from contextlib import suppress
+from functools import partial
+from typing import Literal
+
+from aiogram.types import CallbackQuery
 
 from cache.cache_types import GameCache, PlayersIds
 
@@ -35,3 +40,29 @@ def add_message_to_delete(
     game_data: GameCache, chat_id: int, message_id: int
 ):
     game_data["to_delete"].append([chat_id, message_id])
+
+
+def remove_from_expected(
+    callback: CallbackQuery,
+    game_data: GameCache,
+    key: Literal[
+        "waiting_for_action_at_night",
+        "waiting_for_action_at_day",
+    ],
+    need_to_remove_from_expected: bool = True,
+):
+    if need_to_remove_from_expected:
+        with suppress(ValueError):
+            game_data[key].remove(callback.from_user.id)
+    with suppress(ValueError):
+        game_data["to_delete"].remove(
+            [callback.from_user.id, callback.message.message_id]
+        )
+
+
+remove_from_expected_at_night = partial(
+    remove_from_expected, key="waiting_for_action_at_night"
+)
+remove_from_expected_at_day = partial(
+    remove_from_expected, key="waiting_for_action_at_day"
+)
