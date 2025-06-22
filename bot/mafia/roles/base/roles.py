@@ -534,7 +534,11 @@ class ActiveRoleAtNightABC(RoleABC):
     is_possible_to_skip_move: bool = False
 
     def __init__(self):
-        if self.alias or self.is_alias:
+        if (
+            self.alias
+            or self.is_alias
+            or self.grouping == Groupings.criminals
+        ):
             self.state_for_waiting_for_action = (
                 UserFsm.BASIC_ROLE_WITH_ALLIES
             )

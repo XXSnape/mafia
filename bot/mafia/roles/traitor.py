@@ -19,7 +19,6 @@ from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CHECKING_PLAYER,
 )
-from states.game import UserFsm
 from utils.common import get_criminals_ids
 from utils.informing import send_a_lot_of_messages_safely
 from utils.roles import get_processed_role_and_user_if_exists
@@ -63,11 +62,6 @@ class Traitor(
             features=[
                 "Становится мафией после того, как узнал роли всех игроков",
             ],
-        )
-
-    def __init__(self):
-        self.state_for_waiting_for_action = (
-            UserFsm.BASIC_ROLE_WITH_ALLIES
         )
 
     @get_processed_role_and_user_if_exists
