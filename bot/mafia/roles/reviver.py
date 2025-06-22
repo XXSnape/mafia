@@ -50,7 +50,11 @@ class Reviver(
             skill="Если в игре не осталось маршала или врача, "
             "тогда выбирает их заместителя. Если после ночи и голосования "
             "заместитель остается жив, то он становится маршалом или доктором.",
-            pay_for=["Перевоплощения в маршала или доктора"],
+            pay_for=[
+                "Перевоплощения в маршала или доктора. "
+                "Чем более полезна была роль для общества, "
+                "тем меньше заплатят. Таким образом, за перевоплощение мирного жителя платят больше всего"
+            ],
             limitations=[
                 f"Можно перевоплощать только членов группировки {Groupings.civilians.value.name}",
                 "Если выбранная цель является врачом, или маршалом, или их союзником, "
@@ -103,8 +107,8 @@ class Reviver(
         )
         if (
             current_role.grouping != Groupings.civilians
-            or current_role.role_id
-            in (Policeman.role_id, Doctor.role_id)
+            or current_role.roles_key
+            in (Policeman.roles_key, Doctor.roles_key)
         ):
             return
         if not game_data[Policeman.roles_key]:
@@ -121,7 +125,7 @@ class Reviver(
         )
         self.add_money_to_all_allies(
             game_data=game_data,
-            money=30,
+            money=40 - current_role.payment_for_murder,
             user_url=url,
             custom_message=f"Перевоплощение {url} "
             f"({current_role.pretty_role}) в ({new_role.pretty_role})",

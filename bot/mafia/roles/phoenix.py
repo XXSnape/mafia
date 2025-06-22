@@ -57,9 +57,9 @@ class Phoenix(
     def role_description(self) -> RoleDescription:
         return RoleDescription(
             skill="С одинаковой вероятностью спасает игрока от смерти ночью и на голосовании или убивает",
-            pay_for=["Любое действие ночью"],
+            pay_for=["Любое действие ночью", PAYMENT_FOR_NIGHTS],
             limitations=[CANT_CHOOSE_IN_ROW, DONT_PAY_FOR_VOTING],
-            features=[PAYMENT_FOR_NIGHTS, CAN_CHOOSE_YOURSELF, MAY_SKIP_MOVE],
+            features=[CAN_CHOOSE_YOURSELF, MAY_SKIP_MOVE],
             wins_if="Должен выжить по итогу игры",
         )
 
