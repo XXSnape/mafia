@@ -70,7 +70,7 @@ class Emperor(ProcedureAfterVotingABC, RoleABC):
                 processed_user_id=initial_removed_user_id,
                 all_roles=self.all_roles,
             )
-            if role.grouping != Groupings.civilians:
+            if role.grouping == Groupings.criminals:
                 money = 0
             else:
                 money = int(role.payment_for_treatment * 1.5)
