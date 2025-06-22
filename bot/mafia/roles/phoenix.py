@@ -21,6 +21,7 @@ from mafia.roles.descriptions.texts import (
     CANT_CHOOSE_IN_ROW,
     DONT_PAY_FOR_VOTING,
     MAY_SKIP_MOVE,
+    PAYMENT_FOR_NIGHTS,
 )
 from utils.informing import send_a_lot_of_messages_safely
 from utils.pretty_text import make_build
@@ -48,8 +49,9 @@ class Phoenix(
     notification_message = None
     payment_for_treatment = 10
     payment_for_murder = 10
-    salary = 30
+    salary = 8
     is_possible_to_skip_move = True
+    payment_for_night_spent = 8
 
     @property
     def role_description(self) -> RoleDescription:
@@ -57,8 +59,8 @@ class Phoenix(
             skill="С одинаковой вероятностью спасает игрока от смерти ночью и на голосовании или убивает",
             pay_for=["Любое действие ночью"],
             limitations=[CANT_CHOOSE_IN_ROW, DONT_PAY_FOR_VOTING],
-            features=[CAN_CHOOSE_YOURSELF, MAY_SKIP_MOVE],
-            wins_if="Выживет по итогу игры",
+            features=[PAYMENT_FOR_NIGHTS, CAN_CHOOSE_YOURSELF, MAY_SKIP_MOVE],
+            wins_if="Должен выжить по итогу игры",
         )
 
     def __init__(self):
