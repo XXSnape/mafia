@@ -38,7 +38,7 @@ class Bodyguard(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     def role_description(self) -> RoleDescription:
         return RoleDescription(
             skill="Спасает игрока от смерти ночью и умирает сам",
-            pay_for=[SAVING_PLAYER],
+            pay_for=["Спасение игрока союзной группировки"],
             limitations=[
                 CANT_CHOOSE_IN_ROW,
                 "Выплата не происходит, если выбранного игрока лечил кто-то другой",

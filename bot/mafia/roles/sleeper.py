@@ -71,7 +71,7 @@ class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
             "role_id"
         ]
         role: RoleABC = self.all_roles[user_role]
-        if isinstance(role, ActiveRoleAtNightABC) is False:
+        if not isinstance(role, ActiveRoleAtNightABC):
             return
         send_message = role.cancel_actions(
             game_data=game_data, user_id=processed_user_id
@@ -98,7 +98,7 @@ class Sleeper(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         processed_user_id: UserIdInt,
         **kwargs,
     ):
-        if self.was_euthanized is False:
+        if not self.was_euthanized:
             return
         if processed_role.grouping == Groupings.civilians:
             money = 0

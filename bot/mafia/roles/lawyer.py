@@ -8,6 +8,7 @@ from mafia.roles.descriptions.texts import (
     CAN_CHOOSE_YOURSELF,
     CAN_CHOOSE_YOURSELF_AFTER_2_NIGHTS,
     CANT_CHOOSE_IN_ROW,
+    SAVING_PLAYER,
 )
 from utils.pretty_text import make_build
 from utils.roles import get_processed_role_and_user_if_exists
@@ -35,7 +36,7 @@ class Lawyer(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
     def role_description(self) -> RoleDescription:
         return RoleDescription(
             skill="Спасает игрока от повешения",
-            pay_for=["Спасение игрока союзной группировки"],
+            pay_for=[SAVING_PLAYER],
             limitations=[
                 CANT_CHOOSE_IN_ROW,
                 CAN_CHOOSE_YOURSELF_AFTER_2_NIGHTS,
@@ -56,10 +57,10 @@ class Lawyer(ProcedureAfterVotingABC, ActiveRoleAtNightABC):
         if removed_user[0] != processed_user_id:
             return
         removed_user[:] = [0]
-        if processed_role.grouping == Groupings.civilians:
-            money = processed_role.payment_for_treatment * 2
-        else:
+        if processed_role.grouping == Groupings.criminals:
             money = 0
+        else:
+            money = processed_role.payment_for_treatment * 2
         await resending_message(
             bot=self.bot,
             chat_id=game_data["game_chat"],
