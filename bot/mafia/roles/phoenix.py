@@ -20,6 +20,7 @@ from mafia.roles.descriptions.texts import (
     CAN_CHOOSE_YOURSELF,
     CANT_CHOOSE_IN_ROW,
     DONT_PAY_FOR_VOTING,
+    MAY_SKIP_MOVE,
 )
 from utils.informing import send_a_lot_of_messages_safely
 from utils.pretty_text import make_build
@@ -56,9 +57,7 @@ class Phoenix(
             skill="С одинаковой вероятностью спасает игрока от смерти ночью и на голосовании или убивает",
             pay_for=["Любое действие ночью"],
             limitations=[CANT_CHOOSE_IN_ROW, DONT_PAY_FOR_VOTING],
-            features=[
-                CAN_CHOOSE_YOURSELF,
-            ],
+            features=[CAN_CHOOSE_YOURSELF, MAY_SKIP_MOVE],
             wins_if="Выживет по итогу игры",
         )
 

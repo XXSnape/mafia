@@ -48,6 +48,7 @@ class Forger(
     @property
     def role_description(self) -> RoleDescription:
         from .policeman import Policeman
+        from .martyr import Martyr
 
         return RoleDescription(
             skill="Может подменить документы любому игроку на любую роль, которая есть в игре",
@@ -56,6 +57,7 @@ class Forger(
             ],
             limitations=[
                 "Не может подменить документы игроку на роль, которая может эту роль раскрыть",
+                f"Не может обмануть {Martyr.pretty_role}",
             ],
             features=[
                 f"Становится мафией после смерти {Policeman.pretty_role} и его союзников по роли",

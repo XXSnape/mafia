@@ -8,6 +8,7 @@ from mafia.roles.base.mixins import (
     SunsetKillerABC,
 )
 from mafia.roles.descriptions.description import RoleDescription
+from mafia.roles.descriptions.texts import MAY_SKIP_MOVE
 from utils.informing import send_a_lot_of_messages_safely
 from utils.roles import (
     get_processed_role_and_user_if_exists,
@@ -40,7 +41,12 @@ class Martyr(
             skill="Может узнать роль любого игрока, но потом "
             "умрёт перед наступлением следующей ночи, если игра не завершится раньше",
             pay_for=["Проверку игрока"],
-            features=["За более раннюю смерть платят больше"],
+            features=[
+                "За более раннюю смерть платят больше",
+                "Узнает реальную роль гарантированно, если не был усыплён. "
+                "Не может быть обманут",
+                MAY_SKIP_MOVE,
+            ],
         )
 
     @get_processed_role_and_user_if_exists

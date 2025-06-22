@@ -11,6 +11,7 @@ from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     GUARANTEED_TO_KILL,
     PAYMENT_FOR_NIGHTS,
+    MAY_SKIP_MOVE,
 )
 from utils.informing import notify_aliases_about_transformation
 from utils.pretty_text import make_build
@@ -63,9 +64,7 @@ class Successor(
             f"({Poisoner.pretty_role}, {Analyst.pretty_role}, {Bride.pretty_role}), "
             f"то он не сбрасывается и продолжает расти у погибшего.",
             pay_for=[PAYMENT_FOR_NIGHTS],
-            features=[
-                GUARANTEED_TO_KILL,
-            ],
+            features=[GUARANTEED_TO_KILL, MAY_SKIP_MOVE],
             limitations=[
                 "Может убивать и менять роль только после 1-ой ночи",
                 "Если умирает до окончания голосования, действия отменяются",

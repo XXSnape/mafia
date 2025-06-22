@@ -12,7 +12,6 @@ from mafia.roles.base.mixins import (
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     DONT_PAY_FOR_VOTING,
-    GUARANTEED_TO_KILL,
 )
 from utils.pretty_text import make_build
 from utils.roles import get_processed_user_id_if_exists
@@ -61,8 +60,8 @@ class Bride(
             ],
             limitations=[
                 DONT_PAY_FOR_VOTING,
-                "После смерти невесты ведущий случайным образом убивает только тех, кого не пытались лечить. "
-                "Если все игроки защищены врачом и другими персонажами, убийства не будет.",
+                "После смерти невесты Ведущий случайным образом убивает только тех, кого не пытались лечить. "
+                "Если все игроки защищены врачом и другими персонажами, убийства не будет",
             ],
         )
 
