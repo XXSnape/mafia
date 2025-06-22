@@ -3,7 +3,7 @@ from operator import attrgetter
 
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton
-from cache.cache_types import GameCache, UsersInGame, UserIdInt
+from cache.cache_types import GameCache, UserIdInt, UsersInGame
 from keyboards.inline.builder import generate_inline_kb
 from keyboards.inline.buttons.common import BACK_BTN
 from keyboards.inline.callback_factory.recognize_user import (

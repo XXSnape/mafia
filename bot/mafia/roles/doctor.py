@@ -1,30 +1,19 @@
 from cache.cache_types import (
-    GameCache,
-    PlayersIds,
     RolesLiteral,
-    UserIdInt,
 )
-from general.groupings import Groupings
 from mafia.roles.base import (
     ActiveRoleAtNightABC,
     AliasRoleABC,
 )
 from mafia.roles.base.mixins import (
-    ProcedureAfterNightABC,
     HealerAfterNightABC,
 )
-from mafia.roles.base.roles import RoleABC
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CAN_CHOOSE_YOURSELF,
     CAN_CHOOSE_YOURSELF_AFTER_2_NIGHTS,
     CANT_CHOOSE_IN_ROW,
     SAVING_PLAYER,
-)
-from states.game import UserFsm
-from utils.roles import (
-    get_processed_role_and_user_if_exists,
-    get_processed_user_id_if_exists,
 )
 
 

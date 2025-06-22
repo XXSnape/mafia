@@ -1,17 +1,16 @@
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from cache.extra import ExtraCache
-from general import settings
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
-    ObligatoryKillerABC,
     ProcedureAfterVotingABC,
     SpecialMoneyManagerMixin,
+    SunsetKillerABC,
 )
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
-    GUARANTEED_TO_KILL,
     DONT_PAY_FOR_VOTING,
+    GUARANTEED_TO_KILL,
 )
 from states.game import UserFsm
 from utils.roles import get_user_role_and_url
@@ -19,7 +18,7 @@ from utils.roles import get_user_role_and_url
 
 class Pirate(
     SpecialMoneyManagerMixin,
-    ObligatoryKillerABC,
+    SunsetKillerABC,
     ProcedureAfterVotingABC,
     ActiveRoleAtNightABC,
 ):

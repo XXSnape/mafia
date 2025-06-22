@@ -1,8 +1,9 @@
 import asyncio
 from collections import defaultdict
 from collections.abc import Callable, Iterable
-from typing import TYPE_CHECKING, Union, Literal
 from functools import partial
+from typing import TYPE_CHECKING, Literal, Union
+
 from aiogram import Bot
 from aiogram.types import InlineKeyboardButton
 from cache.cache_types import (
@@ -14,10 +15,10 @@ from cache.cache_types import (
 from general import settings
 from general.groupings import Groupings
 from general.text import (
+    DOUBLE_VOICE,
     MONEY_SYM,
     NUMBER_OF_NIGHT,
     SKIP,
-    DOUBLE_VOICE,
 )
 from keyboards.inline.callback_factory.recognize_user import (
     UserVoteIndexCbData,

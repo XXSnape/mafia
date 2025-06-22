@@ -1,20 +1,17 @@
 from aiogram.exceptions import TelegramAPIError
-from aiogram.types import InlineKeyboardButton
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from exceptiongroup import suppress
 from general.groupings import Groupings
-from keyboards.inline.buttons.common import REFUSE_MOVE_BTN
 from mafia.roles import ActiveRoleAtNightABC, RoleABC
 from mafia.roles.base.mixins import (
     FinisherOfNight,
-    ObligatoryKillerABC,
+    SunsetKillerABC,
 )
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
-    PAYMENT_FOR_NIGHTS,
     GUARANTEED_TO_KILL,
+    PAYMENT_FOR_NIGHTS,
 )
-from states.game import UserFsm
 from utils.informing import notify_aliases_about_transformation
 from utils.pretty_text import make_build
 from utils.roles import (
@@ -25,7 +22,9 @@ from utils.state import get_state_and_assign
 
 
 class Successor(
-    FinisherOfNight, ObligatoryKillerABC, ActiveRoleAtNightABC
+    FinisherOfNight,
+    SunsetKillerABC,
+    ActiveRoleAtNightABC,
 ):
     role = "Тенепреемник"
     role_id: RolesLiteral = "successor"

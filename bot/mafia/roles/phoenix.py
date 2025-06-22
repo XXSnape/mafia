@@ -21,7 +21,6 @@ from mafia.roles.descriptions.texts import (
     CANT_CHOOSE_IN_ROW,
     DONT_PAY_FOR_VOTING,
 )
-from states.game import UserFsm
 from utils.informing import send_a_lot_of_messages_safely
 from utils.pretty_text import make_build
 from utils.roles import (

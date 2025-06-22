@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING
 
-from aiogram.types import InlineKeyboardButton
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from cache.extra import ExtraCache
 from general.groupings import Groupings

@@ -1,4 +1,3 @@
-from aiogram.types import InlineKeyboardButton
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general.groupings import Groupings
 from general.text import (
@@ -21,7 +20,6 @@ from mafia.roles.descriptions.texts import (
     CAN_KILL_AT_NIGHT,
     KILLING_PLAYER,
 )
-from states.game import UserFsm
 from utils.common import get_criminals_ids
 from utils.roles import (
     change_role,

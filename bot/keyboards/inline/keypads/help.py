@@ -16,8 +16,8 @@ from keyboards.inline.cb.cb_text import (
     HOW_TO_SET_UP_GROUP_CB,
     HOW_TO_START_GAME_CB,
     VIEW_ROLES_CB,
-    WHAT_ARE_BIDS_CB,
     WHAT_ARE_ADVANCED_SETTINGS_CB,
+    WHAT_ARE_BIDS_CB,
 )
 
 

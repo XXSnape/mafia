@@ -23,8 +23,8 @@ if TYPE_CHECKING:
 
 from utils.roles import (
     change_role,
-    get_processed_user_id_if_exists,
     get_processed_role_and_user_if_exists,
+    get_processed_user_id_if_exists,
 )
 
 KillersOf: TypeAlias = dict[UserIdInt, list[ActiveRoleAtNightABC]]
@@ -201,7 +201,7 @@ class MafiaConverterABC(FinisherOfNight):
             )
 
 
-class ObligatoryKillerABC(ABC):
+class SunsetKillerABC(ABC):
     @abstractmethod
     def kill_after_all_actions(
         self,

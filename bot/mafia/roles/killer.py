@@ -11,7 +11,6 @@ from mafia.roles.descriptions.texts import (
     KILLING_PLAYER,
     MAKES_MOVE_EVERY_ODD_NIGHT,
 )
-from states.game import UserFsm
 from utils.roles import get_processed_role_and_user_if_exists
 
 

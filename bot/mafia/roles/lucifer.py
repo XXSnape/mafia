@@ -2,7 +2,6 @@ from contextlib import suppress
 from typing import TYPE_CHECKING
 
 from aiogram.exceptions import TelegramAPIError
-from aiogram.types import InlineKeyboardButton
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general.groupings import Groupings
 from general.text import (
@@ -19,7 +18,6 @@ from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     MAKES_MOVE_EVERY_ODD_NIGHT,
 )
-from states.game import UserFsm
 from utils.common import get_criminals_ids
 from utils.pretty_text import make_build
 from utils.roles import get_processed_role_and_user_if_exists

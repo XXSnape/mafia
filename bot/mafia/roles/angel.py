@@ -5,7 +5,6 @@ from cache.cache_types import (
     RolesLiteral,
     UserIdInt,
 )
-from cache.extra import ExtraCache
 from general.groupings import Groupings
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
@@ -17,7 +16,6 @@ from mafia.roles.descriptions.texts import (
     PAYMENT_FOR_NIGHTS,
     SAVING_PLAYER,
 )
-from states.game import UserFsm
 from utils.pretty_text import make_build
 from utils.state import reset_user_state
 

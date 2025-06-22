@@ -19,12 +19,12 @@ from keyboards.inline.keypads.help import (
     HOW_TO_SET_UP_GAME_BTN,
     HOW_TO_SET_UP_GROUP_BTN,
     ROLES_SELECTION_BTN,
+    WHAT_ARE_ADVANCED_SETTINGS_BTN,
+    WHAT_ARE_BIDS_BTN,
     get_roles_kb,
     go_back_to_options_kb,
     help_options_kb,
     to_help_kb,
-    WHAT_ARE_ADVANCED_SETTINGS_BTN,
-    WHAT_ARE_BIDS_BTN,
 )
 from mafia.roles import Instigator, Warden
 from services.base import RouterHelper

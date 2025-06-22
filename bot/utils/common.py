@@ -4,7 +4,6 @@ from functools import partial
 from typing import Literal
 
 from aiogram.types import CallbackQuery
-
 from cache.cache_types import GameCache, PlayersIds
 
 

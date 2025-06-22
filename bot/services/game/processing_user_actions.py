@@ -4,7 +4,6 @@ from html import escape
 
 from aiogram.filters import CommandObject
 from aiogram.fsm.context import FSMContext
-
 from cache.cache_types import (
     GameCache,
     UserIdInt,
@@ -16,7 +15,7 @@ from general import settings
 from general.collection_of_roles import get_data_with_roles
 from general.commands import PrivateCommands
 from general.groupings import Groupings
-from general.text import NUMBER_OF_DAY, NUMBER_OF_NIGHT, DOUBLE_VOICE
+from general.text import DOUBLE_VOICE, NUMBER_OF_DAY, NUMBER_OF_NIGHT
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
@@ -33,16 +32,16 @@ from services.game.game_assistants import (
 from states.game import GameFsm
 from utils.common import (
     get_criminals_ids,
-    remove_from_expected_at_night,
     remove_from_expected_at_day,
+    remove_from_expected_at_night,
 )
 from utils.informing import (
-    send_a_lot_of_messages_safely,
     get_profiles,
+    send_a_lot_of_messages_safely,
 )
 from utils.pretty_text import make_build
 from utils.state import lock_state
-from utils.tg import delete_message, resending_message, ban_user
+from utils.tg import delete_message, resending_message
 
 
 class UserManager(RouterHelper):

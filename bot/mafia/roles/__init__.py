@@ -6,6 +6,7 @@ from .bodyguard import Bodyguard
 from .bride import Bride
 from .civilian import Civilian
 from .doctor import Doctor, DoctorAlias
+from .emperor import Emperor
 from .forger import Forger
 from .hacker import Hacker
 from .instigator import Instigator
@@ -22,7 +23,6 @@ from .phoenix import Phoenix
 from .pirate import Pirate
 from .poisoner import Poisoner
 from .policeman import Policeman, PolicemanAlias
-from .emperor import Emperor
 from .prosecutor import Prosecutor
 from .punisher import Punisher
 from .reviver import Reviver

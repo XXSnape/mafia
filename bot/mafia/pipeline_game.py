@@ -37,7 +37,7 @@ from general.text import MONEY_SYM
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
 from loguru import logger
 from mafia.controlling_game import Controller
-from mafia.roles import RoleABC, ActiveRoleAtNightABC
+from mafia.roles import ActiveRoleAtNightABC, RoleABC
 from services.common.settings import SettingsRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 from states.game import GameFsm

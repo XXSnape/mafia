@@ -30,9 +30,9 @@ from mafia.roles.base import (
 )
 from mafia.roles.base.mixins import (
     FinisherOfNight,
-    ObligatoryKillerABC,
     ProcedureAfterNightABC,
     ProcedureAfterVotingABC,
+    SunsetKillerABC,
 )
 from states.game import UserFsm
 from utils.common import (
@@ -628,10 +628,10 @@ class Controller:
             boss_is_dead_tasks.extend(boss_is_dead)
 
         current_inactive_users = removed_users[:]
-        obligatory_killers = self._get_roles_if_isinstance(
-            ObligatoryKillerABC
+        sunset_killers = self._get_roles_if_isinstance(
+            SunsetKillerABC
         )
-        for killer in obligatory_killers:
+        for killer in sunset_killers:
             result = killer.kill_after_all_actions(
                 game_data=game_data,
                 current_inactive_users=current_inactive_users,

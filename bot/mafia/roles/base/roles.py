@@ -11,7 +11,6 @@ from aiogram.fsm.state import State
 from aiogram.types import InlineKeyboardButton
 from cache.cache_types import (
     GameCache,
-    LastInteraction,
     PlayersIds,
     RolesLiteral,
     UserGameCache,

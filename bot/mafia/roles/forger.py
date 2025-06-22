@@ -1,5 +1,3 @@
-from typing import override
-
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from cache.extra import ExtraCache
 from general.groupings import Groupings

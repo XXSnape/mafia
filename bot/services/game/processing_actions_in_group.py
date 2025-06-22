@@ -10,10 +10,8 @@ from keyboards.inline.callback_factory.recognize_user import (
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
 from mafia.roles import Emperor
 from services.base import RouterHelper
-from utils.informing import get_profiles
-from utils.pretty_text import make_build
 from utils.state import lock_state
-from utils.tg import ban_user, delete_message, resending_message
+from utils.tg import ban_user, delete_message
 
 
 class GroupManager(RouterHelper):

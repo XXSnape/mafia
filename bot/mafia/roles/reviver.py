@@ -1,8 +1,7 @@
 from contextlib import suppress
 
 from aiogram.exceptions import TelegramAPIError
-
-from cache.cache_types import RolesLiteral, UserIdInt, GameCache
+from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general.groupings import Groupings
 from mafia.roles import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
@@ -10,11 +9,10 @@ from mafia.roles.base.mixins import (
     ProcedureAfterVotingABC,
 )
 from mafia.roles.descriptions.description import RoleDescription
-from states.game import UserFsm
 from utils.roles import (
+    change_role,
     get_processed_user_id_if_exists,
     get_user_role_and_url,
-    change_role,
 )
 
 
@@ -79,16 +77,16 @@ class Reviver(
 
     @staticmethod
     def allow_sending_mailing(game_data: GameCache) -> bool:
-        from .policeman import Policeman
         from .doctor import Doctor
+        from .policeman import Policeman
 
         return (not game_data[Policeman.roles_key]) or (
             not game_data[Doctor.roles_key]
         )
 
     async def end_night(self, game_data: GameCache):
-        from .policeman import Policeman
         from .doctor import Doctor
+        from .policeman import Policeman
 
         user_id = self.reborn_id
         self.reborn_id = None
