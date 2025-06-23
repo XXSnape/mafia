@@ -8,7 +8,6 @@ from keyboards.inline.cb.cb_text import (
     HOW_TO_PLAY_CB,
     HOW_TO_SEE_STATISTICS_CB,
     HOW_TO_SET_UP_GAME_CB,
-    HOW_TO_SET_UP_GROUP_CB,
     HOW_TO_START_GAME_CB,
     VIEW_ROLES_CB,
     WHAT_ARE_ADVANCED_SETTINGS_CB,
@@ -65,12 +64,6 @@ async def how_to_set_up_game(callback: CallbackQuery):
 async def what_are_advanced_settings(callback: CallbackQuery):
     base = BaseRouter(callback=callback)
     await base.what_are_advanced_settings()
-
-
-@router.callback_query(F.data == HOW_TO_SET_UP_GROUP_CB)
-async def how_to_set_up_specific_group(callback: CallbackQuery):
-    base = BaseRouter(callback=callback)
-    await base.how_to_set_up_specific_group()
 
 
 @router.callback_query(F.data == HOW_TO_SEE_STATISTICS_CB)

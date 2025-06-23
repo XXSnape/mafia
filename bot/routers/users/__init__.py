@@ -33,12 +33,12 @@ always_available_router.include_routers(
     profile_router,
     help_router,
     shop_router,
-    start_router,
     subscriptions_router,
 )
 
 
 router.include_routers(
+    start_router,
     ban_roles_router,
     order_of_roles_router,
     settings_router,
