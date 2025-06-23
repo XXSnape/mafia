@@ -13,7 +13,6 @@ from keyboards.inline.cb.cb_text import (
     HOW_TO_PLAY_CB,
     HOW_TO_SEE_STATISTICS_CB,
     HOW_TO_SET_UP_GAME_CB,
-    HOW_TO_SET_UP_GROUP_CB,
     HOW_TO_START_GAME_CB,
     VIEW_ROLES_CB,
     WHAT_ARE_ADVANCED_SETTINGS_CB,
@@ -47,7 +46,6 @@ def help_options_kb():
         ),
         HOW_TO_SET_UP_GAME_BTN,
         WHAT_ARE_ADVANCED_SETTINGS_BTN,
-        HOW_TO_SET_UP_GROUP_BTN,
         InlineKeyboardButton(
             text="Как посмотреть статистику?📈",
             callback_data=HOW_TO_SEE_STATISTICS_CB,
@@ -81,10 +79,6 @@ WHAT_ARE_BIDS_BTN = InlineKeyboardButton(
 HOW_TO_START_GAME_BTN = InlineKeyboardButton(
     text="Как начать игру?🎲",
     callback_data=HOW_TO_START_GAME_CB,
-)
-HOW_TO_SET_UP_GROUP_BTN = InlineKeyboardButton(
-    text="Как настроить конкретную группу?👥",
-    callback_data=HOW_TO_SET_UP_GROUP_CB,
 )
 ROLES_SELECTION_BTN = InlineKeyboardButton(
     text=ROLES_SELECTION, callback_data=VIEW_ROLES_CB

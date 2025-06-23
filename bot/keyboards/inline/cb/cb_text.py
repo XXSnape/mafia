@@ -59,7 +59,6 @@ MAFIA_EVERY_3_CB = "mafia_every_3"
 
 HELP_CB = "help"
 HOW_TO_START_GAME_CB = "how_to_start_game"
-HOW_TO_SET_UP_GROUP_CB = "how_to_set_up_group"
 WHAT_ARE_BIDS_CB = "what_are_bids"
 HOW_TO_PLAY_CB = "how_to_play"
 HOW_TO_SET_UP_GAME_CB = "how_to_set_up_game"
