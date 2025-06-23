@@ -1,5 +1,4 @@
 from cache.cache_types import RolesLiteral
-from database.schemas.common import UserTgIdSchema
 from database.schemas.groups import GroupIdSchema
 
 

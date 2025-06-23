@@ -4,8 +4,6 @@ from typing import cast
 from aiogram.exceptions import TelegramAPIError
 from cache.cache_types import StagesOfGameLiteral
 from database.dao.groups import GroupsDao
-from database.dao.settings import SettingsDao
-from database.schemas.common import UserTgIdSchema
 from database.schemas.settings import TimeOfDaySchema
 from keyboards.inline.callback_factory.settings import (
     TimeOfDayCbData,

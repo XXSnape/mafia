@@ -20,7 +20,7 @@ from cache.cache_types import (
 )
 from database.dao.groups import GroupsDao
 from database.dao.users import UsersDao
-from database.schemas.common import TgIdSchema, UserTgIdSchema
+from database.schemas.common import TgIdSchema
 from database.schemas.subscriptions import NotificationSchema
 from general import settings
 from general.collection_of_roles import (
@@ -129,7 +129,7 @@ class Registration(RouterHelper):
         chat_member = await self.message.bot.get_chat_member(
             chat_id=self.message.chat.id, user_id=self.message.bot.id
         )
-        if isinstance(chat_member, ChatMemberAdministrator) is False:
+        if not isinstance(chat_member, ChatMemberAdministrator):
             return False
         return all(
             [
@@ -138,13 +138,6 @@ class Registration(RouterHelper):
                 chat_member.can_pin_messages,
             ]
         )
-
-    async def add_group_if_not_exists(self):
-        dao = GroupsDao(session=self.session)
-        schema = TgIdSchema(tg_id=self.message.chat.id)
-        group = await dao.find_one_or_none(schema)
-        if group is None:
-            await dao.add(schema)
 
     async def start_registration(self):
 
@@ -595,12 +588,11 @@ class Registration(RouterHelper):
         end_of_registration: int,
     ):
         owner_id = self._get_user_id()
-        await self.add_group_if_not_exists()
+        await self.get_group_or_create()
         group_settings_schema = await GroupsDao(
             session=self.session
         ).get_group_settings(
             group_tg_id=TgIdSchema(tg_id=self.message.chat.id),
-            user_tg_id=UserTgIdSchema(user_tg_id=owner_id),
         )
         game_settings: GameSettingsCache = {
             "creator_user_id": owner_id,

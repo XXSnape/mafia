@@ -1,17 +1,15 @@
 from dataclasses import dataclass
-from typing import TypedDict
 
 from aiogram import Dispatcher
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from cache.cache_types import PersonalSettingsCache, AllSettingsCache
+from cache.cache_types import AllSettingsCache, PersonalSettingsCache
 from database.dao.groups import GroupsDao
-from database.schemas.common import TgIdSchema, IdSchema
+from database.schemas.common import IdSchema, TgIdSchema
+from database.schemas.groups import GroupIdSchema
 from faststream.rabbit import RabbitBroker
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from database.schemas.groups import GroupIdSchema
 
 
 @dataclass

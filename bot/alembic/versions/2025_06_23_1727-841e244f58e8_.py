@@ -8,9 +8,8 @@ Create Date: 2025-06-23 17:27:48.711677
 
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "841e244f58e8"
@@ -30,15 +29,26 @@ def downgrade() -> None:
     op.create_table(
         "settings",
         sa.Column(
-            "user_tg_id", sa.BIGINT(), autoincrement=False, nullable=False
+            "user_tg_id",
+            sa.BIGINT(),
+            autoincrement=False,
+            nullable=False,
         ),
         sa.Column(
-            "time_for_night", sa.INTEGER(), autoincrement=False, nullable=False
+            "time_for_night",
+            sa.INTEGER(),
+            autoincrement=False,
+            nullable=False,
         ),
         sa.Column(
-            "time_for_day", sa.INTEGER(), autoincrement=False, nullable=False
+            "time_for_day",
+            sa.INTEGER(),
+            autoincrement=False,
+            nullable=False,
         ),
-        sa.Column("id", sa.INTEGER(), autoincrement=True, nullable=False),
+        sa.Column(
+            "id", sa.INTEGER(), autoincrement=True, nullable=False
+        ),
         sa.Column(
             "show_killers",
             sa.BOOLEAN(),
@@ -148,7 +158,8 @@ def downgrade() -> None:
             "time_for_day > 10", name="settings_time_for_day_check"
         ),
         sa.CheckConstraint(
-            "time_for_night > 10", name="settings_time_for_night_check"
+            "time_for_night > 10",
+            name="settings_time_for_night_check",
         ),
         sa.ForeignKeyConstraint(
             ["user_tg_id"],

@@ -1,8 +1,7 @@
 from database.common.base import BaseModel, IdMixin
+from general import settings
 from sqlalchemy import BigInteger, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column
-
-from general import settings
 
 
 class GroupModel(IdMixin, BaseModel):

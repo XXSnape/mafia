@@ -8,9 +8,8 @@ Create Date: 2025-06-23 17:26:25.370611
 
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "01d391646939"
@@ -24,13 +23,19 @@ def upgrade() -> None:
     op.add_column(
         "groups",
         sa.Column(
-            "time_for_night", sa.Integer(), server_default="45", nullable=False
+            "time_for_night",
+            sa.Integer(),
+            server_default="45",
+            nullable=False,
         ),
     )
     op.add_column(
         "groups",
         sa.Column(
-            "time_for_day", sa.Integer(), server_default="45", nullable=False
+            "time_for_day",
+            sa.Integer(),
+            server_default="45",
+            nullable=False,
         ),
     )
     op.add_column(
@@ -72,7 +77,10 @@ def upgrade() -> None:
     op.add_column(
         "groups",
         sa.Column(
-            "show_killers", sa.Boolean(), server_default="1", nullable=False
+            "show_killers",
+            sa.Boolean(),
+            server_default="1",
+            nullable=False,
         ),
     )
     op.add_column(
@@ -132,13 +140,19 @@ def upgrade() -> None:
     op.add_column(
         "groups",
         sa.Column(
-            "mafia_every_3", sa.Boolean(), server_default="0", nullable=False
+            "mafia_every_3",
+            sa.Boolean(),
+            server_default="0",
+            nullable=False,
         ),
     )
     op.add_column(
         "groups",
         sa.Column(
-            "allow_betting", sa.Boolean(), server_default="1", nullable=False
+            "allow_betting",
+            sa.Boolean(),
+            server_default="1",
+            nullable=False,
         ),
     )
     op.add_column(
@@ -153,21 +167,34 @@ def upgrade() -> None:
     op.add_column(
         "groups",
         sa.Column(
-            "protect_content", sa.Boolean(), server_default="0", nullable=False
+            "protect_content",
+            sa.Boolean(),
+            server_default="0",
+            nullable=False,
         ),
     )
-    op.drop_constraint("groups_setting_id_fkey", "groups", type_="foreignkey")
+    op.drop_constraint(
+        "groups_setting_id_fkey", "groups", type_="foreignkey"
+    )
     op.drop_column("groups", "setting_id")
     op.add_column(
         "orders", sa.Column("group_id", sa.Integer(), nullable=False)
     )
-    op.drop_constraint("orders_user_tg_id_fkey", "orders", type_="foreignkey")
+    op.drop_constraint(
+        "orders_user_tg_id_fkey", "orders", type_="foreignkey"
+    )
     op.create_foreign_key(
-        None, "orders", "groups", ["group_id"], ["id"], ondelete="CASCADE"
+        None,
+        "orders",
+        "groups",
+        ["group_id"],
+        ["id"],
+        ondelete="CASCADE",
     )
     op.drop_column("orders", "user_tg_id")
     op.add_column(
-        "prohibited_roles", sa.Column("group_id", sa.Integer(), nullable=False)
+        "prohibited_roles",
+        sa.Column("group_id", sa.Integer(), nullable=False),
     )
     op.drop_constraint(
         "prohibited_roles_user_tg_id_fkey",
@@ -191,7 +218,10 @@ def downgrade() -> None:
     op.add_column(
         "prohibited_roles",
         sa.Column(
-            "user_tg_id", sa.BIGINT(), autoincrement=False, nullable=False
+            "user_tg_id",
+            sa.BIGINT(),
+            autoincrement=False,
+            nullable=False,
         ),
     )
     op.drop_constraint(None, "prohibited_roles", type_="foreignkey")
@@ -207,7 +237,10 @@ def downgrade() -> None:
     op.add_column(
         "orders",
         sa.Column(
-            "user_tg_id", sa.BIGINT(), autoincrement=False, nullable=False
+            "user_tg_id",
+            sa.BIGINT(),
+            autoincrement=False,
+            nullable=False,
         ),
     )
     op.drop_constraint(None, "orders", type_="foreignkey")
@@ -223,7 +256,10 @@ def downgrade() -> None:
     op.add_column(
         "groups",
         sa.Column(
-            "setting_id", sa.INTEGER(), autoincrement=False, nullable=True
+            "setting_id",
+            sa.INTEGER(),
+            autoincrement=False,
+            nullable=True,
         ),
     )
     op.create_foreign_key(
@@ -243,7 +279,9 @@ def downgrade() -> None:
     op.drop_column("groups", "can_kill_teammates")
     op.drop_column("groups", "show_usernames_after_confirmation")
     op.drop_column("groups", "show_usernames_during_voting")
-    op.drop_column("groups", "show_information_about_guests_at_night")
+    op.drop_column(
+        "groups", "show_information_about_guests_at_night"
+    )
     op.drop_column("groups", "show_killers")
     op.drop_column("groups", "show_peaceful_allies")
     op.drop_column("groups", "show_roles_after_death")

@@ -1,8 +1,7 @@
 from database.dao.base import BaseDAO
-from database.dao.settings import SettingsDao
 from database.models import UserModel
 from database.schemas.bids import UserMoneySchema
-from database.schemas.common import TgIdSchema, UserTgIdSchema
+from database.schemas.common import TgIdSchema
 from general.exceptions import NotEnoughMoney
 from general.resources import Resources
 from general.text import MONEY_SYM
@@ -78,6 +77,4 @@ class UsersDao(BaseDAO[UserModel]):
         if user:
             return user
         user = await self.add(tg_id)
-        settings_dao = SettingsDao(session=self._session)
-        await settings_dao.add(UserTgIdSchema(user_tg_id=user.tg_id))
         return user

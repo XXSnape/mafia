@@ -4,8 +4,6 @@ from cache.cache_types import OrderOfRolesCache, RolesLiteral
 from database.dao.groups import GroupsDao
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
-from database.dao.settings import SettingsDao
-from database.schemas.common import UserTgIdSchema
 from database.schemas.roles import OrderOfRolesSchema
 from general import settings
 from general.collection_of_roles import (

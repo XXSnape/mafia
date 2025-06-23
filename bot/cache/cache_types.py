@@ -1,4 +1,4 @@
-from typing import Literal, TypeAlias, TypedDict, Required
+from typing import Literal, Required, TypeAlias, TypedDict
 
 PlayersIds: TypeAlias = list[int | str]
 UserIdStr: TypeAlias = str

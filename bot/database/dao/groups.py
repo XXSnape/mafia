@@ -1,5 +1,3 @@
-from sqlalchemy import select
-
 from database.dao.base import BaseDAO
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
@@ -8,10 +6,11 @@ from database.schemas.common import (
     TgIdSchema,
 )
 from database.schemas.groups import (
-    GroupSettingsSchema,
     GroupIdSchema,
+    GroupSettingsSchema,
 )
 from database.schemas.settings import DifferentSettingsSchema
+from sqlalchemy import select
 
 
 class GroupsDao(BaseDAO[GroupModel]):

@@ -117,7 +117,7 @@ async def unban_users(bot: Bot, chat_id: int, users: PlayersIds):
             )
             for user_id in users
         ),
-        return_exceptions=True
+        return_exceptions=True,
     )
 
 

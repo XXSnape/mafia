@@ -4,7 +4,6 @@ from aiogram.exceptions import TelegramAPIError
 from cache.cache_types import PollBannedRolesCache, RolesLiteral
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
-from database.schemas.common import UserTgIdSchema
 from database.schemas.roles import ProhibitedRoleSchema
 from general.collection_of_roles import (
     REQUIRED_ROLES,
@@ -16,9 +15,10 @@ from keyboards.inline.keypads.banned_roles import (
     edit_banned_roles_kb,
     suggest_banning_roles_kb,
 )
-from services.base import RouterHelper
+from services.base import (
+    RouterHelper,
+)
 from utils.pretty_text import make_build
-from utils.tg import delete_message
 
 
 class RoleAttendant(RouterHelper):
@@ -72,19 +72,15 @@ class RoleAttendant(RouterHelper):
     async def ban_everything(self):
         all_roles = get_data_with_roles()
         roles_ids = list(set(all_roles.keys()) - set(REQUIRED_ROLES))
-        has_order_been_reset = await self._save_new_prohibited_roles(
-            roles_ids=roles_ids
-        )
+        await self._save_new_prohibited_roles(roles_ids=roles_ids)
         await self.callback.answer(
             "✅Ты успешно забанил все опциональные роли!",
             show_alert=True,
         )
-        await self.view_banned_roles(
-            has_order_been_reset=has_order_been_reset
-        )
+        await self.view_banned_roles()
 
     async def view_banned_roles(
-        self, has_order_been_reset: bool = False
+        self,
     ):
         group_schema = await self.get_group_id_schema()
         await self.clear_settings_data()
@@ -100,18 +96,11 @@ class RoleAttendant(RouterHelper):
         markup = edit_banned_roles_kb(
             banned_roles_ids=banned_roles_ids
         )
-        if has_order_been_reset:
-            await delete_message(self.callback.message)
-            await self.callback.message.answer(
+        with suppress(TelegramAPIError):
+            await self.callback.message.edit_text(
                 text=message,
                 reply_markup=markup,
             )
-        else:
-            with suppress(TelegramAPIError):
-                await self.callback.message.edit_text(
-                    text=message,
-                    reply_markup=markup,
-                )
 
     async def clear_banned_roles(self):
         dao = ProhibitedRolesDAO(session=self.session)
@@ -164,12 +153,8 @@ class RoleAttendant(RouterHelper):
             await self.get_settings_data()
         )
         banned_roles = poll_data["banned_roles_ids"]
-        has_order_been_reset = await self._save_new_prohibited_roles(
-            roles_ids=banned_roles
-        )
+        await self._save_new_prohibited_roles(roles_ids=banned_roles)
         await self.callback.answer(
             "✅Ты успешно забанил роли!", show_alert=True
         )
-        await self.view_banned_roles(
-            has_order_been_reset=has_order_been_reset
-        )
+        await self.view_banned_roles()

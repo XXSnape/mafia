@@ -2,16 +2,14 @@ from collections.abc import Awaitable, Callable
 from typing import Concatenate
 
 from aiogram.exceptions import TelegramAPIError
-from cache.cache_types import DifferentSettingsCache
-from database.dao.groups import GroupsDao
-from database.dao.settings import SettingsDao
-from database.schemas.common import (
-    IdSchema,
-    TgIdSchema,
-    UserTgIdSchema,
+from cache.cache_types import (
+    AllSettingsCache,
+    DifferentSettingsCache,
+    PersonalSettingsCache,
 )
-from database.schemas.groups import (
-    GroupSettingIdSchema,
+from database.dao.groups import GroupsDao
+from database.schemas.common import (
+    TgIdSchema,
 )
 from keyboards.inline.callback_factory.settings import (
     GroupSettingsCbData,
@@ -21,7 +19,10 @@ from keyboards.inline.keypads.different_settings import (
     get_different_settings_buttons,
     get_for_of_war_buttons,
 )
-from keyboards.inline.keypads.settings import set_up_group_kb
+from keyboards.inline.keypads.settings import (
+    select_setting_kb,
+    set_up_group_kb,
+)
 from services.base import RouterHelper
 from services.users.banned_roles import RoleAttendant
 from services.users.order_of_roles import RoleManager
@@ -30,46 +31,6 @@ from utils.pretty_text import (
     make_build,
 )
 from utils.tg import check_user_for_admin_rights, delete_message
-
-
-def checking_for_ability_to_change_settings[R, **P](
-    async_func: Callable[
-        Concatenate["SettingsRouter", GroupSettingsCbData, P],
-        Awaitable[R | None],
-    ],
-):
-    async def wrapper(
-        self: "SettingsRouter",
-        callback_data: GroupSettingsCbData,
-        *args: P.args,
-        **kwargs: P.kwargs,
-    ) -> R | None:
-        groups_dao = GroupsDao(session=self.session)
-        group = await groups_dao.find_one_or_none(
-            IdSchema(id=callback_data.group_id)
-        )
-        is_user_admin = await check_user_for_admin_rights(
-            bot=self.callback.bot,
-            chat_id=group.tg_id,
-            user_id=self.callback.from_user.id,
-        )
-        if is_user_admin is False:
-            await self.callback.answer(
-                "🚫Ты больше не админ в этой группе", show_alert=True
-            )
-            await delete_message(self.callback.message)
-            return None
-        group_info = await self.callback.bot.get_chat(group.tg_id)
-        return await async_func(
-            self,
-            *args,
-            callback_data=callback_data,
-            groups_dao=groups_dao,
-            title=f"«{group_info.title}»",
-            **kwargs,
-        )
-
-    return wrapper
 
 
 def cant_write_to_user[R, **P](
@@ -94,6 +55,13 @@ def cant_write_to_user[R, **P](
 
 
 class SettingsRouter(RouterHelper):
+    async def _suggest_changing_settings(self):
+        await self.callback.message.edit_text(
+            text=make_build(
+                "⚙️Выбери, что конкретно хочешь настроить"
+            ),
+            reply_markup=select_setting_kb(),
+        )
 
     @staticmethod
     def get_other_settings_text(
@@ -176,27 +144,16 @@ class SettingsRouter(RouterHelper):
                 ),
             )
 
-    @checking_for_ability_to_change_settings
-    async def apply_my_settings(
-        self,
-        callback_data: GroupSettingsCbData,
-        groups_dao: GroupsDao,
-        title: str,
+    async def back_to_settings(self):
+        await self.clear_settings_data()
+        await self._suggest_changing_settings()
+
+    async def start_changing_settings(
+        self, callback_data: GroupSettingsCbData
     ):
-
-        my_setting = await SettingsDao(
-            session=self.session
-        ).find_one_or_none(
-            UserTgIdSchema(user_tg_id=self.callback.from_user.id)
+        data: PersonalSettingsCache = await self.state.get_data()
+        data["settings"] = AllSettingsCache(
+            group_id=callback_data.group_id
         )
-
-        await groups_dao.update(
-            filters=IdSchema(id=callback_data.group_id),
-            values=GroupSettingIdSchema(setting_id=my_setting.id),
-        )
-        await self.callback.answer(
-            f"✅Теперь в группе {title} "
-            f"применены твои настройки!",
-            show_alert=True,
-        )
-        await delete_message(self.callback.message)
+        await self.state.set_data(data)
+        await self._suggest_changing_settings()
