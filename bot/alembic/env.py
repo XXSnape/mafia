@@ -13,7 +13,6 @@ from database.models import (
     RateModel,
     ResultModel,
     RoleModel,
-    SettingModel,
     SubscriptionModel,
     UserModel,
 )
