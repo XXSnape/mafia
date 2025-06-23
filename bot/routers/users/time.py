@@ -1,4 +1,5 @@
 from aiogram import F, Router
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from keyboards.inline.callback_factory.settings import (
     TimeOfDayCbData,
@@ -33,10 +34,14 @@ async def select_stage_of_game(callback: CallbackQuery):
     )
 )
 async def edit_game_time(
-    callback: CallbackQuery, session_without_commit: AsyncSession
+    callback: CallbackQuery,
+    state: FSMContext,
+    session_without_commit: AsyncSession,
 ):
     time_router = TimeRouter(
-        callback=callback, session=session_without_commit
+        callback=callback,
+        state=state,
+        session=session_without_commit,
     )
     await time_router.edit_game_time()
 
@@ -45,10 +50,11 @@ async def edit_game_time(
 async def changes_length_of_time_of_day(
     callback: CallbackQuery,
     callback_data: TimeOfDayCbData,
+    state: FSMContext,
     session_with_commit: AsyncSession,
 ):
     time_router = TimeRouter(
-        callback=callback, session=session_with_commit
+        callback=callback, state=state, session=session_with_commit
     )
     await time_router.changes_length_of_time_of_day(
         callback_data=callback_data

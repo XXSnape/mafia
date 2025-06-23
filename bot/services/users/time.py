@@ -3,6 +3,7 @@ from typing import cast
 
 from aiogram.exceptions import TelegramAPIError
 from cache.cache_types import StagesOfGameLiteral
+from database.dao.groups import GroupsDao
 from database.dao.settings import SettingsDao
 from database.schemas.common import UserTgIdSchema
 from database.schemas.settings import TimeOfDaySchema
@@ -32,11 +33,10 @@ class TimeRouter(RouterHelper):
         )
 
     async def edit_game_time(self):
-        setting = await SettingsDao(
+        group_schema = await self.get_group_id_schema(id_schema=True)
+        group = await GroupsDao(
             session=self.session
-        ).find_one_or_none(
-            UserTgIdSchema(user_tg_id=self.callback.from_user.id)
-        )
+        ).find_one_or_none(group_schema)
         stage_of_game = cast(StagesOfGameLiteral, self.callback.data)
         texts = {
             TIME_FOR_NIGHT_CB: "Выбери, сколько должна длиться ночь",
@@ -44,7 +44,7 @@ class TimeRouter(RouterHelper):
             TIME_FOR_VOTING_CB: "Выбери, сколько должно длиться голосование для дальнейшего повешения",
             TIME_FOR_CONFIRMATION_CB: "Выбери, сколько должен длиться процесс подтверждения о повешении",
         }
-        current_time = getattr(setting, stage_of_game)
+        current_time = getattr(group, stage_of_game)
         message = texts[stage_of_game]
         await self.callback.message.edit_text(
             text=make_build(message),
@@ -61,10 +61,9 @@ class TimeRouter(RouterHelper):
         value = TimeOfDaySchema(
             **{callback_data.stage_of_game: callback_data.seconds}
         )
-        await SettingsDao(session=self.session).update(
-            UserTgIdSchema(
-                user_tg_id=self.callback.from_user.id,
-            ),
+        group_schema = await self.get_group_id_schema(id_schema=True)
+        await GroupsDao(session=self.session).update(
+            filters=group_schema,
             values=value,
         )
         with suppress(TelegramAPIError):

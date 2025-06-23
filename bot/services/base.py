@@ -40,8 +40,11 @@ class RouterHelper:
         )
         await self.state.set_data(data)
 
-    async def get_group_id_schema(self):
+    async def get_group_id_schema(self, id_schema: bool = False):
         data: PersonalSettingsCache = await self.state.get_data()
+        group_id = data["settings"]["group_id"]
+        if id_schema:
+            return IdSchema(id=group_id)
         return GroupIdSchema(group_id=data["settings"]["group_id"])
 
     async def set_settings_data(self, data: dict):

@@ -13,28 +13,14 @@ from keyboards.inline.cb.cb_text import (
     ACTIONS_ON_SETTINGS_CB,
 )
 from keyboards.inline.keypads.settings import select_setting_kb
+from services.base import RouterHelper
 from services.common.settings import SettingsRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 from utils.pretty_text import make_build
 
 router = Router(name=__name__)
 
-
-@router.message(
-    Command(PrivateCommands.my_settings.name),
-)
-async def handle_settings(
-    message: Message,
-    session_with_commit: AsyncSession,
-):
-    await message.delete()
-    await UsersDao(session=session_with_commit).get_user_or_create(
-        tg_id=TgIdSchema(tg_id=message.from_user.id)
-    )
-    await message.answer(
-        make_build("⚙️Выбери, что конкретно хочешь настроить"),
-        reply_markup=select_setting_kb(),
-    )
+SETTINGS = make_build("⚙️Выбери, что конкретно хочешь настроить")
 
 
 @router.callback_query(
@@ -43,11 +29,10 @@ async def handle_settings(
 async def back_to_settings(
     callback: CallbackQuery, state: FSMContext
 ):
-    data: PersonalSettingsCache = await state.get_data()
-    data["settings"] = {}
-    await state.set_data(data)
+    router_helper = RouterHelper(callback=callback, state=state)
+    await router_helper.clear_settings_data()
     await callback.message.edit_text(
-        text=make_build("⚙️Выбери, что конкретно хочешь настроить"),
+        text=SETTINGS,
         reply_markup=select_setting_kb(),
     )
 
@@ -64,6 +49,6 @@ async def start_changing_settings(
     )
     await state.set_data(data)
     await callback.message.edit_text(
-        text=make_build("⚙️Выбери, что конкретно хочешь настроить"),
+        text=SETTINGS,
         reply_markup=select_setting_kb(),
     )

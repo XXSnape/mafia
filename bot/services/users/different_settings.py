@@ -1,7 +1,6 @@
 from cache.cache_types import DifferentSettingsCache
+from database.dao.groups import GroupsDao
 from database.dao.order import OrderOfRolesDAO
-from database.dao.settings import SettingsDao
-from database.schemas.common import UserTgIdSchema
 from database.schemas.settings import (
     DifferentSettingsSchema,
 )
@@ -28,7 +27,7 @@ class DifferentSettings(RouterHelper):
     def _get_info_about_anonymous_mode(
         self, fog_of_war_data: DifferentSettingsCache
     ):
-        if fog_of_war_data["show_roles_after_death"] is False:
+        if not fog_of_war_data["show_roles_after_death"]:
             mode = (
                 "🔴Во время игры роли будут скрыты и "
                 "не будет сообщений о ночных действиях"
@@ -38,14 +37,15 @@ class DifferentSettings(RouterHelper):
         return make_build(self.message_to_change + mode)
 
     async def _start_showing_options(self):
+        group_schema = await self.get_group_id_schema(id_schema=True)
+
         await self.clear_settings_data()
-        settings_dao = SettingsDao(session=self.session)
-        user_setting = await settings_dao.find_one_or_none(
-            UserTgIdSchema(user_tg_id=self.callback.from_user.id)
-        )
+        group = await GroupsDao(
+            session=self.session
+        ).find_one_or_none(group_schema)
         different_settings_schema = (
             DifferentSettingsSchema.model_validate(
-                user_setting, from_attributes=True
+                group, from_attributes=True
             )
         )
         different_settings_data: DifferentSettingsCache = (
@@ -70,11 +70,10 @@ class DifferentSettings(RouterHelper):
         different_settings_data[self.callback.data] = not (
             different_settings_data[self.callback.data]
         )
-        settings_dao = SettingsDao(session=self.session)
-        await settings_dao.update(
-            filters=UserTgIdSchema(
-                user_tg_id=self.callback.from_user.id
-            ),
+        groups_dao = GroupsDao(session=self.session)
+        group_schema = await self.get_group_id_schema(id_schema=True)
+        await groups_dao.update(
+            filters=group_schema,
             values=DifferentSettingsSchema.model_validate(
                 different_settings_data
             ),
@@ -126,17 +125,15 @@ class DifferentSettings(RouterHelper):
         different_data: DifferentSettingsCache = (
             await self.update_settings()
         )
-        user_schema = UserTgIdSchema(
-            user_tg_id=self.callback.from_user.id
-        )
+        group_schema = await self.get_group_id_schema()
         order_of_roles_dao = OrderOfRolesDAO(session=self.session)
         roles = (
             await order_of_roles_dao.get_roles_ids_of_order_of_roles(
-                user_schema
+                group_schema
             )
         )
         if roles != list(BASES_ROLES):
-            await order_of_roles_dao.delete(user_schema)
+            await order_of_roles_dao.delete(group_schema)
             await self.callback.answer(
                 "❗️❗️❗️ВНИМАНИЕ! ПОРЯДОК РОЛЕЙ СБРОШЕН!\n\n"
                 "Настрой его заново",
