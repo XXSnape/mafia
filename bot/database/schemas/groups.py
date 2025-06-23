@@ -7,7 +7,6 @@ class GroupSettingsSchema(DifferentSettingsSchema):
     id: int
     banned_roles: list[RolesLiteral]
     order_of_roles: list[RolesLiteral]
-    is_there_settings: bool
 
 
 class GroupIdSchema(BaseModel):

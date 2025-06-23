@@ -2,7 +2,7 @@ from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
-from cache.cache_types import PersonalSettingsCache
+from cache.cache_types import PersonalSettingsCache, AllSettingsCache
 from database.dao.users import UsersDao
 from database.schemas.common import TgIdSchema
 from general.commands import PrivateCommands
@@ -52,29 +52,18 @@ async def back_to_settings(
     )
 
 
-@router.callback_query(
-    GroupSettingsCbData.filter(F.apply_own.is_(False))
-)
-async def apply_any_settings(
+@router.callback_query(GroupSettingsCbData.filter())
+async def start_changing_settings(
     callback: CallbackQuery,
     callback_data: GroupSettingsCbData,
-    session_with_commit: AsyncSession,
+    state: FSMContext,
 ):
-    settings = SettingsRouter(
-        callback=callback, session=session_with_commit
+    data: PersonalSettingsCache = await state.get_data()
+    data["settings"] = AllSettingsCache(
+        group_id=callback_data.group_id
     )
-    await settings.apply_any_settings(callback_data=callback_data)
-
-
-@router.callback_query(
-    GroupSettingsCbData.filter(F.apply_own.is_(True))
-)
-async def apply_my_settings(
-    callback: CallbackQuery,
-    callback_data: GroupSettingsCbData,
-    session_with_commit: AsyncSession,
-):
-    settings = SettingsRouter(
-        callback=callback, session=session_with_commit
+    await state.set_data(data)
+    await callback.message.edit_text(
+        text=make_build("⚙️Выбери, что конкретно хочешь настроить"),
+        reply_markup=select_setting_kb(),
     )
-    await settings.apply_my_settings(callback_data=callback_data)

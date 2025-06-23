@@ -1,4 +1,4 @@
-from typing import Literal, TypeAlias, TypedDict
+from typing import Literal, TypeAlias, TypedDict, Required
 
 PlayersIds: TypeAlias = list[int | str]
 UserIdStr: TypeAlias = str
@@ -88,6 +88,7 @@ class DifferentSettingsCache(TypedDict):
 
 
 class AllSettingsCache(TypedDict, total=False):
+    group_id: Required[int]
     poll_banned_roles: PollBannedRolesCache
     order_of_roles: OrderOfRolesCache
     different_settings: DifferentSettingsCache

@@ -42,23 +42,24 @@ class RoleAttendant(RouterHelper):
     async def _save_new_prohibited_roles(
         self, roles_ids: list[RolesLiteral]
     ):
-        user_id = self.callback.from_user.id
-        user_filter = UserTgIdSchema(user_tg_id=user_id)
+        group_schema = await self.get_group_id_schema()
         prohibited_dao = ProhibitedRolesDAO(session=self.session)
-        await prohibited_dao.delete(user_filter)
+        await prohibited_dao.delete(group_schema)
         prohibited_roles = [
-            ProhibitedRoleSchema(user_tg_id=user_id, role_id=role_id)
+            ProhibitedRoleSchema(
+                group_id=group_schema.group_id, role_id=role_id
+            )
             for role_id in roles_ids
         ]
         await prohibited_dao.add_many(prohibited_roles)
         order_of_roles_dao = OrderOfRolesDAO(session=self.session)
         used_roles = set(
             await order_of_roles_dao.get_roles_ids_of_order_of_roles(
-                user_filter
+                group_schema
             )
         )
         if used_roles - set(roles_ids) != used_roles:
-            await order_of_roles_dao.delete(user_filter)
+            await order_of_roles_dao.delete(group_schema)
             await self.callback.message.answer(
                 text=make_build(
                     "❗️❗️❗️ВНИМАНИЕ! ЗАБАНЕННЫЕ РОЛИ ЕСТЬ В СПИСКЕ С ПОРЯДКОМ РОЛЕЙ. "
@@ -75,7 +76,7 @@ class RoleAttendant(RouterHelper):
             roles_ids=roles_ids
         )
         await self.callback.answer(
-            "✅Вы успешно забанили все опциональные роли!",
+            "✅Ты успешно забанил все опциональные роли!",
             show_alert=True,
         )
         await self.view_banned_roles(
@@ -85,18 +86,16 @@ class RoleAttendant(RouterHelper):
     async def view_banned_roles(
         self, has_order_been_reset: bool = False
     ):
+        group_schema = await self.get_group_id_schema()
         await self.clear_settings_data()
         dao = ProhibitedRolesDAO(session=self.session)
-        user_filter = UserTgIdSchema(
-            user_tg_id=self.callback.from_user.id
-        )
         banned_roles_ids = await dao.get_roles_ids_of_banned_roles(
-            user_filter
+            group_schema
         )
         message = self.get_banned_roles_text(banned_roles_ids)
-        poll_data: PollBannedRolesCache = {
-            "banned_roles_ids": banned_roles_ids
-        }
+        poll_data = PollBannedRolesCache(
+            banned_roles_ids=banned_roles_ids
+        )
         await self.set_settings_data(poll_data)
         markup = edit_banned_roles_kb(
             banned_roles_ids=banned_roles_ids
@@ -116,9 +115,8 @@ class RoleAttendant(RouterHelper):
 
     async def clear_banned_roles(self):
         dao = ProhibitedRolesDAO(session=self.session)
-        await dao.delete(
-            UserTgIdSchema(user_tg_id=self.callback.from_user.id)
-        )
+        group_schema = await self.get_group_id_schema()
+        await dao.delete(group_schema)
         await self.callback.answer(
             "✅Теперь для игры доступны все роли!", show_alert=True
         )
@@ -170,7 +168,7 @@ class RoleAttendant(RouterHelper):
             roles_ids=banned_roles
         )
         await self.callback.answer(
-            "✅Вы успешно забанили роли!", show_alert=True
+            "✅Ты успешно забанил роли!", show_alert=True
         )
         await self.view_banned_roles(
             has_order_been_reset=has_order_been_reset

@@ -1,6 +1,7 @@
 from collections.abc import Iterable
 
 from cache.cache_types import OrderOfRolesCache, RolesLiteral
+from database.dao.groups import GroupsDao
 from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.dao.settings import SettingsDao
@@ -31,14 +32,13 @@ class RoleManager(RouterHelper):
     async def _delete_old_order_of_roles_and_add_new(
         self, roles: list[RolesLiteral]
     ):
+        group_schema = await self.get_group_id_schema()
         await self.clear_settings_data()
         dao = OrderOfRolesDAO(session=self.session)
-        await dao.delete(
-            UserTgIdSchema(user_tg_id=self.callback.from_user.id)
-        )
+        await dao.delete(group_schema)
         order_of_roles = [
             OrderOfRolesSchema(
-                user_tg_id=self.callback.from_user.id,
+                group_id=group_schema.group_id,
                 role_id=role_id,
                 number=number,
             )
@@ -70,8 +70,9 @@ class RoleManager(RouterHelper):
 
     async def view_order_of_roles(self):
         dao = OrderOfRolesDAO(session=self.session)
+        group_schema = await self.get_group_id_schema()
         order_of_roles = await dao.get_roles_ids_of_order_of_roles(
-            UserTgIdSchema(user_tg_id=self.callback.from_user.id),
+            group_schema,
         )
         text = self.get_current_order_text(
             order_of_roles, to_save=False
@@ -87,15 +88,13 @@ class RoleManager(RouterHelper):
     async def start_editing_order(self):
         attacking = []
         other = []
-        user_schema = UserTgIdSchema(
-            user_tg_id=self.callback.from_user.id
-        )
+        group_schema = await self.get_group_id_schema()
         banned_roles_ids = await ProhibitedRolesDAO(
             session=self.session
-        ).get_roles_ids_of_banned_roles(user_schema)
-        criminal_every_3 = await SettingsDao(
+        ).get_roles_ids_of_banned_roles(group_schema)
+        criminal_every_3 = await GroupsDao(
             session=self.session
-        ).get_every_3_attr(user_schema)
+        ).get_every_3_attr(group_schema)
         all_roles = get_data_with_roles()
         for role_id, role in all_roles.items():
             if role_id not in banned_roles_ids and role_id not in {
@@ -108,12 +107,12 @@ class RoleManager(RouterHelper):
                 else:
                     attacking.append(role_id)
         selected = list(BASES_ROLES)
-        order_data: OrderOfRolesCache = {
-            "attacking": attacking,
-            "other": other,
-            "selected": selected,
-            "criminal_every_3": criminal_every_3,
-        }
+        order_data = OrderOfRolesCache(
+            attacking=attacking,
+            other=other,
+            selected=selected,
+            criminal_every_3=criminal_every_3,
+        )
         await self.set_settings_data(order_data)
         markup = get_next_role_kb(order_data=order_data)
         await self.callback.message.edit_text(
@@ -133,7 +132,7 @@ class RoleManager(RouterHelper):
             if role.grouping == Groupings.criminals
             else "other"
         )
-        if role.there_may_be_several is False:
+        if not role.there_may_be_several:
             order_data[key].remove(callback_data.role_id)
         order_data["selected"].append(callback_data.role_id)
         if (
@@ -194,10 +193,9 @@ class RoleManager(RouterHelper):
         await self.view_order_of_roles()
 
     async def clear_order_of_roles(self):
+        group_schema = await self.get_group_id_schema()
         dao = OrderOfRolesDAO(session=self.session)
-        await dao.delete(
-            UserTgIdSchema(user_tg_id=self.callback.from_user.id)
-        )
+        await dao.delete(group_schema)
         await self.callback.answer(
             "✅Порядок ролей сброшен!", show_alert=True
         )

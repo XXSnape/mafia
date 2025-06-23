@@ -128,8 +128,7 @@ class SettingsRouter(RouterHelper):
         await delete_message(self.message)
         groups_dao = GroupsDao(session=self.session)
         group_tg_id = self.message.chat.id
-        group_schema = TgIdSchema(tg_id=group_tg_id)
-        await groups_dao.add(group_schema)
+        await self.get_group_or_create()
         group_settings = await groups_dao.get_group_settings(
             group_tg_id=TgIdSchema(tg_id=group_tg_id)
         )
@@ -141,67 +140,41 @@ class SettingsRouter(RouterHelper):
         group_name = make_build(
             f"🔧Настройки группы «{self.message.chat.title}»\n\n"
         )
-        if group_settings.is_there_settings is False:
-            await self.message.bot.send_message(
-                chat_id=self.message.from_user.id,
-                text=make_build(
-                    group_name
-                    + "👥В данной группе применяются настройки любого желающего,"
-                    " если он начнёт регистрацию!"
-                ),
-            )
-        else:
-            banned_roles_text = RoleAttendant.get_banned_roles_text(
-                roles_ids=group_settings.banned_roles
-            )
-            order_of_roles_text = RoleManager.get_current_order_text(
-                selected_roles=group_settings.order_of_roles,
-                to_save=False,
-            )
-            other_settings_text = self.get_other_settings_text(
-                settings=group_settings.model_dump()
-            )
-            await self.message.bot.send_message(
-                chat_id=self.message.from_user.id,
-                text=group_name + banned_roles_text,
-            )
-            await self.message.bot.send_message(
-                chat_id=self.message.from_user.id,
-                text=group_name + order_of_roles_text,
-            )
-            await self.message.bot.send_message(
-                chat_id=self.message.from_user.id,
-                text=group_name + other_settings_text,
-            )
+
+        banned_roles_text = RoleAttendant.get_banned_roles_text(
+            roles_ids=group_settings.banned_roles
+        )
+        order_of_roles_text = RoleManager.get_current_order_text(
+            selected_roles=group_settings.order_of_roles,
+            to_save=False,
+        )
+        other_settings_text = self.get_other_settings_text(
+            settings=group_settings.model_dump()
+        )
+        await self.message.bot.send_message(
+            chat_id=self.message.from_user.id,
+            text=group_name + other_settings_text,
+        )
+        await self.message.bot.send_message(
+            chat_id=self.message.from_user.id,
+            text=group_name + order_of_roles_text,
+        )
+        await self.message.bot.send_message(
+            chat_id=self.message.from_user.id,
+            text=group_name + banned_roles_text,
+        )
+
         if is_user_admin:
             await self.message.bot.send_message(
                 chat_id=self.message.from_user.id,
                 text=make_build(
-                    f"❗️Ты можешь поменять настройки группы «{self.message.chat.title}» с помощью кнопок ниже:"
+                    f"❗️Ты можешь поменять настройки группы «{self.message.chat.title}»"
+                    f" с помощью кнопки ниже:"
                 ),
                 reply_markup=set_up_group_kb(
                     group_id=group_settings.id,
-                    is_there_settings=group_settings.is_there_settings,
                 ),
             )
-
-    @checking_for_ability_to_change_settings
-    async def apply_any_settings(
-        self,
-        callback_data: GroupSettingsCbData,
-        groups_dao: GroupsDao,
-        title: str,
-    ):
-        await groups_dao.update(
-            filters=IdSchema(id=callback_data.group_id),
-            values=GroupSettingIdSchema(setting_id=None),
-        )
-        await self.callback.answer(
-            f"✅Теперь в группе {title} "
-            f"разрешены настройки всех желающих, если они начнут регистрацию!",
-            show_alert=True,
-        )
-        await delete_message(self.callback.message)
 
     @checking_for_ability_to_change_settings
     async def apply_my_settings(

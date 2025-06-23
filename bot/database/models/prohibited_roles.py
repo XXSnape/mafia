@@ -6,8 +6,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 class ProhibitedRoleModel(IdMixin, BaseModel):
     __tablename__ = "prohibited_roles"
-    user_tg_id: Mapped[int] = mapped_column(
-        BigInteger, ForeignKey("users.tg_id", ondelete="CASCADE")
+    group_id: Mapped[int] = mapped_column(
+        ForeignKey("groups.id", ondelete="CASCADE")
     )
     role_id: Mapped[RolesLiteral] = mapped_column(
         ForeignKey("roles.key", ondelete="CASCADE")

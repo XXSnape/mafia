@@ -15,26 +15,17 @@ from keyboards.inline.cb.cb_text import (
 )
 
 
-def set_up_group_kb(group_id: int, is_there_settings: bool):
-    buttons = [
-        InlineKeyboardButton(
-            text="Применить мои настройки",
-            callback_data=GroupSettingsCbData(
-                group_id=group_id, apply_own=True
-            ).pack(),
-        )
-    ]
-    if is_there_settings:
-        buttons.append(
+def set_up_group_kb(group_id: int):
+    return generate_inline_kb(
+        data_with_buttons=[
             InlineKeyboardButton(
-                text="Разрешить настройки создателя",
+                text="Редактировать",
                 callback_data=GroupSettingsCbData(
-                    group_id=group_id, apply_own=False
+                    group_id=group_id
                 ).pack(),
             )
-        ),
-
-    return generate_inline_kb(data_with_buttons=buttons)
+        ]
+    )
 
 
 def select_setting_kb():

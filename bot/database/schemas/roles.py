@@ -1,11 +1,12 @@
 from cache.cache_types import RolesLiteral
 from database.schemas.common import UserTgIdSchema
+from database.schemas.groups import GroupIdSchema
 
 
-class ProhibitedRoleSchema(UserTgIdSchema):
+class ProhibitedRoleSchema(GroupIdSchema):
     role_id: RolesLiteral
 
 
-class OrderOfRolesSchema(UserTgIdSchema):
+class OrderOfRolesSchema(GroupIdSchema):
     role_id: RolesLiteral
     number: int

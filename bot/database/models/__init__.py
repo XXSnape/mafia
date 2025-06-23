@@ -7,6 +7,5 @@ from .prohibited_roles import ProhibitedRoleModel
 from .rates import RateModel
 from .results import ResultModel
 from .roles import RoleModel
-from .settings import SettingModel
 from .subscriptions import SubscriptionModel
 from .users import UserModel

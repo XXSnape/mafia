@@ -4,7 +4,6 @@ from cache.cache_types import StagesOfGameLiteral
 
 class GroupSettingsCbData(CallbackData, prefix="set"):
     group_id: int
-    apply_own: bool
 
 
 class TimeOfDayCbData(CallbackData, prefix="time"):
