@@ -3,7 +3,7 @@ from enum import StrEnum
 
 class GroupCommands(StrEnum):
     registration = "Начать регистрацию"
-    game = "Запустить игру"
+    go = "Запустить игру"
     extend = "Продлить регистрацию на 30 секунд"
     revoke = "Отменить регистрацию"
     leave = "Удалиться из списка зарегистрировавшихся"

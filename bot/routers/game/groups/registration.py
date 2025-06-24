@@ -69,7 +69,7 @@ async def cancel_game(
 
 
 @router.message(
-    GameFsm.REGISTRATION, Command(GroupCommands.game.name)
+    GameFsm.REGISTRATION, Command(GroupCommands.go.name)
 )
 async def finish_registration_and_start_game(
     message: Message,
