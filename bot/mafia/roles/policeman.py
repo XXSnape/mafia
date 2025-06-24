@@ -17,7 +17,11 @@ from mafia.roles.base import (
     ActiveRoleAtNightABC,
     AliasRoleABC,
 )
-from mafia.roles.base.mixins import KillersOf, ProcedureAfterNightABC
+from mafia.roles.base.mixins import (
+    KillersOf,
+    ProcedureAfterNightABC,
+    DeceivedRoleMixin,
+)
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CHECKING_PLAYER,
@@ -33,7 +37,11 @@ from utils.roles import (
 )
 
 
-class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
+class Policeman(
+    DeceivedRoleMixin,
+    ProcedureAfterNightABC,
+    ActiveRoleAtNightABC,
+):
     role = "Маршал"
     role_id: RolesLiteral = "policeman"
     photo = "https://avatars.mds.yandex.net/get-kinopoisk-image/1777765/59ba5e74-7a28-47b2-944a-2788dcd7ebaa/1920x"
@@ -71,7 +79,6 @@ class Policeman(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     def __init__(self):
         super().__init__()
         self.state_for_waiting_for_action = UserFsm.POLICEMAN
-        self.temporary_roles = {}
 
     async def accrual_of_overnight_rewards(
         self,

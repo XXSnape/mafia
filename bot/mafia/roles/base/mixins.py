@@ -4,6 +4,7 @@ from typing import (
     TypeAlias,
     TypedDict,
     Unpack,
+    Optional,
 )
 
 from cache.cache_types import (
@@ -11,11 +12,13 @@ from cache.cache_types import (
     PlayersIds,
     UserIdInt,
     UserIdStr,
+    RolesLiteral,
 )
 from general import settings
 from general.groupings import Groupings
 from general.text import ATTEMPT_TO_KILL
 from mafia.roles.base import ActiveRoleAtNightABC
+from mafia.roles.descriptions.description import RoleDescription
 from utils.informing import notify_aliases_about_transformation
 
 if TYPE_CHECKING:
@@ -259,3 +262,57 @@ class SpecialMoneyManagerMixin:
             )
             return payment, 0
         return 0, self.payment_for_night_spent * nights_lived
+
+
+class DeceivedRoleMixin:
+    temporary_roles: dict[UserIdInt, RolesLiteral]
+
+    def __call__(self, *args, **kwargs):
+        super().__call__(*args, **kwargs)
+        self.temporary_roles = dict[UserIdInt, RolesLiteral]()
+
+    def set_temporary_role(
+        self,
+        user_id: UserIdInt,
+        new_role: RolesLiteral,
+    ):
+        self.temporary_roles[user_id] = new_role
+
+    def add_money_to_all_allies(
+        self,
+        game_data: GameCache,
+        money: int,
+        custom_message: str | None = None,
+        beginning_message: str | None = None,
+        user_url: str | None = None,
+        processed_role: Optional["RoleABC"] = None,
+        at_night: bool | None = True,
+        additional_players: PlayersIds | None = None,
+    ):
+        if self.temporary_roles:
+            if custom_message:
+                msg = custom_message
+            else:
+                msg = f"{beginning_message} {user_url} ({processed_role.pretty_role})"
+            msg += " (🚫ОБМАНУТ ВО ВРЕМЯ ИГРЫ)"
+            self.temporary_roles.clear()
+            return super().add_money_to_all_allies(
+                game_data=game_data,
+                money=0,
+                custom_message=msg,
+                beginning_message=beginning_message,
+                user_url=user_url,
+                processed_role=processed_role,
+                at_night=at_night,
+                additional_players=additional_players,
+            )
+        return super().add_money_to_all_allies(
+            game_data=game_data,
+            money=money,
+            custom_message=custom_message,
+            beginning_message=beginning_message,
+            user_url=user_url,
+            processed_role=processed_role,
+            at_night=at_night,
+            additional_players=additional_players,
+        )

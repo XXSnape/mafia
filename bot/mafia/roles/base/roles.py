@@ -83,7 +83,6 @@ class RoleABC(ABC):
         self.dispatcher = dispatcher
         self.bot = bot
         self.state = state
-        self.temporary_roles = dict[RolesLiteral, RolesLiteral]()
         self.dropped_out = set[UserIdInt]()
         self.killed_in_afternoon = set[UserIdInt]()
 
@@ -383,8 +382,6 @@ class RoleABC(ABC):
         at_night: bool | None = True,
         additional_players: PlayersIds | None = None,
     ):
-        if self.temporary_roles:
-            money = 0
         players = game_data[self.roles_key][:]
         if not at_night:
             dead_players = set(
@@ -420,8 +417,6 @@ class RoleABC(ABC):
             else:
                 message = f"{beginning_message} {user_url} ({processed_role.pretty_role})"
             message += " - {money}" + MONEY_SYM
-            if self.temporary_roles:
-                message += " (🚫ОБМАНУТ ВО ВРЕМЯ ИГРЫ)"
             if at_night:
                 time_of_day = "🌃Ночь"
             elif at_night is None:
@@ -436,7 +431,6 @@ class RoleABC(ABC):
                     money,
                 ]
             )
-        self.temporary_roles.clear()
 
     def earn_money_for_voting(
         self,

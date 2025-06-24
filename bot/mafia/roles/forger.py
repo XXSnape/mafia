@@ -1,3 +1,5 @@
+from typing import cast
+
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from cache.extra import ExtraCache
 from general.groupings import Groupings
@@ -79,7 +81,8 @@ class Forger(
         forged_roles = game_data["forged_roles"]
         if len(forged_roles) != 2:
             return
-        forged_user_id, forged_role_id = forged_roles
+        forged_user_id = cast(UserIdInt, forged_roles[0])
+        forged_role_id = cast(RolesLiteral, forged_roles[1])
         disclosed_roles = game_data.get("disclosed_roles")
         user_role_id = game_data["players"][str(forged_user_id)][
             "role_id"
@@ -91,9 +94,13 @@ class Forger(
                 and user_role_id != forged_role_id
             ):
                 self.has_policeman_been_deceived = True
-                self.all_roles[Policeman.role_id].temporary_roles[
-                    forged_user_id
-                ] = forged_role_id
+                policeman: Policeman = self.all_roles[
+                    Policeman.role_id
+                ]
+                policeman.set_temporary_role(
+                    user_id=forged_user_id,
+                    new_role=forged_role_id,
+                )
 
         checked = game_data.get("checked_for_the_same_groups", [])
         if len(checked) != 2:
@@ -104,9 +111,10 @@ class Forger(
             != self.all_roles[forged_role_id].grouping
         ):
             self.has_warden_been_deceived = True
-            self.all_roles[Warden.role_id].temporary_roles[
-                forged_user_id
-            ] = forged_role_id
+            warden: Warden = self.all_roles[Warden.role_id]
+            warden.set_temporary_role(
+                user_id=forged_user_id, new_role=forged_role_id
+            )
 
     async def accrual_of_overnight_rewards(
         self, game_data: GameCache, victims: set[UserIdInt], **kwargs

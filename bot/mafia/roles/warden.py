@@ -8,7 +8,10 @@ from cache.extra import ExtraCache
 from general.text import ROLE_IS_KNOWN
 from keyboards.inline.keypads.mailing import selection_to_warden_kb
 from mafia.roles.base import ActiveRoleAtNightABC
-from mafia.roles.base.mixins import ProcedureAfterNightABC
+from mafia.roles.base.mixins import (
+    ProcedureAfterNightABC,
+    DeceivedRoleMixin,
+)
 from mafia.roles.descriptions.description import RoleDescription
 from states.game import UserFsm
 from utils.informing import (
@@ -17,7 +20,11 @@ from utils.informing import (
 )
 
 
-class Warden(ProcedureAfterNightABC, ActiveRoleAtNightABC):
+class Warden(
+    DeceivedRoleMixin,
+    ProcedureAfterNightABC,
+    ActiveRoleAtNightABC,
+):
     role = "Соглядатай"
     role_id: RolesLiteral = "warden"
     photo = (
@@ -53,7 +60,6 @@ class Warden(ProcedureAfterNightABC, ActiveRoleAtNightABC):
     def __init__(self):
         super().__init__()
         self.state_for_waiting_for_action = UserFsm.WARDEN
-        self.temporary_roles = {}
 
     def _get_user_roles_and_url(
         self,
