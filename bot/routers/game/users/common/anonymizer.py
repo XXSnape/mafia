@@ -2,13 +2,15 @@ from aiogram import Dispatcher, Router
 from aiogram.filters import Command, CommandObject
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
+
+from general.commands import PrivateCommands
 from services.game.processing_user_actions import UserManager
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = Router(name=__name__)
 
 
-@router.message(Command("anon"))
+@router.message(Command(PrivateCommands.anon.name))
 async def send_anonymously_to_group(
     message: Message,
     command: CommandObject,

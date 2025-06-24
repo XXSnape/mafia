@@ -634,6 +634,7 @@ class Game:
             winners_bets=winners_bets,
             losers_bets=losers,
         )
+        del game_data["bids"]
         await self.state.set_data(game_data)
         return game_data
 
