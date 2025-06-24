@@ -5,6 +5,11 @@ services:
       - 6379:6379
     volumes:
       - ./redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 3
 
   postgres:
     image: postgres:14.8-alpine3.18
@@ -14,6 +19,11 @@ services:
       - ./db/:/var/lib/postgresql/data
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
 
   rabbitmq:
     image: rabbitmq:alpine
@@ -23,14 +33,23 @@ services:
       - ./rabbitmq_data:/data
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
 
   bot:
     build: .
     depends_on:
-      - faststream
-      - redis
-      - postgres
-      - rabbitmq
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      faststream:
+        condition: service_started
 
     command: sh -c "
       alembic upgrade head &&
@@ -42,7 +61,8 @@ services:
   faststream:
     build: .
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     command: sh -c "
       cd bot &&
       faststream run tasks.game:app
