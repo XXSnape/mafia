@@ -54,9 +54,9 @@ async def main() -> None:
     dp.message.middleware(HandleMessageErrorMiddleware())
     dp.include_routers(
         always_available_router,
+        groups_router,
         game_router,
         users_router,
-        groups_router,
     )
     private_commands = [
         BotCommand(command=command.name, description=command)
