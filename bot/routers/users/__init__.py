@@ -23,7 +23,12 @@ router.callback_query.filter(F.message.chat.type == ChatType.PRIVATE)
 
 router.message.middleware(DatabaseMiddlewareWithCommit())
 router.message.middleware(DatabaseMiddlewareWithoutCommit())
-router.callback_query.middleware(CallbackTimelimiterMiddleware())
+# Промежуточное ПО ниже должно не давать нажимать на кнопки для настройки игры спустя 15 минут,
+# чтобы снова делать проверку на права администратора и
+# пользователь чаще актуализировал настройки, делая запрос в группу
+router.callback_query.middleware(
+    CallbackTimelimiterMiddleware(minutes=15)
+)
 router.callback_query.middleware(DatabaseMiddlewareWithCommit())
 router.callback_query.middleware(DatabaseMiddlewareWithoutCommit())
 

@@ -13,7 +13,13 @@ router = Router(name=__name__)
 
 router.message.middleware(DatabaseMiddlewareWithCommit())
 router.message.middleware(DatabaseMiddlewareWithoutCommit())
-router.callback_query.middleware(CallbackTimelimiterMiddleware())
+# В норме кнопки во время игры удаляются, но если этого не произошло,
+# должно срабатывать промежуточное ПО ниже и не давать пользователю возможность
+# нажать на устаревшие кнопки.
+router.callback_query.middleware(
+    CallbackTimelimiterMiddleware(minutes=5)
+)
+
 router.callback_query.middleware(DatabaseMiddlewareWithCommit())
 router.callback_query.middleware(DatabaseMiddlewareWithoutCommit())
 
