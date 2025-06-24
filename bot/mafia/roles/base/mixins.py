@@ -1,24 +1,23 @@
 from abc import ABC, abstractmethod
 from typing import (
     TYPE_CHECKING,
+    Optional,
     TypeAlias,
     TypedDict,
     Unpack,
-    Optional,
 )
 
 from cache.cache_types import (
     GameCache,
     PlayersIds,
+    RolesLiteral,
     UserIdInt,
     UserIdStr,
-    RolesLiteral,
 )
 from general import settings
 from general.groupings import Groupings
 from general.text import ATTEMPT_TO_KILL
 from mafia.roles.base import ActiveRoleAtNightABC
-from mafia.roles.descriptions.description import RoleDescription
 from utils.informing import notify_aliases_about_transformation
 
 if TYPE_CHECKING:

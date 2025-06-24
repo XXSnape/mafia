@@ -1,6 +1,6 @@
 from cache.cache_types import RolesLiteral
 from database.common.base import BaseModel, IdMixin
-from sqlalchemy import BigInteger, CheckConstraint, ForeignKey
+from sqlalchemy import CheckConstraint, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
 

@@ -1,4 +1,3 @@
-import asyncio
 from html import escape
 
 import sqlalchemy
@@ -179,7 +178,7 @@ class UserManager(RouterHelper):
             )
         except sqlalchemy.exc.DBAPIError:
             await self.message.reply(
-                make_build(f"Попробуй еще раз😉")
+                make_build("Попробуй еще раз😉")
             )
             return
         except TelegramAPIError:
@@ -191,7 +190,7 @@ class UserManager(RouterHelper):
             )
             await self.message.reply(
                 make_build(
-                    f"Не можем связаться с группой, попробуй еще раз..."
+                    "Не можем связаться с группой, попробуй еще раз..."
                 )
             )
             return

@@ -7,6 +7,7 @@ from typing import assert_never
 class Asset:
     name: str
     description: str
+    cost: int
 
 
 class Resources(StrEnum):
@@ -23,6 +24,7 @@ def get_data_about_resource(resource: Resources) -> Asset:
                     "где проходит игра, от лица бота.\n"
                     "Сообщения будут доставлены, если игрок еще жив.\n\n"
                 ),
+                cost=750,
             )
 
         case _:

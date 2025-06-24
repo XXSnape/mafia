@@ -9,8 +9,8 @@ from general.text import ROLE_IS_KNOWN
 from keyboards.inline.keypads.mailing import selection_to_warden_kb
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
-    ProcedureAfterNightABC,
     DeceivedRoleMixin,
+    ProcedureAfterNightABC,
 )
 from mafia.roles.descriptions.description import RoleDescription
 from states.game import UserFsm

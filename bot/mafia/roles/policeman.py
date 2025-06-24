@@ -18,9 +18,9 @@ from mafia.roles.base import (
     AliasRoleABC,
 )
 from mafia.roles.base.mixins import (
+    DeceivedRoleMixin,
     KillersOf,
     ProcedureAfterNightABC,
-    DeceivedRoleMixin,
 )
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
