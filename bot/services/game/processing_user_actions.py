@@ -1,5 +1,8 @@
+import asyncio
 from html import escape
 
+import sqlalchemy
+from aiogram.exceptions import TelegramAPIError
 from aiogram.filters import CommandObject
 from aiogram.fsm.context import FSMContext
 from cache.cache_types import (
@@ -149,6 +152,9 @@ class UserManager(RouterHelper):
         _, game_data = result
         user_id = self.message.from_user.id
         user_tg_id = TgIdSchema(tg_id=user_id)
+        await self.session.connection(
+            execution_options={"isolation_level": "SERIALIZABLE"}
+        )
         users_dao = UsersDao(session=self.session)
         user = await users_dao.get_user_or_create(user_tg_id)
         if user.anonymous_letters < 1:
@@ -157,19 +163,39 @@ class UserManager(RouterHelper):
                 reply_markup=to_shop_kb(),
             )
             return
-        await resending_message(
-            bot=self.message.bot,
-            chat_id=game_data["game_chat"],
-            text=f"😱😱😱НЕИЗВЕСТНЫЙ ОТПРАВИТЕЛЬ\n\n{escape(anonym_message)}"[
-                : settings.mafia.number_of_characters_in_message
-            ],
-        )
-        await users_dao.update(
-            filters=user_tg_id,
-            values=NumberOfAssetsSchema(
-                anonymous_letters=user.anonymous_letters - 1
-            ),
-        )
+        try:
+            await users_dao.update(
+                filters=user_tg_id,
+                values=NumberOfAssetsSchema(
+                    anonymous_letters=user.anonymous_letters - 1
+                ),
+            )
+            await resending_message(
+                bot=self.message.bot,
+                chat_id=game_data["game_chat"],
+                text=f"😱😱😱НЕИЗВЕСТНЫЙ ОТПРАВИТЕЛЬ\n\n{escape(anonym_message)}"[
+                    : settings.mafia.number_of_characters_in_message
+                ],
+            )
+        except sqlalchemy.exc.DBAPIError:
+            await self.message.reply(
+                make_build(f"Попробуй еще раз😉")
+            )
+            return
+        except TelegramAPIError:
+            await users_dao.update(
+                filters=user_tg_id,
+                values=NumberOfAssetsSchema(
+                    anonymous_letters=user.anonymous_letters + 1
+                ),
+            )
+            await self.message.reply(
+                make_build(
+                    f"Не можем связаться с группой, попробуй еще раз..."
+                )
+            )
+            return
+
         await self.message.reply(
             make_build(
                 f"✅Анонимное сообщение успешно доставлено, "
