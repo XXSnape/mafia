@@ -1,8 +1,9 @@
 from database.common.sessions import async_session_maker
-from database.models import GroupingModel, RoleModel
+from database.models import AssetModel, GroupingModel, RoleModel
 from general import settings
 from general.collection_of_roles import get_data_with_roles
 from general.groupings import Groupings
+from general.resources import Resources, get_data_about_resource
 from loguru import logger
 from sqlalchemy.exc import DatabaseError
 
@@ -26,6 +27,14 @@ async def fill_database_with_roles():
                 for key, role in all_roles.items()
             ]
             session.add_all(roles)
+            assets = [
+                AssetModel(
+                    name=resource,
+                    cost=get_data_about_resource(resource).cost,
+                )
+                for resource in Resources
+            ]
+            session.add_all(assets)
             await session.commit()
     except DatabaseError:
         await session.rollback()
