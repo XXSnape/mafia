@@ -1,4 +1,4 @@
-from aiogram import F, Router
+from aiogram import Dispatcher, F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
@@ -76,8 +76,12 @@ async def buy_resources(
     callback_data: BuyResourcesCbData,
     state: FSMContext,
     session_with_commit: AsyncSession,
+    dispatcher: Dispatcher,
 ):
     shop_manager = ShopManager(
-        callback=callback, session=session_with_commit, state=state
+        callback=callback,
+        session=session_with_commit,
+        state=state,
+        dispatcher=dispatcher,
     )
     await shop_manager.buy_resources(callback_data=callback_data)

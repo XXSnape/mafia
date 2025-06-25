@@ -21,6 +21,9 @@ from keyboards.inline.cb.cb_text import (
 )
 from keyboards.inline.keypads.shop import available_resources_kb
 from services.base import RouterHelper
+from services.game.game_assistants import (
+    get_game_state_by_user_state,
+)
 from states.game import GameFsm
 from utils.pretty_text import make_build
 
@@ -135,11 +138,18 @@ class ShopManager(RouterHelper):
     ):
         current_state = await self.state.get_state()
         if current_state == GameFsm.WAIT_FOR_STARTING_GAME.state:
-            await self.callback.answer(
-                "❌Во время регистрацию в игру нельзя покупать ресурсы",
-                show_alert=True,
+            game_state = await get_game_state_by_user_state(
+                tg_obj=self.callback,
+                user_state=self.state,
+                dispatcher=self.dispatcher,
             )
-            return
+            current_game_state = await game_state.get_state()
+            if current_game_state == GameFsm.REGISTRATION.state:
+                await self.callback.answer(
+                    "❌Во время регистрацию в игру нельзя покупать ресурсы",
+                    show_alert=True,
+                )
+                return
         asset = await AssetsDao(
             session=self.session
         ).find_one_or_none(AssetsSchema(name=callback_data.resource))
