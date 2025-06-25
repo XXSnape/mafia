@@ -3,7 +3,6 @@ from collections.abc import Iterable
 from cache.cache_types import OrderOfRolesCache, RolesLiteral
 from database.dao.groups import GroupsDao
 from database.dao.order import OrderOfRolesDAO
-from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.schemas.roles import OrderOfRolesSchema
 from general import settings
 from general.collection_of_roles import (
@@ -58,11 +57,7 @@ class RoleManager(RouterHelper):
                 f"{index}) {all_roles[role].role}"
                 f"{all_roles[role].grouping.value.name[-1]}\n"
             )
-        if (
-            to_save
-            and len(selected_roles)
-            > settings.mafia.minimum_number_of_players
-        ):
+        if to_save:
             result += f"\n\n{REQUIRE_TO_SAVE}"
         return make_build(result)
 
@@ -86,35 +81,39 @@ class RoleManager(RouterHelper):
     async def start_editing_order(self):
         attacking = []
         other = []
-        group_schema = await self.get_group_id_schema()
-        banned_roles_ids = await ProhibitedRolesDAO(
+        group_schema = await self.get_group_id_schema(id_schema=True)
+        group_settings = await GroupsDao(
             session=self.session
-        ).get_roles_ids_of_banned_roles(group_schema)
-        criminal_every_3 = await GroupsDao(
-            session=self.session
-        ).get_every_3_attr(group_schema)
+        ).get_group_settings(
+            group_tg_id=None, id_schema=group_schema
+        )
         all_roles = get_data_with_roles()
         for role_id, role in all_roles.items():
-            if role_id not in banned_roles_ids and role_id not in {
-                Mafia.role_id,
-                Doctor.role_id,
-                Policeman.role_id,
-            }:
+            if (
+                role_id not in group_settings.banned_roles
+                and role_id
+                not in {
+                    Mafia.role_id,
+                    Doctor.role_id,
+                    Policeman.role_id,
+                }
+            ):
                 if role.grouping != Groupings.criminals:
                     other.append(role_id)
                 else:
                     attacking.append(role_id)
-        selected = list(BASES_ROLES)
         order_data = OrderOfRolesCache(
             attacking=attacking,
             other=other,
-            selected=selected,
-            criminal_every_3=criminal_every_3,
+            selected=group_settings.order_of_roles,
+            criminal_every_3=group_settings.mafia_every_3,
         )
         await self.set_settings_data(order_data)
         markup = get_next_role_kb(order_data=order_data)
         await self.callback.message.edit_text(
-            text=self.get_current_order_text(selected),
+            text=self.get_current_order_text(
+                group_settings.order_of_roles
+            ),
             reply_markup=markup,
         )
 

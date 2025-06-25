@@ -44,7 +44,6 @@ def get_next_role_kb(
 ):
     all_roles = get_data_with_roles()
     buttons = []
-    leave_1_each = 1
     divider = 3 if order_data["criminal_every_3"] else 4
     if (len(order_data["selected"]) + 1) % divider == 0:
         if automatic_attacking and len(order_data["attacking"]) == 1:
@@ -69,20 +68,21 @@ def get_next_role_kb(
         len(order_data["selected"])
         > settings.mafia.minimum_number_of_players
     ):
-        buttons.extend(
-            [
-                InlineKeyboardButton(
-                    text="🗑️Убрать последний",
-                    callback_data=DELETE_LATEST_ROLE_IN_ORDER_CB,
-                ),
-                InlineKeyboardButton(
-                    text=TO_SAVE,
-                    callback_data=SAVE_ORDER_OF_ROLES_CB,
-                ),
-            ]
+        buttons.append(
+            InlineKeyboardButton(
+                text="🗑️Убрать последний",
+                callback_data=DELETE_LATEST_ROLE_IN_ORDER_CB,
+            )
         )
-        leave_1_each = 3
-    buttons.append(CANCEL_BTN)
+    buttons.extend(
+        [
+            InlineKeyboardButton(
+                text=TO_SAVE,
+                callback_data=SAVE_ORDER_OF_ROLES_CB,
+            ),
+            CANCEL_BTN,
+        ]
+    )
     return generate_inline_kb(
-        data_with_buttons=buttons, leave_1_each=leave_1_each
+        data_with_buttons=buttons, leave_1_each=3
     )

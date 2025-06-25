@@ -3,6 +3,7 @@ from database.dao.order import OrderOfRolesDAO
 from database.dao.prohibited_roles import ProhibitedRolesDAO
 from database.models import GroupModel
 from database.schemas.common import (
+    IdSchema,
     TgIdSchema,
 )
 from database.schemas.groups import (
@@ -18,10 +19,10 @@ class GroupsDao(BaseDAO[GroupModel]):
 
     async def get_group_settings(
         self,
-        group_tg_id: TgIdSchema,
+        group_tg_id: TgIdSchema | None,
+        id_schema: IdSchema | None = None,
     ) -> GroupSettingsSchema:
-
-        group = await self.find_one_or_none(group_tg_id)
+        group = await self.find_one_or_none(group_tg_id or id_schema)
         group_id_schema = GroupIdSchema(group_id=group.id)
         banned_roles = await ProhibitedRolesDAO(
             session=self._session
