@@ -1,9 +1,12 @@
 from aiogram import F, Router
 from aiogram.enums import ChatType
+
+from general.commands import PrivateCommands
 from middlewares.db import (
     DatabaseMiddlewareWithCommit,
     DatabaseMiddlewareWithoutCommit,
 )
+from middlewares.errors import HandleDeletionOrEditionErrorMiddleware
 from middlewares.time_limits import CallbackTimelimiterMiddleware
 
 from .ban_roles import router as ban_roles_router
@@ -32,6 +35,11 @@ router.callback_query.middleware(
 router.callback_query.middleware(DatabaseMiddlewareWithCommit())
 router.callback_query.middleware(DatabaseMiddlewareWithoutCommit())
 
+help_router.callback_query.middleware(
+    HandleDeletionOrEditionErrorMiddleware(
+        f"Пожалуйста, введи /{PrivateCommands.help.name} снова"
+    )
+)
 
 always_available_router = Router(name=__name__)
 always_available_router.include_routers(

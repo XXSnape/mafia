@@ -66,3 +66,27 @@ class HandleMessageErrorMiddleware(BaseMiddleware):
                     make_build("Попробуй еще раз...")
                 )
             logger.exception("Произошла ошибка в message")
+
+
+class HandleDeletionOrEditionErrorMiddleware(BaseMiddleware):
+    """Если происходит ошибка от телеграма,
+    пользователю показывается окно с сообщением error_message"""
+
+    def __init__(self, error_message: str):
+        self.error_message = error_message
+
+    async def __call__(
+        self,
+        handler: Callable[
+            [TelegramObject, Dict[str, Any]], Awaitable[Any]
+        ],
+        callback: CallbackQuery,
+        data: Dict[str, Any],
+    ) -> Any:
+        try:
+            return await handler(callback, data)
+        except TelegramAPIError:
+            await callback.answer(
+                text=f"🙂{self.error_message}", show_alert=True
+            )
+            return None
