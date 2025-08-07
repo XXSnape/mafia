@@ -174,3 +174,5 @@ cython_debug/
 .pypirc
 
 /redis_data
+/db/
+/faiss_db/
