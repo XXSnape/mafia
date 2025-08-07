@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from dotenv import load_dotenv
@@ -5,6 +7,27 @@ from faststream.rabbit import RabbitBroker
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
+
+
+class AISettings(BaseSettings):
+    deepseek_api_key: str
+    base_dir: Path = Path(__file__).resolve().parent.parent.parent
+    md_path: Path = base_dir / "docs" / "detailed-readme.md"
+    faiss_path: Path = base_dir / "faiss_db"
+    max_chunk_size: int = 512
+    chunk_overlap: int = 50
+    lm_model_name: str = (
+        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    )
+    base_url: str = "https://openrouter.ai/api/v1"
+    deepseek_model_name: str = "deepseek/deepseek-r1-0528:free"
+    unavailable_message: str = (
+        "😢Извините, Mafia AI временно не работает"
+    )
+    use: bool
+    model_config = SettingsConfigDict(
+        case_sensitive=False, env_prefix="ai_"
+    )
 
 
 class RabbitSettings(BaseSettings):
@@ -90,6 +113,7 @@ class Settings(BaseSettings):
     Настройки приложения
     """
 
+    ai: AISettings = AISettings()
     rabbit: RabbitSettings = RabbitSettings()
     db: DBSettings = DBSettings()
     bot: BotSettings = BotSettings()
