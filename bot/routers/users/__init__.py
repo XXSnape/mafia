@@ -8,7 +8,7 @@ from middlewares.db import (
 )
 from middlewares.errors import HandleDeletionOrEditionErrorMiddleware
 from middlewares.time_limits import CallbackTimelimiterMiddleware
-
+from .ai import router as ai_router
 from .ban_roles import router as ban_roles_router
 from .different_settings import router as fog_of_war_router
 from .help import router as help_router
@@ -43,6 +43,7 @@ help_router.callback_query.middleware(
 
 always_available_router = Router(name=__name__)
 always_available_router.include_routers(
+    ai_router,
     profile_router,
     help_router,
     shop_router,
