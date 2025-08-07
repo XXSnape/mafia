@@ -43,5 +43,5 @@ class AIManager(RouterHelper):
                 text = (
                     f"{response[:3950]}\n\n⚠️Ответ сгенерирован Mafia AI. "
                     f"Только для ознакомления."
-                )
+                ).replace("*", "")
             await self.message.answer(escape(text))

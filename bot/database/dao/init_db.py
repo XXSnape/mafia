@@ -38,4 +38,4 @@ async def fill_database_with_roles():
             await session.commit()
     except DatabaseError:
         await session.rollback()
-        logger.error("Ошибка при инициализации ролей")
+        logger.warning("Ошибка при инициализации ролей")
