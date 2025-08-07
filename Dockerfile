@@ -13,6 +13,7 @@ COPY poetry.lock pyproject.toml alembic.ini ./
 
 RUN poetry install --without lint
 
-COPY .env ./
+COPY ./docs ./docs
+COPY .env  ./
 
 COPY bot ./bot

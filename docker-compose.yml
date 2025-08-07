@@ -57,6 +57,8 @@ services:
       python main.py
       "
     restart: on-failure
+    volumes:
+      - ./faiss_db:/mafia/faiss_db
 
   faststream:
     build: .
