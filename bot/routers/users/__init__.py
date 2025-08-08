@@ -1,6 +1,5 @@
 from aiogram import F, Router
 from aiogram.enums import ChatType
-
 from general.commands import PrivateCommands
 from middlewares.db import (
     DatabaseMiddlewareWithCommit,
@@ -8,6 +7,7 @@ from middlewares.db import (
 )
 from middlewares.errors import HandleDeletionOrEditionErrorMiddleware
 from middlewares.time_limits import CallbackTimelimiterMiddleware
+
 from .ai import router as ai_router
 from .ban_roles import router as ban_roles_router
 from .different_settings import router as fog_of_war_router
@@ -19,6 +19,15 @@ from .shop import router as shop_router
 from .start import router as start_router
 from .subscriptions import router as subscriptions_router
 from .time import router as time_router
+
+handle_message_management_middleware = HandleDeletionOrEditionErrorMiddleware(
+    (
+        f"Кажется, информация устарела.\n\n"
+        f"Пожалуйста, введи команду снова или "
+        f"введи /{PrivateCommands.help.name} для помощи!\n\n"
+        f"А для если времени очень мало, воспользуйся Mafia AI командой /{PrivateCommands.q.name}!"
+    )
+)
 
 router = Router(name=__name__)
 router.message.filter(F.chat.type == ChatType.PRIVATE)
@@ -32,16 +41,18 @@ router.message.middleware(DatabaseMiddlewareWithoutCommit())
 router.callback_query.middleware(
     CallbackTimelimiterMiddleware(minutes=15)
 )
+router.callback_query.middleware(
+    handle_message_management_middleware
+)
 router.callback_query.middleware(DatabaseMiddlewareWithCommit())
 router.callback_query.middleware(DatabaseMiddlewareWithoutCommit())
 
-help_router.callback_query.middleware(
-    HandleDeletionOrEditionErrorMiddleware(
-        f"Пожалуйста, введи /{PrivateCommands.help.name} снова"
-    )
-)
 
 always_available_router = Router(name=__name__)
+always_available_router.callback_query.middleware(
+    handle_message_management_middleware
+)
+
 always_available_router.include_routers(
     ai_router,
     profile_router,

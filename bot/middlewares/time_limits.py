@@ -4,6 +4,7 @@ from typing import Any
 
 from aiogram import BaseMiddleware
 from aiogram.types import CallbackQuery, TelegramObject
+from general.exceptions import ActionPerformed
 from loguru import logger
 from utils.tg import delete_message
 
@@ -33,7 +34,13 @@ class CallbackTimelimiterMiddleware(BaseMiddleware):
                 await callback.answer(
                     "🙂Кнопка устарела, нажми новую", show_alert=True
                 )
-                await delete_message(message=callback.message)
+                try:
+                    await delete_message(
+                        message=callback.message,
+                        raise_exception=True,
+                    )
+                except ActionPerformed:
+                    await callback.message.delete_reply_markup()
                 logger.warning(
                     "Пользователь {} ({}) "
                     "использует устаревшую кнопку ({}) с текстом:\n\n{}\n\n"

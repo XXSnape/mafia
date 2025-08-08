@@ -32,14 +32,12 @@ class HandleCallbackErrorMiddleware(BaseMiddleware):
             await callback.answer(
                 text="🙂Не спеши! Скоро тебе придет сообщение о подтверждении твоих намерений!"
             )
-            return
         except Exception as e:
             await callback.answer(
                 "🙂Попробуй еще раз", show_alert=True
             )
             await delete_message(callback.message)
             logger.exception("Произошла ошибка в callback")
-            return
 
 
 class HandleMessageErrorMiddleware(BaseMiddleware):
@@ -60,7 +58,7 @@ class HandleMessageErrorMiddleware(BaseMiddleware):
         """
         try:
             return await handler(message, data)
-        except Exception as e:
+        except Exception:
             with suppress(TelegramAPIError):
                 await message.answer(
                     make_build("Попробуй еще раз...")
@@ -89,4 +87,10 @@ class HandleDeletionOrEditionErrorMiddleware(BaseMiddleware):
             await callback.answer(
                 text=f"🙂{self.error_message}", show_alert=True
             )
+            try:
+                await delete_message(
+                    message=callback.message, raise_exception=True
+                )
+            except ActionPerformed:
+                await callback.message.delete_reply_markup()
             return None
