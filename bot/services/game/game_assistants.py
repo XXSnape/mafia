@@ -11,7 +11,6 @@ from general.text import NUMBER_OF_NIGHT
 from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
-from mafia.roles import ActiveRoleAtNightABC, Hacker, Mafia
 from utils.common import (
     get_criminals_ids,
     remove_from_expected_at_night,
@@ -20,6 +19,8 @@ from utils.informing import send_a_lot_of_messages_safely
 from utils.pretty_text import make_build
 from utils.state import get_state_and_assign, lock_state
 from utils.tg import delete_message
+
+from mafia.roles import ActiveRoleAtNightABC, Hacker, Mafia
 
 
 async def send_messages_to_user_and_group(

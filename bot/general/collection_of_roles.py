@@ -1,6 +1,7 @@
 from typing import Final, TypeAlias, overload
 
 from cache.cache_types import RolesLiteral
+
 from mafia import roles
 from mafia.roles import ActiveRoleAtNightABC, RoleABC
 

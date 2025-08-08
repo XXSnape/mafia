@@ -6,6 +6,7 @@ from cache.cache_types import GameCache, UserIdInt
 
 if TYPE_CHECKING:
     from general.collection_of_roles import DataWithRoles
+
     from mafia.roles import RoleABC
 
 

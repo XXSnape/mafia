@@ -1,5 +1,9 @@
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general.groupings import Groupings
+from utils.pretty_text import make_build
+from utils.roles import get_processed_role_and_user_if_exists
+from utils.tg import resending_message
+
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import ProcedureAfterVotingABC
 from mafia.roles.base.roles import RoleABC
@@ -10,9 +14,6 @@ from mafia.roles.descriptions.texts import (
     CANT_CHOOSE_IN_ROW,
     SAVING_PLAYER,
 )
-from utils.pretty_text import make_build
-from utils.roles import get_processed_role_and_user_if_exists
-from utils.tg import resending_message
 
 
 class Lawyer(ProcedureAfterVotingABC, ActiveRoleAtNightABC):

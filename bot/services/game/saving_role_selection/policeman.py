@@ -14,7 +14,6 @@ from keyboards.inline.keypads.mailing import (
     kill_or_check_on_policeman,
     send_selection_to_players_kb,
 )
-from mafia.roles import Policeman
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_data_and_user_id,
@@ -26,6 +25,8 @@ from services.game.game_assistants import (
 from utils.informing import send_a_lot_of_messages_safely
 from utils.state import lock_state
 from utils.tg import delete_message
+
+from mafia.roles import Policeman
 
 
 class PolicemanSaver(RouterHelper):

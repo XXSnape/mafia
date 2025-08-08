@@ -6,6 +6,7 @@ from cache.cache_types import (
 )
 from general import settings
 from general.groupings import Groupings
+
 from mafia.roles import Bodyguard
 from mafia.roles.base import RoleABC
 from mafia.roles.base.mixins import KillersOf, ProcedureAfterNightABC

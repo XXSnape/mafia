@@ -1,6 +1,7 @@
 import asyncio
 
 import orjson
+from ai.configure import configure_ai
 from aiogram import Dispatcher
 from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.fsm.strategy import FSMStrategy
@@ -10,8 +11,6 @@ from aiogram.types import (
     BotCommandScopeAllPrivateChats,
 )
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
-from ai.configure import configure_ai
 from database.dao.init_db import fill_database_with_roles
 from general import settings
 from general.commands import GroupCommands, PrivateCommands

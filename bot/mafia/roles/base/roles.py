@@ -25,7 +25,6 @@ from keyboards.inline.buttons.common import REFUSE_MOVE_BTN
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
-from mafia.roles.descriptions.description import RoleDescription
 from states.game import UserFsm
 from utils.common import (
     add_message_to_delete,
@@ -44,6 +43,8 @@ from utils.pretty_text import (
 from utils.sorting import sorting_by_rank
 from utils.state import get_state_and_assign
 from utils.tg import resending_message
+
+from mafia.roles.descriptions.description import RoleDescription
 
 if TYPE_CHECKING:
     from general.collection_of_roles import DataWithRoles

@@ -6,6 +6,12 @@ from general.text import (
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
+from utils.common import get_criminals_ids
+from utils.roles import (
+    change_role,
+    get_processed_role_and_user_if_exists,
+)
+
 from mafia.roles.base import (
     ActiveRoleAtNightABC,
     AliasRoleABC,
@@ -19,11 +25,6 @@ from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CAN_KILL_AT_NIGHT,
     KILLING_PLAYER,
-)
-from utils.common import get_criminals_ids
-from utils.roles import (
-    change_role,
-    get_processed_role_and_user_if_exists,
 )
 
 

@@ -8,6 +8,13 @@ from cache.cache_types import (
 )
 from general.groupings import Groupings
 from general.text import NUMBER_OF_DAY
+from utils.pretty_text import make_build
+from utils.roles import (
+    get_processed_role_and_user_if_exists,
+    get_processed_user_id_if_exists,
+)
+from utils.tg import ban_user
+
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,
@@ -15,12 +22,6 @@ from mafia.roles.base.mixins import (
 from mafia.roles.base.roles import RoleABC
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import CANT_CHOOSE_IN_ROW
-from utils.pretty_text import make_build
-from utils.roles import (
-    get_processed_role_and_user_if_exists,
-    get_processed_user_id_if_exists,
-)
-from utils.tg import ban_user
 
 
 class Prosecutor(

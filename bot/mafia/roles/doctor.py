@@ -1,6 +1,7 @@
 from cache.cache_types import (
     RolesLiteral,
 )
+
 from mafia.roles.base import (
     ActiveRoleAtNightABC,
     AliasRoleABC,

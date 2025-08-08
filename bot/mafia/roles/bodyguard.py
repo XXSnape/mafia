@@ -6,6 +6,8 @@ from cache.cache_types import (
 )
 from general import settings
 from general.groupings import Groupings
+from utils.roles import get_processed_role_and_user_if_exists
+
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     KillersOf,
@@ -16,7 +18,6 @@ from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CANT_CHOOSE_IN_ROW,
 )
-from utils.roles import get_processed_role_and_user_if_exists
 
 
 class Bodyguard(ProcedureAfterNightABC, ActiveRoleAtNightABC):

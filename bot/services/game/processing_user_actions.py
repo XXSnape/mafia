@@ -23,7 +23,6 @@ from keyboards.inline.keypads.shop import to_shop_kb
 from keyboards.inline.keypads.to_bot import (
     participate_in_social_life,
 )
-from mafia.roles import Hacker, Manager
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_data_and_user_id,
@@ -42,6 +41,8 @@ from utils.informing import (
 from utils.pretty_text import make_build
 from utils.state import lock_state
 from utils.tg import delete_message, resending_message
+
+from mafia.roles import Hacker, Manager
 
 
 class UserManager(RouterHelper):

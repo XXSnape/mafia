@@ -6,6 +6,8 @@ from general.groupings import Groupings
 from general.text import (
     ROLE_IS_KNOWN,
 )
+from states.game import UserFsm
+
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     MafiaConverterABC,
@@ -15,7 +17,6 @@ from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CAN_CHOOSE_YOURSELF,
 )
-from states.game import UserFsm
 
 
 class Forger(

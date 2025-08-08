@@ -2,6 +2,11 @@ from aiogram.types import InlineKeyboardButton
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general.groupings import Groupings
 from keyboards.inline.cb.cb_text import DRAW_CB
+from states.game import UserFsm
+from utils.roles import (
+    get_processed_user_id_if_exists,
+)
+
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     ProcedureAfterVotingABC,
@@ -11,10 +16,6 @@ from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CAN_CHOOSE_YOURSELF,
     DONT_PAY_FOR_VOTING,
-)
-from states.game import UserFsm
-from utils.roles import (
-    get_processed_user_id_if_exists,
 )
 
 

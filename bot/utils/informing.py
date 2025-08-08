@@ -43,6 +43,7 @@ from utils.sorting import (
 
 if TYPE_CHECKING:
     from general.collection_of_roles import DataWithRoles
+
     from mafia.roles import RoleABC
 
 

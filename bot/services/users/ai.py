@@ -1,13 +1,12 @@
+from html import escape
 from typing import TYPE_CHECKING
 
 from aiogram.filters import CommandObject
 from aiogram.utils.chat_action import ChatActionSender
-
 from general import settings
 from general.commands import PrivateCommands
 from services.base import RouterHelper
 from utils.pretty_text import make_build
-from html import escape
 
 if TYPE_CHECKING:
     from ai.client import RAGSystem

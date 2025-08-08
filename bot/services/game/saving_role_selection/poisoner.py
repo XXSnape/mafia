@@ -7,7 +7,6 @@ from keyboards.inline.keypads.mailing import (
     kill_or_poison_kb,
     send_selection_to_players_kb,
 )
-from mafia.roles import Poisoner
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_state_by_user_state,
@@ -18,6 +17,8 @@ from states.game import UserFsm
 from utils.common import remove_from_expected_at_night
 from utils.state import lock_state
 from utils.tg import delete_message
+
+from mafia.roles import Poisoner
 
 
 class PoisonerSaver(RouterHelper):

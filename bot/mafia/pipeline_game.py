@@ -35,8 +35,6 @@ from general.groupings import Groupings
 from general.text import MONEY_SYM
 from keyboards.inline.keypads.to_bot import get_to_bot_kb
 from loguru import logger
-from mafia.controlling_game import Controller
-from mafia.roles import ActiveRoleAtNightABC, Emperor, RoleABC
 from services.common.settings import SettingsRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 from states.game import GameFsm
@@ -58,6 +56,9 @@ from utils.tg import (
     resending_message,
     unban_users,
 )
+
+from mafia.controlling_game import Controller
+from mafia.roles import ActiveRoleAtNightABC, Emperor, RoleABC
 
 
 class Game:

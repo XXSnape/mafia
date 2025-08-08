@@ -10,6 +10,10 @@ from general.text import (
     ATTEMPT_TO_KILL,
 )
 from keyboards.inline.keypads.mailing import kill_or_poison_kb
+from states.game import UserFsm
+from utils.informing import get_profiles
+from utils.roles import get_user_role_and_url
+
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     FinisherOfNight,
@@ -21,9 +25,6 @@ from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     DONT_PAY_FOR_VOTING,
 )
-from states.game import UserFsm
-from utils.informing import get_profiles
-from utils.roles import get_user_role_and_url
 
 
 class Poisoner(

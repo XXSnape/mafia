@@ -7,7 +7,6 @@ from keyboards.inline.callback_factory.recognize_user import (
     UserActionIndexCbData,
 )
 from keyboards.inline.keypads.mailing import choose_fake_role_kb
-from mafia.roles import Forger
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_data_and_user_id,
@@ -19,6 +18,8 @@ from utils.common import get_criminals_ids
 from utils.informing import send_a_lot_of_messages_safely
 from utils.state import lock_state
 from utils.tg import delete_message
+
+from mafia.roles import Forger
 
 
 class ForgerSaver(RouterHelper):

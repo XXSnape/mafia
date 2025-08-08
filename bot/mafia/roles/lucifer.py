@@ -10,6 +10,11 @@ from general.text import (
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
+from utils.common import get_criminals_ids
+from utils.pretty_text import make_build
+from utils.roles import get_processed_role_and_user_if_exists
+from utils.tg import ban_user
+
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,
@@ -18,10 +23,6 @@ from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     MAKES_MOVE_EVERY_ODD_NIGHT,
 )
-from utils.common import get_criminals_ids
-from utils.pretty_text import make_build
-from utils.roles import get_processed_role_and_user_if_exists
-from utils.tg import ban_user
 
 if TYPE_CHECKING:
     from mafia.roles import RoleABC

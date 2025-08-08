@@ -6,6 +6,9 @@ from cache.cache_types import (
     UserIdInt,
 )
 from general.groupings import Groupings
+from utils.pretty_text import make_build
+from utils.state import reset_user_state
+
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     FinisherOfNight,
@@ -16,8 +19,6 @@ from mafia.roles.descriptions.texts import (
     PAYMENT_FOR_NIGHTS,
     SAVING_PLAYER,
 )
-from utils.pretty_text import make_build
-from utils.state import reset_user_state
 
 
 class Angel(

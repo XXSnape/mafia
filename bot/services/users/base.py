@@ -25,9 +25,10 @@ from keyboards.inline.keypads.help import (
     help_options_kb,
     to_help_kb,
 )
-from mafia.roles import Instigator, Warden
 from services.base import RouterHelper
 from utils.pretty_text import make_build, make_pretty
+
+from mafia.roles import Instigator, Warden
 
 
 class BaseRouter(RouterHelper):

@@ -5,7 +5,6 @@ from keyboards.inline.callback_factory.recognize_user import (
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
-from mafia.roles import ActiveRoleAtNightABC
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_data_and_user_id,
@@ -15,6 +14,8 @@ from services.game.game_assistants import (
 )
 from utils.state import lock_state
 from utils.tg import delete_message
+
+from mafia.roles import ActiveRoleAtNightABC
 
 
 class ChoosingSubjectAndObject(RouterHelper):

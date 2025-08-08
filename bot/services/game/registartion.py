@@ -34,7 +34,6 @@ from keyboards.inline.keypads.join import (
     remind_about_joining_kb,
 )
 from loguru import logger
-from mafia.pipeline_game import Game
 from scheduler.game import (
     clearing_tasks_on_schedule,
     remind_of_beginning_of_game,
@@ -63,6 +62,8 @@ from utils.tg import (
     checking_for_presence_in_group,
     delete_message,
 )
+
+from mafia.pipeline_game import Game
 
 
 def verification_for_admin_or_creator[R, **P](

@@ -22,18 +22,6 @@ from keyboards.inline.keypads.to_bot import (
     participate_in_social_life,
 )
 from keyboards.inline.keypads.voting import get_vote_for_aim_kb
-from mafia.roles import Killer, Mafia
-from mafia.roles.base import (
-    ActiveRoleAtNightABC,
-    AliasRoleABC,
-    RoleABC,
-)
-from mafia.roles.base.mixins import (
-    FinisherOfNight,
-    ProcedureAfterNightABC,
-    ProcedureAfterVotingABC,
-    SunsetKillerABC,
-)
 from states.game import UserFsm
 from utils.common import (
     add_message_to_delete,
@@ -56,6 +44,19 @@ from utils.state import (
     reset_user_state,
 )
 from utils.tg import resending_message, unban_users
+
+from mafia.roles import Killer, Mafia
+from mafia.roles.base import (
+    ActiveRoleAtNightABC,
+    AliasRoleABC,
+    RoleABC,
+)
+from mafia.roles.base.mixins import (
+    FinisherOfNight,
+    ProcedureAfterNightABC,
+    ProcedureAfterVotingABC,
+    SunsetKillerABC,
+)
 
 if TYPE_CHECKING:
     from mafia.pipeline_game import Game

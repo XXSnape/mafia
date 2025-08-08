@@ -13,6 +13,15 @@ from general.text import (
 from keyboards.inline.keypads.mailing import (
     kill_or_check_on_policeman,
 )
+from states.game import UserFsm
+from utils.informing import (
+    remind_commissioner_about_inspections,
+    send_a_lot_of_messages_safely,
+)
+from utils.roles import (
+    get_user_role_and_url,
+)
+
 from mafia.roles.base import (
     ActiveRoleAtNightABC,
     AliasRoleABC,
@@ -26,14 +35,6 @@ from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CHECKING_PLAYER,
     KILLING_PLAYER,
-)
-from states.game import UserFsm
-from utils.informing import (
-    remind_commissioner_about_inspections,
-    send_a_lot_of_messages_safely,
-)
-from utils.roles import (
-    get_user_role_and_url,
 )
 
 

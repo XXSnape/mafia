@@ -1,11 +1,12 @@
 from cache.cache_types import GameCache, RolesLiteral
 from general.groupings import Groupings
 from keyboards.inline.keypads.mailing import send_transformation_kb
+from states.game import UserFsm
+
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import ProcedureAfterNightABC
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import DONT_PAY_FOR_NIGHTS
-from states.game import UserFsm
 
 
 class Werewolf(ProcedureAfterNightABC, ActiveRoleAtNightABC):

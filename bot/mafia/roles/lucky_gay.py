@@ -1,6 +1,7 @@
 from random import randint
 
 from cache.cache_types import GameCache, PlayersIds, RolesLiteral
+
 from mafia.roles.base import RoleABC
 from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,

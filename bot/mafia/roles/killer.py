@@ -1,5 +1,7 @@
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general.groupings import Groupings
+from utils.roles import get_processed_role_and_user_if_exists
+
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     MurderAfterNightABC,
@@ -11,7 +13,6 @@ from mafia.roles.descriptions.texts import (
     KILLING_PLAYER,
     MAKES_MOVE_EVERY_ODD_NIGHT,
 )
-from utils.roles import get_processed_role_and_user_if_exists
 
 
 class Killer(MurderAfterNightABC, ActiveRoleAtNightABC):

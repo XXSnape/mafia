@@ -17,8 +17,9 @@ from cache.cache_types import (
 from general import settings
 from general.groupings import Groupings
 from general.text import ATTEMPT_TO_KILL
-from mafia.roles.base import ActiveRoleAtNightABC
 from utils.informing import notify_aliases_about_transformation
+
+from mafia.roles.base import ActiveRoleAtNightABC
 
 if TYPE_CHECKING:
     from mafia.roles import RoleABC

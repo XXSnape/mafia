@@ -1,21 +1,19 @@
 import asyncio
 import os
 
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
+import torch
+from general import settings
+from langchain.chains import RetrievalQA
+from langchain.prompts import PromptTemplate
+from langchain.schema import Document
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import (
     UnstructuredMarkdownLoader,
 )
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.schema import Document
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
-import torch
+from langchain_community.vectorstores import FAISS
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_openai import ChatOpenAI
-
 from loguru import logger
-
-from general import settings
 
 
 class RAGSystem:

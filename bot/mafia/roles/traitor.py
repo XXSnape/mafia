@@ -10,6 +10,10 @@ from general.text import (
 from keyboards.inline.keypads.mailing import (
     send_selection_to_players_kb,
 )
+from utils.common import get_criminals_ids
+from utils.informing import send_a_lot_of_messages_safely
+from utils.roles import get_processed_role_and_user_if_exists
+
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     MafiaConverterABC,
@@ -19,9 +23,6 @@ from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CHECKING_PLAYER,
 )
-from utils.common import get_criminals_ids
-from utils.informing import send_a_lot_of_messages_safely
-from utils.roles import get_processed_role_and_user_if_exists
 
 if TYPE_CHECKING:
     from mafia.roles import RoleABC

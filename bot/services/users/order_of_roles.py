@@ -16,9 +16,10 @@ from keyboards.inline.keypads.order_of_roles import (
     edit_order_of_roles_kb,
     get_next_role_kb,
 )
-from mafia.roles import Doctor, Mafia, Policeman
 from services.base import RouterHelper
 from utils.pretty_text import make_build
+
+from mafia.roles import Doctor, Mafia, Policeman
 
 
 class RoleManager(RouterHelper):

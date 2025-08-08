@@ -1,15 +1,16 @@
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from cache.extra import ExtraCache
+from utils.informing import send_a_lot_of_messages_safely
+from utils.roles import (
+    get_processed_role_and_user_if_exists,
+    get_processed_user_id_if_exists,
+)
+
 from mafia.roles.base import ActiveRoleAtNightABC, RoleABC
 from mafia.roles.base.mixins import ProcedureAfterNightABC
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import (
     CANT_CHOOSE_IN_ROW,
-)
-from utils.informing import send_a_lot_of_messages_safely
-from utils.roles import (
-    get_processed_role_and_user_if_exists,
-    get_processed_user_id_if_exists,
 )
 
 

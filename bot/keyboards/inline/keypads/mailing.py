@@ -131,6 +131,7 @@ def kill_or_check_on_policeman(game_data: GameCache):
 
 def choose_fake_role_kb(game_data: GameCache):
     from general.collection_of_roles import get_data_with_roles
+
     from mafia.roles import Policeman
 
     policeman = (

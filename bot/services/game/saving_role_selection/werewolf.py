@@ -4,12 +4,6 @@ from keyboards.inline.cb.cb_text import (
     WEREWOLF_TO_MAFIA_CB,
     WEREWOLF_TO_POLICEMAN_CB,
 )
-from mafia.roles import (
-    Doctor,
-    Mafia,
-    Policeman,
-    Werewolf,
-)
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_state_by_user_state,
@@ -23,6 +17,13 @@ from utils.informing import (
 from utils.roles import change_role
 from utils.state import lock_state
 from utils.tg import delete_message, resending_message
+
+from mafia.roles import (
+    Doctor,
+    Mafia,
+    Policeman,
+    Werewolf,
+)
 
 
 class WerewolfSaver(RouterHelper):

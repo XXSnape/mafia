@@ -1,11 +1,12 @@
 from cache.cache_types import GameCache, RolesLiteral
 from cache.extra import ExtraCache
 from general.groupings import Groupings
+from states.game import UserFsm
+from utils.roles import get_user_role_and_url
+
 from mafia.roles.base import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import ProcedureAfterVotingABC
 from mafia.roles.descriptions.description import RoleDescription
-from states.game import UserFsm
-from utils.roles import get_user_role_and_url
 
 
 class Instigator(ProcedureAfterVotingABC, ActiveRoleAtNightABC):

@@ -16,6 +16,7 @@ from keyboards.inline.cb.cb_text import (
     EDIT_ORDER_OF_ROLES_CB,
     SAVE_ORDER_OF_ROLES_CB,
 )
+
 from mafia.roles import MafiaAlias
 
 

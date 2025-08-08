@@ -1,8 +1,9 @@
-from mafia.roles import Instigator
 from services.game.saving_role_selection.subject_and_object import (
     ChoosingSubjectAndObject,
 )
 from states.game import UserFsm
+
+from mafia.roles import Instigator
 
 
 class InstigatorSaver(ChoosingSubjectAndObject):

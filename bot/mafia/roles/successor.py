@@ -2,6 +2,14 @@ from aiogram.exceptions import TelegramAPIError
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from exceptiongroup import suppress
 from general.groupings import Groupings
+from utils.informing import notify_aliases_about_transformation
+from utils.pretty_text import make_build
+from utils.roles import (
+    change_role,
+    get_user_role_and_url,
+)
+from utils.state import get_state_and_assign
+
 from mafia.roles import ActiveRoleAtNightABC, RoleABC
 from mafia.roles.base.mixins import (
     FinisherOfNight,
@@ -12,13 +20,6 @@ from mafia.roles.descriptions.texts import (
     MAY_SKIP_MOVE,
     PAYMENT_FOR_NIGHTS,
 )
-from utils.informing import notify_aliases_about_transformation
-from utils.pretty_text import make_build
-from utils.roles import (
-    change_role,
-    get_user_role_and_url,
-)
-from utils.state import get_state_and_assign
 
 
 class Successor(

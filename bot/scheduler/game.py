@@ -10,13 +10,14 @@ from cache.cache_types import GameCache
 from faststream.rabbit import RabbitBroker
 from general import settings
 from keyboards.inline.keypads.join import remind_about_joining_kb
-from mafia.pipeline_game import Game
 from sqlalchemy.ext.asyncio import AsyncSession
 from utils.pretty_text import (
     get_minutes_and_seconds_text,
     make_build,
 )
 from utils.state import clear_game_data
+
+from mafia.pipeline_game import Game
 
 
 async def start_game(

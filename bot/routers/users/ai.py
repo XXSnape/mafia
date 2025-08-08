@@ -3,10 +3,8 @@ from typing import TYPE_CHECKING, Optional
 from aiogram import Router
 from aiogram.filters import Command, CommandObject
 from aiogram.types import Message
-
 from general import settings
 from general.commands import PrivateCommands
-
 from services.users.ai import AIManager
 
 if TYPE_CHECKING:

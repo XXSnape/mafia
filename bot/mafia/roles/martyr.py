@@ -2,6 +2,11 @@ from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general import settings
 from general.groupings import Groupings
 from general.text import NUMBER_OF_NIGHT, ROLE_IS_KNOWN
+from utils.informing import send_a_lot_of_messages_safely
+from utils.roles import (
+    get_processed_role_and_user_if_exists,
+)
+
 from mafia.roles import ActiveRoleAtNightABC, RoleABC
 from mafia.roles.base.mixins import (
     ProcedureAfterNightABC,
@@ -9,10 +14,6 @@ from mafia.roles.base.mixins import (
 )
 from mafia.roles.descriptions.description import RoleDescription
 from mafia.roles.descriptions.texts import MAY_SKIP_MOVE
-from utils.informing import send_a_lot_of_messages_safely
-from utils.roles import (
-    get_processed_role_and_user_if_exists,
-)
 
 
 class Martyr(

@@ -3,17 +3,18 @@ from contextlib import suppress
 from aiogram.exceptions import TelegramAPIError
 from cache.cache_types import GameCache, RolesLiteral, UserIdInt
 from general.groupings import Groupings
+from utils.roles import (
+    change_role,
+    get_processed_user_id_if_exists,
+    get_user_role_and_url,
+)
+
 from mafia.roles import ActiveRoleAtNightABC
 from mafia.roles.base.mixins import (
     FinisherOfNight,
     ProcedureAfterVotingABC,
 )
 from mafia.roles.descriptions.description import RoleDescription
-from utils.roles import (
-    change_role,
-    get_processed_user_id_if_exists,
-    get_user_role_and_url,
-)
 
 
 class Reviver(

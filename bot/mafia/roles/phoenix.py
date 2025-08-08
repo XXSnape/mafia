@@ -9,6 +9,13 @@ from cache.cache_types import (
 from general import settings
 from general.groupings import Groupings
 from general.text import ATTEMPT_TO_KILL, NUMBER_OF_NIGHT
+from utils.informing import send_a_lot_of_messages_safely
+from utils.pretty_text import make_build
+from utils.roles import (
+    get_processed_role_and_user_if_exists,
+)
+from utils.tg import resending_message
+
 from mafia.roles.base import ActiveRoleAtNightABC, RoleABC
 from mafia.roles.base.mixins import (
     MurderAfterNightABC,
@@ -23,12 +30,6 @@ from mafia.roles.descriptions.texts import (
     MAY_SKIP_MOVE,
     PAYMENT_FOR_NIGHTS,
 )
-from utils.informing import send_a_lot_of_messages_safely
-from utils.pretty_text import make_build
-from utils.roles import (
-    get_processed_role_and_user_if_exists,
-)
-from utils.tg import resending_message
 
 
 class Phoenix(

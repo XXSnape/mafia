@@ -1,7 +1,6 @@
 from aiogram.fsm.context import FSMContext
 from cache.cache_types import GameCache
 from keyboards.inline.keypads.mailing import selection_to_warden_kb
-from mafia.roles import Warden
 from services.base import RouterHelper
 from services.game.game_assistants import (
     get_game_state_by_user_state,
@@ -11,6 +10,8 @@ from services.game.game_assistants import (
 from utils.common import remove_from_expected_at_night
 from utils.state import lock_state
 from utils.tg import delete_message
+
+from mafia.roles import Warden
 
 
 class WardenSaver(RouterHelper):
