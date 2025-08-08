@@ -188,15 +188,3 @@ class RAGSystem:
         except Exception:
             logger.exception("Ошибка при выполнении запроса к AI")
             return settings.ai.unavailable_message
-
-
-async def main():
-    r = RAGSystem()
-    r.create_faiss_if_not_exist()
-    r.load_vectorstore()
-    result = await r.query("Что за ставки?")
-    print("result", result)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
