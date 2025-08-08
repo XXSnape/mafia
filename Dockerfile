@@ -11,7 +11,7 @@ RUN poetry config virtualenvs.create false
 
 COPY poetry.lock pyproject.toml alembic.ini ./
 
-RUN poetry install --without lint
+RUN poetry install --without lint,ai
 
 COPY ./docs ./docs
 COPY .env  ./
