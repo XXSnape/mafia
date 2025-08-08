@@ -358,7 +358,7 @@ class Registration(RouterHelper):
         current_game_state = await game_state.get_state()
         if current_game_state != GameFsm.REGISTRATION.state:
             await self.message.answer(
-                make_build("Начни регистрацию в группе!")
+                make_build("😉Начни регистрацию в группе!")
             )
             return
         if (

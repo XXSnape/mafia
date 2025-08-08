@@ -40,7 +40,9 @@ services:
       retries: 3
 
   bot:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
     depends_on:
       postgres:
         condition: service_healthy
@@ -61,7 +63,9 @@ services:
       - ./faiss_db:/mafia/faiss_db
 
   faststream:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.faststream
     depends_on:
       rabbitmq:
         condition: service_healthy
