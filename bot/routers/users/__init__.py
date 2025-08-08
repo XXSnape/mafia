@@ -20,14 +20,6 @@ from .start import router as start_router
 from .subscriptions import router as subscriptions_router
 from .time import router as time_router
 
-handle_message_management_middleware = HandleDeletionOrEditionErrorMiddleware(
-    (
-        f"Кажется, информация устарела.\n\n"
-        f"Пожалуйста, введи команду снова или "
-        f"введи /{PrivateCommands.help.name} для помощи!\n\n"
-        f"А для если времени очень мало, воспользуйся Mafia AI командой /{PrivateCommands.q.name}!"
-    )
-)
 
 router = Router(name=__name__)
 router.message.filter(F.chat.type == ChatType.PRIVATE)
@@ -41,12 +33,17 @@ router.message.middleware(DatabaseMiddlewareWithoutCommit())
 router.callback_query.middleware(
     CallbackTimelimiterMiddleware(minutes=15)
 )
-router.callback_query.middleware(
-    handle_message_management_middleware
-)
 router.callback_query.middleware(DatabaseMiddlewareWithCommit())
 router.callback_query.middleware(DatabaseMiddlewareWithoutCommit())
 
+handle_message_management_middleware = HandleDeletionOrEditionErrorMiddleware(
+    (
+        f"Кажется, информация устарела.\n\n"
+        f"Пожалуйста, введи команду снова или "
+        f"введи /{PrivateCommands.help.name} для помощи!\n\n"
+        f"А для если времени очень мало, воспользуйся Mafia AI командой /{PrivateCommands.q.name}!"
+    )
+)
 
 always_available_router = Router(name=__name__)
 always_available_router.callback_query.middleware(
