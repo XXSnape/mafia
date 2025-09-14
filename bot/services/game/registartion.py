@@ -206,6 +206,7 @@ class Registration(RouterHelper):
                 "session": self.session,
             },
             replace_existing=True,
+            misfire_grace_time=10,
         )
         self.scheduler.add_job(
             func=remind_of_beginning_of_game,
@@ -213,6 +214,7 @@ class Registration(RouterHelper):
             id=f"remind_{self.message.chat.id}",
             kwargs={"bot": self.message.bot, "state": self.state},
             replace_existing=True,
+            misfire_grace_time=10,
         )
         await self.broker.publish(
             message=NotificationSchema(
@@ -251,7 +253,7 @@ class Registration(RouterHelper):
         )
         await self.message.answer(
             make_build(
-                f"✅Регистрация продлена на 30 секунд\n{time_to_start}"
+                f"✅Регистрация продлена на 30 секунд\n\n{time_to_start}"
             )
         )
 
