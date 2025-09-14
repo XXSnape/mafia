@@ -20,7 +20,6 @@ from .start import router as start_router
 from .subscriptions import router as subscriptions_router
 from .time import router as time_router
 
-
 router = Router(name=__name__)
 router.message.filter(F.chat.type == ChatType.PRIVATE)
 router.callback_query.filter(F.message.chat.type == ChatType.PRIVATE)

@@ -176,3 +176,4 @@ cython_debug/
 /redis_data
 /db/
 /faiss_db/
+/rabbitmq_data/

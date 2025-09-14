@@ -5,8 +5,12 @@ from middlewares.db import (
     DatabaseMiddlewareWithoutCommit,
 )
 
-from .game.users import always_available_router as game_users_always_available_router
-from .users import always_available_router as users_always_available_router
+from .game.users import (
+    always_available_router as game_users_always_available_router,
+)
+from .users import (
+    always_available_router as users_always_available_router,
+)
 
 always_available_router = Router(name=__name__)
 always_available_router.message.filter(
