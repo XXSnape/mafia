@@ -1,6 +1,19 @@
 # 🎩Телеграм бот для игры в [Мафию](https://ru.wikipedia.org/wiki/Мафия_(игра)) с большим количеством игроков и ролей (<u>более 35!</u>).
 # 🤖AI ассистент поможет новичкам быстро разобраться с правилами и настройками бота
 
+
+[![Python Version](https://img.shields.io/badge/python-3.12%2B-blue?logo=python&style=for-the-badge)](https://www.python.org/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?logo=python&style=for-the-badge)](https://github.com/psf/black)
+[![Aiogram](https://img.shields.io/badge/aiogram-3.0%2B-2CA5E0?logo=telegram&style=for-the-badge)](https://aiogram.dev/)
+[![Pydantic](https://img.shields.io/badge/pydantic-2.0%2B-E92063?logo=pydantic&logoColor=white&style=for-the-badge)](https://docs.pydantic.dev/latest/)
+[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0%2B-D71F00?logo=sqlalchemy&style=for-the-badge)](https://www.sqlalchemy.org/)
+[![Alembic](https://img.shields.io/badge/alembic-1.0%2B-009926?logo=alembic&style=for-the-badge)](https://alembic.sqlalchemy.org/en/latest/index.html)
+[![Redis](https://img.shields.io/badge/redis-5.0%2B-DC382D?logo=redis&style=for-the-badge)](https://pypi.org/project/redis/)
+[![FastStream](https://img.shields.io/badge/faststream-0.5%2B-4B8BBE?logo=fastapi&style=for-the-badge)](https://faststream.airt.ai/latest/)
+[![APScheduler](https://img.shields.io/badge/apscheduler-3.10%2B-8A2BE2?logo=python&style=for-the-badge)](https://apscheduler.readthedocs.io/en/stable/userguide.html)
+[![Loguru](https://img.shields.io/badge/loguru-0.7%2B-00AA00?logo=python&style=for-the-badge)](https://loguru.readthedocs.io/en/stable/overview.html)
+[![LangChain](https://img.shields.io/badge/langchain-0.1%2B-FF6B35?logo=langchain&style=for-the-badge)](https://python.langchain.com/docs/introduction/)
+
 ## 🚀Функциональность
 ### 🤔Зачем нужен бот?
 Данный бот анализирует события, происходящие во время игры,
@@ -268,33 +281,24 @@ faststream run tasks.game:app
 
 ### 🧩Данные в .env_template
 
-#### BOT_TOKEN - Токен от [BotFather](https://t.me/BotFather)
-#### BOT_URL - URL бота (нужно добавить только ник бота вместо "<НИК ВАШЕГО БОТА>", то есть без https)
-#### DB_HOST - Хост базы данных
-#### DB_PORT - Порт базы данных
-#### POSTGRES_USER - Логин пользователя 
-#### POSTGRES_PASSWORD - Пароль пользователя
-#### POSTGRES_DB - Название базы данных
-#### MAFIA_INIT_DB - Значение, указывающее на то, нужно ли инициализировать базу данных (необходимо указать True при первом запуске, потом сменить на False, иначе будут появляться логи WARNING)
-#### MAFIA_MAXIMUM_NUMBER_OF_PLAYERS - Максимальное количество игроков в игре
-#### MAFIA_MINIMUM_NUMBER_OF_PLAYERS - Минимальное количество игроков в игре
-#### MAFIA_MAXIMUM_REGISTRATION_TIME - Максимальное время регистрации (в минутах)
-#### RABBITMQ_DEFAULT_USER - Логин для брокера сообщений
-#### RABBITMQ_DEFAULT_PASS - Пароль для брокера сообщений
-#### RABBITMQ_HOST - Хост для брокера сообщений
-#### RABBITMQ_PORT - Порт для брокера сообщений
-#### REDIS_HOST - Хост для Redis
-#### REDIS_PORT - Порт для Redis
-#### AI_USE - "True", если нужно подключать AI, иначе "False". Будет ошибка, если указать "True" и не скачать дополнительные AI пакеты в группе `ai` в `pyproject.toml`
-#### AI_DEEPSEEK_API_KEY - [Ключ для бесплатной AI модели](https://openrouter.ai/settings/keys). Если `AI_USE` установлено в "False", можно оставить значение из файла `.env_template`
-
-## 🐍Использованные инструменты и технологии
-* ### [Aiogram](https://aiogram.dev/)
-* ### [Pydantic](https://docs.pydantic.dev/latest/)
-* ### [SQLAlchemy](https://www.sqlalchemy.org/)
-* ### [Alembic](https://alembic.sqlalchemy.org/en/latest/index.html)
-* ### [Redis](https://pypi.org/project/redis/)
-* ### [FastStream](https://faststream.airt.ai/latest/)
-* ### [APScheduler](https://apscheduler.readthedocs.io/en/stable/userguide.html)
-* ### [Loguru](https://loguru.readthedocs.io/en/stable/overview.html)
-* ### [LangChain](https://python.langchain.com/docs/introduction/)
+| Переменная                      | Описание |
+|---------------------------------|----------|
+| `BOT_TOKEN`                     | Токен от [BotFather](https://t.me/BotFather) |
+| `BOT_URL`                       | URL бота (нужно добавить только ник бота вместо "<НИК ВАШЕГО БОТА>", то есть без https) |
+| `DB_HOST`                       | Хост базы данных |
+| `DB_PORT`                       | Порт базы данных |
+| `POSTGRES_USER`                 | Логин пользователя |
+| `POSTGRES_PASSWORD`             | Пароль пользователя |
+| `POSTGRES_DB`                   | Название базы данных |
+| `MAFIA_INIT_DB`                 | Значение, указывающее на то, нужно ли инициализировать базу данных (необходимо указать True при первом запуске, потом сменить на False, иначе будут появляться логи WARNING) |
+| `MAFIA_MAXIMUM_NUMBER_OF_PLAYERS` | Максимальное количество игроков в игре |
+| `MAFIA_MINIMUM_NUMBER_OF_PLAYERS` | Минимальное количество игроков в игре |
+| `MAFIA_MAXIMUM_REGISTRATION_TIME` | Максимальное время регистрации (в минутах) |
+| `RABBITMQ_DEFAULT_USER`         | Логин для брокера сообщений |
+| `RABBITMQ_DEFAULT_PASS`         | Пароль для брокера сообщений |
+| `RABBITMQ_HOST`                 | Хост для брокера сообщений |
+| `RABBITMQ_PORT`                 | Порт для брокера сообщений |
+| `REDIS_HOST`                    | Хост для Redis |
+| `REDIS_PORT`                    | Порт для Redis |
+| `AI_USE`                        | "True", если нужно подключать AI, иначе "False". Будет ошибка, если указать "True" и не скачать дополнительные AI пакеты в группе `ai` в `pyproject.toml` |
+| `AI_DEEPSEEK_API_KEY`           | [Ключ для бесплатной AI модели](https://openrouter.ai/settings/keys). Если `AI_USE` установлено в "False", можно оставить значение из файла `.env_template` |
