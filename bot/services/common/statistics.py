@@ -96,7 +96,7 @@ class StatisticsRouter(RouterHelper):
         )
 
     @staticmethod
-    def sorting_by_efficiency(rows):
+    def sorting_by_efficiency(rows, delimiter: int):
         n = 1
         is_sorted = False
         while not is_sorted:
@@ -107,7 +107,7 @@ class StatisticsRouter(RouterHelper):
                         rows[i].number_of_games
                         - rows[i + 1].number_of_games
                     )
-                    <= 8
+                    <= delimiter
                     and rows[i + 1].efficiency > rows[i].efficiency
                 ):
                     rows[i], rows[i + 1] = rows[i + 1], rows[i]
@@ -155,7 +155,10 @@ class StatisticsRouter(RouterHelper):
                 group_id_filter
             )
         )
-        self.sorting_by_efficiency(users_result)
+        delimiter = await games_dao.get_average_number_of_games(
+            group_id_filter
+        )
+        self.sorting_by_efficiency(users_result, delimiter)
         users_info = await asyncio.gather(
             *(
                 self.message.bot.get_chat_member(

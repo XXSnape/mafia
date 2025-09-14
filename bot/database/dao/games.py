@@ -65,6 +65,36 @@ class GamesDao(BaseDAO[GameModel]):
         result = await self._session.execute(query)
         return result.one_or_none()
 
+    async def get_average_number_of_games(
+        self, group_id_filter: GroupIdSchema
+    ) -> int:
+        sub_query = (
+            select(
+                func.count(ResultModel.user_tg_id).label(
+                    "number_of_games"
+                )
+            )
+            .select_from(self.model)
+            .join(ResultModel, ResultModel.game_id == self.model.id)
+            .filter(
+                self.model.group_id == group_id_filter.group_id,
+                self.model.end.is_not(None),
+                self.model.winning_group.is_not(None),
+                datetime.now() - self.model.end < timedelta(days=30),
+            )
+            .group_by(ResultModel.user_tg_id)
+        ).subquery()
+        query = select(
+            func.greatest(
+                1,
+                func.cast(
+                    func.avg(sub_query.c.number_of_games) * 0.15,
+                    Integer,
+                ),
+            )
+        ).select_from(sub_query)
+        return await self._session.scalar(query)
+
     async def get_average_number_of_players(
         self, group_id_filter: GroupIdSchema
     ):
