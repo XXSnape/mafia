@@ -233,7 +233,7 @@ class Game:
         game_data = await delete_messages_from_to_delete(
             bot=self.bot, state=self.state
         )
-        await asyncio.sleep(4)
+        await asyncio.sleep(5)
         await self.controller.send_delay_messages(
             game_data=game_data, at_night=False
         )
@@ -251,7 +251,7 @@ class Game:
         await self.controller.sum_up_after_voting()
         await self.controller.removing_players()
         await self.controller.end_night()
-        await asyncio.sleep(4)
+        await asyncio.sleep(5)
 
     async def background_scanning(
         self, seconds: int, at_night: bool | None = None
@@ -288,7 +288,7 @@ class Game:
             seconds -= 5
 
     async def give_out_rewards(self, e: GameIsOver):
-        await asyncio.sleep(1)
+        await asyncio.sleep(2)
         game_data: GameCache = await self.state.get_data()
         result = make_build(
             f"🚩Игра завершена! Победившая группировка — {e.winner.value.name}\n\n"

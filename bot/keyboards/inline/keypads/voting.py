@@ -18,7 +18,7 @@ def get_vote_for_aim_kb(
             ).pack(),
         ),
         InlineKeyboardButton(
-            text=f"Бережём наше сокровище🥹 ({len(cons)})",
+            text=f"Бережём сокровище🥹 ({len(cons)})",
             callback_data=AimedUserCbData(
                 user_id=user_id, action=ProsAndCons.cons
             ).pack(),
