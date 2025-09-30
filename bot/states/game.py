@@ -10,7 +10,6 @@ class GameFsm(StatesGroup):
 class UserFsm(StatesGroup):
     BASIC_NIGHT_ROLE = State()
     BASIC_ROLE_WITH_ALLIES = State()
-    ANALYST = State()
     FORGER = State()
     POLICEMAN = State()
     WARDEN = State()

@@ -69,10 +69,6 @@ class Analyst(
             f"верных прогноза, если 8, тогда {8 // self.divider} и т.д.",
         )
 
-    def __init__(self):
-        super().__init__()
-        self.state_for_waiting_for_action = UserFsm.ANALYST
-
     def cancel_actions(self, game_data: GameCache, user_id: int):
         if self.get_processed_user_id(game_data) == 0:
             game_data[self.processed_users_key].clear()

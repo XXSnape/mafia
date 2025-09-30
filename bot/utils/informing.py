@@ -325,9 +325,7 @@ async def send_messages_after_night(
     messages = game_data["messages_after_night"]
     if not messages:
         return
-    number_of_night = (
-        f"Важнейшие события ночи {game_data['number_of_night']}:\n\n"
-    )
+    number_of_night = f"☝️Важнейшие события ночи {game_data['number_of_night']}:\n\n"
     chats_and_messages = defaultdict(list)
     for chat_id, message in messages:
         chats_and_messages[chat_id].append(message)
