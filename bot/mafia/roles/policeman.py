@@ -176,6 +176,14 @@ class Policeman(
             )
         return super().leave_notification_message(game_data)
 
+    def get_processed_user_id(self, game_data: GameCache):
+        user_id = super().get_processed_user_id(game_data)
+        if user_id:
+            return user_id
+        if game_data["disclosed_roles"]:
+            return game_data["disclosed_roles"][0]
+        return None
+
     def cancel_actions(self, game_data: GameCache, user_id: int):
         game_data["disclosed_roles"].clear()
         return super().cancel_actions(
