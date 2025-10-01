@@ -33,6 +33,7 @@ class Journalist(ProcedureAfterNightABC, ActiveRoleAtNightABC):
         ExtraCache(key="tracking", data_type=dict),
     ]
     payment_for_murder = 14
+    need_to_monitor_interaction = False
 
     @property
     def role_description(self) -> RoleDescription:
@@ -40,7 +41,6 @@ class Journalist(ProcedureAfterNightABC, ActiveRoleAtNightABC):
             skill="Узнает людей, которые приходили к жертве ночью",
             pay_for=["Количество людей, пришедших к жертве"],
             limitations=[
-                CANT_CHOOSE_IN_ROW,
                 "Может делать ход только на чётную ночь",
             ],
         )
