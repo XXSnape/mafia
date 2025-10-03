@@ -28,8 +28,11 @@ class CallbackTimelimiterMiddleware(BaseMiddleware):
         sending_time = callback.message.date
         if sending_time != 0:
             now = datetime.now(UTC)
-
-            minutes = (now - sending_time).seconds // 60
+            maximum = max([now, sending_time])
+            minimum = min([now, sending_time])
+            minutes = (
+                maximum - minimum
+            ).seconds // 60  # Иногда телеграм присылает время, которое больше текущего
             if minutes > self.minutes - 1:
                 await callback.answer(
                     "🙂Кнопка устарела, нажми новую", show_alert=True

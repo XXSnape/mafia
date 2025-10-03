@@ -49,7 +49,7 @@ class GroupManager(RouterHelper):
                 bot=self.message.bot,
                 chat_id=game_data["game_chat"],
                 user_id=self.message.from_user.id,
-                until_date=timedelta(seconds=30),
+                until_date=timedelta(seconds=31),
             )
 
     async def confirm_vote(self, callback_data: AimedUserCbData):
