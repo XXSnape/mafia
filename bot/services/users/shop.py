@@ -72,12 +72,12 @@ class ShopManager(RouterHelper):
         prices = ""
         buttons = []
         for count in [1, 3, 5, 10, 15, 20]:
-            cost = get_cost_of_discounted_resource(
+            cost, discount = get_cost_of_discounted_resource(
                 cost=asset.cost, count=count
             )
             buttons.append(
                 InlineKeyboardButton(
-                    text=f"{count} ({cost}{MONEY_SYM})",
+                    text=f"{count} ({cost}{MONEY_SYM}) 🏷️{discount}%",
                     callback_data=BuyResourcesCbData(
                         resource=resource,
                         count=count,
@@ -109,12 +109,12 @@ class ShopManager(RouterHelper):
         asset = await AssetsDao(
             session=self.session
         ).find_one_or_none(AssetsSchema(name=callback_data.resource))
-        cost = get_cost_of_discounted_resource(
+        cost, discount = get_cost_of_discounted_resource(
             cost=asset.cost, count=callback_data.count
         )
         message = (
             f"❗️Ты уверен, что хочешь купить «{asset_data.name}» "
-            f"в количестве {callback_data.count} шт за {cost}{MONEY_SYM}?"
+            f"в количестве {callback_data.count} шт за {cost}{MONEY_SYM} со скидкой {discount}%?"
         )
         callback_data.is_confirmed = True
         await self.callback.message.edit_text(
@@ -153,7 +153,7 @@ class ShopManager(RouterHelper):
         asset = await AssetsDao(
             session=self.session
         ).find_one_or_none(AssetsSchema(name=callback_data.resource))
-        cost = get_cost_of_discounted_resource(
+        cost, _ = get_cost_of_discounted_resource(
             cost=asset.cost, count=callback_data.count
         )
         try:

@@ -88,7 +88,7 @@ class GamesDao(BaseDAO[GameModel]):
             func.greatest(
                 1,
                 func.cast(
-                    func.avg(sub_query.c.number_of_games) * 0.15,
+                    func.avg(sub_query.c.number_of_games) * 0.45,
                     Integer,
                 ),
             )
