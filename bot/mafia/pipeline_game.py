@@ -213,12 +213,13 @@ class Game:
             seconds=game_data["settings"]["time_for_night"],
             at_night=True,
         )
-        game_data = await delete_messages_from_to_delete(
+        await delete_messages_from_to_delete(
             bot=self.bot, state=self.state
         )
         await asyncio.sleep(6)
+        game_data = await self.state.get_data()
         await self.controller.send_delay_messages(
-            game_data=game_data, at_night=True
+            game_data=cast(GameCache, game_data), at_night=True
         )
         game_data = await self.controller.sum_up_after_night()
         await self.controller.start_discussions(game_data)
@@ -230,12 +231,13 @@ class Game:
             seconds=game_data["settings"]["time_for_voting"],
             at_night=False,
         )
-        game_data = await delete_messages_from_to_delete(
+        await delete_messages_from_to_delete(
             bot=self.bot, state=self.state
         )
         await asyncio.sleep(6)
+        game_data = await self.state.get_data()
         await self.controller.send_delay_messages(
-            game_data=game_data, at_night=False
+            game_data=cast(GameCache, game_data), at_night=False
         )
         result = await self.controller.confirm_final_aim()
         if result:
