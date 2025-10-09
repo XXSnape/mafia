@@ -874,3 +874,8 @@ class AliasRoleABC(ABC):
     def boss_name(cls):
         super_classes = cls.__bases__
         return super_classes[1].pretty_role
+
+    def cancel_actions(self, game_data: GameCache, user_id: int):
+        if not self.is_mass_mailing_list:
+            return False
+        return super().cancel_actions(game_data, user_id)
