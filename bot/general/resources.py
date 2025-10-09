@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import assert_never
 
+from utils.pretty_text import make_pretty
+
 
 @dataclass
 class Asset:
@@ -23,6 +25,10 @@ def get_data_about_resource(resource: Resources) -> Asset:
                     "💌Анонимки позволяют отправлять сообщения в группу, "
                     "где проходит игра, от лица бота.\n"
                     "Сообщения будут доставлены, если игрок еще жив.\n\n"
+                    f'Чтобы отправить анонимку, напишите в бота: {make_pretty('/anon "Ваше сообщение"')}\n\n'
+                    f"Пример сообщения:\n"
+                    f"<blockquote>😱😱😱НЕИЗВЕСТНЫЙ ОТПРАВИТЕЛЬ\n\n"
+                    f'"Ваше сообщение"</blockquote>'
                 ),
                 cost=750,
             )
@@ -35,11 +41,11 @@ def get_cost_of_discounted_resource(
     cost: int, count: int
 ) -> tuple[int, int]:
     discounts = {
-        20: 43,
+        20: 45,
         15: 40,
         10: 35,
         5: 25,
-        3: 15,
+        3: 10,
         1: 0,
     }
     discount = 0

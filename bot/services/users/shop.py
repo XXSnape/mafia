@@ -77,7 +77,7 @@ class ShopManager(RouterHelper):
             )
             buttons.append(
                 InlineKeyboardButton(
-                    text=f"{count} ({cost}{MONEY_SYM}) 🏷️{discount}%",
+                    text=f"{count} шт — {cost}{MONEY_SYM}",
                     callback_data=BuyResourcesCbData(
                         resource=resource,
                         count=count,
@@ -85,12 +85,19 @@ class ShopManager(RouterHelper):
                     ).pack(),
                 )
             )
-            prices += f"\n{count} шт: {cost}{MONEY_SYM}"
+            if discount != 0:
+                prices += (
+                    f"\n{count} шт — <strike>{asset.cost * count} маф</strike> "
+                    f"{cost}{MONEY_SYM} (скидка {discount}%🚀)"
+                )
+            else:
+                prices += f"\n{count} шт — {cost}{MONEY_SYM}"
+
         buttons.append(SHOP_BTN)
         text += (
-            f"💰Баланс: {user.balance}{MONEY_SYM}\n"
+            f"\n\n💰Баланс: {user.balance}{MONEY_SYM}\n"
             f"🧰Текущее количество: {resource_count}\n\n"
-            f"📈Цены:\n{prices}"
+            f"🏷Цены:\n{prices}"
         )
         markup = generate_inline_kb(
             data_with_buttons=buttons, sizes=(2,)
